@@ -48,7 +48,7 @@ const tokenToUser = new Map(
   mockUsers.map((record) => [record.token, record.user] as const),
 );
 
-function simulateDelay(duration = 300) {
+export function simulateDelay(duration = 300) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
