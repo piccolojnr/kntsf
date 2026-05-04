@@ -8,12 +8,16 @@ import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 
 type PlaceholderScreenProps = {
   title: string;
+  description: string;
   screenName: string;
+  showLogout?: boolean;
 };
 
 export function PlaceholderScreen({
   title,
+  description,
   screenName,
+  showLogout = false,
 }: PlaceholderScreenProps) {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
@@ -42,7 +46,7 @@ export function PlaceholderScreen({
             <View />
           )}
 
-          {isAuthenticated ? (
+          {isAuthenticated && showLogout ? (
             <Pressable
               style={[
                 styles.secondaryButton,
@@ -62,6 +66,7 @@ export function PlaceholderScreen({
 
         <View style={styles.container}>
           <Text style={styles.title}>{title}</Text>
+          <Text style={styles.description}>{description}</Text>
           <Text style={styles.screenName}>{screenName}</Text>
         </View>
       </View>
@@ -91,9 +96,16 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
   },
+  description: {
+    color: colors.text,
+    fontSize: fontSizes.md,
+    lineHeight: 24,
+    maxWidth: 320,
+    textAlign: "center",
+  },
   screenName: {
     color: colors.textMuted,
-    fontSize: fontSizes.md,
+    fontSize: fontSizes.sm,
     fontWeight: "500",
     textAlign: "center",
   },

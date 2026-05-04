@@ -1,12 +1,17 @@
-import { Stack } from "expo-router";
+import { CreditCard, FileText, House, User } from "lucide-react-native";
+
+import { RoleTabsLayout } from "@/components/layout/role-tabs-layout";
 
 export default function StudentLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="permits" />
-      <Stack.Screen name="card" />
-      <Stack.Screen name="profile" />
-    </Stack>
+    <RoleTabsLayout
+      role="student"
+      tabs={[
+        { name: "index", title: "Home", icon: House },
+        { name: "permits", title: "Permits", icon: FileText },
+        { name: "card", title: "Card", icon: CreditCard },
+        { name: "profile", title: "Profile", icon: User },
+      ]}
+    />
   );
 }
