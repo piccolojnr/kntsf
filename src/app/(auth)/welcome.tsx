@@ -5,27 +5,22 @@ import { RoleOptionCard } from "@/components/cards/role-option-card";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
-import { UserRole } from "@/features/auth/auth-types";
+import { AuthWorkspace } from "@/features/auth/auth-types";
 
-const roleOptions: {
+const workspaceOptions: {
   label: string;
   description: string;
-  value: UserRole;
+  value: AuthWorkspace;
 }[] = [
   {
     label: "Student",
-    description: "View permits, card status, and personal profile details.",
+    description: "Sign in to the student side to view permits, card status, and personal details.",
     value: "student",
   },
   {
-    label: "Staff",
-    description: "Access scan tools, history, and staff profile actions.",
-    value: "staff",
-  },
-  {
-    label: "Admin",
-    description: "Manage students, permits, cards, and application settings.",
-    value: "admin",
+    label: "Operations",
+    description: "Sign in to the shared operations side used by both staff and admin roles.",
+    value: "operations",
   },
 ];
 
@@ -37,19 +32,19 @@ export default function WelcomeScreen() {
       <View style={styles.container}>
         <AuthHeader
           title="Knutsford SRC"
-          subtitle="Select your role to continue"
+          subtitle="Choose the side of the app you want to access"
         />
 
         <View style={styles.actions}>
-          {roleOptions.map((role) => (
+          {workspaceOptions.map((workspace) => (
             <RoleOptionCard
-              key={role.value}
-              title={role.label}
-              description={role.description}
+              key={workspace.value}
+              title={workspace.label}
+              description={workspace.description}
               onPress={() =>
                 router.push({
                   pathname: "/(auth)/login",
-                  params: { selectedRole: role.value },
+                  params: { selectedWorkspace: workspace.value },
                 })
               }
             />

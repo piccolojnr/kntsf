@@ -1,4 +1,5 @@
 export type UserRole = "student" | "staff" | "admin";
+export type AuthWorkspace = "student" | "operations";
 
 export type AuthUser = {
   id: string;
