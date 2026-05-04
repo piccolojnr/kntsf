@@ -158,6 +158,16 @@ Reusable UI must live in:
 
 `src/components/ui`
 
+If you create UI that is likely to be reused, extract it into a shared
+component instead of leaving it inside a screen.
+
+Place reusable pieces in the most appropriate folder:
+
+- `src/components/ui` for generic building blocks
+- `src/components/cards` for card-style display components
+- `src/components/forms` for form-specific inputs and controls
+- `src/components/layout` for shared screen and section layout wrappers
+
 Avoid large inline styles.
 
 ---
