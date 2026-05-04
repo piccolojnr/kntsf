@@ -10,9 +10,8 @@ function getRoleRoute(role?: string | null): Href {
     case "student":
       return "/(student)" as Href;
     case "staff":
-      return "/(staff)" as Href;
     case "admin":
-      return "/(admin)" as Href;
+      return "/(operations)/scan" as Href;
     default:
       return "/(auth)/welcome";
   }

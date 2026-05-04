@@ -14,19 +14,21 @@ import { AuthHeader } from "@/components/ui/auth-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { fontSizes, spacing } from "@/constants/theme";
-import { LoginPayload, UserRole } from "@/features/auth/auth-types";
+import {
+  AuthWorkspace,
+  LoginPayload,
+  UserRole,
+} from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
 
-function getRoleTitle(role?: string | string[]) {
-  const normalizedRole = Array.isArray(role) ? role[0] : role;
+function getWorkspaceTitle(workspace?: string | string[]) {
+  const normalizedWorkspace = Array.isArray(workspace) ? workspace[0] : workspace;
 
-  switch (normalizedRole) {
+  switch (normalizedWorkspace) {
     case "student":
       return "Student Login";
-    case "staff":
-      return "Staff Login";
-    case "admin":
-      return "Admin Login";
+    case "operations":
+      return "Operations Login";
     default:
       return "Login";
   }
@@ -37,15 +39,29 @@ function getRoleRoute(role: UserRole): Href {
     case "student":
       return "/(student)" as Href;
     case "staff":
-      return "/(staff)" as Href;
     case "admin":
-      return "/(admin)" as Href;
+      return "/(operations)/scan" as Href;
+  }
+}
+
+function getWorkspaceSubtitle(workspace?: string | string[]) {
+  const normalizedWorkspace = Array.isArray(workspace) ? workspace[0] : workspace;
+
+  switch (normalizedWorkspace) {
+    case "student":
+      return "Use your student credentials to access permits, card details, and your profile.";
+    case "operations":
+      return "Use your shared operations credentials. Staff and admin access are separated by backend role.";
+    default:
+      return "Use your credentials to continue.";
   }
 }
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { selectedRole } = useLocalSearchParams<{ selectedRole?: UserRole }>();
+  const { selectedWorkspace } = useLocalSearchParams<{
+    selectedWorkspace?: AuthWorkspace;
+  }>();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -54,7 +70,14 @@ export default function LoginScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const title = useMemo(() => getRoleTitle(selectedRole), [selectedRole]);
+  const title = useMemo(
+    () => getWorkspaceTitle(selectedWorkspace),
+    [selectedWorkspace],
+  );
+  const subtitle = useMemo(
+    () => getWorkspaceSubtitle(selectedWorkspace),
+    [selectedWorkspace],
+  );
 
   async function handleLogin() {
     setIsSubmitting(true);
@@ -91,7 +114,7 @@ export default function LoginScreen() {
           <View style={styles.container}>
             <AuthHeader
               title={title}
-              subtitle="Use the mock credentials for your selected role."
+              subtitle={subtitle}
             />
 
             <View style={styles.form}>

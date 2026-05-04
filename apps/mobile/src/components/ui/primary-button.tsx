@@ -4,12 +4,15 @@ import {
   StyleSheet,
   Text,
   ViewStyle,
+  View,
 } from "react-native";
+import { LucideIcon } from "lucide-react-native";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 
 type PrimaryButtonProps = {
   label: string;
+  icon?: LucideIcon;
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -18,6 +21,7 @@ type PrimaryButtonProps = {
 
 export function PrimaryButton({
   label,
+  icon: Icon,
   onPress,
   disabled = false,
   loading = false,
@@ -32,7 +36,12 @@ export function PrimaryButton({
       {loading ? (
         <ActivityIndicator color="#ffffff" />
       ) : (
-        <Text style={styles.label}>{label}</Text>
+        <View style={styles.content}>
+          {Icon ? (
+            <Icon color="#ffffff" size={18} strokeWidth={2.2} />
+          ) : null}
+          <Text style={styles.label}>{label}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -48,6 +57,12 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.7,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
   },
   label: {
     color: "#ffffff",

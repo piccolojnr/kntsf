@@ -1,99 +1,96 @@
-import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { Tabs } from "expo-router";
+import { Href } from "expo-router";
 import { LucideIcon } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
-import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { UserRole } from "@/features/auth/auth-types";
-import { useAuth } from "@/hooks/use-auth";
+
+import { RoleAccessGuard } from "./role-access-guard";
 
 type RoleTabDefinition = {
   name: string;
   title: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   isPrimary?: boolean;
+  hidden?: boolean;
 };
 
 type RoleTabsLayoutProps = {
-  role: UserRole;
+  allowedRoles: UserRole[];
+  initialRouteName: string;
   tabs: RoleTabDefinition[];
+  getForbiddenHref?: (role?: UserRole | null) => Href;
 };
 
-export function RoleTabsLayout({ role, tabs }: RoleTabsLayoutProps) {
-  const { isLoading, isAuthenticated, user } = useAuth();
-
-  if (isLoading) {
-    return (
-      <Screen>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      </Screen>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/welcome" />;
-  }
-
-  if (user?.role !== role) {
-    return <Redirect href="/" />;
-  }
-
+export function RoleTabsLayout({
+  allowedRoles,
+  initialRouteName,
+  tabs,
+  getForbiddenHref,
+}: RoleTabsLayoutProps) {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-      }}
+    <RoleAccessGuard
+      allowedRoles={allowedRoles}
+      getForbiddenHref={getForbiddenHref}
     >
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
+      <Tabs
+        initialRouteName={initialRouteName}
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textMuted,
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabBarLabel,
+        }}
+      >
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
 
-        return (
-          <Tabs.Screen
-            key={tab.name}
-            name={tab.name}
-            options={{
-              title: tab.title,
-              tabBarIcon: ({ color, focused, size }) => (
-                <View
-                  style={[
-                    styles.iconWrap,
-                    tab.isPrimary && styles.primaryIconWrap,
-                    focused && tab.isPrimary && styles.primaryIconWrapFocused,
-                  ]}
-                >
-                  <Icon
-                    color={
-                      tab.isPrimary
-                        ? focused
-                          ? "#ffffff"
-                          : colors.primary
-                        : color
-                    }
-                    size={tab.isPrimary ? size + 2 : size}
-                    strokeWidth={focused ? 2.4 : 2}
-                  />
-                </View>
-              ),
-            }}
-          />
-        );
-      })}
-    </Tabs>
+          return (
+            <Tabs.Screen
+              key={tab.name}
+              name={tab.name}
+              options={{
+                href: tab.hidden ? null : undefined,
+                tabBarStyle: tab.hidden ? { display: "none" } : styles.tabBar,
+                title: tab.title,
+                tabBarIcon:
+                  tab.hidden || !Icon
+                    ? undefined
+                    : ({ color, focused, size }) => (
+                        <View
+                          style={[
+                            styles.iconWrap,
+                            tab.isPrimary && styles.primaryIconWrap,
+                            focused &&
+                              tab.isPrimary &&
+                              styles.primaryIconWrapFocused,
+                          ]}
+                        >
+                          <Icon
+                            color={
+                              tab.isPrimary
+                                ? focused
+                                  ? "#ffffff"
+                                  : colors.primary
+                                : color
+                            }
+                            size={tab.isPrimary ? size + 2 : size}
+                            strokeWidth={focused ? 2.4 : 2}
+                          />
+                        </View>
+                      ),
+              }}
+            />
+          );
+        })}
+      </Tabs>
+    </RoleAccessGuard>
   );
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   tabBar: {
     height: 76,
     paddingTop: spacing.sm,

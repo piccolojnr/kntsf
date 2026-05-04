@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { ChevronLeft, LogOut } from "lucide-react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -40,7 +41,10 @@ export function PlaceholderScreen({
         <View style={styles.actions}>
           {router.canGoBack() ? (
             <Pressable style={styles.secondaryButton} onPress={router.back}>
-              <Text style={styles.secondaryButtonText}>Back</Text>
+              <View style={styles.secondaryButtonContent}>
+                <ChevronLeft color={colors.text} size={16} strokeWidth={2.2} />
+                <Text style={styles.secondaryButtonText}>Back</Text>
+              </View>
             </Pressable>
           ) : (
             <View />
@@ -55,9 +59,12 @@ export function PlaceholderScreen({
               onPress={handleLogout}
               disabled={isLoggingOut}
             >
-              <Text style={styles.secondaryButtonText}>
-                {isLoggingOut ? "Logging out..." : "Logout"}
-              </Text>
+              <View style={styles.secondaryButtonContent}>
+                <LogOut color={colors.text} size={16} strokeWidth={2.2} />
+                <Text style={styles.secondaryButtonText}>
+                  {isLoggingOut ? "Logging out..." : "Logout"}
+                </Text>
+              </View>
             </Pressable>
           ) : (
             <View />
@@ -120,6 +127,12 @@ const styles = StyleSheet.create({
   },
   secondaryButtonDisabled: {
     opacity: 0.7,
+  },
+  secondaryButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
   },
   secondaryButtonText: {
     color: colors.text,
