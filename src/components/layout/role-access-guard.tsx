@@ -1,5 +1,5 @@
-import { PropsWithChildren } from "react";
 import { Href, Redirect } from "expo-router";
+import { PropsWithChildren } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { Screen } from "@/components/ui/screen";
@@ -13,6 +13,17 @@ type RoleAccessGuardProps = PropsWithChildren<{
   getForbiddenHref?: (role?: UserRole | null) => Href;
 }>;
 
+/**
+ * A component that guards access to its children based on the user's role.
+ * It checks if the user is authenticated and if their role is included in the allowedRoles array.
+ * If the user is not authenticated, they are redirected to the unauthenticatedHref.
+ * If the user is authenticated but does not have the required role, they are redirected to a forbidden page determined by getForbiddenHref.
+ *
+ * @param allowedRoles - An array of user roles that are allowed to access the children components.
+ * @param unauthenticatedHref - The href to redirect to if the user is not authenticated. Defaults to "/(auth)/welcome".
+ * @param getForbiddenHref - A function that returns the href to redirect to if the user does not have the required role. It receives the user's role as an argument.
+ * @param children - The components that should be rendered if access is granted.
+ */
 export function RoleAccessGuard({
   allowedRoles,
   unauthenticatedHref = "/(auth)/welcome",
