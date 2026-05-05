@@ -22,6 +22,7 @@ import { VerificationResultCard } from "@/components/cards/verification-result-c
 import { FloatingScanInput } from "@/components/forms/floating-scan-input";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, spacing } from "@/constants/theme";
@@ -135,14 +136,12 @@ export default function OperationsScanScreen() {
   return (
     <Screen>
       <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
-        {/* ─── Header ─── */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View style={styles.dot} />
-            <Text style={styles.eyebrow}>EXAM PERMIT SYSTEM</Text>
-          </View>
-          <Text style={styles.title}>Verify Permit</Text>
-        </View>
+        <PageHeader
+          eyebrow="Operations"
+          subtitle="Verify a student's permit status from their student ID."
+          style={styles.pageHeader}
+          title="Verify"
+        />
 
         {/* ─── Stage ─── */}
         {screenState === "result" && result ? (
@@ -202,36 +201,8 @@ export default function OperationsScanScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-
-  /* ── Header ── */
-  header: {
-    gap: spacing.xs,
-    paddingBottom: spacing.sm,
-  },
-  headerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.xs,
-    marginBottom: 2,
-  },
-  dot: {
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-    height: 8,
-    width: 8,
-  },
-  eyebrow: {
-    color: colors.primary,
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-    lineHeight: 32,
+  pageHeader: {
+    paddingTop: 0,
   },
 
   /* ── Radar zone ── */
@@ -241,6 +212,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     justifyContent: "center",
     paddingBottom: 300,
+    paddingTop: spacing.md,
   },
   statusArea: {
     alignItems: "center",

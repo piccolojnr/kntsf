@@ -5,17 +5,27 @@ import { ProfileHeaderCard } from "@/components/cards/profile-header-card";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { DetailRow } from "@/components/ui/detail-row";
+import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
-import { colors, spacing } from "@/constants/theme";
+import { spacing } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function StudentProfileScreen() {
   const { logout, user } = useAuth();
 
   return (
-    <Screen>
-      <ScrollView contentContainerStyle={styles.content}>
+    <Screen scrolled>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <PageHeader
+          eyebrow="Student"
+          subtitle="Review your account, permit readiness, and support details."
+          title="Profile"
+        />
+
         <ProfileHeaderCard
           email={user?.email ?? "student@example.com"}
           name={user?.name ?? "Student User"}
@@ -83,6 +93,8 @@ export default function StudentProfileScreen() {
 const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xxxxl,
     paddingBottom: spacing.xxl + 72,
   },
   statusGrid: {

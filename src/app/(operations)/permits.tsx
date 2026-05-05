@@ -13,6 +13,7 @@ import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
@@ -115,16 +116,12 @@ export default function OperationsPermitsScreen() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        style={{ paddingTop: spacing.xxxxl }}
       >
-        {/* ── Header ── */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View style={styles.dot} />
-            <Text style={styles.eyebrow}>PERMITS</Text>
-          </View>
-          <Text style={styles.title}>Permit Records</Text>
-        </View>
+        <PageHeader
+          eyebrow="Operations"
+          subtitle="Search, review, and inspect permit records across the workspace."
+          title="Permits"
+        />
 
         {/* ── Stat Chips ── */}
         <View style={styles.statRow}>
@@ -221,7 +218,6 @@ export default function OperationsPermitsScreen() {
             ))}
           </View>
         )}
-        <View style={{ height: spacing.xxxxxl * 2 }} />
       </ScrollView>
 
       <PermitDetailModal
@@ -237,39 +233,10 @@ export default function OperationsPermitsScreen() {
 const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.pageHeader,
     paddingBottom: spacing.xxl + 96,
   },
-
-  /* ── Header ── */
-  header: {
-    gap: spacing.xs,
-  },
-  headerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.xs,
-    marginBottom: 2,
-  },
-  dot: {
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-    height: 8,
-    width: 8,
-  },
-  eyebrow: {
-    color: colors.primary,
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-    lineHeight: 32,
-  },
-
   /* ── Stat chips ── */
   statRow: {
     flexDirection: "row",
