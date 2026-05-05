@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   CreditCard,
+  Lock,
   RefreshCw,
   ShieldAlert,
   ShieldOff,
@@ -21,6 +22,7 @@ import {
 import { Screen } from "@/components/ui/screen";
 
 import { StudentInfoCard } from "@/components/cards/student-info-card";
+import { SectionCard } from "@/components/cards/section-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -28,6 +30,7 @@ import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { revokeCardForStudent } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
+import { useAuth } from "@/hooks/use-auth";
 
 const statusConfig = {
   active: {
@@ -78,6 +81,7 @@ function formatDate(dateString: string) {
 
 export default function OperationsStudentDetailsScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const { studentId } = useLocalSearchParams<{ studentId?: string }>();
   const studentsQuery = useStudents();
   const cardsQuery = useCards();
@@ -145,6 +149,7 @@ export default function OperationsStudentDetailsScreen() {
   const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const hasActiveCard = currentCard?.status === "active";
+  const canManageCards = user?.role === "admin";
 
   return (
     <Screen scrolled>
@@ -241,34 +246,57 @@ export default function OperationsStudentDetailsScreen() {
 
             {/* ── Action Buttons ── */}
             <View style={styles.actionsContainer}>
-              {!hasActiveCard ? (
-                <Button
-                  icon={CreditCard}
-                  label="Register New Card"
-                  onPress={() => openAssignmentFlow("register")}
-                />
+              {canManageCards ? (
+                !hasActiveCard ? (
+                  <Button
+                    icon={CreditCard}
+                    label="Register New Card"
+                    onPress={() => openAssignmentFlow("register")}
+                  />
+                ) : (
+                  <View style={styles.actionRow}>
+                    <View style={styles.actionFlex}>
+                      <Button
+                        icon={RefreshCw}
+                        label="Replace"
+                        onPress={() => openAssignmentFlow("replace")}
+                        size="compact"
+                        variant="secondary"
+                      />
+                    </View>
+                    <View style={styles.actionFlex}>
+                      <Button
+                        icon={ShieldOff}
+                        label="Revoke"
+                        loading={actionLoading === "revoke"}
+                        onPress={runRevoke}
+                        size="compact"
+                        variant="danger"
+                      />
+                    </View>
+                  </View>
+                )
               ) : (
-                <View style={styles.actionRow}>
-                  <View style={styles.actionFlex}>
-                    <Button
-                      icon={RefreshCw}
-                      label="Replace"
-                      onPress={() => openAssignmentFlow("replace")}
-                      size="compact"
-                      variant="secondary"
-                    />
+                <SectionCard title="Card Management">
+                  <View style={styles.adminNotice}>
+                    <View style={styles.adminNoticeIconWrap}>
+                      <Lock
+                        color={colors.warning}
+                        size={16}
+                        strokeWidth={2.2}
+                      />
+                    </View>
+                    <View style={styles.adminNoticeCopy}>
+                      <Text style={styles.adminNoticeTitle}>
+                        Admin Access Required
+                      </Text>
+                      <Text style={styles.adminNoticeText}>
+                        Registering, replacing, and revoking cards can only be
+                        performed by an admin user.
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.actionFlex}>
-                    <Button
-                      icon={ShieldOff}
-                      label="Revoke"
-                      loading={actionLoading === "revoke"}
-                      onPress={runRevoke}
-                      size="compact"
-                      variant="danger"
-                    />
-                  </View>
-                </View>
+                </SectionCard>
               )}
             </View>
           </>
@@ -395,5 +423,32 @@ const styles = StyleSheet.create({
   },
   actionFlex: {
     flex: 1,
+  },
+  adminNotice: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  adminNoticeIconWrap: {
+    alignItems: "center",
+    backgroundColor: colors.warningSoft,
+    borderRadius: radius.pill,
+    height: 32,
+    justifyContent: "center",
+    width: 32,
+  },
+  adminNoticeCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  adminNoticeTitle: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+  },
+  adminNoticeText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
   },
 });
