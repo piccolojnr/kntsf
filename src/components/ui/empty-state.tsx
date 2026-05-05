@@ -15,7 +15,6 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <View style={styles.card}>
-      <View style={styles.accent} />
       <View style={styles.body}>
         <View style={styles.iconWrap}>
           <Icon color={colors.danger} size={18} strokeWidth={2.5} />

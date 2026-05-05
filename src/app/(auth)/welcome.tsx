@@ -14,12 +14,14 @@ const workspaceOptions: {
 }[] = [
   {
     label: "Student",
-    description: "Sign in to the student side to view permits, card status, and personal details.",
+    description:
+      "Sign in to the student side to view permits, card status, and personal details.",
     value: "student",
   },
   {
     label: "Operations",
-    description: "Sign in to the shared operations side used by both staff and admin roles.",
+    description:
+      "Sign in to the shared operations side used by both staff and admin roles.",
     value: "operations",
   },
 ];

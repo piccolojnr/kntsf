@@ -22,7 +22,9 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 
 function getWorkspaceTitle(workspace?: string | string[]) {
-  const normalizedWorkspace = Array.isArray(workspace) ? workspace[0] : workspace;
+  const normalizedWorkspace = Array.isArray(workspace)
+    ? workspace[0]
+    : workspace;
 
   switch (normalizedWorkspace) {
     case "student":
@@ -45,7 +47,9 @@ function getRoleRoute(role: UserRole): Href {
 }
 
 function getWorkspaceSubtitle(workspace?: string | string[]) {
-  const normalizedWorkspace = Array.isArray(workspace) ? workspace[0] : workspace;
+  const normalizedWorkspace = Array.isArray(workspace)
+    ? workspace[0]
+    : workspace;
 
   switch (normalizedWorkspace) {
     case "student":
@@ -112,10 +116,7 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.container}>
-            <AuthHeader
-              title={title}
-              subtitle={subtitle}
-            />
+            <AuthHeader title={title} subtitle={subtitle} />
 
             <View style={styles.form}>
               <TextField

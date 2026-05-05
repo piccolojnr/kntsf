@@ -133,9 +133,6 @@ export function VerificationResultCard({
             : "Looked up by UID"}{" "}
           · {result.value}
         </Text>
-        <Text style={styles.footerMeta}>
-          Checked {formatDate(result.log.scannedAt)}
-        </Text>
       </View>
     </View>
   );
@@ -151,7 +148,7 @@ const styles = StyleSheet.create({
   },
   banner: {
     gap: spacing.sm,
-    padding: spacing.lg,
+    padding: spacing.md,
   },
   statusBadge: {
     alignItems: "center",
@@ -221,7 +218,7 @@ const styles = StyleSheet.create({
   },
   footerMeta: {
     color: colors.textMuted,
-    fontSize: fontSizes.xs,
+    fontSize: fontSizes.xxs,
     fontWeight: "600",
   },
 });
