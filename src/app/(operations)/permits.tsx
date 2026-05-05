@@ -5,7 +5,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -14,6 +13,7 @@ import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { SearchField } from "@/components/ui/search-field";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
@@ -154,19 +154,11 @@ export default function OperationsPermitsScreen() {
         </View>
 
         {/* ── Search Bar ── */}
-        <View style={styles.searchPill}>
-          <Search color={colors.textMuted} size={16} strokeWidth={2.5} />
-          <TextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={setSearchTerm}
-            placeholder="Search by name, ID or permit code…"
-            placeholderTextColor={colors.textMuted}
-            returnKeyType="search"
-            style={styles.searchInput}
-            value={searchTerm}
-          />
-        </View>
+        <SearchField
+          onChangeText={setSearchTerm}
+          placeholder="Search by name, ID or permit code…"
+          value={searchTerm}
+        />
 
         {/* ── Filter Tabs ── */}
         <View style={styles.filterRow}>
@@ -262,31 +254,6 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.xs,
     fontWeight: "700",
   },
-
-  /* ── Search ── */
-  searchPill: {
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  searchInput: {
-    color: colors.text,
-    flex: 1,
-    fontSize: fontSizes.sm,
-    fontWeight: "600",
-  },
-
   /* ── Filter tabs ── */
   filterRow: {
     backgroundColor: colors.surfaceMuted,

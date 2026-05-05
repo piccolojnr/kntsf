@@ -9,34 +9,37 @@ type StudentCardProps = {
   student: Student;
 };
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-}
-
 export function StudentCard({ onPress, student }: StudentCardProps) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{getInitials(student.name)}</Text>
+      <View style={styles.body}>
+        <View style={styles.nameBlock}>
+          <Text style={styles.name} numberOfLines={1}>
+            {student.name}
+          </Text>
+          <Text style={styles.meta} numberOfLines={1}>
+            {student.studentId} · Level {student.level}
+          </Text>
+        </View>
+
+        <View style={styles.rightBlock}>
+          <View style={styles.courseBadge}>
+            <Text style={styles.courseLabel} numberOfLines={1}>
+              {student.course}
+            </Text>
+          </View>
+          <Text style={styles.levelMeta}>Level {student.level}</Text>
+        </View>
       </View>
-      <View style={styles.copy}>
-        <Text style={styles.name} numberOfLines={1}>
-          {student.name}
-        </Text>
-        <Text style={styles.studentId}>{student.studentId}</Text>
-        <Text style={styles.meta} numberOfLines={1}>
-          {student.course} · Level {student.level}
-        </Text>
-      </View>
-      <ChevronRight color={colors.border} size={20} strokeWidth={2.5} />
+      <ChevronRight
+        color={colors.border}
+        size={16}
+        strokeWidth={2.5}
+        style={{ marginRight: 10 }}
+      />
     </Pressable>
   );
 }
@@ -48,46 +51,58 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.lg,
     borderWidth: 1,
+    elevation: 2,
     flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.md,
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
   },
   cardPressed: {
-    backgroundColor: colors.background,
-    borderColor: colors.primarySoft,
+    opacity: 0.75,
   },
-  avatar: {
+  body: {
     alignItems: "center",
-    backgroundColor: colors.primarySoft,
-    borderRadius: radius.pill,
-    height: 48,
-    justifyContent: "center",
-    width: 48,
-  },
-  avatarText: {
-    color: colors.primary,
-    fontSize: fontSizes.md,
-    fontWeight: "800",
-    letterSpacing: 1,
-  },
-  copy: {
     flex: 1,
-    gap: 2,
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  nameBlock: {
+    flex: 1,
+    gap: spacing.xs - 2,
   },
   name: {
     color: colors.text,
     fontSize: fontSizes.md,
     fontWeight: "800",
-    letterSpacing: -0.2,
-  },
-  studentId: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: "700",
   },
   meta: {
     color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: fontSizes.xs,
+    fontWeight: "600",
+  },
+  rightBlock: {
+    alignItems: "flex-end",
+    gap: spacing.xs,
+    maxWidth: 112,
+  },
+  courseBadge: {
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  courseLabel: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  levelMeta: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "600",
   },
 });
