@@ -6,15 +6,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 type ScreenProps = PropsWithChildren<{
   style?: ViewStyle;
   scrolled?: boolean;
+  freeBottom?: boolean;
 }>;
 
-export function Screen({ children, style, scrolled }: ScreenProps) {
+export function Screen({ children, style, scrolled, freeBottom }: ScreenProps) {
   return (
     <SafeAreaView
       style={styles.safeArea}
-      edges={["bottom", scrolled ? "bottom" : "top"]}
+      // edges={["bottom", scrolled ? "bottom" : "top"]}
+      edges={
+        scrolled && freeBottom ? [] : scrolled ? ["bottom"] : ["top", "bottom"]
+      }
     >
-      <View style={[styles.content, style, scrolled && { paddingTop: 0 }]}>
+      <View
+        style={[
+          styles.content,
+          style,
+          scrolled && { paddingTop: 0 },
+          freeBottom && { paddingBottom: 0 },
+        ]}
+      >
         {children}
       </View>
     </SafeAreaView>

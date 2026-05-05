@@ -1,6 +1,6 @@
 import { simulateDelay } from "@/lib/api/mock-api";
 
-import { StudentCard } from "./card-types";
+import { CardStatus, StudentCard } from "./card-types";
 
 const mockCards: StudentCard[] = [
   {
@@ -57,6 +57,34 @@ function cloneCard(card: StudentCard) {
   return { ...card };
 }
 
+function sortCardsByRegisteredAt(left: StudentCard, right: StudentCard) {
+  return (
+    new Date(right.registeredAt).getTime() - new Date(left.registeredAt).getTime()
+  );
+}
+
+function createMockUid(studentId: string) {
+  const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `UID-${studentId.slice(-4)}-${suffix}`;
+}
+
+function createCardRecord(studentId: string): StudentCard {
+  return {
+    id: `card-${mockCards.length + 1}`,
+    studentId,
+    uid: createMockUid(studentId),
+    type: "ntag216",
+    status: "active",
+    registeredAt: new Date().toISOString(),
+  };
+}
+
+function getActiveCardRecord(studentId: string) {
+  return mockCards.find(
+    (card) => card.studentId === studentId && card.status === "active",
+  );
+}
+
 export async function getCards() {
   await simulateDelay(250);
   return mockCards.map(cloneCard);
@@ -84,5 +112,58 @@ export async function getCardsByStudentId(studentId: string) {
 
   return mockCards
     .filter((item) => item.studentId === studentId)
+    .sort(sortCardsByRegisteredAt)
     .map(cloneCard);
+}
+
+export async function getCurrentCardByStudentId(studentId: string) {
+  await simulateDelay(140);
+
+  const cards = mockCards
+    .filter((item) => item.studentId === studentId)
+    .sort(sortCardsByRegisteredAt);
+
+  return cards[0] ? cloneCard(cards[0]) : null;
+}
+
+async function updateActiveCardStatus(studentId: string, status: CardStatus) {
+  const activeCard = getActiveCardRecord(studentId);
+
+  if (activeCard) {
+    activeCard.status = status;
+  }
+
+  return activeCard;
+}
+
+export async function registerCardForStudent(studentId: string) {
+  await simulateDelay(260);
+
+  await updateActiveCardStatus(studentId, "revoked");
+  const nextCard = createCardRecord(studentId);
+  mockCards.unshift(nextCard);
+
+  return cloneCard(nextCard);
+}
+
+export async function replaceCardForStudent(studentId: string) {
+  await simulateDelay(260);
+
+  await updateActiveCardStatus(studentId, "replaced");
+  const nextCard = createCardRecord(studentId);
+  mockCards.unshift(nextCard);
+
+  return cloneCard(nextCard);
+}
+
+export async function revokeCardForStudent(studentId: string) {
+  await simulateDelay(220);
+
+  const activeCard = await updateActiveCardStatus(studentId, "revoked");
+
+  if (!activeCard) {
+    throw new Error("No active card is available to revoke.");
+  }
+
+  return cloneCard(activeCard);
 }

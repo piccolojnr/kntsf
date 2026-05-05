@@ -221,6 +221,7 @@ export default function OperationsPermitsScreen() {
             ))}
           </View>
         )}
+        <View style={{ height: spacing.xxxxxl * 2 }} />
       </ScrollView>
 
       <PermitDetailModal
