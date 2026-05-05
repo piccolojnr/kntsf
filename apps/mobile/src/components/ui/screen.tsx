@@ -13,7 +13,6 @@ export function Screen({ children, style, scrolled, freeBottom }: ScreenProps) {
   return (
     <SafeAreaView
       style={styles.safeArea}
-      // edges={["bottom", scrolled ? "bottom" : "top"]}
       edges={
         scrolled && freeBottom ? [] : scrolled ? ["bottom"] : ["top", "bottom"]
       }
@@ -22,7 +21,7 @@ export function Screen({ children, style, scrolled, freeBottom }: ScreenProps) {
         style={[
           styles.content,
           style,
-          scrolled && { paddingTop: 0 },
+          scrolled && styles.scrolledContent,
           freeBottom && { paddingBottom: 0 },
         ]}
       >
@@ -41,6 +40,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: spacing.lg,
+    paddingTop: spacing.xs,
     backgroundColor: colors.background,
+  },
+  scrolledContent: {
+    padding: 0,
+    paddingTop: 0,
   },
 });

@@ -1,11 +1,12 @@
 import { Href, useRouter } from "expo-router";
 import { Search, Users } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useStudents } from "@/features/students/use-students";
@@ -34,21 +35,14 @@ export default function OperationsStudentsScreen() {
   return (
     <Screen scrolled>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* ── Header ── */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <Text style={styles.eyebrow}>OPERATIONS</Text>
-            {studentsQuery.data && (
-              <View style={styles.countBadge}>
-                <Text style={styles.countText}>{studentsQuery.data.length}</Text>
-              </View>
-            )}
-          </View>
-          <Text style={styles.title}>Students Directory</Text>
-          <Text style={styles.subtitle}>
-            Search student records and manage NFC card assignments.
-          </Text>
-        </View>
+        <PageHeader
+          badgeText={
+            studentsQuery.data ? String(studentsQuery.data.length) : undefined
+          }
+          eyebrow="Operations"
+          subtitle="Search student records and manage NFC card assignments."
+          title="Students"
+        />
 
         {/* ── Search Bar ── */}
         <View style={styles.searchPill}>
@@ -95,7 +89,6 @@ export default function OperationsStudentsScreen() {
             ))}
           </View>
         )}
-        <View style={{ height: spacing.xxxxxl * 2 }} />
       </ScrollView>
     </Screen>
   );
@@ -104,47 +97,9 @@ export default function OperationsStudentsScreen() {
 const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
-    paddingTop: spacing.xxxxl,
-  },
-
-  /* ── Header ── */
-  header: {
-    gap: spacing.xs,
-  },
-  headerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.xs,
-    marginBottom: 2,
-  },
-  eyebrow: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-  },
-  countBadge: {
-    backgroundColor: colors.primarySoft,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  countText: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: "800",
-  },
-  title: {
-    color: colors.text,
-    fontSize: fontSizes.xxl,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    color: colors.textMuted,
-    fontSize: fontSizes.sm,
-    lineHeight: 22,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.pageHeader,
+    paddingBottom: spacing.xxl + 96,
   },
 
   /* ── Search ── */

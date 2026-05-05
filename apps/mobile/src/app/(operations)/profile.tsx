@@ -16,6 +16,7 @@ import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { DetailRow } from "@/components/ui/detail-row";
 import { NavigationListItem } from "@/components/ui/navigation-list-item";
+import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, spacing } from "@/constants/theme";
@@ -63,8 +64,17 @@ export default function OperationsProfileScreen() {
   const { user, logout } = useAuth();
 
   return (
-    <Screen>
-      <ScrollView contentContainerStyle={styles.content}>
+    <Screen scrolled>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <PageHeader
+          eyebrow="Operations"
+          subtitle="Review your shared workspace identity, access level, and admin tools."
+          title="Profile"
+        />
+
         <ProfileHeaderCard
           email={user?.email ?? "operations@example.com"}
           name={user?.name ?? "Operations User"}
@@ -132,7 +142,8 @@ export default function OperationsProfileScreen() {
             <View style={styles.focusCopy}>
               <Text style={styles.focusTitle}>Operational Readiness</Text>
               <Text style={styles.focusDescription}>
-                Your workspace is positioned for permit handling, student lookup, and scanning tasks.
+                Your workspace is positioned for permit handling, student
+                lookup, and scanning tasks.
               </Text>
             </View>
           </View>
@@ -143,7 +154,8 @@ export default function OperationsProfileScreen() {
             <View style={styles.focusCopy}>
               <Text style={styles.focusTitle}>Shared Staff Surface</Text>
               <Text style={styles.focusDescription}>
-                Staff and admin users follow the same main workflow, with admin tools separated to avoid tab clutter.
+                Staff and admin users follow the same main workflow, with admin
+                tools separated to avoid tab clutter.
               </Text>
             </View>
           </View>
@@ -163,6 +175,8 @@ export default function OperationsProfileScreen() {
 const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.pageHeader,
     paddingBottom: spacing.xxl + 72,
   },
   statusGrid: {

@@ -106,7 +106,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <Screen>
+    <Screen scrolled>
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -114,6 +114,7 @@ export default function LoginScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.container}>
             <AuthHeader title={title} subtitle={subtitle} />
@@ -165,6 +166,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   container: {
     flex: 1,

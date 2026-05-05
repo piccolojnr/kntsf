@@ -271,7 +271,6 @@ export default function OperationsStudentDetailsScreen() {
                 </View>
               )}
             </View>
-            <View style={{ height: spacing.xxxxxl * 2 }} />
           </>
         )}
       </ScrollView>
@@ -280,8 +279,6 @@ export default function OperationsStudentDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-
-
   /* ── Sheet affordances ── */
   dragHandle: {
     alignSelf: "center",
@@ -316,6 +313,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xxl + 32,
   },
 
   /* ── NFC card section ── */

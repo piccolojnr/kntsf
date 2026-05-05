@@ -27,6 +27,7 @@ export const spacing = {
   xxxl: 48,
   xxxxl: 56,
   xxxxxl: 64,
+  pageHeader: 56,
 };
 
 export const radius = {
