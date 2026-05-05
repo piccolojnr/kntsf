@@ -3,6 +3,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import {
   CheckCircle2,
   CreditCard,
+  Lock,
   ScanLine,
   X,
 } from "lucide-react-native";
@@ -38,6 +39,7 @@ import {
 } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
+import { useAuth } from "@/hooks/use-auth";
 
 type ScreenState = "idle" | "loading" | "result";
 
@@ -76,6 +78,7 @@ function formatDate(dateString: string) {
 
 export default function OperationsCardAssignmentScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const { mode, studentId } = useLocalSearchParams<{
@@ -149,6 +152,7 @@ export default function OperationsCardAssignmentScreen() {
 
   const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
+  const canManageCards = user?.role === "admin";
 
   const handleAssign = useCallback(async () => {
     Keyboard.dismiss();
@@ -219,6 +223,19 @@ export default function OperationsCardAssignmentScreen() {
       <Pressable style={styles.body} onPress={Keyboard.dismiss}>
         {isLoading ? (
           <LoadingState message="Loading student and card records..." />
+        ) : !canManageCards ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageTitle}>Admin access required</Text>
+            <View style={styles.restrictedRow}>
+              <View style={styles.restrictedIconWrap}>
+                <Lock color={colors.warning} size={18} strokeWidth={2.2} />
+              </View>
+              <Text style={styles.messageText}>
+                Only admins can register or replace student cards. Return to the
+                student record to continue reviewing details.
+              </Text>
+            </View>
+          </View>
         ) : hasError ? (
           <View style={styles.messageCard}>
             <Text style={styles.messageTitle}>Unable to load</Text>
@@ -348,6 +365,7 @@ export default function OperationsCardAssignmentScreen() {
       {screenState !== "result" &&
         student &&
         !isLoading &&
+        canManageCards &&
         !hasError &&
         isReadyForReplace && (
           <Animated.View style={[styles.floatingPill, pillAnimStyle]}>
@@ -606,6 +624,19 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     lineHeight: 22,
+  },
+  restrictedRow: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  restrictedIconWrap: {
+    alignItems: "center",
+    backgroundColor: colors.warningSoft,
+    borderRadius: radius.pill,
+    height: 32,
+    justifyContent: "center",
+    width: 32,
   },
   loadingWrap: {
     alignSelf: "stretch",
