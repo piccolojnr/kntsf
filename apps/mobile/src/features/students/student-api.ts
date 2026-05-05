@@ -5,7 +5,7 @@ import { Student } from "./student-types";
 const mockStudents: Student[] = [
   {
     id: "student-1",
-    studentId: "KNU/23/001",
+    studentId: "26102859",
     name: "Ama Boateng",
     email: "ama.boateng@example.com",
     course: "Computer Science",
@@ -14,7 +14,7 @@ const mockStudents: Student[] = [
   },
   {
     id: "student-2",
-    studentId: "KNU/23/002",
+    studentId: "26102860",
     name: "Kwesi Mensah",
     email: "kwesi.mensah@example.com",
     course: "Business Administration",
@@ -23,7 +23,7 @@ const mockStudents: Student[] = [
   },
   {
     id: "student-3",
-    studentId: "KNU/23/003",
+    studentId: "26102861",
     name: "Efua Owusu",
     email: "efua.owusu@example.com",
     course: "Civil Engineering",
@@ -32,7 +32,7 @@ const mockStudents: Student[] = [
   },
   {
     id: "student-4",
-    studentId: "KNU/23/004",
+    studentId: "26102862",
     name: "Kojo Asare",
     email: "kojo.asare@example.com",
     course: "Nursing",
@@ -41,7 +41,7 @@ const mockStudents: Student[] = [
   },
   {
     id: "student-5",
-    studentId: "KNU/23/005",
+    studentId: "26102863",
     name: "Abena Adjei",
     email: "abena.adjei@example.com",
     course: "Law",
@@ -70,7 +70,10 @@ export async function getStudentById(id: string) {
 export async function getStudentByStudentId(studentId: string) {
   await simulateDelay(200);
 
-  const student = mockStudents.find((item) => item.studentId === studentId);
+  const normalizedStudentId = studentId.trim();
+  const student = mockStudents.find(
+    (item) => item.studentId === normalizedStudentId,
+  );
 
   return student ? cloneStudent(student) : null;
 }

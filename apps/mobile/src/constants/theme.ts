@@ -14,6 +14,7 @@ export const colors = {
   textMuted: "#5f6b85",
   border: "#d7ddea",
   shadow: "#0f172a",
+  transparent: "transparent",
 };
 
 export const spacing = {
