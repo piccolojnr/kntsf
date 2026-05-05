@@ -10,9 +10,12 @@ export type ScanDecision =
   | "no_active_permit"
   | "expired_permit";
 
-export type ScanLog = {
+export type VerificationMethod = "student_id" | "uid";
+
+export type VerificationLog = {
   id: string;
-  uid: string;
+  method: VerificationMethod;
+  value: string;
   scannedAt: string;
   decision: ScanDecision;
   message: string;
@@ -21,11 +24,16 @@ export type ScanLog = {
   studentId?: string;
 };
 
-export type ScanCardResult = {
+export type VerificationResult = {
   decision: ScanDecision;
   message: string;
+  method: VerificationMethod;
+  value: string;
   student: Student | null;
   card: StudentCard | null;
   permit: Permit | null;
-  log: ScanLog;
+  log: VerificationLog;
 };
+
+export type ScanLog = VerificationLog;
+export type ScanCardResult = VerificationResult;
