@@ -2,6 +2,8 @@ import { simulateDelay } from "@/lib/api/mock-api";
 
 import { CardStatus, StudentCard } from "./card-types";
 
+export type CardAssignmentMode = "register" | "replace";
+
 const mockCards: StudentCard[] = [
   {
     id: "card-1",
@@ -154,6 +156,32 @@ export async function replaceCardForStudent(studentId: string) {
   mockCards.unshift(nextCard);
 
   return cloneCard(nextCard);
+}
+
+export async function assignCardToStudent(input: {
+  mode: CardAssignmentMode;
+  studentId: string;
+  uid: string;
+}) {
+  const normalizedUid = input.uid.trim().toUpperCase();
+
+  if (!normalizedUid) {
+    throw new Error("Enter a card UID before assigning a card.");
+  }
+
+  const modeAction =
+    input.mode === "register" ? registerCardForStudent : replaceCardForStudent;
+
+  const nextCard = await modeAction(input.studentId);
+  const cardRecord = mockCards.find((card) => card.id === nextCard.id);
+
+  if (!cardRecord) {
+    throw new Error("The new card record could not be created.");
+  }
+
+  cardRecord.uid = normalizedUid;
+
+  return cloneCard(cardRecord);
 }
 
 export async function revokeCardForStudent(studentId: string) {

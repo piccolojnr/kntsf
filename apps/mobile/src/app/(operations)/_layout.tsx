@@ -39,6 +39,12 @@ export default function OperationsLayout() {
           hidden: true,
           icon: LayoutDashboard,
         },
+        {
+          name: "card-assignment",
+          title: "Card Assignment",
+          hidden: true,
+          icon: CreditCard,
+        },
         { name: "cards", title: "Cards", hidden: true, icon: CreditCard },
         { name: "settings", title: "Settings", hidden: true, icon: Settings },
         { name: "audit-logs", title: "Audit Logs", hidden: true, icon: Shield },

@@ -19,8 +19,16 @@ export default function RootLayout() {
             <Stack.Screen
               name="(operations)/student-details"
               options={{
-                gestureEnabled: true,
                 headerShown: false,
+                gestureEnabled: true,
+                presentation: "formSheet",
+              }}
+            />
+            <Stack.Screen
+              name="(operations)/card-assignment"
+              options={{
+                headerShown: false,
+                gestureEnabled: true,
                 presentation: "formSheet",
               }}
             />
