@@ -4,22 +4,27 @@ import {
   CreditCard,
   LayoutDashboard,
   LogOut,
+  ShieldAlert,
   Settings,
   Shield,
-  ShieldCheck,
   Users,
 } from "lucide-react-native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { ProfileHeaderCard } from "@/components/cards/profile-header-card";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { DetailRow } from "@/components/ui/detail-row";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
 import { NavigationListItem } from "@/components/ui/navigation-list-item";
 import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
-import { colors, fontSizes, spacing } from "@/constants/theme";
+import { spacing } from "@/constants/theme";
+import { useCards } from "@/features/cards/use-cards";
+import { usePermits } from "@/features/permits/use-permits";
+import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
 
 const adminTools: {
@@ -62,6 +67,22 @@ const adminTools: {
 
 export default function OperationsProfileScreen() {
   const { user, logout } = useAuth();
+  const studentsQuery = useStudents();
+  const cardsQuery = useCards();
+  const permitsQuery = usePermits();
+
+  const isLoading =
+    studentsQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
+  const hasError =
+    studentsQuery.isError || cardsQuery.isError || permitsQuery.isError;
+
+  const studentCount = (studentsQuery.data ?? []).length;
+  const activePermitCount = (permitsQuery.data ?? []).filter(
+    (permit) => permit.status === "active",
+  ).length;
+  const activeCardCount = (cardsQuery.data ?? []).filter(
+    (card) => card.status === "active",
+  ).length;
 
   return (
     <Screen scrolled>
@@ -71,102 +92,92 @@ export default function OperationsProfileScreen() {
       >
         <PageHeader
           eyebrow="Operations"
-          subtitle="Review your shared workspace identity, access level, and admin tools."
+          subtitle="Review your workspace identity, access level, and live mock record counts."
           title="Profile"
         />
+        {isLoading ? (
+          <LoadingState message="Loading workspace profile..." />
+        ) : hasError ? (
+          <EmptyState
+            description="Workspace profile data could not be loaded right now."
+            icon={ShieldAlert}
+            title="Unable to load profile"
+          />
+        ) : (
+          <>
+            <ProfileHeaderCard
+              email={user?.email ?? "No email"}
+              name={user?.name ?? "Unknown User"}
+              role={user?.role ?? "staff"}
+              subtitle="This workspace is shared by staff and admins, with access expanding according to your role."
+              workspaceLabel="Operations"
+            />
 
-        <ProfileHeaderCard
-          email={user?.email ?? "operations@example.com"}
-          name={user?.name ?? "Operations User"}
-          role={user?.role ?? "staff"}
-          subtitle="This workspace is shared by staff and admins, with access expanding according to your role."
-          workspaceLabel="Operations"
-        />
-
-        <View style={styles.statusGrid}>
-          <StatusCard
-            title="Workspace Access"
-            value="Enabled"
-            description="Scanning, permits, and student support tools are available from this area."
-            tone="primary"
-          />
-          <StatusCard
-            title="Privilege Level"
-            value={user?.role === "admin" ? "Admin" : "Staff"}
-            description={
-              user?.role === "admin"
-                ? "You can open advanced administrative tools from this profile."
-                : "You have standard operations access across shared staff workflows."
-            }
-            tone={user?.role === "admin" ? "warning" : "success"}
-          />
-        </View>
-
-        <SectionCard title="Operations Access">
-          <DetailRow
-            label="User Name"
-            value={user?.name ?? "Unknown User"}
-            helper="This identity is shared across the operations workspace and reflects your assigned role."
-          />
-          <DetailRow
-            label="Email"
-            value={user?.email ?? "No email"}
-            helper="Use this email for operations sign-in and future service notifications."
-          />
-          <DetailRow
-            label="Role"
-            value={user?.role === "admin" ? "Administrator" : "Staff Member"}
-            helper="Role-based controls decide whether admin-only tools are available from this screen."
-          />
-        </SectionCard>
-
-        {user?.role === "admin" ? (
-          <SectionCard title="Admin Tools">
-            {adminTools.map((tool) => (
-              <NavigationListItem
-                key={tool.label}
-                description={tool.description}
-                href={tool.href}
-                icon={tool.icon}
-                label={tool.label}
+            <View style={styles.statusGrid}>
+              <StatusCard
+                title="Students Indexed"
+                value={String(studentCount)}
+                description="Student records currently available in the operations workspace."
+                tone="primary"
               />
-            ))}
-          </SectionCard>
-        ) : null}
+              <StatusCard
+                title="Active Permits"
+                value={String(activePermitCount)}
+                description="Permits that are currently valid for verification."
+                tone="success"
+              />
+              <StatusCard
+                title="Active Cards"
+                value={String(activeCardCount)}
+                description="Student cards currently usable for card-based verification."
+                tone="warning"
+              />
+            </View>
 
-        <SectionCard title="Quick Focus">
-          <View style={styles.focusRow}>
-            <View style={styles.focusIconWrap}>
-              <ShieldCheck color={colors.primary} size={18} strokeWidth={2.2} />
-            </View>
-            <View style={styles.focusCopy}>
-              <Text style={styles.focusTitle}>Operational Readiness</Text>
-              <Text style={styles.focusDescription}>
-                Your workspace is positioned for permit handling, student
-                lookup, and scanning tasks.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.focusRow}>
-            <View style={styles.focusIconWrap}>
-              <Users color={colors.primary} size={18} strokeWidth={2.2} />
-            </View>
-            <View style={styles.focusCopy}>
-              <Text style={styles.focusTitle}>Shared Staff Surface</Text>
-              <Text style={styles.focusDescription}>
-                Staff and admin users follow the same main workflow, with admin
-                tools separated to avoid tab clutter.
-              </Text>
-            </View>
-          </View>
-        </SectionCard>
+            <SectionCard title="Operations Access">
+              <DetailRow
+                label="User Name"
+                value={user?.name ?? "Unknown User"}
+                helper="This identity is used for the shared operations workspace."
+              />
+              <DetailRow
+                label="Email"
+                value={user?.email ?? "No email"}
+                helper="Use this email for operations sign-in."
+              />
+              <DetailRow
+                label="Role"
+                value={user?.role === "admin" ? "Administrator" : "Staff Member"}
+                helper={
+                  user?.role === "admin"
+                    ? "You can manage cards and access admin tools."
+                    : "You can verify permits and inspect records, but admin-only tools stay restricted."
+                }
+              />
+            </SectionCard>
 
-        <PrimaryButton
-          label="Logout"
-          icon={LogOut}
-          onPress={logout}
-          variant="danger"
-        />
+            {user?.role === "admin" ? (
+              <SectionCard title="Admin Tools">
+                {adminTools.map((tool) => (
+                  <NavigationListItem
+                    key={tool.label}
+                    description={tool.description}
+                    href={tool.href}
+                    icon={tool.icon}
+                    label={tool.label}
+                  />
+                ))}
+              </SectionCard>
+            ) : null}
+
+            <PrimaryButton
+              label="Logout"
+              icon={LogOut}
+              onPress={logout}
+              variant="danger"
+            />
+          </>
+        )}
       </ScrollView>
     </Screen>
   );
@@ -181,32 +192,5 @@ const styles = StyleSheet.create({
   },
   statusGrid: {
     gap: spacing.md,
-  },
-  focusRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.md,
-  },
-  focusIconWrap: {
-    width: 36,
-    height: 36,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 18,
-    backgroundColor: colors.primarySoft,
-  },
-  focusCopy: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  focusTitle: {
-    color: colors.text,
-    fontSize: fontSizes.md,
-    fontWeight: "700",
-  },
-  focusDescription: {
-    color: colors.textMuted,
-    fontSize: fontSizes.sm,
-    lineHeight: 20,
   },
 });
