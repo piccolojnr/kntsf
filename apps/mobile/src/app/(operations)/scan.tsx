@@ -133,7 +133,7 @@ export default function OperationsScanScreen() {
   }
 
   return (
-    <Screen style={styles.screen}>
+    <Screen>
       <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
         {/* ─── Header ─── */}
         <View style={styles.header}>
@@ -203,10 +203,6 @@ export default function OperationsScanScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
 
-  screen: {
-    paddingBottom: 0,
-  },
-
   /* ── Header ── */
   header: {
     gap: spacing.xs,
@@ -272,8 +268,8 @@ const styles = StyleSheet.create({
   /* ── Result ── */
   resultStage: {
     flex: 1,
-    gap: spacing.md,
-    paddingTop: spacing.xl,
+    gap: spacing.sm,
+    // paddingTop: spacing.xl,
     paddingBottom: TAB_BAR_CLEARANCE + spacing.lg,
   },
 });

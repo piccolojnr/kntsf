@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { useRouter } from "expo-router";
 import { ChevronLeft, LogOut } from "lucide-react-native";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { useAuth } from "@/hooks/use-auth";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+import { useAuth } from "@/hooks/use-auth";
 
 type PlaceholderScreenProps = {
   title: string;
