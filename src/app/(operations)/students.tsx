@@ -1,9 +1,9 @@
+import { Href, useRouter } from "expo-router";
 import { Search, Users } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
-import { StudentDetailModal } from "@/components/cards/student-detail-modal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Screen } from "@/components/ui/screen";
@@ -11,8 +11,8 @@ import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useStudents } from "@/features/students/use-students";
 
 export default function OperationsStudentsScreen() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const studentsQuery = useStudents();
 
   const filteredStudents = useMemo(() => {
@@ -85,7 +85,11 @@ export default function OperationsStudentsScreen() {
             {filteredStudents.map((student) => (
               <StudentCard
                 key={student.id}
-                onPress={() => setSelectedStudentId(student.studentId)}
+                onPress={() =>
+                  router.push(
+                    `/(operations)/student-details?studentId=${student.studentId}` as Href,
+                  )
+                }
                 student={student}
               />
             ))}
@@ -93,15 +97,6 @@ export default function OperationsStudentsScreen() {
         )}
         <View style={{ height: spacing.xxxxxl * 2 }} />
       </ScrollView>
-
-      <StudentDetailModal
-        onClose={() => setSelectedStudentId(null)}
-        student={
-          studentsQuery.data?.find((s) => s.studentId === selectedStudentId) ??
-          null
-        }
-        visible={selectedStudentId !== null}
-      />
     </Screen>
   );
 }

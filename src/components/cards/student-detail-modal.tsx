@@ -3,6 +3,7 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { useQueryClient } from "@tanstack/react-query";
+import { Href, useRouter } from "expo-router";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -20,8 +21,6 @@ import { StudentInfoCard } from "@/components/cards/student-info-card";
 import { Button } from "@/components/ui/button";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import {
-  registerCardForStudent,
-  replaceCardForStudent,
   revokeCardForStudent,
 } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
@@ -85,15 +84,14 @@ export function StudentDetailModal({
   student,
   visible,
 }: StudentDetailModalProps) {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["85%", "95%"], []);
   
   const cardsQuery = useCards();
   const queryClient = useQueryClient();
-  const [actionLoading, setActionLoading] = useState<
-    "register" | "replace" | "revoke" | null
-  >(null);
+  const [actionLoading, setActionLoading] = useState<"revoke" | null>(null);
 
   const currentCard = useMemo(() => {
     if (!student) return null;
@@ -131,7 +129,7 @@ export function StudentDetailModal({
   }
 
   function runAction(
-    action: "register" | "replace" | "revoke",
+    action: "revoke",
     perform: () => Promise<unknown>,
     successMessage: string,
   ) {
@@ -167,6 +165,16 @@ export function StudentDetailModal({
   }
 
   const cardConfig = currentCard ? statusConfig[currentCard.status] : undefined;
+
+  function openAssignmentFlow(mode: "register" | "replace") {
+    if (!student) {
+      return;
+    }
+
+    router.push(
+      `/(operations)/card-assignment?studentId=${student.studentId}&mode=${mode}` as Href,
+    );
+  }
 
   return (
     <Modal
@@ -257,14 +265,7 @@ export function StudentDetailModal({
                     {!currentCard || currentCard.status !== "active" ? (
                       <Button
                         label="Register New Card"
-                        loading={actionLoading === "register"}
-                        onPress={() =>
-                          runAction(
-                            "register",
-                            () => registerCardForStudent(student.id),
-                            "A new card was successfully registered.",
-                          )
-                        }
+                        onPress={() => openAssignmentFlow("register")}
                       />
                     ) : (
                       <>
@@ -273,14 +274,7 @@ export function StudentDetailModal({
                             <Button
                               fullWidth={false}
                               label="Replace Card"
-                              loading={actionLoading === "replace"}
-                              onPress={() =>
-                                runAction(
-                                  "replace",
-                                  () => replaceCardForStudent(student.id),
-                                  "The active card was replaced.",
-                                )
-                              }
+                              onPress={() => openAssignmentFlow("replace")}
                               size="compact"
                               variant="secondary"
                             />
