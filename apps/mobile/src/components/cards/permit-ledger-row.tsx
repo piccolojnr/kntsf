@@ -79,7 +79,12 @@ export function PermitLedgerRow({
       </View>
 
       {/* Chevron */}
-      <ChevronRight color={colors.border} size={16} strokeWidth={2.5} />
+      <ChevronRight
+        color={colors.border}
+        size={16}
+        strokeWidth={2.5}
+        style={{ marginRight: 10 }}
+      />
     </Pressable>
   );
 }
