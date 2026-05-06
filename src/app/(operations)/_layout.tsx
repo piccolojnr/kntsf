@@ -1,55 +1,30 @@
-import { Href } from "expo-router";
-import {
-  BarChart3,
-  CreditCard,
-  FileText,
-  LayoutDashboard,
-  ScanLine,
-  Settings,
-  Shield,
-  User,
-  Users,
-} from "lucide-react-native";
-
-import { RoleTabsLayout } from "@/components/layout/role-tabs-layout";
-import { UserRole } from "@/features/auth/auth-types";
-
-function getOperationsForbiddenHref(role?: UserRole | null): Href {
-  if (role === "student") {
-    return "/(student)" as Href;
-  }
-
-  return "/" as Href;
-}
+import { Stack } from "expo-router";
 
 export default function OperationsLayout() {
   return (
-    <RoleTabsLayout
-      allowedRoles={["staff", "admin"]}
-      initialRouteName="scan"
-      getForbiddenHref={getOperationsForbiddenHref}
-      tabs={[
-        { name: "scan", title: "Verify", icon: ScanLine },
-        { name: "permits", title: "Permits", icon: FileText },
-        { name: "students", title: "Students", icon: Users },
-        { name: "profile", title: "Profile", icon: User },
-        {
-          name: "admin-dashboard",
-          title: "Dashboard",
-          hidden: true,
-          icon: LayoutDashboard,
-        },
-        {
-          name: "card-assignment",
-          title: "Card Assignment",
-          hidden: true,
-          icon: CreditCard,
-        },
-        { name: "cards", title: "Cards", hidden: true, icon: CreditCard },
-        { name: "settings", title: "Settings", hidden: true, icon: Settings },
-        { name: "audit-logs", title: "Audit Logs", hidden: true, icon: Shield },
-        { name: "reports", title: "Reports", hidden: true, icon: BarChart3 },
-      ]}
-    />
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="student-details"
+        options={{
+          headerShown: false,
+          gestureEnabled: true,
+          presentation: "formSheet",
+        }}
+      />
+      <Stack.Screen
+        name="card-assignment"
+        options={{
+          headerShown: false,
+          gestureEnabled: true,
+          presentation: "formSheet",
+        }}
+      />
+      <Stack.Screen name="admin-dashboard" options={{ headerShown: false }} />
+      <Stack.Screen name="cards" options={{ headerShown: false }} />
+      <Stack.Screen name="settings" options={{ headerShown: false }} />
+      <Stack.Screen name="audit-logs" options={{ headerShown: false }} />
+      <Stack.Screen name="reports" options={{ headerShown: false }} />
+    </Stack>
   );
 }

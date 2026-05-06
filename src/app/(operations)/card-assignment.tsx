@@ -5,9 +5,10 @@ import {
   CreditCard,
   Lock,
   ScanLine,
+  ShieldAlert,
   X,
 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Keyboard,
   Platform,
@@ -17,11 +18,7 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, {
-  Easing,
-  FadeInDown,
-  FadeOut,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
@@ -41,31 +38,6 @@ import { readCardUid } from "@/lib/nfc/nfc-service";
 
 type ScreenState = "idle" | "loading" | "result";
 
-const ANIM_CONFIG = { duration: 280, easing: Easing.bezier(0.4, 0, 0.2, 1) };
-
-function useKeyboardHeight() {
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    const showEvent =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent =
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-
-    const showSub = Keyboard.addListener(showEvent, (e) =>
-      setHeight(e.endCoordinates.height),
-    );
-    const hideSub = Keyboard.addListener(hideEvent, () => setHeight(0));
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
-
-  return height;
-}
-
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString(undefined, {
     day: "numeric",
@@ -78,7 +50,7 @@ export default function OperationsCardAssignmentScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const { fixedScreen, isCompact } = useScreenDensity();
+  const { fixedScreen, height, isCompact, width } = useScreenDensity();
   const queryClient = useQueryClient();
   const { mode, studentId } = useLocalSearchParams<{
     mode?: CardAssignmentMode;
@@ -93,6 +65,15 @@ export default function OperationsCardAssignmentScreen() {
 
   const assignmentMode: CardAssignmentMode =
     mode === "replace" ? "replace" : "register";
+  const isNarrow = width < 380;
+  const horizontalPadding = isNarrow ? spacing.md : spacing.lg;
+  const assignmentHeroSize = Math.min(
+    fixedScreen.heroSize,
+    Math.max(176, width - horizontalPadding * 4),
+    isCompact ? height * 0.32 : height * 0.36,
+  );
+  const assignmentBottomPadding =
+    Math.max(insets.bottom, spacing.md) + spacing.xl;
 
   const student = useMemo(() => {
     const students = studentsQuery.data ?? [];
@@ -123,7 +104,7 @@ export default function OperationsCardAssignmentScreen() {
         setErrorMessage(null);
         setAssignedUid(null);
       };
-    }, [])
+    }, []),
   );
 
   const actionLabel =
@@ -133,39 +114,42 @@ export default function OperationsCardAssignmentScreen() {
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
 
-  const runAssignment = useCallback(async (nextUid: string) => {
-    if (!student) {
-      setErrorMessage("The selected student record could not be found.");
-      return;
-    }
+  const runAssignment = useCallback(
+    async (nextUid: string) => {
+      if (!student) {
+        setErrorMessage("The selected student record could not be found.");
+        return;
+      }
 
-    if (!nextUid.trim()) {
-      setErrorMessage("No NFC card UID was found.");
-      return;
-    }
+      if (!nextUid.trim()) {
+        setErrorMessage("No NFC card UID was found.");
+        return;
+      }
 
-    setErrorMessage(null);
-    setScreenState("loading");
+      setErrorMessage(null);
+      setScreenState("loading");
 
-    try {
-      const nextCard = await assignCardToStudent({
-        mode: assignmentMode,
-        studentId: student.id,
-        uid: nextUid.trim(),
-      });
+      try {
+        const nextCard = await assignCardToStudent({
+          mode: assignmentMode,
+          studentId: student.id,
+          uid: nextUid.trim(),
+        });
 
-      await queryClient.invalidateQueries({ queryKey: ["cards"] });
-      setAssignedUid(nextCard.uid);
-      setScreenState("result");
-    } catch (error) {
-      setScreenState("idle");
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "The card could not be assigned.",
-      );
-    }
-  }, [assignmentMode, queryClient, student]);
+        await queryClient.invalidateQueries({ queryKey: ["cards"] });
+        setAssignedUid(nextCard.uid);
+        setScreenState("result");
+      } catch (error) {
+        setScreenState("idle");
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "The card could not be assigned.",
+        );
+      }
+    },
+    [assignmentMode, queryClient, student],
+  );
 
   const handleAssignByNfc = useCallback(async () => {
     Keyboard.dismiss();
@@ -193,7 +177,12 @@ export default function OperationsCardAssignmentScreen() {
   }, [runAssignment]);
 
   return (
-    <View style={styles.root}>
+    <View
+      style={[
+        styles.root,
+        { paddingBottom: Math.max(insets.bottom, spacing.sm) },
+      ]}
+    >
       {/* ── Drag handle ── */}
       <View style={styles.dragHandle} />
 
@@ -269,7 +258,15 @@ export default function OperationsCardAssignmentScreen() {
             style={styles.resultStage}
           >
             <ScrollView
-              contentContainerStyle={styles.resultContent}
+              contentContainerStyle={[
+                styles.resultContent,
+                {
+                  gap: isCompact ? spacing.md : spacing.lg,
+                  paddingBottom: assignmentBottomPadding,
+                  paddingHorizontal: horizontalPadding,
+                  paddingTop: isCompact ? spacing.md : spacing.xl,
+                },
+              ]}
               showsVerticalScrollIndicator={false}
             >
               {/* Success ring */}
@@ -326,36 +323,77 @@ export default function OperationsCardAssignmentScreen() {
           </Animated.View>
         ) : (
           /* ── Idle / scanning state ── */
-          <View style={styles.radarZone}>
-            <RadarPulse
-              active={screenState === "idle"}
-              size={fixedScreen.heroSize}
-              ringCount={3}
-            >
-              <ScanLine
-                color="#ffffff"
-                size={fixedScreen.heroIconSize}
-                strokeWidth={2}
-              />
-            </RadarPulse>
-
-            <View style={[styles.statusArea, { gap: fixedScreen.statusGap }]}>
-              <Text
-                style={[styles.scanPrompt, isCompact && styles.scanPromptCompact]}
+          <ScrollView
+            contentContainerStyle={[
+              styles.assignmentContent,
+              {
+                gap: isCompact ? spacing.sm : spacing.md,
+                paddingBottom: assignmentBottomPadding,
+                paddingHorizontal: horizontalPadding,
+                paddingTop: isCompact ? spacing.sm : spacing.lg,
+              },
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.radarCluster}>
+              <RadarPulse
+                active={screenState === "idle"}
+                size={assignmentHeroSize}
+                ringCount={3}
               >
-                {assignmentMode === "replace"
-                  ? "Place new card near reader"
-                  : "Place card near reader"}
-              </Text>
-              <Text style={styles.scanHint}>
-                Scan the student card to continue
-              </Text>
-              <View style={styles.nfcAction}>
-                <Button
-                  label="Scan NFC Card"
-                  onPress={() => void handleAssignByNfc()}
-                  variant="secondary"
+                <ScanLine
+                  color="#ffffff"
+                  size={Math.min(
+                    fixedScreen.heroIconSize,
+                    assignmentHeroSize * 0.16,
+                  )}
+                  strokeWidth={2}
                 />
+              </RadarPulse>
+
+              <View style={[styles.statusArea, { gap: fixedScreen.statusGap }]}>
+                {screenState === "loading" ? (
+                  <LoadingState message={`${actionLabel} in progress...`} />
+                ) : (
+                  <>
+                    <Text
+                      style={[
+                        styles.scanPrompt,
+                        isCompact && styles.scanPromptCompact,
+                      ]}
+                    >
+                      {assignmentMode === "replace"
+                        ? "Place new card near reader"
+                        : "Place card near reader"}
+                    </Text>
+                    <Text style={styles.scanHint}>
+                      Scan the student card to continue
+                    </Text>
+                    <View style={styles.nfcAction}>
+                      <Button
+                        label="Scan NFC Card"
+                        onPress={() => void handleAssignByNfc()}
+                        variant="secondary"
+                      />
+                    </View>
+                    {errorMessage ? (
+                      <Animated.View
+                        entering={FadeInDown.duration(200)}
+                        exiting={FadeOut.duration(150)}
+                        style={styles.inlineError}
+                      >
+                        <ShieldAlert
+                          color={colors.danger}
+                          size={14}
+                          strokeWidth={2.5}
+                        />
+                        <Text style={styles.inlineErrorText} numberOfLines={2}>
+                          {errorMessage}
+                        </Text>
+                      </Animated.View>
+                    ) : null}
+                  </>
+                )}
               </View>
             </View>
 
@@ -368,45 +406,15 @@ export default function OperationsCardAssignmentScreen() {
                 </Text>
               </View>
             )}
-
-            {screenState === "loading" && (
-              <View style={styles.loadingWrap}>
-                <LoadingState message={`${actionLabel} in progress...`} />
-              </View>
-            )}
-          </View>
+          </ScrollView>
         )}
       </Pressable>
-
-      {errorMessage &&
-      screenState !== "result" &&
-      student &&
-      !isLoading &&
-      canManageCards &&
-      !hasError &&
-      isReadyForReplace ? (
-        <View style={styles.errorToastWrap}>
-          <View
-            style={[
-              styles.errorToast,
-              {
-                marginBottom:
-                  Math.max(insets.bottom, spacing.sm) +
-                  fixedScreen.bottomToastOffset,
-              },
-            ]}
-          >
-            <Text style={styles.errorToastText}>{errorMessage}</Text>
-          </View>
-        </View>
-      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: colors.background,
     flex: 1,
   },
 
@@ -440,7 +448,7 @@ const styles = StyleSheet.create({
   },
 
   titleRow: {
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
@@ -451,6 +459,7 @@ const styles = StyleSheet.create({
   titleCopy: {
     flex: 1,
     gap: spacing.xs,
+    minWidth: 0,
   },
   title: {
     color: colors.text,
@@ -458,6 +467,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: -0.5,
     lineHeight: 30,
+    flexShrink: 1,
   },
   titleCompact: {
     fontSize: 22,
@@ -468,6 +478,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
     fontWeight: "500",
     lineHeight: 20,
+    flexShrink: 1,
   },
 
   /* ── Body ── */
@@ -476,23 +487,28 @@ const styles = StyleSheet.create({
   },
 
   /* ── Radar / idle zone ── */
-  radarZone: {
+  assignmentContent: {
     alignItems: "center",
-    flex: 1,
-    gap: spacing.md,
+    flexGrow: 1,
     justifyContent: "center",
-    paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.lg,
+    minHeight: "100%",
+  },
+  radarCluster: {
+    alignItems: "center",
+    gap: spacing.md,
+    width: "100%",
   },
   statusArea: {
     alignItems: "center",
     gap: spacing.xs,
+    width: "100%",
   },
   scanPrompt: {
     color: colors.text,
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: -0.3,
+    textAlign: "center",
   },
   scanPromptCompact: {
     fontSize: fontSizes.md,
@@ -501,10 +517,13 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+    textAlign: "center",
   },
   nfcAction: {
     marginTop: spacing.sm,
     minWidth: 180,
+    width: "100%",
+    maxWidth: 260,
   },
   currentCardPill: {
     alignItems: "center",
@@ -514,8 +533,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: spacing.xs,
     marginTop: spacing.md,
+    maxWidth: 420,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    width: "100%",
   },
   currentCardLabel: {
     color: colors.textMuted,
@@ -529,28 +550,25 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: 1.5,
+    textAlign: "center",
   },
   currentCardMeta: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
+    textAlign: "center",
   },
 
-  errorToastWrap: {
-    left: spacing.lg,
-    position: "absolute",
-    right: spacing.lg,
-  },
-  errorToast: {
+  inlineError: {
     alignItems: "center",
-    backgroundColor: colors.dangerSoft,
-    borderColor: colors.danger,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    flexDirection: "row",
+    gap: spacing.xs,
+    justifyContent: "center",
+    maxWidth: 320,
+    paddingHorizontal: spacing.sm,
   },
-  errorToastText: {
+  inlineErrorText: {
     color: colors.danger,
+    flexShrink: 1,
     fontSize: fontSizes.xs,
     fontWeight: "700",
     textAlign: "center",
@@ -562,10 +580,8 @@ const styles = StyleSheet.create({
   },
   resultContent: {
     alignItems: "center",
-    gap: spacing.lg,
-    paddingBottom: spacing.xxxxl,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    flexGrow: 1,
+    justifyContent: "center",
   },
   successRing: {
     alignItems: "center",
@@ -610,9 +626,10 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: 2.5,
+    textAlign: "center",
   },
   summaryCard: {
-    alignItems: "center",
+    alignItems: "flex-start",
     backgroundColor: colors.surface,
     borderColor: colors.border,
     borderRadius: radius.lg,
@@ -639,17 +656,20 @@ const styles = StyleSheet.create({
   summaryText: {
     flex: 1,
     gap: 2,
+    minWidth: 0,
   },
   summaryName: {
     color: colors.text,
     fontSize: fontSizes.md,
     fontWeight: "800",
     letterSpacing: -0.2,
+    flexShrink: 1,
   },
   summaryMeta: {
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "500",
+    flexShrink: 1,
   },
 
   /* ── Message / error card ── */
@@ -684,9 +704,5 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: "center",
     width: 32,
-  },
-  loadingWrap: {
-    alignSelf: "stretch",
-    marginTop: spacing.md,
   },
 });

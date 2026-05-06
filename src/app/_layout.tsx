@@ -16,22 +16,6 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(student)" options={{ headerShown: false }} />
             <Stack.Screen name="(operations)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(operations)/student-details"
-              options={{
-                headerShown: false,
-                gestureEnabled: true,
-                presentation: "formSheet",
-              }}
-            />
-            <Stack.Screen
-              name="(operations)/card-assignment"
-              options={{
-                headerShown: false,
-                gestureEnabled: true,
-                presentation: "formSheet",
-              }}
-            />
           </Stack>
           <StatusBar style="auto" />
         </AppProviders>
