@@ -32,25 +32,32 @@ export function FloatingScanInput({
   errorMessage,
   helperText,
 }: FloatingScanInputProps) {
+  const shouldShowGhost = studentId.length < 8;
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.pill}>
         <View style={styles.inputArea}>
           <Text style={styles.prefix}>ID</Text>
-          <TextInput
-            autoCorrect={false}
-            keyboardType="number-pad"
-            maxLength={8}
-            onChangeText={(v) =>
-              onChangeStudentId(v.replace(/[^\d]/g, "").slice(0, 8))
-            }
-            onSubmitEditing={onSubmit}
-            placeholder="26102859"
-            placeholderTextColor={colors.textMuted}
-            returnKeyType="done"
-            style={styles.input}
-            value={studentId}
-          />
+          <View style={styles.inputStack}>
+            {shouldShowGhost ? (
+              <Text style={styles.ghostText} numberOfLines={1}>
+                26102859
+              </Text>
+            ) : null}
+            <TextInput
+              autoCorrect={false}
+              keyboardType="number-pad"
+              maxLength={8}
+              onChangeText={(v) =>
+                onChangeStudentId(v.replace(/[^\d]/g, "").slice(0, 8))
+              }
+              onSubmitEditing={onSubmit}
+              returnKeyType="done"
+              style={styles.input}
+              value={studentId}
+            />
+          </View>
         </View>
 
         <Pressable
@@ -141,13 +148,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
   },
+  inputStack: {
+    flex: 1,
+    justifyContent: "center",
+  },
   prefix: {
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "800",
     letterSpacing: 1,
   },
+  ghostText: {
+    color: colors.textMuted,
+    fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
+    fontSize: fontSizes.lg,
+    fontWeight: "700",
+    left: 0,
+    letterSpacing: 3,
+    opacity: 0.45,
+    position: "absolute",
+    right: 0,
+  },
   input: {
+    backgroundColor: colors.transparent,
     color: colors.text,
     flex: 1,
     fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
