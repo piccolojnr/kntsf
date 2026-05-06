@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 
-type StatusCardTone = "primary" | "success" | "warning";
+type StatusCardTone = "primary" | "success" | "warning" | "danger";
 
 type StatusCardProps = {
   description: string;
@@ -29,6 +29,11 @@ const toneStyles: Record<
     backgroundColor: colors.warningSoft,
     borderColor: colors.warningSoft,
     valueColor: colors.warning,
+  },
+  danger: {
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerSoft,
+    valueColor: colors.danger,
   },
 };
 

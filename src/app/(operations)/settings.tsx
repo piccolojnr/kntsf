@@ -1,19 +1,133 @@
-import { Href } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { Settings, ShieldAlert } from "lucide-react-native";
+import { StyleSheet, Switch, Text, View } from "react-native";
 
-import { RoleAccessGuard } from "@/components/layout/role-access-guard";
-import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { SectionCard } from "@/components/cards/section-card";
+import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { DetailRow } from "@/components/ui/detail-row";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+import { getPermitIssuanceConfig } from "@/features/permits/permit-api";
+
+function formatCurrency(amount: number) {
+  return `GHS ${amount.toFixed(2)}`;
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export default function OperationsSettingsScreen() {
+  const configQuery = useQuery({
+    queryKey: ["permit-issuance-config"],
+    queryFn: getPermitIssuanceConfig,
+  });
+
+  const config = configQuery.data;
+
   return (
-    <RoleAccessGuard
-      allowedRoles={["admin"]}
-      getForbiddenHref={() => "/(operations)/scan" as Href}
+    <AdminToolScreen
+      title="Settings"
+      subtitle="Inspect mock permit issuance configuration for this workspace."
     >
-      <PlaceholderScreen
-        title="Operations Settings"
-        description="Adjust configuration and administrative settings for operations."
-        screenName="operations/settings"
-      />
-    </RoleAccessGuard>
+      {configQuery.isLoading ? (
+        <LoadingState message="Loading permit settings..." />
+      ) : configQuery.isError || !config ? (
+        <EmptyState
+          description="Permit issuance settings could not be loaded right now."
+          icon={ShieldAlert}
+          title="Unable to load settings"
+        />
+      ) : (
+        <>
+          <SectionCard title="Permit Issuance">
+            <View style={styles.settingRow}>
+              <View style={styles.settingCopy}>
+                <Text style={styles.settingTitle}>Issuance Enabled</Text>
+                <Text style={styles.settingHelper}>
+                  Mock-only switch. Backend configuration will own this later.
+                </Text>
+              </View>
+              <Switch
+                disabled
+                thumbColor={config.enabled ? colors.primary : colors.border}
+                trackColor={{
+                  false: colors.surfaceMuted,
+                  true: colors.primarySoft,
+                }}
+                value={config.enabled}
+              />
+            </View>
+            <DetailRow
+              label="Academic Year"
+              value={config.academicYear}
+              helper="Applied automatically when a permit is issued."
+            />
+            <DetailRow
+              label="Default Amount"
+              value={formatCurrency(config.defaultAmount)}
+              helper="Staff do not enter amounts in the mobile workflow."
+            />
+            <DetailRow
+              label="Expiry Date"
+              value={formatDate(config.expiryDate)}
+              helper="All newly issued mock permits use this expiry date."
+            />
+          </SectionCard>
+
+          <View style={styles.notice}>
+            <Settings color={colors.warning} size={18} strokeWidth={2.4} />
+            <Text style={styles.noticeText}>
+              These settings are read-only in the mobile app for now. Production
+              changes should come from the backend dashboard.
+            </Text>
+          </View>
+        </>
+      )}
+    </AdminToolScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  settingRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+  },
+  settingCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  settingTitle: {
+    color: colors.text,
+    fontSize: fontSizes.md,
+    fontWeight: "800",
+  },
+  settingHelper: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+  notice: {
+    alignItems: "flex-start",
+    backgroundColor: colors.warningSoft,
+    borderColor: colors.warning,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    padding: spacing.md,
+  },
+  noticeText: {
+    color: colors.text,
+    flex: 1,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+});
