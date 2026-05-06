@@ -33,6 +33,7 @@ import {
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
+import { useNfcAvailability } from "@/hooks/use-nfc-availability";
 import { useScreenDensity } from "@/hooks/use-screen-density";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
@@ -51,6 +52,7 @@ export default function OperationsCardAssignmentScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { fixedScreen, height, isCompact, width } = useScreenDensity();
+  const { isCheckingNfc, isNfcAvailable } = useNfcAvailability();
   const queryClient = useQueryClient();
   const { mode, studentId } = useLocalSearchParams<{
     mode?: CardAssignmentMode;
@@ -113,6 +115,7 @@ export default function OperationsCardAssignmentScreen() {
   const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
+  const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
 
   const runAssignment = useCallback(
     async (nextUid: string) => {
@@ -154,6 +157,12 @@ export default function OperationsCardAssignmentScreen() {
   const handleAssignByNfc = useCallback(async () => {
     Keyboard.dismiss();
     setErrorMessage(null);
+
+    if (!isNfcAvailable) {
+      setErrorMessage("NFC scan is not supported on this device.");
+      return;
+    }
+
     setScreenState("loading");
 
     try {
@@ -174,7 +183,7 @@ export default function OperationsCardAssignmentScreen() {
           : "NFC card reading is not available right now.",
       );
     }
-  }, [runAssignment]);
+  }, [isNfcAvailable, runAssignment]);
 
   return (
     <View
@@ -337,12 +346,12 @@ export default function OperationsCardAssignmentScreen() {
           >
             <View style={styles.radarCluster}>
               <RadarPulse
-                active={screenState === "idle"}
+                active={screenState === "idle" && isNfcAvailable}
                 size={assignmentHeroSize}
                 ringCount={3}
               >
                 <ScanLine
-                  color="#ffffff"
+                  color={isNfcAvailable ? "#ffffff" : colors.textMuted}
                   size={Math.min(
                     fixedScreen.heroIconSize,
                     assignmentHeroSize * 0.16,
@@ -371,11 +380,26 @@ export default function OperationsCardAssignmentScreen() {
                     </Text>
                     <View style={styles.nfcAction}>
                       <Button
-                        label="Scan NFC Card"
+                        disabled={isCheckingNfc || nfcUnavailable}
+                        label={isCheckingNfc ? "Checking NFC" : "Scan NFC Card"}
                         onPress={() => void handleAssignByNfc()}
                         variant="secondary"
                       />
                     </View>
+                    {nfcUnavailable ? (
+                      <View style={styles.nfcNotice}>
+                        <ShieldAlert
+                          color={colors.textMuted}
+                          size={14}
+                          strokeWidth={2.5}
+                        />
+                        <Text style={styles.nfcNoticeText}>
+                          NFC scan is not supported on this device. Card
+                          assignment requires an Android development build with
+                          NFC.
+                        </Text>
+                      </View>
+                    ) : null}
                     {errorMessage ? (
                       <Animated.View
                         entering={FadeInDown.duration(200)}
@@ -571,6 +595,22 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontSize: fontSizes.xs,
     fontWeight: "700",
+    textAlign: "center",
+  },
+  nfcNotice: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.xs,
+    justifyContent: "center",
+    maxWidth: 330,
+    paddingHorizontal: spacing.sm,
+  },
+  nfcNoticeText: {
+    color: colors.textMuted,
+    flexShrink: 1,
+    fontSize: fontSizes.xs,
+    fontWeight: "700",
+    lineHeight: 17,
     textAlign: "center",
   },
 
