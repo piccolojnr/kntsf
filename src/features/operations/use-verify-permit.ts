@@ -7,7 +7,7 @@ import {
   getStudentByStudentId,
 } from "@/features/students/student-api";
 import { Student } from "@/features/students/student-types";
-import { isNfcSupported, readCardUid } from "@/lib/nfc/nfc-service";
+import { readCardUid } from "@/lib/nfc/nfc-service";
 
 import {
   scanCardByUid,
@@ -15,11 +15,22 @@ import {
 } from "./scan-api";
 import { VerificationResult } from "./scan-types";
 
+export type VerificationPhase =
+  | "idle"
+  | "verifying_student_id"
+  | "reading_nfc"
+  | "nfc_read_success"
+  | "verifying_card_uid"
+  | "issuing_permit"
+  | "success"
+  | "error";
+
 type UseVerifyPermitState = {
   loading: boolean;
   result: VerificationResult | null;
   error: string | null;
   success: boolean;
+  phase: VerificationPhase;
 };
 
 export type UseVerifyPermitReturn = UseVerifyPermitState & {
@@ -52,19 +63,42 @@ async function resolveStudentRecord(studentId: string, currentStudent?: Student 
   return getStudentById(normalizedStudentId);
 }
 
+function getSafeNfcErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "Unknown error";
+  }
+
+  switch (error.message) {
+    case "NFC not supported":
+    case "NFC disabled":
+    case "Scan cancelled":
+    case "No card detected":
+    case "Unknown error":
+      return error.message;
+    default:
+      return "Unknown error";
+  }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function useVerifyPermit(): UseVerifyPermitReturn {
   const [state, setState] = useState<UseVerifyPermitState>({
     loading: false,
     result: null,
     error: null,
     success: false,
+    phase: "idle",
   });
   const operationIdRef = useRef(0);
+  const nfcVerificationRef = useRef<Promise<VerificationResult> | null>(null);
 
   const currentStudent = state.result?.student ?? null;
   const currentPermit = state.result?.permit ?? null;
 
-  const beginOperation = useCallback((options?: { clearResult?: boolean }) => {
+  const beginOperation = useCallback((options?: { clearResult?: boolean; phase?: VerificationPhase }) => {
     operationIdRef.current += 1;
     const operationId = operationIdRef.current;
 
@@ -72,10 +106,24 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       loading: true,
       error: null,
       success: false,
+      phase: options?.phase ?? "verifying_student_id",
       result: options?.clearResult ? null : current.result,
     }));
 
     return operationId;
+  }, []);
+
+  const updatePhase = useCallback((operationId: number, phase: VerificationPhase) => {
+    if (operationId !== operationIdRef.current) {
+      return false;
+    }
+
+    setState((current) => ({
+      ...current,
+      phase,
+    }));
+
+    return true;
   }, []);
 
   const commitSuccess = useCallback(
@@ -89,6 +137,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
         result,
         error: null,
         success: true,
+        phase: "success",
       });
 
       return true;
@@ -106,6 +155,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       result: null,
       error: message,
       success: false,
+      phase: "error",
     });
 
     return true;
@@ -113,7 +163,10 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
 
   const verifyByStudentId = useCallback(
     async (studentId: string) => {
-      const operationId = beginOperation({ clearResult: true });
+      const operationId = beginOperation({
+        clearResult: true,
+        phase: "verifying_student_id",
+      });
 
       try {
         const nextResult = await verifyPermitByStudentId(studentId);
@@ -147,7 +200,10 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
 
   const verifyByCardUid = useCallback(
     async (uid: string) => {
-      const operationId = beginOperation({ clearResult: true });
+      const operationId = beginOperation({
+        clearResult: true,
+        phase: "verifying_card_uid",
+      });
 
       return runCardUidVerification(uid, operationId);
     },
@@ -155,46 +211,52 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
   );
 
   const verifyByNfc = useCallback(async () => {
-    const operationId = beginOperation({ clearResult: true });
-
-    try {
-      const supported = await isNfcSupported();
-
-      if (!supported) {
-        const message = "NFC is not supported on this device";
-        commitFailure(operationId, message);
-        throw new Error(message);
-      }
-
-      const uid = await readCardUid();
-
-      if (!uid) {
-        const message = "No NFC card was detected";
-        commitFailure(operationId, message);
-        throw new Error(message);
-      }
-
-      return await runCardUidVerification(uid, operationId);
-    } catch (error) {
-      if (operationId !== operationIdRef.current) {
-        throw error;
-      }
-
-      const message =
-        error instanceof Error &&
-          (error.message === "NFC is not supported on this device" ||
-            error.message === "No NFC card was detected")
-          ? error.message
-          : "NFC reading is not available yet.";
-
-      commitFailure(operationId, message);
-      throw new Error(message);
+    if (nfcVerificationRef.current) {
+      return nfcVerificationRef.current;
     }
-  }, [beginOperation, commitFailure, runCardUidVerification]);
+
+    const operationId = beginOperation({
+      clearResult: true,
+      phase: "reading_nfc",
+    });
+
+    const nfcVerification = (async () => {
+      try {
+        const uid = await readCardUid();
+
+        if (!uid) {
+          const message = "No card detected";
+          commitFailure(operationId, message);
+          throw new Error(message);
+        }
+
+        updatePhase(operationId, "nfc_read_success");
+        await delay(450);
+        updatePhase(operationId, "verifying_card_uid");
+
+        return await runCardUidVerification(uid, operationId);
+      } catch (error) {
+        if (operationId !== operationIdRef.current) {
+          throw error;
+        }
+
+        const message = getSafeNfcErrorMessage(error);
+
+        commitFailure(operationId, message);
+        throw new Error(message);
+      }
+    })();
+
+    nfcVerificationRef.current = nfcVerification.finally(() => {
+      nfcVerificationRef.current = null;
+    });
+
+    return nfcVerificationRef.current;
+  }, [beginOperation, commitFailure, runCardUidVerification, updatePhase]);
 
   const issuePermit = useCallback(
     async (studentId: string) => {
-      const operationId = beginOperation();
+      const operationId = beginOperation({ phase: "issuing_permit" });
 
       try {
         const student = await resolveStudentRecord(studentId, currentStudent);
@@ -225,11 +287,13 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
 
   const reset = useCallback(() => {
     operationIdRef.current += 1;
+    nfcVerificationRef.current = null;
     setState({
       loading: false,
       result: null,
       error: null,
       success: false,
+      phase: "idle",
     });
   }, []);
 
@@ -239,6 +303,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       result: state.result,
       error: state.error,
       success: state.success,
+      phase: state.phase,
       currentStudent,
       currentPermit,
       verifyByStudentId,
@@ -254,6 +319,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       reset,
       state.error,
       state.loading,
+      state.phase,
       state.result,
       state.success,
       verifyByCardUid,
