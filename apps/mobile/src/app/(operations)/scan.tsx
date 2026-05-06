@@ -1,9 +1,10 @@
-import { RotateCcw, ScanLine } from "lucide-react-native";
+import { FileText, RotateCcw, ScanLine } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -18,6 +19,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
+import { PermitIssueConfirmationModal } from "@/components/cards/permit-issue-confirmation-modal";
 import { VerificationResultCard } from "@/components/cards/verification-result-card";
 import { FloatingScanInput } from "@/components/forms/floating-scan-input";
 import { Button } from "@/components/ui/button";
@@ -25,14 +28,17 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
-import { colors, fontSizes, spacing } from "@/constants/theme";
-import { verifyPermitByStudentId } from "@/features/operations/scan-api";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+import {
+  issuePermitFromVerification,
+  verifyPermitByStudentId,
+} from "@/features/operations/scan-api";
 import { VerificationResult } from "@/features/operations/scan-types";
 
 type ScreenState = "idle" | "loading" | "result";
 
-/** Tab bar height (76) + bottom margin (~16) + gap (12). */
-const TAB_BAR_CLEARANCE = 104;
+/** Tab bar height (76) + bottom margin (~16) + extra breathing room for result actions. */
+const TAB_BAR_CLEARANCE = 128;
 const ANIM_CONFIG = { duration: 280, easing: Easing.bezier(0.4, 0, 0.2, 1) };
 
 function useKeyboardHeight() {
@@ -63,10 +69,14 @@ export default function OperationsScanScreen() {
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
 
-  const [studentId, setStudentId] = useState("2610");
+  const [studentId, setStudentId] = useState("");
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [screenState, setScreenState] = useState<ScreenState>("idle");
+  const [showPermitDetails, setShowPermitDetails] = useState(false);
+  const [showIssueConfirm, setShowIssueConfirm] = useState(false);
+  const [isIssuing, setIsIssuing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Animate the pill's bottom offset
   const pillBottom = useSharedValue(
@@ -108,6 +118,7 @@ export default function OperationsScanScreen() {
 
     setStudentId(normalizedStudentId);
     setErrorMessage(null);
+    setSuccessMessage(null);
     setScreenState("loading");
 
     try {
@@ -129,9 +140,46 @@ export default function OperationsScanScreen() {
   function handleVerifyAnother() {
     setResult(null);
     setErrorMessage(null);
-    setStudentId("2610");
+    setSuccessMessage(null);
+    setShowIssueConfirm(false);
+    setShowPermitDetails(false);
+    setStudentId("");
     setScreenState("idle");
   }
+
+  async function handleIssuePermit() {
+    if (!result) return;
+
+    setIsIssuing(true);
+
+    try {
+      const issued = await issuePermitFromVerification(result);
+      setResult({
+        ...result,
+        decision: "allowed",
+        message: "Permit issued successfully.",
+        permit: issued.permit,
+        canIssuePermit: false,
+        issuanceConfig: issued.issuanceConfig,
+      });
+      setSuccessMessage("Permit issued successfully.");
+      setShowIssueConfirm(false);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Permit issuance failed. Try again.",
+      );
+    } finally {
+      setIsIssuing(false);
+    }
+  }
+
+  const canViewPermit =
+    !!result?.permit &&
+    (result.decision === "allowed" ||
+      result.decision === "expired_permit" ||
+      result.decision === "revoked_permit");
 
   return (
     <Screen>
@@ -150,13 +198,65 @@ export default function OperationsScanScreen() {
             exiting={FadeOut.duration(200)}
             style={styles.resultStage}
           >
-            <VerificationResultCard result={result} />
-            <Button
-              icon={RotateCcw}
-              label="Verify Another"
-              onPress={handleVerifyAnother}
-              variant="secondary"
-            />
+            <ScrollView
+              contentContainerStyle={styles.resultContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {successMessage ? (
+                <View style={styles.successNotice}>
+                  <Text style={styles.successNoticeTitle}>Success</Text>
+                  <Text style={styles.successNoticeText}>{successMessage}</Text>
+                </View>
+              ) : null}
+              <VerificationResultCard result={result} />
+              {result.decision === "denied" &&
+              result.method === "student_id" ? (
+                <View style={styles.infoNotice}>
+                  <FileText
+                    color={colors.warning}
+                    size={18}
+                    strokeWidth={2.2}
+                  />
+                  <Text style={styles.infoNoticeText}>
+                    Student records must be added in the dashboard system before
+                    a permit can be verified or issued here.
+                  </Text>
+                </View>
+              ) : null}
+              {result.issuanceConfig && !result.issuanceConfig.enabled ? (
+                <View style={styles.closedNotice}>
+                  <Text style={styles.closedNoticeTitle}>Issuance Closed</Text>
+                  <Text style={styles.closedNoticeText}>
+                    Permit issuance is currently closed.
+                  </Text>
+                </View>
+              ) : null}
+              <View style={styles.actions}>
+                {canViewPermit ? (
+                  <View style={styles.actionFlex}>
+                    <Button
+                      label="View Permit"
+                      onPress={() => setShowPermitDetails(true)}
+                      variant="secondary"
+                    />
+                  </View>
+                ) : null}
+                {result.canIssuePermit ? (
+                  <View style={styles.actionFlex}>
+                    <Button
+                      label="Issue Permit"
+                      onPress={() => setShowIssueConfirm(true)}
+                    />
+                  </View>
+                ) : null}
+              </View>
+              <Button
+                icon={RotateCcw}
+                label="Verify Another"
+                onPress={handleVerifyAnother}
+                variant="secondary"
+              />
+            </ScrollView>
           </Animated.View>
         ) : (
           <View style={styles.radarZone}>
@@ -175,8 +275,8 @@ export default function OperationsScanScreen() {
                 </View>
               ) : (
                 <View style={styles.statusArea}>
-                  <Text style={styles.scanPrompt}>Tap to Scan NFC Card</Text>
-                  <Text style={styles.scanHint}>or enter ID below</Text>
+                  <Text style={styles.scanPrompt}>Verify Student Permit</Text>
+                  <Text style={styles.scanHint}>Enter student ID below</Text>
                 </View>
               ))}
           </View>
@@ -188,6 +288,7 @@ export default function OperationsScanScreen() {
         <Animated.View style={[styles.floatingPill, pillAnimStyle]}>
           <FloatingScanInput
             errorMessage={errorMessage}
+            helperText="Most student IDs start with 2610."
             isLoading={screenState === "loading"}
             onChangeStudentId={setStudentId}
             onSubmit={() => void handleVerify()}
@@ -195,12 +296,28 @@ export default function OperationsScanScreen() {
           />
         </Animated.View>
       )}
+
+      <PermitIssueConfirmationModal
+        config={result?.issuanceConfig}
+        isSubmitting={isIssuing}
+        onClose={() => setShowIssueConfirm(false)}
+        onConfirm={() => void handleIssuePermit()}
+        student={result?.student ?? null}
+        visible={showIssueConfirm}
+      />
+
+      <PermitDetailModal
+        onClose={() => setShowPermitDetails(false)}
+        permit={result?.permit ?? null}
+        student={result?.student ?? null}
+        visible={showPermitDetails}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
+  flex: { flex: 1, gap: spacing.lg },
   pageHeader: {
     paddingTop: 0,
   },
@@ -240,8 +357,70 @@ const styles = StyleSheet.create({
   /* ── Result ── */
   resultStage: {
     flex: 1,
+  },
+  resultContent: {
+    flexGrow: 1,
     gap: spacing.sm,
-    // paddingTop: spacing.xl,
-    paddingBottom: TAB_BAR_CLEARANCE + spacing.lg,
+    justifyContent: "center",
+    paddingBottom: TAB_BAR_CLEARANCE + spacing.xl,
+  },
+  actions: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  actionFlex: {
+    flex: 1,
+  },
+  closedNotice: {
+    backgroundColor: colors.warningSoft,
+    borderColor: colors.warning,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  closedNoticeTitle: {
+    color: colors.warning,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+  },
+  closedNoticeText: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+  infoNotice: {
+    alignItems: "flex-start",
+    backgroundColor: colors.warningSoft,
+    borderColor: colors.warning,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    padding: spacing.md,
+  },
+  infoNoticeText: {
+    color: colors.text,
+    flex: 1,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+  successNotice: {
+    backgroundColor: colors.successSoft,
+    borderColor: colors.success,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  successNoticeTitle: {
+    color: colors.success,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+  },
+  successNoticeText: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
   },
 });

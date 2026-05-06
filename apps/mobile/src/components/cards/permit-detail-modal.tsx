@@ -4,14 +4,13 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react-native";
 import { useCallback, useMemo, useRef } from "react";
-import { Alert, Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit } from "@/features/permits/permit-types";
 import { Student } from "@/features/students/student-types";
-import { Button } from "../ui/button";
 
 type PermitDetailModalProps = {
   onClose: () => void;
@@ -55,10 +54,6 @@ function formatAmount(amount: number) {
     currency: "GHS",
     minimumFractionDigits: 2,
   }).format(amount);
-}
-
-function showPlaceholder(label: string) {
-  Alert.alert("Action Unavailable", `${label} is not implemented yet.`);
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -205,34 +200,6 @@ export function PermitDetailModal({
                     value={formatAmount(permit.amountPaid)}
                   />
                 </InfoCard>
-
-                {/* ── Actions ── */}
-                <View style={styles.actions}>
-                  <View style={styles.actionsRow}>
-                    <View style={styles.actionGhost}>
-                      <Button
-                        fullWidth={false}
-                        label="View Details"
-                        onPress={() => showPlaceholder("View Details")}
-                        size="compact"
-                        variant="secondary"
-                      />
-                    </View>
-                    <View style={styles.actionGhost}>
-                      <Button
-                        fullWidth={false}
-                        label="Verify"
-                        onPress={() => showPlaceholder("Verify")}
-                        size="compact"
-                        variant="secondary"
-                      />
-                    </View>
-                  </View>
-                  <Button
-                    label="Issue / Renew"
-                    onPress={() => showPlaceholder("Issue/Renew")}
-                  />
-                </View>
               </>
             ) : null}
           </BottomSheetScrollView>
@@ -325,8 +292,9 @@ const styles = StyleSheet.create({
     marginHorizontal: -spacing.lg,
   },
   infoRow: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
+    gap: spacing.md,
     justifyContent: "space-between",
     paddingVertical: 2,
   },
@@ -334,26 +302,14 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+    maxWidth: "40%",
   },
   infoValue: {
     color: colors.text,
     flex: 1,
     fontSize: fontSizes.sm,
     fontWeight: "700",
-    paddingLeft: spacing.md,
+    flexShrink: 1,
     textAlign: "right",
-  },
-
-  /* ── Actions ── */
-  actions: {
-    gap: spacing.sm,
-    paddingTop: spacing.xs,
-  },
-  actionsRow: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  actionGhost: {
-    flex: 1,
   },
 });

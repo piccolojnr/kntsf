@@ -1,6 +1,6 @@
 import { simulateDelay } from "@/lib/api/mock-api";
 
-import { Permit } from "./permit-types";
+import { Permit, PermitIssuanceConfig } from "./permit-types";
 
 const mockPermits: Permit[] = [
   {
@@ -41,8 +41,19 @@ const mockPermits: Permit[] = [
   },
 ];
 
+const mockPermitIssuanceConfig: PermitIssuanceConfig = {
+  enabled: true,
+  defaultAmount: 850,
+  expiryDate: "2026-12-31T23:59:59.000Z",
+  academicYear: "2025/2026",
+};
+
 function clonePermit(permit: Permit) {
   return { ...permit };
+}
+
+function clonePermitIssuanceConfig() {
+  return { ...mockPermitIssuanceConfig };
 }
 
 export async function getPermits() {
@@ -74,4 +85,39 @@ export async function getLatestPermitByStudentId(studentId: string) {
       new Date(right.startDate).getTime() - new Date(left.startDate).getTime()
     );
   })[0] ?? null;
+}
+
+export async function getPermitIssuanceConfig() {
+  await simulateDelay(180);
+  return clonePermitIssuanceConfig();
+}
+
+function createPermitCode(studentId: string, academicYear: string) {
+  const suffix = studentId.split("-").at(-1)?.toUpperCase() ?? "STD";
+  const year = academicYear.split("/")[1] ?? "2026";
+  return `PRM-${suffix}-${year}`;
+}
+
+export async function issuePermitForStudent(studentId: string) {
+  await simulateDelay(320);
+
+  const config = clonePermitIssuanceConfig();
+
+  if (!config.enabled) {
+    throw new Error("Permit issuance is currently closed.");
+  }
+
+  const nextPermit: Permit = {
+    id: `permit-${mockPermits.length + 1}`,
+    studentId,
+    permitCode: createPermitCode(studentId, config.academicYear),
+    status: "active",
+    startDate: new Date().toISOString(),
+    expiryDate: config.expiryDate,
+    amountPaid: config.defaultAmount,
+  };
+
+  mockPermits.unshift(nextPermit);
+
+  return clonePermit(nextPermit);
 }

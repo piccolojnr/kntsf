@@ -21,6 +21,7 @@ type FloatingScanInputProps = {
   onSubmit: () => void;
   isLoading: boolean;
   errorMessage: string | null;
+  helperText?: string;
 };
 
 export function FloatingScanInput({
@@ -29,6 +30,7 @@ export function FloatingScanInput({
   onSubmit,
   isLoading,
   errorMessage,
+  helperText,
 }: FloatingScanInputProps) {
   return (
     <View style={styles.wrapper}>
@@ -82,6 +84,8 @@ export function FloatingScanInput({
           )}
         </Pressable>
       </View>
+
+      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
     </View>
   );
 }
@@ -90,6 +94,13 @@ const styles = StyleSheet.create({
   wrapper: {
     gap: spacing.sm,
     alignItems: "stretch",
+  },
+  helperText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "600",
+    paddingHorizontal: spacing.md,
+    textAlign: "center",
   },
 
   /* ── Error toast ── */

@@ -1,20 +1,14 @@
 import { FileText, Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { SearchField } from "@/components/ui/search-field";
 import { Screen } from "@/components/ui/screen";
+import { SearchField } from "@/components/ui/search-field";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { usePermits } from "@/features/permits/use-permits";
