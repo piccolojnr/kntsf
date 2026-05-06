@@ -2,7 +2,9 @@ import { getCardByUid } from "@/features/cards/card-api";
 import { StudentCard } from "@/features/cards/card-types";
 import {
   getLatestPermitByStudentId,
+  getPermitIssuanceConfig,
   getPermitsByStudentId,
+  issuePermitForStudent,
 } from "@/features/permits/permit-api";
 import { Permit } from "@/features/permits/permit-types";
 import {
@@ -17,6 +19,7 @@ import {
   ScanDecision,
   ScanLog,
   VerificationMethod,
+  VerificationResult,
 } from "./scan-types";
 
 const mockScanLogs: ScanLog[] = [
@@ -112,6 +115,8 @@ function createResult(
     student: context?.student ?? null,
     card: context?.card ?? null,
     permit: context?.permit ?? null,
+    canIssuePermit: false,
+    issuanceConfig: null,
     log: buildScanLog(method, value, decision, message, context),
   };
 }
@@ -138,21 +143,32 @@ async function evaluatePermitForStudent(
     card?: StudentCard | null;
   },
 ): Promise<ScanCardResult> {
+  const issuanceConfig = await getPermitIssuanceConfig();
   const permits = await getPermitsByStudentId(student.id);
   const activePermit = permits.find((permit) => permit.status === "active");
 
   if (activePermit) {
-    return createResult(method, value, "allowed", "Active permit verified. Access granted.", {
-      card: extras?.card,
-      permit: activePermit,
-      student,
-    });
+    return {
+      ...createResult(
+      method,
+      value,
+      "allowed",
+      "Active permit verified. Access granted.",
+      {
+        card: extras?.card,
+        permit: activePermit,
+        student,
+      },
+      ),
+      issuanceConfig,
+    };
   }
 
   const latestPermit = await getLatestPermitByStudentId(student.id);
 
   if (latestPermit?.status === "expired") {
-    return createResult(
+    return {
+      ...createResult(
       method,
       value,
       "expired_permit",
@@ -162,20 +178,45 @@ async function evaluatePermitForStudent(
         permit: latestPermit,
         student,
       },
-    );
+      ),
+      canIssuePermit: issuanceConfig.enabled,
+      issuanceConfig,
+    };
   }
 
-  return createResult(
-    method,
-    value,
-    "no_active_permit",
-    "Student found, but there is no active permit for entry.",
-    {
-      card: extras?.card,
-      permit: latestPermit,
-      student,
-    },
-  );
+  if (latestPermit?.status === "revoked") {
+    return {
+      ...createResult(
+        method,
+        value,
+        "revoked_permit",
+        "The student's latest permit was revoked.",
+        {
+          card: extras?.card,
+          permit: latestPermit,
+          student,
+        },
+      ),
+      canIssuePermit: issuanceConfig.enabled,
+      issuanceConfig,
+    };
+  }
+
+  return {
+    ...createResult(
+      method,
+      value,
+      "no_active_permit",
+      "Student found, but there is no active permit for entry.",
+      {
+        card: extras?.card,
+        permit: latestPermit,
+        student,
+      },
+    ),
+    canIssuePermit: issuanceConfig.enabled,
+    issuanceConfig,
+  };
 }
 
 export async function getScanLogs() {
@@ -236,7 +277,7 @@ export async function verifyPermitByStudentId(
       "student_id",
       normalizedStudentId,
       "denied",
-      "No student record was found for this student ID.",
+      "No student record was found for this student ID. Please add the student in the dashboard system.",
     );
   }
 
@@ -252,4 +293,23 @@ export async function verifyPermit(input: {
   }
 
   return verifyPermitByStudentId(input.value);
+}
+
+export async function issuePermitFromVerification(result: VerificationResult) {
+  if (!result.student) {
+    throw new Error("A student record is required before issuing a permit.");
+  }
+
+  const issuanceConfig = await getPermitIssuanceConfig();
+
+  if (!issuanceConfig.enabled) {
+    throw new Error("Permit issuance is currently closed.");
+  }
+
+  const permit = await issuePermitForStudent(result.student.id);
+
+  return {
+    permit,
+    issuanceConfig,
+  };
 }

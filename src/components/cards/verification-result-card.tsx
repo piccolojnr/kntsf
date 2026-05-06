@@ -23,12 +23,17 @@ function getResultTone(result: VerificationResult): ResultTone {
       };
     case "expired_permit":
     case "no_active_permit":
+    case "revoked_permit":
       return {
         accent: colors.warning,
         soft: colors.warningSoft,
         Icon: AlertTriangle,
         statusLabel:
-          result.decision === "expired_permit" ? "EXPIRED" : "NO PERMIT",
+          result.decision === "expired_permit"
+            ? "EXPIRED"
+            : result.decision === "revoked_permit"
+              ? "REVOKED"
+              : "NO PERMIT",
       };
     default:
       return {
@@ -37,7 +42,7 @@ function getResultTone(result: VerificationResult): ResultTone {
         Icon: XCircle,
         statusLabel: "DENIED",
       };
-  }
+    }
 }
 
 function getVerdictLabel(result: VerificationResult) {
@@ -46,6 +51,8 @@ function getVerdictLabel(result: VerificationResult) {
       return "Permit Verified";
     case "expired_permit":
       return "Permit Expired";
+    case "revoked_permit":
+      return "Permit Revoked";
     case "no_active_permit":
       return "Permit Missing";
     case "card_not_registered":
@@ -53,7 +60,9 @@ function getVerdictLabel(result: VerificationResult) {
     case "card_inactive":
       return "Card Inactive";
     default:
-      return "Verification Denied";
+      return result.method === "student_id"
+        ? "Student Not Found"
+        : "Verification Denied";
   }
 }
 
@@ -91,6 +100,11 @@ export function VerificationResultCard({
         <Text style={[styles.verdict, { color: tone.accent }]}>
           {verdictLabel}
         </Text>
+        {result.student ? (
+          <Text style={styles.bannerSubtitle}>
+            {result.student.name} · {result.student.studentId}
+          </Text>
+        ) : null}
       </View>
 
       {/* Message */}
@@ -98,20 +112,6 @@ export function VerificationResultCard({
         <Text style={styles.metaLabel}>MESSAGE</Text>
         <Text style={styles.message}>{result.message}</Text>
       </View>
-
-      {/* Student block */}
-      {result.student && (
-        <View style={styles.section}>
-          <Text style={styles.metaLabel}>STUDENT</Text>
-          <Row label="Name" value={result.student.name} />
-          <View style={styles.divider} />
-          <Row label="Student ID" value={result.student.studentId} />
-          <View style={styles.divider} />
-          <Row label="Course" value={result.student.course} />
-          <View style={styles.divider} />
-          <Row label="Level" value={result.student.level} />
-        </View>
-      )}
 
       {/* Permit block */}
       {result.permit && (
@@ -170,6 +170,11 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: -0.5,
   },
+  bannerSubtitle: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
+  },
   section: {
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
@@ -188,13 +193,15 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    gap: spacing.md,
     paddingVertical: 2,
   },
   rowLabel: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+    maxWidth: "40%",
   },
   rowValue: {
     color: colors.text,
@@ -202,7 +209,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "right",
     flex: 1,
-    paddingLeft: spacing.md,
+    flexShrink: 1,
   },
   divider: {
     backgroundColor: colors.border,

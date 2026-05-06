@@ -1,5 +1,5 @@
 import { StudentCard } from "@/features/cards/card-types";
-import { Permit } from "@/features/permits/permit-types";
+import { Permit, PermitIssuanceConfig } from "@/features/permits/permit-types";
 import { Student } from "@/features/students/student-types";
 
 export type ScanDecision =
@@ -8,7 +8,8 @@ export type ScanDecision =
   | "card_not_registered"
   | "card_inactive"
   | "no_active_permit"
-  | "expired_permit";
+  | "expired_permit"
+  | "revoked_permit";
 
 export type VerificationMethod = "student_id" | "uid";
 
@@ -32,6 +33,8 @@ export type VerificationResult = {
   student: Student | null;
   card: StudentCard | null;
   permit: Permit | null;
+  canIssuePermit?: boolean;
+  issuanceConfig?: PermitIssuanceConfig | null;
   log: VerificationLog;
 };
 

@@ -9,3 +9,10 @@ export type Permit = {
   expiryDate: string;
   amountPaid: number;
 };
+
+export type PermitIssuanceConfig = {
+  enabled: boolean;
+  defaultAmount: number;
+  expiryDate: string;
+  academicYear: string;
+};
