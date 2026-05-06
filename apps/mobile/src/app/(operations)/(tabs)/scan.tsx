@@ -162,7 +162,7 @@ export default function OperationsScanScreen() {
     setSuccessMessage(null);
     setShowIssueConfirm(false);
     setShowPermitDetails(false);
-    setStudentId("");
+    setStudentId("2610");
   }
 
   async function handleIssuePermit() {
