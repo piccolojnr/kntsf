@@ -11,7 +11,7 @@ export type ScanDecision =
   | "expired_permit"
   | "revoked_permit";
 
-export type VerificationMethod = "student_id" | "uid";
+export type VerificationMethod = "student_id" | "card_uid";
 
 export type VerificationLog = {
   id: string;
@@ -26,6 +26,7 @@ export type VerificationLog = {
 };
 
 export type VerificationResult = {
+  status: ScanDecision;
   decision: ScanDecision;
   message: string;
   method: VerificationMethod;
