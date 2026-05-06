@@ -1,17 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert, ScrollView, StyleSheet } from "react-native";
 import { CreditCard, ShieldAlert, UserRound } from "lucide-react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { CardStatusBadge } from "@/components/cards/card-status-badge";
-import { SectionCard } from "@/components/cards/section-card";
-import { StatusCard } from "@/components/cards/status-card";
-import { DetailRow } from "@/components/ui/detail-row";
+import StudentIDCard from "@/components/cards/student-id-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
-import { spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
@@ -26,41 +23,70 @@ function formatDate(dateString?: string | null) {
   });
 }
 
-function formatCardStatus(status?: CardStatus | null) {
-  switch (status) {
-    case "active":
-      return "Active";
-    case "lost":
-      return "Lost";
-    case "revoked":
-      return "Revoked";
-    case "blocked":
-      return "Blocked";
-    case "replaced":
-      return "Replaced";
+function formatCardType(type: StudentCard["type"]) {
+  switch (type) {
+    case "mifare_classic":
+      return "MIFARE Classic";
+    case "ntag216":
+      return "NTAG216";
     default:
-      return "Not Registered";
+      return "Unknown";
   }
-}
-
-function getCardTone(status?: CardStatus | null) {
-  if (status === "active") return "success" as const;
-  if (status === "lost" || status === "revoked" || status === "blocked") {
-    return "danger" as const;
-  }
-  if (status === "replaced") return "warning" as const;
-  return "primary" as const;
 }
 
 function getLatestCard(cards: StudentCard[], studentId: string) {
   return (
     cards
-      .filter((card) => card.studentId === studentId)
+      .filter((c) => c.studentId === studentId)
       .sort(
-        (left, right) =>
-          new Date(right.registeredAt).getTime() -
-          new Date(left.registeredAt).getTime(),
+        (a, b) =>
+          new Date(b.registeredAt).getTime() -
+          new Date(a.registeredAt).getTime(),
       )[0] ?? null
+  );
+}
+
+function CardDetailRow({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={[styles.detailValue, accent && styles.detailValueAccent]}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+function CardStatusRow({ status }: { status: CardStatus | null }) {
+  const isActive = status === "active";
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1)
+    : "Not registered";
+
+  const badgeStyle = isActive ? styles.badgeActive : styles.badgeInactive;
+  const dotStyle = isActive ? styles.dotActive : styles.dotInactive;
+  const textStyle = isActive
+    ? styles.badgeTextActive
+    : styles.badgeTextInactive;
+
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>Status</Text>
+      <View style={[styles.statusBadge, badgeStyle]}>
+        <View style={[styles.statusDot, dotStyle]} />
+        <Text style={[styles.statusBadgeText, textStyle]}>
+          {label.toUpperCase()}
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -69,14 +95,14 @@ export default function StudentCardScreen() {
   const studentQuery = useCurrentStudent();
   const cardsQuery = useCards();
   const student = studentQuery.student;
-  const latestCard = student ? getLatestCard(cardsQuery.data ?? [], student.id) : null;
+  const latestCard = student
+    ? getLatestCard(cardsQuery.data ?? [], student.id)
+    : null;
 
   const reportLostMutation = useMutation({
     mutationFn: async () => {
-      if (!student) {
-        throw new Error("No student record is linked to this account.");
-      }
-
+      if (!student)
+        throw new Error("No student record linked to this account.");
       return reportLostCardForStudent(student.id);
     },
     onSuccess: async () => {
@@ -100,7 +126,7 @@ export default function StudentCardScreen() {
   function handleReportLost() {
     Alert.alert(
       "Report Lost Card",
-      "This will mark your active SRC card as lost in mock mode.",
+      "This will mark your active SRC card as lost. This action cannot be undone.",
       [
         { style: "cancel", text: "Cancel" },
         {
@@ -121,7 +147,7 @@ export default function StudentCardScreen() {
         <PageHeader
           eyebrow="Student"
           title="SRC Card"
-          subtitle="Review your registered student card and report issues."
+          subtitle="Your NFC student card and registration details."
         />
 
         {isLoading ? (
@@ -140,38 +166,49 @@ export default function StudentCardScreen() {
           />
         ) : (
           <>
-            <StatusCard
-              title="Card Status"
-              value={formatCardStatus(latestCard?.status)}
-              description={
-                latestCard
-                  ? `Registered ${formatDate(latestCard.registeredAt)}.`
-                  : "No SRC card is currently registered to your student record."
-              }
-              tone={getCardTone(latestCard?.status)}
+            {/* NFC card hero */}
+            <StudentIDCard
+              student={{
+                name: student.name,
+                studentId: student.studentId,
+                programme: student.course,
+                level: student.level,
+                validUntil: latestCard
+                  ? formatDate(latestCard.registeredAt)
+                  : undefined,
+                status: latestCard
+                  ? (latestCard.status as CardStatus)
+                  : undefined,
+              }}
             />
 
-            <SectionCard title="Card Details">
-              <CardStatusBadge status={latestCard?.status ?? "none"} />
-              <DetailRow
-                label="Card UID"
-                value={latestCard?.uid ?? "Not registered"}
-                helper="Operations staff use this card UID for NFC verification."
-              />
-              <DetailRow
-                label="Card Type"
-                value={latestCard?.type.replaceAll("_", " ") ?? "Not available"}
-              />
-              <DetailRow
-                label="Registered Date"
-                value={formatDate(latestCard?.registeredAt)}
-              />
-            </SectionCard>
+            {/* Card details */}
+            <View style={styles.detailsCard}>
+              <Text style={styles.detailsTitle}>Card Details</Text>
+              <View style={styles.detailsList}>
+                <CardDetailRow
+                  label="Card UID"
+                  value={latestCard?.uid ?? "Not registered"}
+                />
+                <CardDetailRow
+                  label="Card Type"
+                  value={latestCard ? formatCardType(latestCard.type) : "N/A"}
+                />
+                <CardDetailRow
+                  label="Registered Date"
+                  value={formatDate(latestCard?.registeredAt)}
+                />
+                <CardStatusRow status={latestCard?.status ?? null} />
+              </View>
+            </View>
 
+            {/* Report lost */}
             <PrimaryButton
               disabled={!canReportLost}
               icon={CreditCard}
-              label={canReportLost ? "Report Lost Card" : "No Active Card to Report"}
+              label={
+                canReportLost ? "Report Lost Card" : "No Active Card to Report"
+              }
               loading={reportLostMutation.isPending}
               onPress={handleReportLost}
               variant={canReportLost ? "danger" : "primary"}
@@ -190,4 +227,70 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.pageHeader,
   },
+
+  // ── Details card ───────────────────────────────────────
+  detailsCard: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  detailsTitle: {
+    color: colors.text,
+    fontSize: fontSizes.lg,
+    fontWeight: "700",
+  },
+  detailsList: {
+    gap: spacing.md,
+  },
+  detailRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  detailLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
+  },
+  detailValue: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+  },
+  detailValueAccent: {
+    color: colors.primary,
+  },
+
+  // Status badge
+  statusBadge: {
+    alignItems: "center",
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  badgeActive: {
+    backgroundColor: colors.successSoft,
+  },
+  badgeInactive: {
+    backgroundColor: colors.dangerSoft,
+  },
+  statusDot: {
+    borderRadius: 3,
+    height: 6,
+    width: 6,
+  },
+  dotActive: { backgroundColor: colors.success },
+  dotInactive: { backgroundColor: colors.danger },
+  statusBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  badgeTextActive: { color: colors.success },
+  badgeTextInactive: { color: colors.danger },
 });
