@@ -34,21 +34,6 @@ export function FloatingScanInput({
 }: FloatingScanInputProps) {
   return (
     <View style={styles.wrapper}>
-      {/* Error toast — floats above the pill */}
-      {errorMessage ? (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          exiting={FadeOut.duration(150)}
-          style={styles.errorToast}
-        >
-          <ShieldAlert color={colors.danger} size={14} strokeWidth={2.5} />
-          <Text style={styles.errorText} numberOfLines={2}>
-            {errorMessage}
-          </Text>
-        </Animated.View>
-      ) : null}
-
-      {/* Floating pill input */}
       <View style={styles.pill}>
         <View style={styles.inputArea}>
           <Text style={styles.prefix}>ID</Text>
@@ -85,7 +70,20 @@ export function FloatingScanInput({
         </Pressable>
       </View>
 
-      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
+      {errorMessage ? (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(150)}
+          style={styles.inlineMessage}
+        >
+          <ShieldAlert color={colors.danger} size={14} strokeWidth={2.5} />
+          <Text style={styles.errorText} numberOfLines={2}>
+            {errorMessage}
+          </Text>
+        </Animated.View>
+      ) : helperText ? (
+        <Text style={styles.helperText}>{helperText}</Text>
+      ) : null}
     </View>
   );
 }
@@ -102,25 +100,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     textAlign: "center",
   },
-
-  /* ── Error toast ── */
-  errorToast: {
+  inlineMessage: {
     alignItems: "center",
     alignSelf: "center",
-    backgroundColor: colors.dangerSoft,
-    borderColor: colors.danger,
-    borderRadius: radius.pill,
-    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.xs,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.sm,
   },
   errorText: {
     color: colors.danger,
     fontSize: fontSizes.xs,
     fontWeight: "700",
     flexShrink: 1,
+    textAlign: "center",
   },
 
   /* ── Pill ── */

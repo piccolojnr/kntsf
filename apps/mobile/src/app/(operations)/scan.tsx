@@ -30,11 +30,10 @@ import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useVerifyPermit } from "@/features/operations/use-verify-permit";
+import { useScreenDensity } from "@/hooks/use-screen-density";
 
 type ScreenState = "idle" | "loading" | "result";
 
-/** Tab bar height (76) + bottom margin (~16) + extra breathing room for result actions. */
-const TAB_BAR_CLEARANCE = 128;
 const ANIM_CONFIG = { duration: 280, easing: Easing.bezier(0.4, 0, 0.2, 1) };
 
 function useKeyboardHeight() {
@@ -64,6 +63,7 @@ export default function OperationsScanScreen() {
   const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
+  const { fixedScreen, isCompact } = useScreenDensity();
   const {
     error,
     issuePermit,
@@ -84,17 +84,23 @@ export default function OperationsScanScreen() {
 
   // Animate the pill's bottom offset
   const pillBottom = useSharedValue(
-    Math.max(insets.bottom, spacing.sm) + TAB_BAR_CLEARANCE,
+    Math.max(insets.bottom, spacing.sm) + fixedScreen.pillClearance,
   );
 
   useEffect(() => {
     pillBottom.value = withTiming(
       keyboardOpen
         ? keyboardHeight + spacing.sm
-        : Math.max(insets.bottom, spacing.sm) + TAB_BAR_CLEARANCE,
+        : Math.max(insets.bottom, spacing.sm) + fixedScreen.pillClearance,
       ANIM_CONFIG,
     );
-  }, [keyboardOpen, keyboardHeight, insets.bottom, pillBottom]);
+  }, [
+    fixedScreen.pillClearance,
+    keyboardOpen,
+    keyboardHeight,
+    insets.bottom,
+    pillBottom,
+  ]);
 
   const pillAnimStyle = useAnimatedStyle(() => ({
     bottom: pillBottom.value,
@@ -186,7 +192,11 @@ export default function OperationsScanScreen() {
         <PageHeader
           eyebrow="Operations"
           subtitle="Verify a student's permit status from their student ID."
-          style={styles.pageHeader}
+          style={
+            isCompact
+              ? { ...styles.pageHeader, ...styles.pageHeaderCompact }
+              : styles.pageHeader
+          }
           title="Verify"
         />
 
@@ -198,7 +208,15 @@ export default function OperationsScanScreen() {
             style={styles.resultStage}
           >
             <ScrollView
-              contentContainerStyle={styles.resultContent}
+              contentContainerStyle={[
+                styles.resultContent,
+                {
+                  gap: fixedScreen.resultGap,
+                  paddingTop: fixedScreen.resultTopPadding,
+                  paddingBottom:
+                    fixedScreen.tabBarClearance + fixedScreen.bottomToastOffset,
+                },
+              ]}
               showsVerticalScrollIndicator={false}
             >
               {successMessage ? (
@@ -258,13 +276,22 @@ export default function OperationsScanScreen() {
             </ScrollView>
           </Animated.View>
         ) : (
-          <View style={styles.radarZone}>
+          <View
+            style={[
+              styles.radarZone,
+              { paddingBottom: fixedScreen.heroBottomReserve },
+            ]}
+          >
             <RadarPulse
               active={screenState === "idle" && !keyboardOpen}
-              size={300}
+              size={fixedScreen.heroSize}
               ringCount={3}
             >
-              <ScanLine color="#ffffff" size={42} strokeWidth={2} />
+              <ScanLine
+                color="#ffffff"
+                size={fixedScreen.heroIconSize}
+                strokeWidth={2}
+              />
             </RadarPulse>
 
             {!keyboardOpen &&
@@ -273,8 +300,17 @@ export default function OperationsScanScreen() {
                   <LoadingState message="Verifying permit..." />
                 </View>
               ) : (
-                <View style={styles.statusArea}>
-                  <Text style={styles.scanPrompt}>Verify Student Permit</Text>
+                <View
+                  style={[
+                    styles.statusArea,
+                    { gap: fixedScreen.statusGap },
+                  ]}
+                >
+                  <Text
+                    style={[styles.scanPrompt, isCompact && styles.scanPromptCompact]}
+                  >
+                    Verify Student Permit
+                  </Text>
                   <Text style={styles.scanHint}>Enter student ID below</Text>
                   <View style={styles.nfcAction}>
                     <Button
@@ -327,13 +363,15 @@ const styles = StyleSheet.create({
   pageHeader: {
     paddingTop: 0,
   },
+  pageHeaderCompact: {
+    marginBottom: -4,
+  },
 
   /* ── Radar zone ── */
   radarZone: {
     alignItems: "center",
     flex: 1,
     justifyContent: "center",
-    paddingBottom: 350,
     paddingTop: spacing.md,
   },
   statusArea: {
@@ -345,6 +383,9 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: -0.3,
+  },
+  scanPromptCompact: {
+    fontSize: fontSizes.md,
   },
   scanHint: {
     color: colors.textMuted,
@@ -371,7 +412,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: spacing.sm,
     justifyContent: "center",
-    paddingBottom: TAB_BAR_CLEARANCE + spacing.xl,
   },
   actions: {
     flexDirection: "row",

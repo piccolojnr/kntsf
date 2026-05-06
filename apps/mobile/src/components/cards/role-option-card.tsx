@@ -6,20 +6,24 @@ type RoleOptionCardProps = {
   title: string;
   description: string;
   onPress: () => void;
+  compact?: boolean;
 };
 
 export function RoleOptionCard({
   title,
   description,
   onPress,
+  compact,
 }: RoleOptionCardProps) {
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <View style={styles.badge}>
+    <Pressable style={[styles.card, compact && styles.cardCompact]} onPress={onPress}>
+      <View style={[styles.badge, compact && styles.badgeCompact]}>
         <Text style={styles.badgeText}>{title.slice(0, 1)}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
+      <Text style={[styles.title, compact && styles.titleCompact]}>{title}</Text>
+      <Text style={[styles.description, compact && styles.descriptionCompact]}>
+        {description}
+      </Text>
     </Pressable>
   );
 }
@@ -35,12 +39,20 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     justifyContent: "center",
   },
+  cardCompact: {
+    gap: spacing.xs,
+    minHeight: 128,
+    padding: spacing.md,
+  },
   badge: {
     alignSelf: "flex-start",
     borderRadius: radius.pill,
     backgroundColor: colors.primarySoft,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
+  },
+  badgeCompact: {
+    paddingHorizontal: spacing.xs + 2,
   },
   badgeText: {
     color: colors.primary,
@@ -52,9 +64,16 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.xl,
     fontWeight: "700",
   },
+  titleCompact: {
+    fontSize: fontSizes.lg,
+  },
   description: {
     color: colors.textMuted,
     fontSize: fontSizes.md,
     lineHeight: 22,
+  },
+  descriptionCompact: {
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
   },
 });

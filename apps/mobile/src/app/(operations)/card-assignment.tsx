@@ -22,6 +22,7 @@ import Animated, {
   FadeInDown,
   FadeOut,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
+import { useScreenDensity } from "@/hooks/use-screen-density";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
 type ScreenState = "idle" | "loading" | "result";
@@ -75,6 +77,8 @@ function formatDate(dateString: string) {
 export default function OperationsCardAssignmentScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+  const { fixedScreen, isCompact } = useScreenDensity();
   const queryClient = useQueryClient();
   const { mode, studentId } = useLocalSearchParams<{
     mode?: CardAssignmentMode;
@@ -200,7 +204,9 @@ export default function OperationsCardAssignmentScreen() {
       </View>
       <View style={styles.titleRow}>
         <View style={styles.titleCopy}>
-          <Text style={styles.title}>{actionLabel}</Text>
+          <Text style={[styles.title, isCompact && styles.titleCompact]}>
+            {actionLabel}
+          </Text>
           <Text style={styles.subtitle}>
             {student
               ? `${student.name} · ${student.studentId}`
@@ -323,14 +329,20 @@ export default function OperationsCardAssignmentScreen() {
           <View style={styles.radarZone}>
             <RadarPulse
               active={screenState === "idle"}
-              size={260}
+              size={fixedScreen.heroSize}
               ringCount={3}
             >
-              <ScanLine color="#ffffff" size={38} strokeWidth={2} />
+              <ScanLine
+                color="#ffffff"
+                size={fixedScreen.heroIconSize}
+                strokeWidth={2}
+              />
             </RadarPulse>
 
-            <View style={styles.statusArea}>
-              <Text style={styles.scanPrompt}>
+            <View style={[styles.statusArea, { gap: fixedScreen.statusGap }]}>
+              <Text
+                style={[styles.scanPrompt, isCompact && styles.scanPromptCompact]}
+              >
                 {assignmentMode === "replace"
                   ? "Place new card near reader"
                   : "Place card near reader"}
@@ -374,7 +386,16 @@ export default function OperationsCardAssignmentScreen() {
       !hasError &&
       isReadyForReplace ? (
         <View style={styles.errorToastWrap}>
-          <View style={styles.errorToast}>
+          <View
+            style={[
+              styles.errorToast,
+              {
+                marginBottom:
+                  Math.max(insets.bottom, spacing.sm) +
+                  fixedScreen.bottomToastOffset,
+              },
+            ]}
+          >
             <Text style={styles.errorToastText}>{errorMessage}</Text>
           </View>
         </View>
@@ -438,6 +459,10 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
     lineHeight: 30,
   },
+  titleCompact: {
+    fontSize: 22,
+    lineHeight: 26,
+  },
   subtitle: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
@@ -456,7 +481,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.md,
     justifyContent: "center",
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.lg,
   },
   statusArea: {
@@ -468,6 +493,9 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: -0.3,
+  },
+  scanPromptCompact: {
+    fontSize: fontSizes.md,
   },
   scanHint: {
     color: colors.textMuted,
@@ -508,7 +536,6 @@ const styles = StyleSheet.create({
   },
 
   errorToastWrap: {
-    bottom: spacing.xl,
     left: spacing.lg,
     position: "absolute",
     right: spacing.lg,

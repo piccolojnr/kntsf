@@ -1,3 +1,4 @@
+import { Screen } from "@/components/ui/screen";
 import { useQueryClient } from "@tanstack/react-query";
 import { Href, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -12,17 +13,10 @@ import {
   XCircle,
 } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { Screen } from "@/components/ui/screen";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { StudentInfoCard } from "@/components/cards/student-info-card";
 import { SectionCard } from "@/components/cards/section-card";
+import { StudentInfoCard } from "@/components/cards/student-info-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -301,6 +295,11 @@ export default function OperationsStudentDetailsScreen() {
             </View>
           </>
         )}
+        <View
+          style={{
+            height: 32,
+          }} /* Extra spacing at the bottom for comfortable scrolling */
+        />
       </ScrollView>
     </Screen>
   );
