@@ -6,6 +6,7 @@ export type AuthUser = {
   name: string;
   email: string;
   role: UserRole;
+  studentId?: string;
 };
 
 export type LoginPayload = {

@@ -17,9 +17,10 @@ const mockUsers: MockUserRecord[] = [
     token: "mock-student-token",
     user: {
       id: "student-1",
-      name: "Student User",
+      name: "Ama Boateng",
       email: "student@example.com",
       role: "student",
+      studentId: "26102859",
     },
   },
   {
