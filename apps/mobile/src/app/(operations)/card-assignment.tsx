@@ -21,14 +21,9 @@ import Animated, {
   Easing,
   FadeInDown,
   FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
-import { FloatingCardInput } from "@/components/forms/floating-card-input";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
 import { RadarPulse } from "@/components/ui/radar-pulse";
@@ -40,6 +35,7 @@ import {
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
+import { readCardUid } from "@/lib/nfc/nfc-service";
 
 type ScreenState = "idle" | "loading" | "result";
 
@@ -80,17 +76,13 @@ export default function OperationsCardAssignmentScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const insets = useSafeAreaInsets();
   const { mode, studentId } = useLocalSearchParams<{
     mode?: CardAssignmentMode;
     studentId?: string;
   }>();
   const studentsQuery = useStudents();
   const cardsQuery = useCards();
-  const keyboardHeight = useKeyboardHeight();
-  const keyboardOpen = keyboardHeight > 0;
 
-  const [uid, setUid] = useState("");
   const [screenState, setScreenState] = useState<ScreenState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [assignedUid, setAssignedUid] = useState<string | null>(null);
@@ -126,26 +118,9 @@ export default function OperationsCardAssignmentScreen() {
         setScreenState("idle");
         setErrorMessage(null);
         setAssignedUid(null);
-        setUid("");
       };
     }, [])
   );
-
-  // Floating pill offset — moves above keyboard when open
-  const pillOffset = useSharedValue(Math.max(insets.bottom, spacing.md));
-
-  useEffect(() => {
-    pillOffset.value = withTiming(
-      keyboardOpen
-        ? keyboardHeight + spacing.sm
-        : Math.max(insets.bottom, spacing.md),
-      ANIM_CONFIG,
-    );
-  }, [keyboardOpen, keyboardHeight, insets.bottom, pillOffset]);
-
-  const pillAnimStyle = useAnimatedStyle(() => ({
-    bottom: pillOffset.value,
-  }));
 
   const actionLabel =
     assignmentMode === "replace" ? "Replace Card" : "Register Card";
@@ -154,16 +129,14 @@ export default function OperationsCardAssignmentScreen() {
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
 
-  const handleAssign = useCallback(async () => {
-    Keyboard.dismiss();
-
+  const runAssignment = useCallback(async (nextUid: string) => {
     if (!student) {
       setErrorMessage("The selected student record could not be found.");
       return;
     }
 
-    if (!uid.trim()) {
-      setErrorMessage("Enter a mock card UID to continue.");
+    if (!nextUid.trim()) {
+      setErrorMessage("No NFC card UID was found.");
       return;
     }
 
@@ -174,7 +147,7 @@ export default function OperationsCardAssignmentScreen() {
       const nextCard = await assignCardToStudent({
         mode: assignmentMode,
         studentId: student.id,
-        uid,
+        uid: nextUid.trim(),
       });
 
       await queryClient.invalidateQueries({ queryKey: ["cards"] });
@@ -188,7 +161,32 @@ export default function OperationsCardAssignmentScreen() {
           : "The card could not be assigned.",
       );
     }
-  }, [assignmentMode, queryClient, student, uid]);
+  }, [assignmentMode, queryClient, student]);
+
+  const handleAssignByNfc = useCallback(async () => {
+    Keyboard.dismiss();
+    setErrorMessage(null);
+    setScreenState("loading");
+
+    try {
+      const scannedUid = await readCardUid();
+
+      if (!scannedUid) {
+        setScreenState("idle");
+        setErrorMessage("No NFC card was detected.");
+        return;
+      }
+
+      await runAssignment(scannedUid);
+    } catch (error) {
+      setScreenState("idle");
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "NFC card reading is not available right now.",
+      );
+    }
+  }, [runAssignment]);
 
   return (
     <View style={styles.root}>
@@ -324,23 +322,30 @@ export default function OperationsCardAssignmentScreen() {
           /* ── Idle / scanning state ── */
           <View style={styles.radarZone}>
             <RadarPulse
-              active={screenState === "idle" && !keyboardOpen}
+              active={screenState === "idle"}
               size={260}
               ringCount={3}
             >
               <ScanLine color="#ffffff" size={38} strokeWidth={2} />
             </RadarPulse>
 
-            {!keyboardOpen && (
-              <View style={styles.statusArea}>
-                <Text style={styles.scanPrompt}>
-                  {assignmentMode === "replace"
-                    ? "Place new card near reader"
-                    : "Place card near reader"}
-                </Text>
-                <Text style={styles.scanHint}>or enter mock UID below</Text>
+            <View style={styles.statusArea}>
+              <Text style={styles.scanPrompt}>
+                {assignmentMode === "replace"
+                  ? "Place new card near reader"
+                  : "Place card near reader"}
+              </Text>
+              <Text style={styles.scanHint}>
+                Scan the student card to continue
+              </Text>
+              <View style={styles.nfcAction}>
+                <Button
+                  label="Scan NFC Card"
+                  onPress={() => void handleAssignByNfc()}
+                  variant="secondary"
+                />
               </View>
-            )}
+            </View>
 
             {currentCard && assignmentMode === "replace" && (
               <View style={styles.currentCardPill}>
@@ -361,23 +366,19 @@ export default function OperationsCardAssignmentScreen() {
         )}
       </Pressable>
 
-      {/* ── Floating UID input pill ── */}
-      {screenState !== "result" &&
-        student &&
-        !isLoading &&
-        canManageCards &&
-        !hasError &&
-        isReadyForReplace && (
-          <Animated.View style={[styles.floatingPill, pillAnimStyle]}>
-            <FloatingCardInput
-              errorMessage={errorMessage}
-              isLoading={screenState === "loading"}
-              onChangeUid={setUid}
-              onSubmit={() => void handleAssign()}
-              uid={uid}
-            />
-          </Animated.View>
-        )}
+      {errorMessage &&
+      screenState !== "result" &&
+      student &&
+      !isLoading &&
+      canManageCards &&
+      !hasError &&
+      isReadyForReplace ? (
+        <View style={styles.errorToastWrap}>
+          <View style={styles.errorToast}>
+            <Text style={styles.errorToastText}>{errorMessage}</Text>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -455,8 +456,8 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.md,
     justifyContent: "center",
-    // Reserve space for floating pill (~80px pill + safe bottom)
-    paddingBottom: 120,
+    paddingBottom: spacing.xxxl,
+    paddingHorizontal: spacing.lg,
   },
   statusArea: {
     alignItems: "center",
@@ -472,6 +473,10 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+  },
+  nfcAction: {
+    marginTop: spacing.sm,
+    minWidth: 180,
   },
   currentCardPill: {
     alignItems: "center",
@@ -502,11 +507,26 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
   },
 
-  /* ── Floating pill ── */
-  floatingPill: {
+  errorToastWrap: {
+    bottom: spacing.xl,
     left: spacing.lg,
     position: "absolute",
     right: spacing.lg,
+  },
+  errorToast: {
+    alignItems: "center",
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.danger,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  errorToastText: {
+    color: colors.danger,
+    fontSize: fontSizes.xs,
+    fontWeight: "700",
+    textAlign: "center",
   },
 
   /* ── Success / result ── */
