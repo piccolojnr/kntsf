@@ -74,7 +74,7 @@ export default function OperationsScanScreen() {
     verifyByStudentId,
   } = useVerifyPermit();
 
-  const [studentId, setStudentId] = useState("");
+  const [studentId, setStudentId] = useState("2610");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [screenState, setScreenState] = useState<ScreenState>("idle");
   const [showPermitDetails, setShowPermitDetails] = useState(false);
@@ -301,13 +301,13 @@ export default function OperationsScanScreen() {
                 </View>
               ) : (
                 <View
-                  style={[
-                    styles.statusArea,
-                    { gap: fixedScreen.statusGap },
-                  ]}
+                  style={[styles.statusArea, { gap: fixedScreen.statusGap }]}
                 >
                   <Text
-                    style={[styles.scanPrompt, isCompact && styles.scanPromptCompact]}
+                    style={[
+                      styles.scanPrompt,
+                      isCompact && styles.scanPromptCompact,
+                    ]}
                   >
                     Verify Student Permit
                   </Text>
