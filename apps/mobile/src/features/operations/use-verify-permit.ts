@@ -7,6 +7,7 @@ import {
   getStudentByStudentId,
 } from "@/features/students/student-api";
 import { Student } from "@/features/students/student-types";
+import { isNfcSupported, readCardUid } from "@/lib/nfc/nfc-service";
 
 import {
   scanCardByUid,
@@ -26,6 +27,7 @@ export type UseVerifyPermitReturn = UseVerifyPermitState & {
   currentPermit: Permit | null;
   verifyByStudentId: (studentId: string) => Promise<VerificationResult>;
   verifyByCardUid: (uid: string) => Promise<VerificationResult>;
+  verifyByNfc: () => Promise<VerificationResult>;
   issuePermit: (studentId: string) => Promise<Permit>;
   reset: () => void;
 };
@@ -127,10 +129,8 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
     [beginOperation, commitFailure, commitSuccess],
   );
 
-  const verifyByCardUid = useCallback(
-    async (uid: string) => {
-      const operationId = beginOperation({ clearResult: true });
-
+  const runCardUidVerification = useCallback(
+    async (uid: string, operationId: number) => {
       try {
         const nextResult = await scanCardByUid(uid);
         commitSuccess(operationId, nextResult);
@@ -142,8 +142,55 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
         throw error;
       }
     },
-    [beginOperation, commitFailure, commitSuccess],
+    [commitFailure, commitSuccess],
   );
+
+  const verifyByCardUid = useCallback(
+    async (uid: string) => {
+      const operationId = beginOperation({ clearResult: true });
+
+      return runCardUidVerification(uid, operationId);
+    },
+    [beginOperation, runCardUidVerification],
+  );
+
+  const verifyByNfc = useCallback(async () => {
+    const operationId = beginOperation({ clearResult: true });
+
+    try {
+      const supported = await isNfcSupported();
+
+      if (!supported) {
+        const message = "NFC is not supported on this device";
+        commitFailure(operationId, message);
+        throw new Error(message);
+      }
+
+      const uid = await readCardUid();
+
+      if (!uid) {
+        const message = "No NFC card was detected";
+        commitFailure(operationId, message);
+        throw new Error(message);
+      }
+
+      return await runCardUidVerification(uid, operationId);
+    } catch (error) {
+      if (operationId !== operationIdRef.current) {
+        throw error;
+      }
+
+      const message =
+        error instanceof Error &&
+          (error.message === "NFC is not supported on this device" ||
+            error.message === "No NFC card was detected")
+          ? error.message
+          : "NFC reading is not available yet.";
+
+      commitFailure(operationId, message);
+      throw new Error(message);
+    }
+  }, [beginOperation, commitFailure, runCardUidVerification]);
 
   const issuePermit = useCallback(
     async (studentId: string) => {
@@ -196,6 +243,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       currentPermit,
       verifyByStudentId,
       verifyByCardUid,
+      verifyByNfc,
       issuePermit,
       reset,
     }),
@@ -209,6 +257,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       state.result,
       state.success,
       verifyByCardUid,
+      verifyByNfc,
       verifyByStudentId,
     ],
   );
