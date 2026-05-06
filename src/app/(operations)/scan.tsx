@@ -29,11 +29,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import {
-  issuePermitFromVerification,
-  verifyPermitByStudentId,
-} from "@/features/operations/scan-api";
-import { VerificationResult } from "@/features/operations/scan-types";
+import { useVerifyPermit } from "@/features/operations/use-verify-permit";
 
 type ScreenState = "idle" | "loading" | "result";
 
@@ -68,10 +64,18 @@ export default function OperationsScanScreen() {
   const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
+  const {
+    error,
+    issuePermit,
+    loading,
+    reset,
+    result,
+    verifyByNfc,
+    verifyByStudentId,
+  } = useVerifyPermit();
 
   const [studentId, setStudentId] = useState("");
-  const [result, setResult] = useState<VerificationResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [screenState, setScreenState] = useState<ScreenState>("idle");
   const [showPermitDetails, setShowPermitDetails] = useState(false);
   const [showIssueConfirm, setShowIssueConfirm] = useState(false);
@@ -96,80 +100,75 @@ export default function OperationsScanScreen() {
     bottom: pillBottom.value,
   }));
 
+  useEffect(() => {
+    if (loading) {
+      setScreenState("loading");
+      return;
+    }
+
+    if (result) {
+      setScreenState("result");
+      return;
+    }
+
+    setScreenState("idle");
+  }, [loading, result]);
+
   const handleVerify = useCallback(async () => {
     Keyboard.dismiss();
     const normalizedStudentId = studentId.replace(/[^\d]/g, "").trim();
 
     if (!normalizedStudentId) {
-      setErrorMessage("Enter a student ID to verify.");
-      setResult(null);
+      setValidationError("Enter a student ID to verify.");
       return;
     }
     if (!/^\d+$/.test(normalizedStudentId)) {
-      setErrorMessage("Digits only.");
-      setResult(null);
+      setValidationError("Digits only.");
       return;
     }
     if (normalizedStudentId.length !== 8) {
-      setErrorMessage("Must be 8 digits, e.g. 26102859.");
-      setResult(null);
+      setValidationError("Must be 8 digits, e.g. 26102859.");
       return;
     }
 
     setStudentId(normalizedStudentId);
-    setErrorMessage(null);
+    setValidationError(null);
     setSuccessMessage(null);
-    setScreenState("loading");
 
     try {
-      const verificationResult =
-        await verifyPermitByStudentId(normalizedStudentId);
-      setResult(verificationResult);
-      setScreenState("result");
-    } catch (error) {
-      setResult(null);
-      setScreenState("idle");
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Verification failed. Try again.",
-      );
-    }
-  }, [studentId]);
+      await verifyByStudentId(normalizedStudentId);
+    } catch {}
+  }, [studentId, verifyByStudentId]);
+
+  const handleVerifyByNfc = useCallback(async () => {
+    Keyboard.dismiss();
+    setValidationError(null);
+    setSuccessMessage(null);
+
+    try {
+      await verifyByNfc();
+    } catch {}
+  }, [verifyByNfc]);
 
   function handleVerifyAnother() {
-    setResult(null);
-    setErrorMessage(null);
+    reset();
+    setValidationError(null);
     setSuccessMessage(null);
     setShowIssueConfirm(false);
     setShowPermitDetails(false);
     setStudentId("");
-    setScreenState("idle");
   }
 
   async function handleIssuePermit() {
-    if (!result) return;
+    if (!result?.student) return;
 
     setIsIssuing(true);
 
     try {
-      const issued = await issuePermitFromVerification(result);
-      setResult({
-        ...result,
-        decision: "allowed",
-        message: "Permit issued successfully.",
-        permit: issued.permit,
-        canIssuePermit: false,
-        issuanceConfig: issued.issuanceConfig,
-      });
+      await issuePermit(result.student.studentId);
       setSuccessMessage("Permit issued successfully.");
       setShowIssueConfirm(false);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Permit issuance failed. Try again.",
-      );
+    } catch {
     } finally {
       setIsIssuing(false);
     }
@@ -277,6 +276,13 @@ export default function OperationsScanScreen() {
                 <View style={styles.statusArea}>
                   <Text style={styles.scanPrompt}>Verify Student Permit</Text>
                   <Text style={styles.scanHint}>Enter student ID below</Text>
+                  <View style={styles.nfcAction}>
+                    <Button
+                      label="Scan NFC Card"
+                      onPress={() => void handleVerifyByNfc()}
+                      variant="secondary"
+                    />
+                  </View>
                 </View>
               ))}
           </View>
@@ -287,9 +293,9 @@ export default function OperationsScanScreen() {
       {screenState !== "result" && (
         <Animated.View style={[styles.floatingPill, pillAnimStyle]}>
           <FloatingScanInput
-            errorMessage={errorMessage}
+            errorMessage={validationError ?? error}
             helperText="Most student IDs start with 2610."
-            isLoading={screenState === "loading"}
+            isLoading={loading}
             onChangeStudentId={setStudentId}
             onSubmit={() => void handleVerify()}
             studentId={studentId}
@@ -326,9 +332,8 @@ const styles = StyleSheet.create({
   radarZone: {
     alignItems: "center",
     flex: 1,
-    gap: spacing.md,
     justifyContent: "center",
-    paddingBottom: 300,
+    paddingBottom: 350,
     paddingTop: spacing.md,
   },
   statusArea: {
@@ -345,6 +350,10 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+  },
+  nfcAction: {
+    marginTop: spacing.sm,
+    minWidth: 180,
   },
 
   /* ── Floating pill (absolute) ── */
