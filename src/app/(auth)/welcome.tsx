@@ -6,6 +6,7 @@ import { AuthHeader } from "@/components/ui/auth-header";
 import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
 import { AuthWorkspace } from "@/features/auth/auth-types";
+import { useScreenDensity } from "@/hooks/use-screen-density";
 
 const workspaceOptions: {
   label: string;
@@ -28,18 +29,30 @@ const workspaceOptions: {
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { entryScreen, isCompact } = useScreenDensity();
 
   return (
     <Screen>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            gap: entryScreen.contentGap,
+            justifyContent: entryScreen.justifyContent,
+            paddingTop: entryScreen.topPadding,
+          },
+        ]}
+      >
         <AuthHeader
+          compact={isCompact}
           title="Knutsford SRC"
           subtitle="Choose the side of the app you want to access"
         />
 
-        <View style={styles.actions}>
+        <View style={[styles.actions, { gap: entryScreen.cardGap }]}>
           {workspaceOptions.map((workspace) => (
             <RoleOptionCard
+              compact={isCompact}
               key={workspace.value}
               title={workspace.label}
               description={workspace.description}
