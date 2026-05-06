@@ -72,6 +72,7 @@ export default function OperationsScanScreen() {
     error,
     issuePermit,
     loading,
+    phase,
     reset,
     result,
     verifyByNfc,
@@ -202,6 +203,14 @@ export default function OperationsScanScreen() {
   const canIssuePermit = !!result?.canIssuePermit;
   const canViewStudent = !!result?.student;
   const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
+  const loadingMessage =
+    phase === "reading_nfc"
+      ? "Reading card..."
+      : phase === "nfc_read_success"
+        ? "Card read successfully"
+        : phase === "verifying_card_uid"
+          ? "Checking permit..."
+          : "Verifying permit...";
 
   return (
     <Screen>
@@ -293,7 +302,11 @@ export default function OperationsScanScreen() {
             ]}
           >
             <RadarPulse
-              active={screenState === "idle" && !keyboardOpen && isNfcAvailable}
+              active={
+                ((screenState === "idle" && !keyboardOpen) ||
+                  phase === "reading_nfc") &&
+                isNfcAvailable
+              }
               size={fixedScreen.heroSize}
               ringCount={3}
             >
@@ -307,7 +320,10 @@ export default function OperationsScanScreen() {
             {!keyboardOpen &&
               (screenState === "loading" ? (
                 <View style={styles.statusArea}>
-                  <LoadingState message="Verifying permit..." />
+                  <LoadingState
+                    message={loadingMessage}
+                    status={phase === "nfc_read_success" ? "success" : "loading"}
+                  />
                 </View>
               ) : (
                 <View

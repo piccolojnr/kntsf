@@ -38,6 +38,17 @@ import { useScreenDensity } from "@/hooks/use-screen-density";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
 type ScreenState = "idle" | "loading" | "result";
+type AssignmentPhase =
+  | "idle"
+  | "reading_nfc"
+  | "nfc_read_success"
+  | "assigning"
+  | "success"
+  | "error";
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString(undefined, {
@@ -62,6 +73,8 @@ export default function OperationsCardAssignmentScreen() {
   const cardsQuery = useCards();
 
   const [screenState, setScreenState] = useState<ScreenState>("idle");
+  const [assignmentPhase, setAssignmentPhase] =
+    useState<AssignmentPhase>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [assignedUid, setAssignedUid] = useState<string | null>(null);
 
@@ -103,6 +116,7 @@ export default function OperationsCardAssignmentScreen() {
       // Cleanup function runs when the screen loses focus (e.g. user goes back)
       return () => {
         setScreenState("idle");
+        setAssignmentPhase("idle");
         setErrorMessage(null);
         setAssignedUid(null);
       };
@@ -130,6 +144,7 @@ export default function OperationsCardAssignmentScreen() {
       }
 
       setErrorMessage(null);
+      setAssignmentPhase("assigning");
       setScreenState("loading");
 
       try {
@@ -141,9 +156,11 @@ export default function OperationsCardAssignmentScreen() {
 
         await queryClient.invalidateQueries({ queryKey: ["cards"] });
         setAssignedUid(nextCard.uid);
+        setAssignmentPhase("success");
         setScreenState("result");
       } catch (error) {
         setScreenState("idle");
+        setAssignmentPhase("error");
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -163,6 +180,7 @@ export default function OperationsCardAssignmentScreen() {
       return;
     }
 
+    setAssignmentPhase("reading_nfc");
     setScreenState("loading");
 
     try {
@@ -170,13 +188,17 @@ export default function OperationsCardAssignmentScreen() {
 
       if (!scannedUid) {
         setScreenState("idle");
+        setAssignmentPhase("error");
         setErrorMessage("No NFC card was detected.");
         return;
       }
 
+      setAssignmentPhase("nfc_read_success");
+      await delay(450);
       await runAssignment(scannedUid);
     } catch (error) {
       setScreenState("idle");
+      setAssignmentPhase("error");
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -184,6 +206,13 @@ export default function OperationsCardAssignmentScreen() {
       );
     }
   }, [isNfcAvailable, runAssignment]);
+
+  const loadingMessage =
+    assignmentPhase === "reading_nfc"
+      ? "Reading card..."
+      : assignmentPhase === "nfc_read_success"
+        ? "Card read successfully"
+        : `${actionLabel} in progress...`;
 
   return (
     <View
@@ -346,7 +375,11 @@ export default function OperationsCardAssignmentScreen() {
           >
             <View style={styles.radarCluster}>
               <RadarPulse
-                active={screenState === "idle" && isNfcAvailable}
+                active={
+                  (screenState === "idle" ||
+                    assignmentPhase === "reading_nfc") &&
+                  isNfcAvailable
+                }
                 size={assignmentHeroSize}
                 ringCount={3}
               >
@@ -362,7 +395,14 @@ export default function OperationsCardAssignmentScreen() {
 
               <View style={[styles.statusArea, { gap: fixedScreen.statusGap }]}>
                 {screenState === "loading" ? (
-                  <LoadingState message={`${actionLabel} in progress...`} />
+                  <LoadingState
+                    message={loadingMessage}
+                    status={
+                      assignmentPhase === "nfc_read_success"
+                        ? "success"
+                        : "loading"
+                    }
+                  />
                 ) : (
                   <>
                     <Text
