@@ -1,9 +1,20 @@
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { VerificationResult } from "@/features/operations/scan-types";
-import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react-native";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronRight,
+  FileText,
+  UserRound,
+  XCircle,
+} from "lucide-react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type VerificationResultCardProps = { result: VerificationResult };
+type VerificationResultCardProps = {
+  result: VerificationResult;
+  onViewPermit?: () => void;
+  onViewStudent?: () => void;
+};
 
 type ResultTone = {
   accent: string;
@@ -85,6 +96,8 @@ function Row({ label, value }: { label: string; value: string }) {
 
 export function VerificationResultCard({
   result,
+  onViewPermit,
+  onViewStudent,
 }: VerificationResultCardProps) {
   const tone = getResultTone(result);
   const verdictLabel = getVerdictLabel(result);
@@ -101,9 +114,20 @@ export function VerificationResultCard({
           {verdictLabel}
         </Text>
         {result.student ? (
-          <Text style={styles.bannerSubtitle}>
-            {result.student.name} · {result.student.studentId}
-          </Text>
+          <View style={styles.studentMetaWrap}>
+            <Text style={styles.bannerSubtitle}>
+              {result.student.name} · {result.student.studentId}
+            </Text>
+            {onViewStudent ? (
+              <Pressable onPress={onViewStudent} style={styles.studentAction}>
+                <UserRound color={tone.accent} size={14} strokeWidth={2.2} />
+                <Text style={[styles.studentActionLabel, { color: tone.accent }]}>
+                  View Student
+                </Text>
+                <ChevronRight color={tone.accent} size={14} strokeWidth={2.4} />
+              </Pressable>
+            ) : null}
+          </View>
         ) : null}
       </View>
 
@@ -116,7 +140,18 @@ export function VerificationResultCard({
       {/* Permit block */}
       {result.permit && (
         <View style={styles.section}>
-          <Text style={styles.metaLabel}>PERMIT</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.metaLabel}>PERMIT</Text>
+            {onViewPermit ? (
+              <Pressable onPress={onViewPermit} style={styles.sectionAction}>
+                <FileText color={tone.accent} size={14} strokeWidth={2.2} />
+                <Text style={[styles.sectionActionLabel, { color: tone.accent }]}>
+                  View Permit
+                </Text>
+                <ChevronRight color={tone.accent} size={14} strokeWidth={2.4} />
+              </Pressable>
+            ) : null}
+          </View>
           <Row label="Code" value={result.permit.permitCode} />
           <View style={styles.divider} />
           <Row label="Status" value={result.permit.status} />
@@ -175,6 +210,23 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
     fontWeight: "600",
   },
+  studentMetaWrap: {
+    gap: spacing.xs,
+  },
+  studentAction: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  studentActionLabel: {
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
+  },
   section: {
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
@@ -184,6 +236,25 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1.5,
+  },
+  sectionHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "space-between",
+  },
+  sectionAction: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: 5,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+  },
+  sectionActionLabel: {
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
   },
   message: {
     color: colors.text,

@@ -298,7 +298,7 @@ export default function OperationsStudentDetailsScreen() {
         <View
           style={{
             height: 32,
-          }} /* Extra spacing at the bottom for comfortable scrolling */
+          }}
         />
       </ScrollView>
     </Screen>
