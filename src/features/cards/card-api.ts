@@ -219,3 +219,15 @@ export async function revokeCardForStudent(studentId: string) {
 
   return cloneCard(activeCard);
 }
+
+export async function reportLostCardForStudent(studentId: string) {
+  await simulateDelay(220);
+
+  const activeCard = await updateActiveCardStatus(studentId, "lost");
+
+  if (!activeCard) {
+    throw new Error("No active card is available to report as lost.");
+  }
+
+  return cloneCard(activeCard);
+}

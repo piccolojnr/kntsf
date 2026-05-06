@@ -15,7 +15,7 @@ import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { usePermits } from "@/features/permits/use-permits";
-import { useStudents } from "@/features/students/use-students";
+import { useCurrentStudent } from "@/features/students/use-current-student";
 import { useAuth } from "@/hooks/use-auth";
 
 function formatDate(dateString?: string | null) {
@@ -116,17 +116,16 @@ function getLatestCard(cards: StudentCard[], studentId: string) {
 
 export default function StudentProfileScreen() {
   const { logout, user } = useAuth();
-  const studentsQuery = useStudents();
+  const studentQuery = useCurrentStudent();
   const cardsQuery = useCards();
   const permitsQuery = usePermits();
 
   const isLoading =
-    studentsQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
+    studentQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
   const hasError =
-    studentsQuery.isError || cardsQuery.isError || permitsQuery.isError;
+    studentQuery.isError || cardsQuery.isError || permitsQuery.isError;
 
-  const student =
-    (studentsQuery.data ?? []).find((item) => item.id === user?.id) ?? null;
+  const student = studentQuery.student;
   const latestCard = student
     ? getLatestCard(cardsQuery.data ?? [], student.id)
     : null;
