@@ -1,19 +1,107 @@
-import { Href } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { BarChart3, ShieldAlert } from "lucide-react-native";
 
-import { RoleAccessGuard } from "@/components/layout/role-access-guard";
-import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { SectionCard } from "@/components/cards/section-card";
+import { StatusCard } from "@/components/cards/status-card";
+import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { DetailRow } from "@/components/ui/detail-row";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { useCards } from "@/features/cards/use-cards";
+import { getScanLogs } from "@/features/operations/scan-api";
+import { usePermits } from "@/features/permits/use-permits";
 
 export default function OperationsReportsScreen() {
+  const permitsQuery = usePermits();
+  const cardsQuery = useCards();
+  const logsQuery = useQuery({
+    queryKey: ["scan-logs"],
+    queryFn: getScanLogs,
+  });
+
+  const isLoading =
+    permitsQuery.isLoading || cardsQuery.isLoading || logsQuery.isLoading;
+  const hasError =
+    permitsQuery.isError || cardsQuery.isError || logsQuery.isError;
+
+  const permits = permitsQuery.data ?? [];
+  const cards = cardsQuery.data ?? [];
+  const logs = logsQuery.data ?? [];
+
+  const issuedPermits = permits.filter(
+    (permit) => permit.status === "active" || permit.status === "expired",
+  );
+  const allowedVerifications = logs.filter(
+    (log) => log.decision === "allowed",
+  );
+  const deniedVerifications = logs.filter(
+    (log) => log.decision !== "allowed",
+  );
+  const registeredCards = cards.filter((card) => card.status === "active");
+  const revokedCards = cards.filter(
+    (card) => card.status === "revoked" || card.status === "lost",
+  );
+
   return (
-    <RoleAccessGuard
-      allowedRoles={["admin"]}
-      getForbiddenHref={() => "/(operations)/scan" as Href}
+    <AdminToolScreen
+      title="Reports"
+      subtitle="Read simple operational summaries before charting is added."
     >
-      <PlaceholderScreen
-        title="Reports"
-        description="Review generated reports and operational insights for administrators."
-        screenName="operations/reports"
-      />
-    </RoleAccessGuard>
+      {isLoading ? (
+        <LoadingState message="Loading reports..." />
+      ) : hasError ? (
+        <EmptyState
+          description="Report data could not be loaded right now."
+          icon={ShieldAlert}
+          title="Unable to load reports"
+        />
+      ) : (
+        <>
+          <StatusCard
+            title="Permits Issued"
+            value={String(issuedPermits.length)}
+            description="Active and expired permits currently on record."
+            tone="primary"
+          />
+          <StatusCard
+            title="Allowed Verifications"
+            value={String(allowedVerifications.length)}
+            description="Verification attempts that granted access."
+            tone="success"
+          />
+          <StatusCard
+            title="Denied/Warning Verifications"
+            value={String(deniedVerifications.length)}
+            description="Verification attempts that required follow-up."
+            tone="warning"
+          />
+          <StatusCard
+            title="Cards Registered"
+            value={String(registeredCards.length)}
+            description="Active cards currently linked to student records."
+            tone="success"
+          />
+          <StatusCard
+            title="Cards Revoked/Lost"
+            value={String(revokedCards.length)}
+            description="Cards removed from active verification use."
+            tone="danger"
+          />
+
+          <SectionCard title="Report Notes">
+            <DetailRow
+              label="Charts"
+              value="Not added yet"
+              helper="This screen intentionally shows summaries only for the current mock phase."
+            />
+            <DetailRow
+              label="Backend Source"
+              value="Mock APIs"
+              helper="Production reports should be generated from backend analytics endpoints."
+            />
+          </SectionCard>
+        </>
+      )}
+    </AdminToolScreen>
   );
 }
