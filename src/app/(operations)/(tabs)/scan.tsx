@@ -1,4 +1,5 @@
 import { FileText, RotateCcw, ScanLine } from "lucide-react-native";
+import { Href, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
@@ -60,6 +61,7 @@ function useKeyboardHeight() {
 }
 
 export default function OperationsScanScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
@@ -165,6 +167,16 @@ export default function OperationsScanScreen() {
     setStudentId("2610");
   }
 
+  function handleViewStudent() {
+    if (!result?.student?.studentId) {
+      return;
+    }
+
+    router.push(
+      `/(operations)/student-details?studentId=${result.student.studentId}` as Href,
+    );
+  }
+
   async function handleIssuePermit() {
     if (!result?.student) return;
 
@@ -185,6 +197,8 @@ export default function OperationsScanScreen() {
     (result.decision === "allowed" ||
       result.decision === "expired_permit" ||
       result.decision === "revoked_permit");
+  const canIssuePermit = !!result?.canIssuePermit;
+  const canViewStudent = !!result?.student;
 
   return (
     <Screen>
@@ -225,7 +239,11 @@ export default function OperationsScanScreen() {
                   <Text style={styles.successNoticeText}>{successMessage}</Text>
                 </View>
               ) : null}
-              <VerificationResultCard result={result} />
+              <VerificationResultCard
+                onViewPermit={canViewPermit ? () => setShowPermitDetails(true) : undefined}
+                onViewStudent={canViewStudent ? handleViewStudent : undefined}
+                result={result}
+              />
               {result.decision === "denied" &&
               result.method === "student_id" ? (
                 <View style={styles.infoNotice}>
@@ -248,25 +266,14 @@ export default function OperationsScanScreen() {
                   </Text>
                 </View>
               ) : null}
-              <View style={styles.actions}>
-                {canViewPermit ? (
-                  <View style={styles.actionFlex}>
-                    <Button
-                      label="View Permit"
-                      onPress={() => setShowPermitDetails(true)}
-                      variant="secondary"
-                    />
-                  </View>
-                ) : null}
-                {result.canIssuePermit ? (
-                  <View style={styles.actionFlex}>
-                    <Button
-                      label="Issue Permit"
-                      onPress={() => setShowIssueConfirm(true)}
-                    />
-                  </View>
-                ) : null}
-              </View>
+              {canIssuePermit ? (
+                <View style={styles.actions}>
+                  <Button
+                    label="Issue Permit"
+                    onPress={() => setShowIssueConfirm(true)}
+                  />
+                </View>
+              ) : null}
               <Button
                 icon={RotateCcw}
                 label="Verify Another"
@@ -414,11 +421,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   actions: {
-    flexDirection: "row",
     gap: spacing.sm,
-  },
-  actionFlex: {
-    flex: 1,
   },
   closedNotice: {
     backgroundColor: colors.warningSoft,

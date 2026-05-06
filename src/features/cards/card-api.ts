@@ -1,4 +1,5 @@
 import { simulateDelay } from "@/lib/api/mock-api";
+import { getStudentById } from "@/features/students/student-api";
 
 import { CardStatus, StudentCard } from "./card-types";
 
@@ -87,6 +88,17 @@ function getActiveCardRecord(studentId: string) {
   );
 }
 
+function getConflictingActiveCard(studentId: string, uid: string) {
+  const normalizedUid = uid.trim().toUpperCase();
+
+  return mockCards.find(
+    (card) =>
+      card.studentId !== studentId &&
+      card.status === "active" &&
+      card.uid.toUpperCase() === normalizedUid,
+  );
+}
+
 export async function getCards() {
   await simulateDelay(250);
   return mockCards.map(cloneCard);
@@ -163,10 +175,22 @@ export async function assignCardToStudent(input: {
   studentId: string;
   uid: string;
 }) {
+  await simulateDelay(220);
   const normalizedUid = input.uid.trim().toUpperCase();
 
   if (!normalizedUid) {
     throw new Error("Enter a card UID before assigning a card.");
+  }
+
+  const conflictingCard = getConflictingActiveCard(input.studentId, normalizedUid);
+
+  if (conflictingCard) {
+    const assignedStudent = await getStudentById(conflictingCard.studentId);
+    const assignedName = assignedStudent?.name ?? "another student";
+
+    throw new Error(
+      `This card is already assigned to ${assignedName}. If you need to move this card, revoke it from that student first and then try again.`,
+    );
   }
 
   const modeAction =
