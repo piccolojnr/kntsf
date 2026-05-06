@@ -25,7 +25,7 @@ import {
 const mockScanLogs: ScanLog[] = [
   {
     id: "scan-log-1",
-    method: "uid",
+    method: "card_uid",
     value: "UID-AMA-001",
     scannedAt: "2026-05-03T08:30:00.000Z",
     decision: "allowed",
@@ -36,7 +36,7 @@ const mockScanLogs: ScanLog[] = [
   },
   {
     id: "scan-log-2",
-    method: "uid",
+    method: "card_uid",
     value: "UID-EFUA-003",
     scannedAt: "2026-05-03T10:10:00.000Z",
     decision: "card_inactive",
@@ -46,7 +46,7 @@ const mockScanLogs: ScanLog[] = [
   },
   {
     id: "scan-log-3",
-    method: "uid",
+    method: "card_uid",
     value: "UID-UNKNOWN-999",
     scannedAt: "2026-05-03T12:45:00.000Z",
     decision: "card_not_registered",
@@ -108,6 +108,7 @@ function createResult(
   },
 ): ScanCardResult {
   return {
+    status: decision,
     decision,
     message,
     method,
@@ -232,7 +233,7 @@ export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
 
   if (!card) {
     return createResult(
-      "uid",
+      "card_uid",
       normalizedUid,
       "card_not_registered",
       "Card not registered in the system.",
@@ -241,7 +242,7 @@ export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
 
   if (card.status !== "active") {
     return createResult(
-      "uid",
+      "card_uid",
       normalizedUid,
       "card_inactive",
       `This card is ${card.status} and cannot be used for entry.`,
@@ -253,7 +254,7 @@ export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
 
   if (!student) {
     return createResult(
-      "uid",
+      "card_uid",
       normalizedUid,
       "denied",
       "No student record was found for this card.",
@@ -261,7 +262,7 @@ export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
     );
   }
 
-  return evaluatePermitForStudent("uid", normalizedUid, student, { card });
+  return evaluatePermitForStudent("card_uid", normalizedUid, student, { card });
 }
 
 export async function verifyPermitByStudentId(
@@ -288,7 +289,7 @@ export async function verifyPermit(input: {
   method: VerificationMethod;
   value: string;
 }) {
-  if (input.method === "uid") {
+  if (input.method === "card_uid") {
     return scanCardByUid(input.value);
   }
 
