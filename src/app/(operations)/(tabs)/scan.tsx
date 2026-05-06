@@ -1,4 +1,4 @@
-import { FileText, RotateCcw, ScanLine } from "lucide-react-native";
+import { FileText, RotateCcw, ScanLine, ShieldAlert } from "lucide-react-native";
 import { Href, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -31,6 +31,7 @@ import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useVerifyPermit } from "@/features/operations/use-verify-permit";
+import { useNfcAvailability } from "@/hooks/use-nfc-availability";
 import { useScreenDensity } from "@/hooks/use-screen-density";
 
 type ScreenState = "idle" | "loading" | "result";
@@ -66,6 +67,7 @@ export default function OperationsScanScreen() {
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
   const { fixedScreen, isCompact } = useScreenDensity();
+  const { isCheckingNfc, isNfcAvailable } = useNfcAvailability();
   const {
     error,
     issuePermit,
@@ -199,6 +201,7 @@ export default function OperationsScanScreen() {
       result.decision === "revoked_permit");
   const canIssuePermit = !!result?.canIssuePermit;
   const canViewStudent = !!result?.student;
+  const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
 
   return (
     <Screen>
@@ -290,12 +293,12 @@ export default function OperationsScanScreen() {
             ]}
           >
             <RadarPulse
-              active={screenState === "idle" && !keyboardOpen}
+              active={screenState === "idle" && !keyboardOpen && isNfcAvailable}
               size={fixedScreen.heroSize}
               ringCount={3}
             >
               <ScanLine
-                color="#ffffff"
+                color={isNfcAvailable ? "#ffffff" : colors.textMuted}
                 size={fixedScreen.heroIconSize}
                 strokeWidth={2}
               />
@@ -321,11 +324,25 @@ export default function OperationsScanScreen() {
                   <Text style={styles.scanHint}>Enter student ID below</Text>
                   <View style={styles.nfcAction}>
                     <Button
-                      label="Scan NFC Card"
+                      disabled={nfcUnavailable || isCheckingNfc}
+                      label={isCheckingNfc ? "Checking NFC" : "Scan NFC Card"}
                       onPress={() => void handleVerifyByNfc()}
                       variant="secondary"
                     />
                   </View>
+                  {nfcUnavailable ? (
+                    <View style={styles.nfcNotice}>
+                      <ShieldAlert
+                        color={colors.textMuted}
+                        size={15}
+                        strokeWidth={2.4}
+                      />
+                      <Text style={styles.nfcNoticeText}>
+                        NFC scan is not supported on this device. Use student ID
+                        verification instead.
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               ))}
           </View>
@@ -402,6 +419,22 @@ const styles = StyleSheet.create({
   nfcAction: {
     marginTop: spacing.sm,
     minWidth: 180,
+  },
+  nfcNotice: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.xs,
+    justifyContent: "center",
+    maxWidth: 320,
+    paddingHorizontal: spacing.md,
+  },
+  nfcNoticeText: {
+    color: colors.textMuted,
+    flexShrink: 1,
+    fontSize: fontSizes.xs,
+    fontWeight: "700",
+    lineHeight: 17,
+    textAlign: "center",
   },
 
   /* ── Floating pill (absolute) ── */
