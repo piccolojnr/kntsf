@@ -1,22 +1,25 @@
-import { LogOut, ShieldAlert, UserRound } from "lucide-react-native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { LogOut, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { ProfileHeaderCard } from "@/components/cards/profile-header-card";
-import { SectionCard } from "@/components/cards/section-card";
-import { StatusCard } from "@/components/cards/status-card";
-import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
-import { spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { usePermits } from "@/features/permits/use-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 import { useAuth } from "@/hooks/use-auth";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(dateString?: string | null) {
   if (!dateString) return "Not available";
@@ -36,68 +39,24 @@ function formatCurrency(amount?: number | null) {
   }).format(amount);
 }
 
-function formatCardStatus(status?: CardStatus | null) {
-  switch (status) {
-    case "active":
-      return "Active";
-    case "revoked":
-      return "Revoked";
-    case "lost":
-      return "Lost";
-    case "blocked":
-      return "Blocked";
-    case "replaced":
-      return "Replaced";
-    default:
-      return "No Card";
-  }
-}
-
-function formatPermitStatus(status?: PermitStatus | null) {
-  switch (status) {
-    case "active":
-      return "Active";
-    case "expired":
-      return "Expired";
-    case "revoked":
-      return "Revoked";
-    default:
-      return "No Permit";
-  }
-}
-
-function getPermitTone(status?: PermitStatus | null) {
-  switch (status) {
-    case "active":
-      return "success" as const;
-    case "expired":
-    case "revoked":
-      return "warning" as const;
-    default:
-      return "primary" as const;
-  }
-}
-
-function getCardTone(status?: CardStatus | null) {
-  switch (status) {
-    case "active":
-      return "success" as const;
-    case "revoked":
-    case "blocked":
-    case "lost":
-      return "warning" as const;
-    default:
-      return "primary" as const;
-  }
+function getInitials(name: string) {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "U"
+  );
 }
 
 function getLatestPermit(permits: Permit[], studentId: string) {
   return (
     permits
-      .filter((permit) => permit.studentId === studentId)
+      .filter((p) => p.studentId === studentId)
       .sort(
-        (left, right) =>
-          new Date(right.startDate).getTime() - new Date(left.startDate).getTime(),
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
       )[0] ?? null
   );
 }
@@ -105,14 +64,404 @@ function getLatestPermit(permits: Permit[], studentId: string) {
 function getLatestCard(cards: StudentCard[], studentId: string) {
   return (
     cards
-      .filter((card) => card.studentId === studentId)
+      .filter((c) => c.studentId === studentId)
       .sort(
-        (left, right) =>
-          new Date(right.registeredAt).getTime() -
-          new Date(left.registeredAt).getTime(),
+        (a, b) =>
+          new Date(b.registeredAt).getTime() -
+          new Date(a.registeredAt).getTime(),
       )[0] ?? null
   );
 }
+
+// ─── Status configs ───────────────────────────────────────────────────────────
+
+const PERMIT_COLOR: Record<PermitStatus, string> = {
+  active: colors.success,
+  expired: colors.warning,
+  revoked: colors.danger,
+};
+const PERMIT_SOFT: Record<PermitStatus, string> = {
+  active: colors.successSoft,
+  expired: colors.warningSoft,
+  revoked: colors.dangerSoft,
+};
+
+const CARD_COLOR: Record<CardStatus, string> = {
+  active: colors.success,
+  blocked: colors.danger,
+  revoked: colors.danger,
+  lost: colors.warning,
+  replaced: colors.warning,
+};
+const CARD_SOFT: Record<CardStatus, string> = {
+  active: colors.successSoft,
+  blocked: colors.dangerSoft,
+  revoked: colors.dangerSoft,
+  lost: colors.warningSoft,
+  replaced: colors.warningSoft,
+};
+
+// ─── Profile hero card ────────────────────────────────────────────────────────
+
+function ProfileHeroCard({
+  name,
+  email,
+  role,
+}: {
+  name: string;
+  email: string;
+  role: string;
+}) {
+  return (
+    <View style={heroStyles.card}>
+      {/* Avatar */}
+      <View style={heroStyles.avatarWrap}>
+        <Text style={heroStyles.avatarText}>{getInitials(name)}</Text>
+      </View>
+
+      {/* Identity */}
+      <View style={heroStyles.identity}>
+        <Text style={heroStyles.name} numberOfLines={1}>
+          {name}
+        </Text>
+        <Text style={heroStyles.email} numberOfLines={1}>
+          {email}
+        </Text>
+        <View style={heroStyles.badgeRow}>
+          <View style={heroStyles.roleBadge}>
+            <Text style={heroStyles.roleBadgeText}>{role.toUpperCase()}</Text>
+          </View>
+          <View style={heroStyles.workspaceBadge}>
+            <Text style={heroStyles.workspaceBadgeText}>STUDENT</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const heroStyles = StyleSheet.create({
+  card: {
+    backgroundColor: "#0a1628",
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: "#1e3a5f33",
+    padding: spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    shadowColor: "#1f4b9966",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  avatarWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.xl,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  avatarText: {
+    color: "#ffffff",
+    fontSize: fontSizes.xl,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
+  identity: {
+    flex: 1,
+    gap: 5,
+  },
+  name: {
+    color: "#ffffff",
+    fontSize: fontSizes.lg,
+    fontWeight: "800",
+    letterSpacing: 0.1,
+  },
+  email: {
+    color: "rgba(255,255,255,0.40)",
+    fontSize: fontSizes.xs,
+    fontWeight: "500",
+  },
+  badgeRow: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    marginTop: 2,
+  },
+  roleBadge: {
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  roleBadgeText: {
+    color: "rgba(255,255,255,0.60)",
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+  },
+  workspaceBadge: {
+    backgroundColor: `${colors.primary}55`,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  workspaceBadgeText: {
+    color: "rgba(255,255,255,0.70)",
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+  },
+});
+
+// ─── Status chip pair ─────────────────────────────────────────────────────────
+
+function StatusChipPair({
+  permitStatus,
+  cardStatus,
+}: {
+  permitStatus: PermitStatus | null;
+  cardStatus: CardStatus | null;
+}) {
+  const pColor = permitStatus ? PERMIT_COLOR[permitStatus] : colors.textMuted;
+  const pSoft = permitStatus ? PERMIT_SOFT[permitStatus] : colors.surfaceMuted;
+  const cColor = cardStatus ? CARD_COLOR[cardStatus] : colors.textMuted;
+  const cSoft = cardStatus ? CARD_SOFT[cardStatus] : colors.surfaceMuted;
+
+  return (
+    <View style={chipPairStyles.row}>
+      <StatusChip
+        label="Permit"
+        value={
+          permitStatus
+            ? permitStatus.charAt(0).toUpperCase() + permitStatus.slice(1)
+            : "None"
+        }
+        color={pColor}
+        soft={pSoft}
+      />
+      <StatusChip
+        label="SRC Card"
+        value={
+          cardStatus
+            ? cardStatus.charAt(0).toUpperCase() + cardStatus.slice(1)
+            : "None"
+        }
+        color={cColor}
+        soft={cSoft}
+        icon={<Nfc size={14} color={cColor} strokeWidth={1.5} />}
+      />
+    </View>
+  );
+}
+
+function StatusChip({
+  label,
+  value,
+  color,
+  soft,
+  icon,
+}: {
+  label: string;
+  value: string;
+  color: string;
+  soft: string;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <View
+      style={[
+        chipPairStyles.chip,
+        { backgroundColor: soft, borderColor: `${color}40` },
+      ]}
+    >
+      <View style={chipPairStyles.chipTop}>
+        <Text style={[chipPairStyles.chipLabel, { color }]}>
+          {label.toUpperCase()}
+        </Text>
+        {icon}
+      </View>
+      <Text style={[chipPairStyles.chipValue, { color }]}>{value}</Text>
+    </View>
+  );
+}
+
+const chipPairStyles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  chip: {
+    flex: 1,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.md,
+    gap: 6,
+  },
+  chipTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  chipLabel: {
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 1.4,
+  },
+  chipValue: {
+    fontSize: fontSizes.md,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+  },
+});
+
+// ─── Info panel (replaces SectionCard) ───────────────────────────────────────
+
+function InfoPanel({
+  title,
+  accentColor,
+  rows,
+}: {
+  title: string;
+  accentColor?: string;
+  rows: { label: string; value: string; sub?: string }[];
+}) {
+  const accent = accentColor ?? colors.primary;
+  return (
+    <View style={panelStyles.card}>
+      <View style={panelStyles.inner}>
+        <Text style={panelStyles.title}>{title}</Text>
+        <View style={panelStyles.rows}>
+          {rows.map((row, i) => (
+            <View
+              key={i}
+              style={[
+                panelStyles.row,
+                i < rows.length - 1 && panelStyles.rowBorder,
+              ]}
+            >
+              <Text style={panelStyles.rowLabel}>{row.label}</Text>
+              <View style={panelStyles.rowRight}>
+                <Text style={panelStyles.rowValue}>{row.value}</Text>
+                {row.sub ? (
+                  <Text style={panelStyles.rowSub}>{row.sub}</Text>
+                ) : null}
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const panelStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  stripe: {
+    width: 4,
+  },
+  inner: {
+    flex: 1,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  title: {
+    color: colors.text,
+    fontSize: fontSizes.md,
+    fontWeight: "700",
+  },
+  rows: {
+    gap: 0,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    paddingVertical: spacing.sm + 2,
+  },
+  rowBorder: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+  },
+  rowLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "600",
+    flex: 1,
+    paddingRight: spacing.sm,
+  },
+  rowRight: {
+    flex: 2,
+    alignItems: "flex-end",
+    gap: 2,
+  },
+  rowValue: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+    textAlign: "right",
+  },
+  rowSub: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xxs,
+    textAlign: "right",
+    lineHeight: 16,
+  },
+});
+
+// ─── Logout button ────────────────────────────────────────────────────────────
+
+function LogoutButton({ onPress }: { onPress: () => void }) {
+  return (
+    <TouchableOpacity
+      style={logoutStyles.btn}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <LogOut size={16} color={colors.danger} strokeWidth={2.2} />
+      <Text style={logoutStyles.label}>Sign Out</Text>
+    </TouchableOpacity>
+  );
+}
+
+const logoutStyles = StyleSheet.create({
+  btn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.dangerSoft,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: `${colors.danger}30`,
+    paddingVertical: spacing.md,
+  },
+  label: {
+    color: colors.danger,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+    letterSpacing: 0.3,
+  },
+});
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StudentProfileScreen() {
   const { logout, user } = useAuth();
@@ -141,9 +490,10 @@ export default function StudentProfileScreen() {
       >
         <PageHeader
           eyebrow="Student"
-          subtitle="Review your account, permit record, and SRC card details."
+          subtitle="Your account, permit record, and SRC card details."
           title="Profile"
         />
+
         {isLoading ? (
           <LoadingState message="Loading your profile..." />
         ) : hasError ? (
@@ -160,104 +510,97 @@ export default function StudentProfileScreen() {
           />
         ) : (
           <>
-            <ProfileHeaderCard
-              email={student.email}
+            {/* Hero card */}
+            <ProfileHeroCard
               name={student.name}
+              email={user?.email ?? student.email}
               role={user?.role ?? "student"}
-              subtitle="Your student workspace keeps your permit and SRC card access in one place."
-              workspaceLabel="Student"
             />
 
-            <View style={styles.statusGrid}>
-              <StatusCard
-                title="Permit Status"
-                value={formatPermitStatus(latestPermit?.status)}
-                description={
-                  latestPermit
-                    ? `Permit ${latestPermit.permitCode} expires ${formatDate(latestPermit.expiryDate)}.`
-                    : "No permit record is currently linked to your student account."
-                }
-                tone={getPermitTone(latestPermit?.status)}
-              />
-              <StatusCard
-                title="SRC Card"
-                value={formatCardStatus(latestCard?.status)}
-                description={
-                  latestCard
-                    ? `Card UID ${latestCard.uid} was registered ${formatDate(latestCard.registeredAt)}.`
-                    : "No SRC card record is currently linked to your student account."
-                }
-                tone={getCardTone(latestCard?.status)}
-              />
-            </View>
-
-            <SectionCard title="Account Overview">
-              <DetailRow
-                label="Student ID"
-                value={student.studentId}
-                helper="Use this student ID when operations staff verify your permit."
-              />
-              <DetailRow
-                label="Course"
-                value={student.course}
-                helper={`Current academic level: ${student.level}.`}
-              />
-              <DetailRow
-                label="Phone"
-                value={student.phone}
-                helper="This contact is attached to your student record."
-              />
-              <DetailRow
-                label="Sign-in Email"
-                value={user?.email ?? student.email}
-                helper="Your current app sign-in identity."
-              />
-            </SectionCard>
-
-            <SectionCard title="Permit Record">
-              <DetailRow
-                label="Permit Code"
-                value={latestPermit?.permitCode ?? "No Permit"}
-                helper={
-                  latestPermit
-                    ? `Permit window: ${formatDate(latestPermit.startDate)} to ${formatDate(latestPermit.expiryDate)}.`
-                    : "A permit record has not been issued for this student yet."
-                }
-              />
-              <DetailRow
-                label="Amount Paid"
-                value={formatCurrency(latestPermit?.amountPaid)}
-                helper={
-                  latestPermit
-                    ? `Current status: ${formatPermitStatus(latestPermit.status)}.`
-                    : "No payment record is available without an issued permit."
-                }
-              />
-            </SectionCard>
-
-            <SectionCard title="Card Record">
-              <DetailRow
-                label="Card UID"
-                value={latestCard?.uid ?? "No Card"}
-                helper={
-                  latestCard
-                    ? `Card type: ${latestCard.type.replaceAll("_", " ")}.`
-                    : "No card UID has been assigned to this student."
-                }
-              />
-              <DetailRow
-                label="Registered"
-                value={formatDate(latestCard?.registeredAt)}
-                helper={`Current card status: ${formatCardStatus(latestCard?.status)}.`}
-              />
-            </SectionCard>
-
-            <PrimaryButton
-              label="Logout"
-              icon={LogOut}
-              onPress={logout}
-              variant="danger"
+            {/* Status chips */}
+            <StatusChipPair
+              permitStatus={latestPermit?.status ?? null}
+              cardStatus={latestCard?.status ?? null}
             />
+
+            {/* Account details */}
+            <InfoPanel
+              title="Account Overview"
+              accentColor={colors.primary}
+              rows={[
+                {
+                  label: "Student ID",
+                  value: student.studentId,
+                  sub: "Present this when staff verify your permit.",
+                },
+                {
+                  label: "Course",
+                  value: student.course,
+                  sub: `Level ${student.level}`,
+                },
+                {
+                  label: "Phone",
+                  value: student.phone,
+                  sub: "Attached to your student record.",
+                },
+                {
+                  label: "Sign-in Email",
+                  value: user?.email ?? student.email,
+                },
+              ]}
+            />
+
+            {/* Permit record */}
+            <InfoPanel
+              title="Permit Record"
+              accentColor={
+                latestPermit
+                  ? PERMIT_COLOR[latestPermit.status]
+                  : colors.textMuted
+              }
+              rows={[
+                {
+                  label: "Permit Code",
+                  value: latestPermit?.permitCode ?? "No Permit",
+                  sub: latestPermit
+                    ? `${formatDate(latestPermit.startDate)} → ${formatDate(latestPermit.expiryDate)}`
+                    : "No permit issued yet.",
+                },
+                {
+                  label: "Amount Paid",
+                  value: formatCurrency(latestPermit?.amountPaid),
+                  sub: latestPermit
+                    ? `Status: ${latestPermit.status.charAt(0).toUpperCase() + latestPermit.status.slice(1)}`
+                    : undefined,
+                },
+              ]}
+            />
+
+            {/* Card record */}
+            <InfoPanel
+              title="SRC Card"
+              accentColor={
+                latestCard ? CARD_COLOR[latestCard.status] : colors.textMuted
+              }
+              rows={[
+                {
+                  label: "Card UID",
+                  value: latestCard?.uid ?? "No Card",
+                  sub: latestCard
+                    ? `Type: ${latestCard.type.replaceAll("_", " ")}`
+                    : "No card assigned yet.",
+                },
+                {
+                  label: "Registered",
+                  value: formatDate(latestCard?.registeredAt),
+                  sub: latestCard
+                    ? `Status: ${latestCard.status.charAt(0).toUpperCase() + latestCard.status.slice(1)}`
+                    : undefined,
+                },
+              ]}
+            />
+
+            <LogoutButton onPress={logout} />
           </>
         )}
       </ScrollView>
@@ -271,8 +614,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.pageHeader,
     paddingBottom: spacing.xxl + 72,
-  },
-  statusGrid: {
-    gap: spacing.md,
   },
 });

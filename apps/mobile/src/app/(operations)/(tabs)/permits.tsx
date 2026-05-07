@@ -1,6 +1,6 @@
-import { FileText, Search } from "lucide-react-native";
-import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FileText, Search, ChevronDown } from "lucide-react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
@@ -42,10 +42,18 @@ const statConfig = {
   revoked: { label: "Revoked", accent: colors.danger, soft: colors.dangerSoft },
 } as const;
 
+const PAGE_SIZE = 10;
+
 export default function OperationsPermitsScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [selectedPermitId, setSelectedPermitId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Reset pagination when search or filter changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchTerm, activeFilter]);
 
   const permitsQuery = usePermits();
   const studentsQuery = useStudents();
@@ -194,7 +202,7 @@ export default function OperationsPermitsScreen() {
           />
         ) : (
           <View style={styles.list}>
-            {filteredItems.map((item) => (
+            {filteredItems.slice(0, visibleCount).map((item) => (
               <PermitLedgerRow
                 key={item.permit.id}
                 onPress={() => setSelectedPermitId(item.permit.id)}
@@ -202,6 +210,18 @@ export default function OperationsPermitsScreen() {
                 student={item.student}
               />
             ))}
+            {visibleCount < filteredItems.length && (
+              <TouchableOpacity
+                style={styles.showMoreBtn}
+                onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                activeOpacity={0.75}
+              >
+                <ChevronDown size={16} color={colors.primary} strokeWidth={2.5} />
+                <Text style={styles.showMoreText}>
+                  Show more · {filteredItems.length - visibleCount} remaining
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </ScrollView>
@@ -283,5 +303,21 @@ const styles = StyleSheet.create({
   /* ── List ── */
   list: {
     gap: spacing.sm,
+  },
+  showMoreBtn: {
+    alignItems: "center",
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: `${colors.primary}30`,
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+  },
+  showMoreText: {
+    color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
   },
 });
