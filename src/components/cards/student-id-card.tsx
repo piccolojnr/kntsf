@@ -1,5 +1,4 @@
-import { theme } from "@/constants/theme";
-import { CardStatus } from "@/features/cards/card-types";
+import { Nfc } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Image,
@@ -10,11 +9,17 @@ import {
   useWindowDimensions,
 } from "react-native";
 
+import { radius, spacing } from "@/constants/theme";
+import { CardStatus } from "@/features/cards/card-types";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export interface StudentData {
   name?: string;
   studentId?: string;
   programme?: string;
   level?: string;
+  /** Kept for backwards compatibility — not currently displayed on the card */
   validUntil?: string;
   status?: CardStatus;
   photoUri?: string;
@@ -24,6 +29,8 @@ interface StudentIDCardProps {
   student?: StudentData;
   style?: ViewStyle;
 }
+
+// ─── Config ───────────────────────────────────────────────────────────────────
 
 const FALLBACK: Required<StudentData> = {
   name: "Student Name",
@@ -36,12 +43,23 @@ const FALLBACK: Required<StudentData> = {
 };
 
 const STATUS: Record<CardStatus, { label: string; color: string }> = {
-  active: { label: "ACTIVE", color: "#2ECC71" },
-  blocked: { label: "BLOCKED", color: "#E74C3C" },
-  revoked: { label: "REVOKED", color: "#E74C3C" },
-  lost: { label: "LOST", color: "#E74C3C" },
-  replaced: { label: "REPLACED", color: "#E74C3C" },
+  active: { label: "ACTIVE", color: "#22c55e" },
+  blocked: { label: "BLOCKED", color: "#ef4444" },
+  revoked: { label: "REVOKED", color: "#ef4444" },
+  lost: { label: "LOST", color: "#f59e0b" },
+  replaced: { label: "REPLACED", color: "#f59e0b" },
 };
+
+// Status → card bg colours (dark, distinct per state)
+const CARD_BG: Record<CardStatus, { bg: string; border: string; glow: string }> = {
+  active: { bg: "#0a1628", border: "#1e3a5f33", glow: "#1f4b9966" },
+  blocked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
+  revoked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
+  lost: { bg: "#1a1200", border: "#5f4a1e33", glow: "#99781f66" },
+  replaced: { bg: "#0f0f1a", border: "#2e2e5f33", glow: "#4a4a9966" },
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function initials(name: string) {
   return name
@@ -52,27 +70,45 @@ function initials(name: string) {
     .join("");
 }
 
+// ─── Sub-component ────────────────────────────────────────────────────────────
+
+function MetaChip({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={chipStyles.wrap}>
+      <Text style={chipStyles.label}>{label}</Text>
+      <Text style={chipStyles.value}>{value}</Text>
+    </View>
+  );
+}
+
+const chipStyles = StyleSheet.create({
+  wrap: { gap: 3 },
+  label: {
+    color: "rgba(255,255,255,0.28)",
+    fontSize: 9,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  value: {
+    color: "rgba(255,255,255,0.80)",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+  },
+});
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function StudentIDCard({ student, style }: StudentIDCardProps) {
   const { width: screenWidth } = useWindowDimensions();
   const d: Required<StudentData> = { ...FALLBACK, ...student };
   const [err, setErr] = useState(false);
   const showPhoto = !!d.photoUri && !err;
   const st = STATUS[d.status] ?? STATUS.active;
+  const bg = CARD_BG[d.status] ?? CARD_BG.active;
 
-  // Card fills screen width minus 32px margin, capped at 500px
-  const cardWidth = Math.min(screenWidth - 32, 500);
-  // Height scales proportionally (500:290 ratio)
-  const cardHeight = Math.round(cardWidth * (290 / 500));
-
-  // Scale font sizes and spacing relative to card width
-  const s = cardWidth / 500;
-  const scale = (n: number) => Math.round(n * s);
-
-  const photoSize = {
-    width: scale(76),
-    height: scale(90),
-    borderRadius: scale(12),
-  };
+  const cardWidth = Math.min(screenWidth - 32, 440);
 
   return (
     <View
@@ -80,92 +116,45 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
         styles.card,
         {
           width: cardWidth,
-          height: cardHeight,
-          borderRadius: scale(20),
-          paddingHorizontal: scale(28),
-          paddingTop: scale(26),
-          paddingBottom: scale(22),
+          backgroundColor: bg.bg,
+          borderColor: bg.border,
+          shadowColor: bg.glow,
         },
         style,
       ]}
     >
-      {/* Top row */}
+      {/* ── Top: issuer + NFC icon ───────────────────────── */}
       <View style={styles.top}>
-        <View style={styles.logoRow}>
-          <View
-            style={[
-              styles.dot,
-              {
-                width: scale(8),
-                height: scale(8),
-                borderRadius: scale(4),
-                marginTop: scale(3),
-              },
-            ]}
-          />
-          <View>
-            <Text
-              style={[
-                styles.uniName,
-                { fontSize: scale(11), letterSpacing: scale(1) },
-              ]}
-            >
-              KNUTSFORD UNIVERSITY
-            </Text>
-            <Text
-              style={[
-                styles.motto,
-                { fontSize: scale(8), marginTop: scale(2) },
-              ]}
-            >
-              LEARN · LEAD · SERVE
-            </Text>
-          </View>
+        <View style={styles.topLeft}>
+          <Text style={styles.issuerLabel}>KNUTSFORD UNIVERSITY</Text>
+          <Text style={styles.issuerSub}>SRC STUDENT CARD</Text>
         </View>
-        <View style={styles.nfcBlock}>
-          <Text style={[styles.nfcWaves, { fontSize: scale(13) }]}>)))</Text>
-          <Text
-            style={[
-              styles.nfcLabel,
-              { fontSize: scale(8), marginTop: scale(1) },
-            ]}
-          >
-            NFC
-          </Text>
+
+        <View
+          style={[
+            styles.nfcWrap,
+            { backgroundColor: `${st.color}15`, borderColor: `${st.color}30` },
+          ]}
+        >
+          <Nfc size={22} color={st.color} strokeWidth={1.5} />
+          <Text style={[styles.nfcLabel, { color: st.color }]}>NFC</Text>
         </View>
       </View>
 
-      {/* Middle: name + photo */}
+      {/* ── Middle: name + photo ─────────────────────────── */}
       <View style={styles.mid}>
         <View style={styles.nameBlock}>
-          <Text
-            style={[
-              styles.idTag,
-              { fontSize: scale(8), marginBottom: scale(6) },
-            ]}
-          >
-            SRC STUDENT ID
-          </Text>
-          <Text
-            style={[
-              styles.name,
-              { fontSize: scale(26), lineHeight: scale(30) },
-            ]}
-            numberOfLines={1}
-          >
+          <Text style={styles.nameEyebrow}>STUDENT</Text>
+          <Text style={styles.name} numberOfLines={1}>
             {d.name}
           </Text>
-          <Text
-            style={[
-              styles.programme,
-              { fontSize: scale(11), marginTop: scale(5) },
-            ]}
-            numberOfLines={1}
-          >
+          <Text style={styles.programme} numberOfLines={1}>
             {d.programme}
           </Text>
         </View>
-        <View style={[styles.photoWrap, photoSize]}>
+
+        {/* Photo / initials */}
+        <View style={styles.photoWrap}>
           {showPhoto ? (
             <Image
               source={{ uri: d.photoUri }}
@@ -173,52 +162,51 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
               onError={() => setErr(true)}
             />
           ) : (
-            <Text style={[styles.initialsText, { fontSize: scale(22) }]}>
-              {initials(d.name)}
-            </Text>
+            <Text style={styles.initialsText}>{initials(d.name)}</Text>
           )}
         </View>
       </View>
 
-      {/* Hairline */}
-      <View style={styles.hairline} />
-
-      {/* Bottom: meta + status */}
-      <View style={styles.bottom}>
-        <View style={[styles.metaRow, { gap: scale(20) }]}>
-          {[
-            { key: "STUDENT ID", val: d.studentId },
-            { key: "VALID UNTIL", val: d.validUntil },
-            { key: "LEVEL", val: d.level },
-          ].map(({ key, val }) => (
-            <View key={key} style={styles.field}>
-              <Text style={[styles.fieldKey, { fontSize: scale(7.5) }]}>
-                {key}
-              </Text>
-              <Text style={[styles.fieldVal, { fontSize: scale(11) }]}>
-                {val}
-              </Text>
-            </View>
+      {/* ── Dashed divider ───────────────────────────────── */}
+      <View style={styles.dividerRow}>
+        <View
+          style={[styles.notch, styles.notchLeft, { backgroundColor: "#f5f7fb" }]}
+        />
+        <View style={styles.dashedLine}>
+          {Array.from({ length: 18 }).map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dash,
+                { backgroundColor: `${st.color}28` },
+              ]}
+            />
           ))}
         </View>
-        <View style={styles.statusRow}>
-          <View
-            style={[
-              styles.statusDot,
-              {
-                backgroundColor: st.color,
-                width: scale(5),
-                height: scale(5),
-                borderRadius: scale(3),
-              },
-            ]}
-          />
-          <Text
-            style={[
-              styles.statusLabel,
-              { color: st.color, fontSize: scale(9) },
-            ]}
-          >
+        <View
+          style={[styles.notch, styles.notchRight, { backgroundColor: "#f5f7fb" }]}
+        />
+      </View>
+
+      {/* ── Bottom: meta chips + status ──────────────────── */}
+      <View style={styles.bottom}>
+        <MetaChip label="Student ID" value={d.studentId} />
+        <View
+          style={[
+            styles.dividerV,
+            { backgroundColor: `${st.color}20` },
+          ]}
+        />
+        <MetaChip label="Level" value={d.level} />
+        <View
+          style={[
+            styles.dividerV,
+            { backgroundColor: `${st.color}20` },
+          ]}
+        />
+        {/* Status pill */}
+        <View style={styles.statusWrap}>
+          <Text style={[styles.statusLabel, { color: st.color }]}>
             {st.label}
           </Text>
         </View>
@@ -227,113 +215,158 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const NOTCH_SIZE = 18;
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.primary,
-    justifyContent: "space-between",
-    overflow: "hidden",
     alignSelf: "center",
-    // iOS shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: theme.spacing.sm },
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    gap: spacing.lg,
+    overflow: "hidden",
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
-    shadowRadius: theme.spacing.lg,
-    // Android
-    elevation: 12,
+    shadowRadius: 20,
+    elevation: 10,
   },
+
+  // Top
   top: {
+    alignItems: "flex-start",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
   },
-  logoRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 9,
-    flexShrink: 1,
+  topLeft: {
+    flex: 1,
+    gap: 4,
+    paddingRight: spacing.md,
   },
-  dot: {
-    backgroundColor: "#FFFFFF",
-    flexShrink: 0,
+  issuerLabel: {
+    color: "rgba(255,255,255,0.70)",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.5,
   },
-  uniName: {
-    color: "rgba(255,255,255,0.9)",
-    fontWeight: "600",
-  },
-  motto: {
-    color: "rgba(255,255,255,0.28)",
-    letterSpacing: 0.8,
-  },
-  nfcBlock: { alignItems: "flex-end", flexShrink: 0 },
-  nfcWaves: { color: "rgba(255,255,255,0.2)" },
-  nfcLabel: { color: "rgba(255,255,255,0.2)", letterSpacing: 0.5 },
-  mid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  nameBlock: { flex: 1, paddingRight: 12 },
-  idTag: {
+  issuerSub: {
     color: "rgba(255,255,255,0.25)",
-    fontWeight: "500",
+    fontSize: 9,
+    fontWeight: "600",
+    letterSpacing: 2,
+  },
+  nfcWrap: {
+    alignItems: "center",
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  nfcLabel: {
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+  },
+
+  // Middle
+  mid: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  nameBlock: {
+    flex: 1,
+    gap: 4,
+    paddingRight: spacing.md,
+  },
+  nameEyebrow: {
+    color: "rgba(255,255,255,0.25)",
+    fontSize: 9,
+    fontWeight: "600",
     letterSpacing: 2,
   },
   name: {
-    color: "#FFFFFF",
-    fontWeight: "700",
+    color: "#ffffff",
+    fontSize: 24,
+    fontWeight: "800",
     letterSpacing: 0.2,
   },
   programme: {
-    color: "rgba(255,255,255,0.35)",
-    fontWeight: "400",
+    color: "rgba(255,255,255,0.40)",
+    fontSize: 12,
+    fontWeight: "500",
   },
   photoWrap: {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
     alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderColor: "rgba(255,255,255,0.08)",
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    height: 72,
     justifyContent: "center",
     overflow: "hidden",
-    flexShrink: 0,
+    width: 60,
   },
-  photo: { width: "100%", height: "100%", resizeMode: "cover" },
+  photo: { height: "100%", resizeMode: "cover", width: "100%" },
   initialsText: {
-    color: "rgba(255,255,255,0.2)",
-    fontWeight: "600",
+    color: "rgba(255,255,255,0.20)",
+    fontSize: 22,
+    fontWeight: "700",
   },
-  hairline: {
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.05)",
-  },
-  bottom: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  metaRow: {
-    flexDirection: "row",
-    flexShrink: 1,
-  },
-  field: { gap: 3 },
-  fieldKey: {
-    color: "rgba(255,255,255,0.22)",
-    fontWeight: "500",
-    letterSpacing: 1.4,
-  },
-  fieldVal: {
-    color: "rgba(255,255,255,0.7)",
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-  statusRow: {
-    flexDirection: "row",
+
+  // Divider
+  dividerRow: {
     alignItems: "center",
-    gap: 6,
-    flexShrink: 0,
+    flexDirection: "row",
+    marginHorizontal: -spacing.lg,
   },
-  statusDot: {},
+  notch: {
+    borderRadius: NOTCH_SIZE / 2,
+    height: NOTCH_SIZE,
+    width: NOTCH_SIZE / 2,
+  },
+  notchLeft: {
+    borderBottomRightRadius: NOTCH_SIZE,
+    borderTopRightRadius: NOTCH_SIZE,
+  },
+  notchRight: {
+    borderBottomLeftRadius: NOTCH_SIZE,
+    borderTopLeftRadius: NOTCH_SIZE,
+  },
+  dashedLine: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+  },
+  dash: {
+    borderRadius: 2,
+    height: 2,
+    width: 8,
+  },
+
+  // Bottom
+  bottom: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+  },
+  dividerV: {
+    height: 32,
+    width: 1,
+  },
+  statusWrap: {
+    alignItems: "flex-end",
+    flex: 1,
+  },
   statusLabel: {
-    fontWeight: "600",
+    fontSize: 10,
+    fontWeight: "800",
     letterSpacing: 1.5,
   },
 });
