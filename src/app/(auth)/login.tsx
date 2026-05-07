@@ -1,19 +1,21 @@
 import { Href, useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 
-import { TextField } from "@/components/forms/text-field";
-import { AuthHeader } from "@/components/ui/auth-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
-import { Screen } from "@/components/ui/screen";
-import { fontSizes, spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import {
   AuthWorkspace,
   LoginPayload,
@@ -21,20 +23,7 @@ import {
 } from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
 
-function getWorkspaceTitle(workspace?: string | string[]) {
-  const normalizedWorkspace = Array.isArray(workspace)
-    ? workspace[0]
-    : workspace;
-
-  switch (normalizedWorkspace) {
-    case "student":
-      return "Student Login";
-    case "operations":
-      return "Operations Login";
-    default:
-      return "Login";
-  }
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getRoleRoute(role: UserRole): Href {
   switch (role) {
@@ -46,20 +35,120 @@ function getRoleRoute(role: UserRole): Href {
   }
 }
 
-function getWorkspaceSubtitle(workspace?: string | string[]) {
-  const normalizedWorkspace = Array.isArray(workspace)
-    ? workspace[0]
-    : workspace;
+const WORKSPACE_META: Record<
+  string,
+  { title: string; pill: string; accentColor: string }
+> = {
+  student: {
+    title: "Sign in",
+    pill: "Student",
+    accentColor: colors.primary,
+  },
+  operations: {
+    title: "Sign in",
+    pill: "Operations",
+    accentColor: "#0f766e",
+  },
+};
 
-  switch (normalizedWorkspace) {
-    case "student":
-      return "Use your student credentials to access permits, card details, and your profile.";
-    case "operations":
-      return "Use your shared operations credentials. Staff and admin access are separated by backend role.";
-    default:
-      return "Use your credentials to continue.";
-  }
+function getWorkspaceMeta(workspace?: string | string[]) {
+  const ws = Array.isArray(workspace) ? workspace[0] : workspace;
+  return (
+    WORKSPACE_META[ws ?? ""] ?? {
+      title: "Sign in",
+      pill: "Workspace",
+      accentColor: colors.primary,
+    }
+  );
 }
+
+// ─── Input field ──────────────────────────────────────────────────────────────
+
+function InputField({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  secureTextEntry,
+  autoCapitalize,
+  keyboardType,
+  onToggleSecure,
+  showSecure,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (t: string) => void;
+  placeholder: string;
+  secureTextEntry?: boolean;
+  autoCapitalize?: "none" | "sentences";
+  keyboardType?: "email-address" | "default";
+  onToggleSecure?: () => void;
+  showSecure?: boolean;
+}) {
+  return (
+    <View style={fieldStyles.wrap}>
+      <Text style={fieldStyles.label}>{label}</Text>
+      <View style={fieldStyles.row}>
+        <TextInput
+          style={fieldStyles.input}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={colors.border}
+          secureTextEntry={secureTextEntry}
+          autoCapitalize={autoCapitalize ?? "sentences"}
+          keyboardType={keyboardType ?? "default"}
+          autoCorrect={false}
+          selectionColor={colors.primary}
+        />
+        {onToggleSecure && (
+          <TouchableOpacity
+            onPress={onToggleSecure}
+            style={fieldStyles.eyeBtn}
+          >
+            {showSecure ? (
+              <EyeOff size={16} color={colors.textMuted} strokeWidth={2} />
+            ) : (
+              <Eye size={16} color={colors.textMuted} strokeWidth={2} />
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+}
+
+const fieldStyles = StyleSheet.create({
+  wrap: { gap: 6 },
+  label: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "600",
+  },
+  row: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    flexDirection: "row",
+    paddingHorizontal: spacing.md,
+  },
+  input: {
+    color: colors.text,
+    flex: 1,
+    fontSize: fontSizes.md,
+    paddingVertical: spacing.md,
+  },
+  eyeBtn: {
+    alignItems: "center",
+    height: 44,
+    justifyContent: "center",
+    width: 32,
+  },
+});
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -67,121 +156,196 @@ export default function LoginScreen() {
     selectedWorkspace?: AuthWorkspace;
   }>();
   const { login } = useAuth();
+  const meta = useMemo(
+    () => getWorkspaceMeta(selectedWorkspace),
+    [selectedWorkspace],
+  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const title = useMemo(
-    () => getWorkspaceTitle(selectedWorkspace),
-    [selectedWorkspace],
-  );
-  const subtitle = useMemo(
-    () => getWorkspaceSubtitle(selectedWorkspace),
-    [selectedWorkspace],
-  );
 
   async function handleLogin() {
     setIsSubmitting(true);
     setErrorMessage(null);
-
     try {
-      const payload: LoginPayload = {
-        email: email.trim(),
-        password,
-      };
-
+      const payload: LoginPayload = { email: email.trim(), password };
       const response = await login(payload);
-
       router.replace(getRoleRoute(response.user.role));
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unable to log in";
-      setErrorMessage(message);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unable to sign in",
+      );
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <Screen scrolled>
+    <SafeAreaView style={styles.screen}>
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.container}>
-            <AuthHeader title={title} subtitle={subtitle} />
+          {/* Back */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.backBtn,
+              pressed && { opacity: 0.5 },
+            ]}
+            onPress={() => router.back()}
+          >
+            <ArrowLeft size={16} color={colors.textMuted} strokeWidth={2.5} />
+            <Text style={styles.backLabel}>Back</Text>
+          </Pressable>
 
-            <View style={styles.form}>
-              <TextField
-                label="Email"
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
+          {/* Header */}
+          <View style={styles.header}>
+            {/* Workspace pill */}
+            <View
+              style={[
+                styles.pill,
+                { backgroundColor: `${meta.accentColor}15` },
+              ]}
+            >
+              <View
+                style={[
+                  styles.pillDot,
+                  { backgroundColor: meta.accentColor },
+                ]}
               />
-
-              <TextField
-                label="Password"
-                placeholder="Enter your password"
-                secureTextEntry={!isPasswordVisible}
-                rightActionLabel={isPasswordVisible ? "Hide" : "Show"}
-                onRightActionPress={() =>
-                  setIsPasswordVisible((currentValue) => !currentValue)
-                }
-                value={password}
-                onChangeText={setPassword}
-              />
-
-              {errorMessage ? (
-                <Text style={styles.error}>{errorMessage}</Text>
-              ) : null}
-
-              <PrimaryButton
-                label="Login"
-                onPress={handleLogin}
-                disabled={isSubmitting}
-                loading={isSubmitting}
-              />
+              <Text
+                style={[styles.pillText, { color: meta.accentColor }]}
+              >
+                {meta.pill}
+              </Text>
             </View>
+
+            <Text style={styles.title}>{meta.title}</Text>
+            <Text style={styles.subtitle}>
+              Enter your credentials to access the {meta.pill.toLowerCase()}{" "}
+              workspace.
+            </Text>
+          </View>
+
+          {/* Form */}
+          <View style={styles.form}>
+            <InputField
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+
+            <InputField
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter your password"
+              secureTextEntry={!showPassword}
+              onToggleSecure={() => setShowPassword((v) => !v)}
+              showSecure={showPassword}
+            />
+
+            {errorMessage ? (
+              <Text style={styles.error}>{errorMessage}</Text>
+            ) : null}
+
+            <PrimaryButton
+              label="Sign In"
+              onPress={handleLogin}
+              disabled={isSubmitting || !email || !password}
+              loading={isSubmitting}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </Screen>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   keyboard: {
     flex: 1,
   },
-  scrollContent: {
+  scroll: {
     flexGrow: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  container: {
-    flex: 1,
     justifyContent: "center",
     gap: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
   },
+
+  // Back
+  backBtn: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    gap: spacing.xs,
+  },
+  backLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
+  },
+
+  // Header
+  header: {
+    gap: spacing.sm,
+  },
+  pill: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: 5,
+  },
+  pillDot: {
+    borderRadius: 4,
+    height: 7,
+    width: 7,
+  },
+  pillText: {
+    fontSize: fontSizes.xs,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+  title: {
+    color: colors.text,
+    fontSize: fontSizes.xxl,
+    fontWeight: "900",
+    letterSpacing: -1,
+  },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+
+  // Form
   form: {
     gap: spacing.md,
   },
   error: {
-    color: "#b42318",
+    color: colors.danger,
     fontSize: fontSizes.sm,
+    fontWeight: "600",
     textAlign: "center",
   },
 });

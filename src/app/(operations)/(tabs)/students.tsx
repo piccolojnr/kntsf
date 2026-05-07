@@ -1,7 +1,7 @@
 import { Href, useRouter } from "expo-router";
-import { Search, Users } from "lucide-react-native";
-import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ChevronDown, Search, Users } from "lucide-react-native";
+import { useEffect, useMemo, useState } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -9,13 +9,21 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchField } from "@/components/ui/search-field";
 import { Screen } from "@/components/ui/screen";
-import { spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useStudents } from "@/features/students/use-students";
+
+const PAGE_SIZE = 10;
 
 export default function OperationsStudentsScreen() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const studentsQuery = useStudents();
+
+  // Reset pagination when search changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchTerm]);
 
   const filteredStudents = useMemo(() => {
     const students = studentsQuery.data ?? [];
@@ -68,7 +76,7 @@ export default function OperationsStudentsScreen() {
           />
         ) : (
           <View style={styles.list}>
-            {filteredStudents.map((student) => (
+            {filteredStudents.slice(0, visibleCount).map((student) => (
               <StudentCard
                 key={student.id}
                 onPress={() =>
@@ -79,6 +87,18 @@ export default function OperationsStudentsScreen() {
                 student={student}
               />
             ))}
+            {visibleCount < filteredStudents.length && (
+              <TouchableOpacity
+                style={styles.showMoreBtn}
+                onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                activeOpacity={0.75}
+              >
+                <ChevronDown size={16} color={colors.primary} strokeWidth={2.5} />
+                <Text style={styles.showMoreText}>
+                  Show more · {filteredStudents.length - visibleCount} remaining
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </ScrollView>
@@ -96,5 +116,21 @@ const styles = StyleSheet.create({
   /* ── List ── */
   list: {
     gap: spacing.sm,
+  },
+  showMoreBtn: {
+    alignItems: "center",
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: `${colors.primary}30`,
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    paddingVertical: spacing.md,
+  },
+  showMoreText: {
+    color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
   },
 });
