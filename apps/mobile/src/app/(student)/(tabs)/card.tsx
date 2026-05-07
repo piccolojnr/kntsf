@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreditCard, ShieldAlert, UserRound } from "lucide-react-native";
+import { CreditCard, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import StudentIDCard from "@/components/cards/student-id-card";
@@ -13,6 +13,8 @@ import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
 import { useCurrentStudent } from "@/features/students/use-current-student";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(dateString?: string | null) {
   if (!dateString) return "Not registered";
@@ -46,49 +48,196 @@ function getLatestCard(cards: StudentCard[], studentId: string) {
   );
 }
 
-function CardDetailRow({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
-  return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={[styles.detailValue, accent && styles.detailValueAccent]}>
-        {value}
-      </Text>
-    </View>
-  );
-}
+// ─── Card Details Panel ───────────────────────────────────────────────────────
 
-function CardStatusRow({ status }: { status: CardStatus | null }) {
-  const isActive = status === "active";
-  const label = status
-    ? status.charAt(0).toUpperCase() + status.slice(1)
-    : "Not registered";
+const CARD_STATUS_COLOR: Record<CardStatus, string> = {
+  active: colors.success,
+  blocked: colors.danger,
+  revoked: colors.danger,
+  lost: colors.warning,
+  replaced: colors.warning,
+};
+const CARD_STATUS_SOFT: Record<CardStatus, string> = {
+  active: colors.successSoft,
+  blocked: colors.dangerSoft,
+  revoked: colors.dangerSoft,
+  lost: colors.warningSoft,
+  replaced: colors.warningSoft,
+};
 
-  const badgeStyle = isActive ? styles.badgeActive : styles.badgeInactive;
-  const dotStyle = isActive ? styles.dotActive : styles.dotInactive;
-  const textStyle = isActive
-    ? styles.badgeTextActive
-    : styles.badgeTextInactive;
+function CardDetailsPanel({ card }: { card: StudentCard | null }) {
+  const status: CardStatus | null = card?.status ?? null;
+  const statusColor = status ? CARD_STATUS_COLOR[status] : colors.textMuted;
+  const statusSoft = status ? CARD_STATUS_SOFT[status] : colors.surfaceMuted;
 
   return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>Status</Text>
-      <View style={[styles.statusBadge, badgeStyle]}>
-        <View style={[styles.statusDot, dotStyle]} />
-        <Text style={[styles.statusBadgeText, textStyle]}>
-          {label.toUpperCase()}
-        </Text>
+    <View style={panelStyles.card}>
+      <View style={panelStyles.inner}>
+        {/* Header */}
+        <View style={panelStyles.header}>
+          <Text style={panelStyles.title}>NFC Card Details</Text>
+          <View
+            style={[panelStyles.statusBadge, { backgroundColor: statusSoft }]}
+          >
+            <View
+              style={[panelStyles.statusDot, { backgroundColor: statusColor }]}
+            />
+            <Text style={[panelStyles.statusText, { color: statusColor }]}>
+              {status ? status.toUpperCase() : "NOT REGISTERED"}
+            </Text>
+          </View>
+        </View>
+
+        {/* UID display block */}
+        <View style={panelStyles.uidBlock}>
+          <View style={panelStyles.uidLeft}>
+            <Text style={panelStyles.uidLabel}>CARD UID</Text>
+            <Text style={panelStyles.uidValue} numberOfLines={1}>
+              {card?.uid ?? "—"}
+            </Text>
+          </View>
+          <View
+            style={[
+              panelStyles.nfcIcon,
+              {
+                backgroundColor: `${statusColor}15`,
+                borderColor: `${statusColor}30`,
+              },
+            ]}
+          >
+            <Nfc size={22} color={statusColor} strokeWidth={1.5} />
+          </View>
+        </View>
+
+        {/* 2-column grid */}
+        <View style={panelStyles.grid}>
+          <DetailCell
+            label="Card Type"
+            value={card ? formatCardType(card.type) : "—"}
+          />
+          <DetailCell
+            label="Registered"
+            value={formatDate(card?.registeredAt)}
+          />
+        </View>
       </View>
     </View>
   );
 }
+
+function DetailCell({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={panelStyles.cell}>
+      <Text style={panelStyles.cellLabel}>{label}</Text>
+      <Text style={panelStyles.cellValue}>{value}</Text>
+    </View>
+  );
+}
+
+const panelStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    overflow: "hidden",
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  accentStripe: {
+    borderBottomLeftRadius: radius.lg,
+    borderTopLeftRadius: radius.lg,
+    width: 4,
+  },
+  inner: {
+    flex: 1,
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  header: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  title: {
+    color: colors.text,
+    fontSize: fontSizes.md,
+    fontWeight: "700",
+  },
+  statusBadge: {
+    alignItems: "center",
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  statusDot: {
+    borderRadius: 3,
+    height: 6,
+    width: 6,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.6,
+  },
+  uidBlock: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+  },
+  uidLeft: { flex: 1, gap: 4, paddingRight: spacing.md },
+  uidLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xxs,
+    fontWeight: "600",
+    letterSpacing: 1.4,
+  },
+  uidValue: {
+    color: colors.primary,
+    fontSize: fontSizes.md,
+    fontWeight: "800",
+    letterSpacing: 0.4,
+  },
+  nfcIcon: {
+    alignItems: "center",
+    borderRadius: radius.md,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  grid: {
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  cell: {
+    flex: 1,
+    gap: 4,
+  },
+  cellLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xxs,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+  },
+  cellValue: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+  },
+});
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StudentCardScreen() {
   const queryClient = useQueryClient();
@@ -166,7 +315,7 @@ export default function StudentCardScreen() {
           />
         ) : (
           <>
-            {/* NFC card hero */}
+            {/* Bold ID card hero */}
             <StudentIDCard
               student={{
                 name: student.name,
@@ -182,25 +331,8 @@ export default function StudentCardScreen() {
               }}
             />
 
-            {/* Card details */}
-            <View style={styles.detailsCard}>
-              <Text style={styles.detailsTitle}>Card Details</Text>
-              <View style={styles.detailsList}>
-                <CardDetailRow
-                  label="Card UID"
-                  value={latestCard?.uid ?? "Not registered"}
-                />
-                <CardDetailRow
-                  label="Card Type"
-                  value={latestCard ? formatCardType(latestCard.type) : "N/A"}
-                />
-                <CardDetailRow
-                  label="Registered Date"
-                  value={formatDate(latestCard?.registeredAt)}
-                />
-                <CardStatusRow status={latestCard?.status ?? null} />
-              </View>
-            </View>
+            {/* Card details panel */}
+            <CardDetailsPanel card={latestCard} />
 
             {/* Report lost */}
             <PrimaryButton
@@ -227,70 +359,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.pageHeader,
   },
-
-  // ── Details card ───────────────────────────────────────
-  detailsCard: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  detailsTitle: {
-    color: colors.text,
-    fontSize: fontSizes.lg,
-    fontWeight: "700",
-  },
-  detailsList: {
-    gap: spacing.md,
-  },
-  detailRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  detailLabel: {
-    color: colors.textMuted,
-    fontSize: fontSizes.sm,
-    fontWeight: "600",
-  },
-  detailValue: {
-    color: colors.text,
-    fontSize: fontSizes.sm,
-    fontWeight: "700",
-  },
-  detailValueAccent: {
-    color: colors.primary,
-  },
-
-  // Status badge
-  statusBadge: {
-    alignItems: "center",
-    borderRadius: radius.pill,
-    flexDirection: "row",
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  badgeActive: {
-    backgroundColor: colors.successSoft,
-  },
-  badgeInactive: {
-    backgroundColor: colors.dangerSoft,
-  },
-  statusDot: {
-    borderRadius: 3,
-    height: 6,
-    width: 6,
-  },
-  dotActive: { backgroundColor: colors.success },
-  dotInactive: { backgroundColor: colors.danger },
-  statusBadgeText: {
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-  },
-  badgeTextActive: { color: colors.success },
-  badgeTextInactive: { color: colors.danger },
 });
