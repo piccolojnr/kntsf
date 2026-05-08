@@ -6,7 +6,7 @@ type EnvironmentConfig = {
 
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
-    apiBaseUrl: "http://192.168.8.163:3001",
+    apiBaseUrl: "",
   },
   staging: {
     apiBaseUrl: "",
@@ -31,8 +31,12 @@ export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
   process.env.EXPO_PUBLIC_API_URL?.trim() ||
   ENVIRONMENT_CONFIG[APP_ENV].apiBaseUrl;
-export const USE_MOCK_API =
-  process.env.EXPO_PUBLIC_USE_MOCK_API === "true" || !API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error(
+    "EXPO_PUBLIC_API_BASE_URL is required. Set it to your backend base URL.",
+  );
+}
 
 export const STORAGE_KEYS = {
   authToken: "auth_token",

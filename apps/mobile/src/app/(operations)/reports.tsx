@@ -92,12 +92,12 @@ export default function OperationsReportsScreen() {
             <DetailRow
               label="Charts"
               value="Not added yet"
-              helper="This screen intentionally shows summaries only for the current mock phase."
+              helper="This screen intentionally shows summaries only until charting is added."
             />
             <DetailRow
               label="Backend Source"
-              value="Mock APIs"
-              helper="Production reports should be generated from backend analytics endpoints."
+              value="Mobile APIs"
+              helper="Reports are calculated from backend mobile operations endpoints."
             />
           </SectionCard>
         </>

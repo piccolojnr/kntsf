@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useStudentCard } from "@/features/cards/use-student-card";
 import { useCurrentStudent } from "@/features/students/use-current-student";
@@ -39,17 +40,23 @@ function formatCardType(type: StudentCard["type"]) {
 
 const CARD_STATUS_COLOR: Record<CardStatus, string> = {
   active: colors.success,
+  inactive: colors.textMuted,
   blocked: colors.danger,
   revoked: colors.danger,
   lost: colors.warning,
+  stolen: colors.danger,
   replaced: colors.warning,
+  damaged: colors.warning,
 };
 const CARD_STATUS_SOFT: Record<CardStatus, string> = {
   active: colors.successSoft,
+  inactive: colors.surfaceMuted,
   blocked: colors.dangerSoft,
   revoked: colors.dangerSoft,
   lost: colors.warningSoft,
+  stolen: colors.dangerSoft,
   replaced: colors.warningSoft,
+  damaged: colors.warningSoft,
 };
 
 function CardDetailsPanel({ card }: { card: StudentCard | null }) {
@@ -237,7 +244,7 @@ export default function StudentCardScreen() {
     mutationFn: async () => {
       if (!student)
         throw new Error("No student record linked to this account.");
-      throw new Error("Lost card reporting is not connected yet.");
+      return reportLostCardForStudent(student.studentId);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["student-card"] });

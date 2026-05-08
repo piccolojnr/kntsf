@@ -13,4 +13,5 @@ export type StudentDto = Partial<Student> & {
   student_id?: string;
   programme?: string;
   program?: string;
+  number?: string;
 };

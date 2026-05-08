@@ -99,7 +99,12 @@ export default function OperationsCardAssignmentScreen() {
     if (!student) return null;
     return (
       (cardsQuery.data ?? [])
-        .filter((card) => card.studentId === student.id)
+        .filter(
+          (card) =>
+            card.studentId === student.id ||
+            card.studentId === student.studentId ||
+            card.student?.studentId === student.studentId,
+        )
         .sort(
           (l, r) =>
             new Date(r.registeredAt).getTime() -
@@ -150,7 +155,7 @@ export default function OperationsCardAssignmentScreen() {
       try {
         const nextCard = await assignCardToStudent({
           mode: assignmentMode,
-          studentId: student.id,
+          studentId: student.studentId,
           uid: nextUid.trim(),
         });
 

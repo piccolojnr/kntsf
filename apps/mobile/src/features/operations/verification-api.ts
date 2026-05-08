@@ -1,16 +1,15 @@
 import { Permit } from "@/features/permits/permit-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
-import { simulateDelay } from "@/lib/api/mock-api";
+import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
-  ScanCardResult,
-  ScanDecision,
-  ScanLog,
   VerificationLogDto,
   VerificationMethod,
   VerificationOutcome,
   VerificationReason,
+  VerificationDecision,
+  VerificationLog,
   VerificationResult,
   VerificationResultDto,
 } from "./verification-types";
@@ -35,61 +34,7 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
   return response.data;
 }
 
-const mockVerificationLogs: ScanLog[] = [
-  {
-    id: "scan-log-1",
-    method: "card_uid",
-    value: "UID-AMA-001",
-    scannedAt: "2026-05-03T08:30:00.000Z",
-    checkedAt: "2026-05-03T08:30:00.000Z",
-    outcome: "allowed",
-    reason: "active_permit",
-    decision: "allowed",
-    message: "Active permit verified. Access granted.",
-    studentId: "student-1",
-    cardId: "card-1",
-    permitId: "permit-1",
-  },
-  {
-    id: "scan-log-2",
-    method: "card_uid",
-    value: "UID-EFUA-003",
-    scannedAt: "2026-05-03T10:10:00.000Z",
-    checkedAt: "2026-05-03T10:10:00.000Z",
-    outcome: "denied",
-    reason: "card_inactive",
-    decision: "card_inactive",
-    message: "This card is not active for scanning.",
-    studentId: "student-3",
-    cardId: "card-3",
-  },
-  {
-    id: "scan-log-3",
-    method: "card_uid",
-    value: "UID-UNKNOWN-999",
-    scannedAt: "2026-05-03T12:45:00.000Z",
-    checkedAt: "2026-05-03T12:45:00.000Z",
-    outcome: "denied",
-    reason: "card_not_registered",
-    decision: "card_not_registered",
-    message: "Card not registered in the system.",
-  },
-  {
-    id: "scan-log-4",
-    method: "student_id",
-    value: "26102859",
-    scannedAt: "2026-05-03T14:00:00.000Z",
-    checkedAt: "2026-05-03T14:00:00.000Z",
-    outcome: "allowed",
-    reason: "active_permit",
-    decision: "allowed",
-    message: "Active permit verified. Access granted.",
-    studentId: "student-1",
-    permitId: "permit-1",
-  },
-];
-
-function normalizeVerificationLog(dto: VerificationLogDto): ScanLog {
+function normalizeVerificationLog(dto: VerificationLogDto): VerificationLog {
   return { ...dto };
 }
 
@@ -141,10 +86,6 @@ function normalizeVerificationResult(
   };
 }
 
-function cloneVerificationLog(log: ScanLog) {
-  return normalizeVerificationLog(log);
-}
-
 function getOutcomeFromReason(reason: VerificationReason): VerificationOutcome {
   switch (reason) {
     case "active_permit":
@@ -161,7 +102,7 @@ function getOutcomeFromReason(reason: VerificationReason): VerificationOutcome {
   }
 }
 
-function getDecisionFromReason(reason: VerificationReason): ScanDecision {
+function getDecisionFromReason(reason: VerificationReason): VerificationDecision {
   switch (reason) {
     case "active_permit":
       return "allowed";
@@ -230,17 +171,26 @@ async function postIssuePermit(studentId: string) {
 }
 
 export async function getVerificationLogs() {
-  await simulateDelay(220);
-  return mockVerificationLogs.map(cloneVerificationLog);
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<VerificationLogDto> | VerificationLogDto[]>
+    >("/api/mobile/operations/verifications");
+    const data = getMobileData(response.data);
+    const logs = Array.isArray(data) ? data : data.items;
+
+    return logs.map(normalizeVerificationLog);
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
 }
 
-export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
+export async function scanCardByUid(uid: string): Promise<VerificationResult> {
   return postVerification("/api/mobile/verify/card", { uid });
 }
 
 export async function verifyPermitByStudentId(
   studentId: string,
-): Promise<ScanCardResult> {
+): Promise<VerificationResult> {
   return postVerification("/api/mobile/verify/student", { studentId });
 }
 
@@ -291,5 +241,3 @@ export async function issuePermitFromVerification(result: VerificationResult) {
     verification: response.verification,
   };
 }
-
-export const getScanLogs = getVerificationLogs;

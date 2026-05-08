@@ -20,9 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StudentInfoCard } from "@/components/cards/student-info-card";
 import { Button } from "@/components/ui/button";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import {
-  revokeCardForStudent,
-} from "@/features/cards/card-api";
+import { revokeCardForStudent } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
 import { Student } from "@/features/students/student-types";
 
@@ -69,6 +67,18 @@ const statusConfig = {
     label: "Revoked",
     Icon: XCircle,
   },
+  stolen: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Stolen",
+    Icon: ShieldAlert,
+  },
+  damaged: {
+    accent: colors.warning,
+    soft: colors.warningSoft,
+    label: "Damaged",
+    Icon: AlertTriangle,
+  },
 } as const;
 
 function formatDate(dateString: string) {
@@ -96,7 +106,12 @@ export function StudentDetailModal({
   const currentCard = useMemo(() => {
     if (!student) return null;
     const cards = (cardsQuery.data ?? [])
-      .filter((card) => card.studentId === student.id)
+      .filter(
+        (card) =>
+          card.studentId === student.id ||
+          card.studentId === student.studentId ||
+          card.student?.studentId === student.studentId,
+      )
       .sort(
         (left, right) =>
           new Date(right.registeredAt).getTime() -
@@ -286,7 +301,14 @@ export function StudentDetailModal({
                           onPress={() =>
                             runAction(
                               "revoke",
-                              () => revokeCardForStudent(student.id),
+                              () =>
+                                currentCard
+                                  ? revokeCardForStudent(currentCard.id)
+                                  : Promise.reject(
+                                      new Error(
+                                        "No active card is available to revoke.",
+                                      ),
+                                    ),
                               "The active card was revoked.",
                             )
                           }

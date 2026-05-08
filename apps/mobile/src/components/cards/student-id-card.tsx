@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import { radius, spacing } from "@/constants/theme";
+import { colors, radius, spacing } from "@/constants/theme";
 import { CardStatus } from "@/features/cards/card-types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -43,20 +43,26 @@ const FALLBACK: Required<StudentData> = {
 };
 
 const STATUS: Record<CardStatus, { label: string; color: string }> = {
-  active: { label: "ACTIVE", color: "#22c55e" },
-  blocked: { label: "BLOCKED", color: "#ef4444" },
-  revoked: { label: "REVOKED", color: "#ef4444" },
-  lost: { label: "LOST", color: "#f59e0b" },
-  replaced: { label: "REPLACED", color: "#f59e0b" },
+  active: { label: "ACTIVE", color: colors.success },
+  inactive: { label: "INACTIVE", color: colors.textMuted },
+  blocked: { label: "BLOCKED", color: colors.danger },
+  revoked: { label: "REVOKED", color: colors.danger },
+  lost: { label: "LOST", color: colors.warning },
+  stolen: { label: "STOLEN", color: colors.danger },
+  replaced: { label: "REPLACED", color: colors.warning },
+  damaged: { label: "DAMAGED", color: colors.warning },
 };
 
 // Status → card bg colours (dark, distinct per state)
 const CARD_BG: Record<CardStatus, { bg: string; border: string; glow: string }> = {
   active: { bg: "#0a1628", border: "#1e3a5f33", glow: "#1f4b9966" },
+  inactive: { bg: "#10151f", border: "#33415533", glow: "#33415566" },
   blocked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
   revoked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
   lost: { bg: "#1a1200", border: "#5f4a1e33", glow: "#99781f66" },
+  stolen: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
   replaced: { bg: "#0f0f1a", border: "#2e2e5f33", glow: "#4a4a9966" },
+  damaged: { bg: "#1a1200", border: "#5f4a1e33", glow: "#99781f66" },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

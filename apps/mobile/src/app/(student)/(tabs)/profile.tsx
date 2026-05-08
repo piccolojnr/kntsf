@@ -75,17 +75,23 @@ const PERMIT_SOFT: Record<PermitStatus, string> = {
 
 const CARD_COLOR: Record<CardStatus, string> = {
   active: colors.success,
+  inactive: colors.textMuted,
   blocked: colors.danger,
   revoked: colors.danger,
   lost: colors.warning,
+  stolen: colors.danger,
   replaced: colors.warning,
+  damaged: colors.warning,
 };
 const CARD_SOFT: Record<CardStatus, string> = {
   active: colors.successSoft,
+  inactive: colors.surfaceMuted,
   blocked: colors.dangerSoft,
   revoked: colors.dangerSoft,
   lost: colors.warningSoft,
+  stolen: colors.dangerSoft,
   replaced: colors.warningSoft,
+  damaged: colors.warningSoft,
 };
 
 // ─── Profile hero card ────────────────────────────────────────────────────────

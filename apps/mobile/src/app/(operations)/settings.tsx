@@ -33,7 +33,7 @@ export default function OperationsSettingsScreen() {
   return (
     <AdminToolScreen
       title="Settings"
-      subtitle="Inspect mock permit issuance configuration for this workspace."
+      subtitle="Inspect permit issuance configuration for this workspace."
     >
       {configQuery.isLoading ? (
         <LoadingState message="Loading permit settings..." />
@@ -50,7 +50,7 @@ export default function OperationsSettingsScreen() {
               <View style={styles.settingCopy}>
                 <Text style={styles.settingTitle}>Issuance Enabled</Text>
                 <Text style={styles.settingHelper}>
-                  Mock-only switch. Backend configuration will own this later.
+                  Backend configuration controls mobile permit issuing.
                 </Text>
               </View>
               <Switch
@@ -76,7 +76,7 @@ export default function OperationsSettingsScreen() {
             <DetailRow
               label="Expiry Date"
               value={formatDate(config.expiryDate)}
-              helper="All newly issued mock permits use this expiry date."
+              helper="All newly issued permits use this expiry date."
             />
           </SectionCard>
 

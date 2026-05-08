@@ -41,7 +41,7 @@ export default function OperationsAuditLogsScreen() {
   return (
     <AdminToolScreen
       title="Audit Logs"
-      subtitle="Review protected actions and verification activity in the mock workspace."
+      subtitle="Review protected actions and verification activity in the operations workspace."
     >
       {logsQuery.isLoading ? (
         <LoadingState message="Loading audit logs..." />

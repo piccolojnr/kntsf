@@ -58,7 +58,7 @@ export default function AdminDashboardScreen() {
   return (
     <AdminToolScreen
       title="Dashboard"
-      subtitle="Review high-level operations metrics from the current mock workspace."
+      subtitle="Review high-level operations metrics from the current workspace."
     >
       {isLoading ? (
         <LoadingState message="Loading admin dashboard..." />
