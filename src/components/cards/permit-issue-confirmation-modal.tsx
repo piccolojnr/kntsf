@@ -22,10 +22,10 @@ function formatDate(dateString: string) {
   });
 }
 
-function formatAmount(amount: number) {
+function formatAmount(amount: number, currency = "GHS") {
   return new Intl.NumberFormat(undefined, {
     style: "currency",
-    currency: "GHS",
+    currency,
     minimumFractionDigits: 2,
   }).format(amount);
 }
@@ -77,12 +77,18 @@ export function PermitIssueConfirmationModal({
           </View>
 
           <View style={styles.card}>
-            <InfoRow label="Amount" value={formatAmount(config.defaultAmount)} />
+            <InfoRow
+              label="Amount"
+              value={formatAmount(config.defaultAmount, config.currency)}
+            />
             <InfoRow
               label="Expiry Date"
               value={formatDate(config.expiryDate)}
             />
-            <InfoRow label="Academic Year" value={config.academicYear} />
+            <InfoRow
+              label="Academic Year"
+              value={config.academicYear ?? "Unavailable"}
+            />
           </View>
 
           <View style={styles.actions}>

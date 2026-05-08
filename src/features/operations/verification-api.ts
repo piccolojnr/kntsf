@@ -1,3 +1,4 @@
+import { USE_MOCK_API } from "@/constants/config";
 import { getCardByUid } from "@/features/cards/card-api";
 import { StudentCard } from "@/features/cards/card-types";
 import {
@@ -12,6 +13,8 @@ import {
   getStudentByStudentId,
 } from "@/features/students/student-api";
 import { Student } from "@/features/students/student-types";
+import { apiClient } from "@/lib/api/api-client";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import { simulateDelay } from "@/lib/api/mock-api";
 
 import {
@@ -25,6 +28,26 @@ import {
   VerificationResult,
   VerificationResultDto,
 } from "./verification-types";
+
+type MobileApiResponse<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+type IssuePermitResponseDto = {
+  permit: Permit;
+  verificationResult?: VerificationResultDto | null;
+  verification?: VerificationResultDto;
+};
+
+function getMobileData<T>(response: MobileApiResponse<T>) {
+  if (!response.success) {
+    throw new Error(response.message ?? "The request could not be completed.");
+  }
+
+  return response.data;
+}
 
 const mockVerificationLogs: ScanLog[] = [
   {
@@ -87,12 +110,48 @@ function normalizeVerificationLog(dto: VerificationLogDto): ScanLog {
 function normalizeVerificationResult(
   dto: VerificationResultDto,
 ): VerificationResult {
+  const checkedAt = dto.checkedAt ?? new Date().toISOString();
+  const reason = dto.reason ?? "unknown_error";
+  const decision = dto.decision ?? getDecisionFromReason(reason);
+  const outcome = dto.outcome ?? getOutcomeFromReason(reason);
+  const method = dto.method ?? "student_id";
+  const value = dto.value ?? "";
+  const message = dto.message ?? "Verification completed.";
+  const log = dto.log
+    ? normalizeVerificationLog(dto.log)
+    : {
+        id: `verification-${checkedAt}`,
+        method,
+        value,
+        scannedAt: checkedAt,
+        checkedAt,
+        outcome,
+        reason,
+        decision,
+        message,
+        cardId: dto.card?.id,
+        permitId: dto.permit?.id,
+        studentId: dto.student?.id,
+      };
+
   return {
     ...dto,
+    checkedAt,
+    outcome,
+    reason,
+    status: dto.status ?? decision,
+    decision,
+    message,
+    method,
+    value,
     card: dto.card ? { ...dto.card } : null,
     permit: dto.permit ? { ...dto.permit } : null,
     student: dto.student ? { ...dto.student } : null,
-    log: normalizeVerificationLog(dto.log),
+    canIssuePermit:
+      dto.canIssuePermit ??
+      (outcome === "warning" && reason !== "permit_issuance_disabled"),
+    issuanceConfig: dto.issuanceConfig ?? null,
+    log,
   };
 }
 
@@ -107,6 +166,9 @@ function getOutcomeFromReason(reason: VerificationReason): VerificationOutcome {
     case "expired_permit":
     case "revoked_permit":
     case "no_active_permit":
+    case "permit_not_found":
+      return "warning";
+    case "permit_issuance_disabled":
       return "warning";
     default:
       return "denied";
@@ -122,13 +184,62 @@ function getDecisionFromReason(reason: VerificationReason): ScanDecision {
     case "revoked_permit":
       return "revoked_permit";
     case "no_active_permit":
+    case "permit_not_found":
       return "no_active_permit";
     case "card_not_registered":
       return "card_not_registered";
     case "card_inactive":
       return "card_inactive";
+    case "permit_issuance_disabled":
+      return "no_active_permit";
     default:
       return "denied";
+  }
+}
+
+async function postVerification<TBody>(
+  endpoint: string,
+  body: TBody,
+): Promise<VerificationResult> {
+  try {
+    const response = await apiClient.post<MobileApiResponse<VerificationResultDto>>(
+      endpoint,
+      body,
+    );
+
+    return normalizeVerificationResult(getMobileData(response.data));
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
+}
+
+async function postIssuePermit(studentId: string) {
+  try {
+    const response = await apiClient.post<MobileApiResponse<IssuePermitResponseDto>>(
+      "/api/mobile/permits/issue",
+      { studentId },
+    );
+
+    const data = getMobileData(response.data);
+
+    return {
+      permit: data.permit,
+      verification: (data.verificationResult ?? data.verification)
+        ? normalizeVerificationResult(data.verificationResult ?? data.verification!)
+        : null,
+    };
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 401) {
+      throw new Error("Your session has expired. Please log in again.");
+    }
+
+    if (normalizedError.statusCode === 403) {
+      throw new Error("You do not have permission to issue permits.");
+    }
+
+    throw new Error(normalizedError.message);
   }
 }
 
@@ -295,13 +406,15 @@ async function evaluatePermitForStudent(
 }
 
 export async function getVerificationLogs() {
-  // TODO(real-api): replace mock logs with backend audit/verification logs endpoint.
   await simulateDelay(220);
   return mockVerificationLogs.map(cloneVerificationLog);
 }
 
 export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
-  // TODO(real-api): replace mock UID verification with POST /api/mobile/staff/scan-card.
+  if (!USE_MOCK_API) {
+    return postVerification("/api/mobile/verify/card", { uid });
+  }
+
   await simulateDelay(350);
 
   const normalizedUid = uid.trim().toUpperCase();
@@ -344,7 +457,10 @@ export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
 export async function verifyPermitByStudentId(
   studentId: string,
 ): Promise<ScanCardResult> {
-  // TODO(real-api): replace mock student ID verification with backend permit verification endpoint.
+  if (!USE_MOCK_API) {
+    return postVerification("/api/mobile/verify/student", { studentId });
+  }
+
   await simulateDelay(300);
 
   const normalizedStudentId = validateStudentId(studentId);
@@ -362,6 +478,25 @@ export async function verifyPermitByStudentId(
   return evaluatePermitForStudent("student_id", normalizedStudentId, student);
 }
 
+export async function verifyPermitByCardUid(uid: string) {
+  return scanCardByUid(uid);
+}
+
+export async function verifyPermitByPermitCode(code: string) {
+  if (!USE_MOCK_API) {
+    return postVerification("/api/mobile/verify/permit-code", { code });
+  }
+
+  await simulateDelay(300);
+
+  return createResult(
+    "permit_code",
+    code.trim(),
+    "invalid_input",
+    "Permit code verification is only available when connected to the backend.",
+  );
+}
+
 export async function verifyPermit(input: {
   method: VerificationMethod;
   value: string;
@@ -370,7 +505,28 @@ export async function verifyPermit(input: {
     return scanCardByUid(input.value);
   }
 
+  if (input.method === "permit_code") {
+    return verifyPermitByPermitCode(input.value);
+  }
+
   return verifyPermitByStudentId(input.value);
+}
+
+export async function issuePermitWithVerification(studentId: string) {
+  if (!USE_MOCK_API) {
+    return postIssuePermit(studentId);
+  }
+
+  const student = await getStudentByStudentId(studentId);
+  return {
+    permit: await issuePermitForStudent(student?.id ?? studentId),
+    verification: null,
+  };
+}
+
+export async function issuePermit(studentId: string) {
+  const response = await issuePermitWithVerification(studentId);
+  return response.permit;
 }
 
 export async function issuePermitFromVerification(result: VerificationResult) {
@@ -384,11 +540,18 @@ export async function issuePermitFromVerification(result: VerificationResult) {
     throw new Error("Permit issuance is currently closed.");
   }
 
-  const permit = await issuePermitForStudent(result.student.id);
+  const studentId = result.student.studentId ?? result.student.id;
+  const response = !USE_MOCK_API
+    ? await issuePermitWithVerification(studentId)
+    : {
+        permit: await issuePermit(studentId),
+        verification: null,
+      };
 
   return {
-    permit,
+    permit: response.permit,
     issuanceConfig,
+    verification: response.verification,
   };
 }
 
