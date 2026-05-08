@@ -1,5 +1,3 @@
-import { USE_MOCK_API } from "@/constants/config";
-import { mockGetCurrentUser, mockLogout } from "@/lib/api/mock-api";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import {
@@ -78,11 +76,7 @@ export async function login(payload: LoginPayload) {
 
 export async function logout() {
   try {
-    if (USE_MOCK_API) {
-      await mockLogout();
-    } else {
-      await apiClient.post("/api/mobile/auth/logout");
-    }
+    await apiClient.post("/api/mobile/auth/logout");
   } catch {
     // Logout must still clear local auth state if the server is unavailable.
   } finally {
@@ -98,10 +92,6 @@ export async function getCurrentUser() {
   }
 
   try {
-    if (USE_MOCK_API) {
-      return normalizeAuthUser(await mockGetCurrentUser(token));
-    }
-
     const response =
       await apiClient.get<MobileAuthResponse<BackendMeData>>("/api/mobile/me");
 

@@ -9,9 +9,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
-import { useCards } from "@/features/cards/use-cards";
+import { useStudentCard } from "@/features/cards/use-student-card";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -34,18 +33,6 @@ function formatCardType(type: StudentCard["type"]) {
     default:
       return "Unknown";
   }
-}
-
-function getLatestCard(cards: StudentCard[], studentId: string) {
-  return (
-    cards
-      .filter((c) => c.studentId === studentId)
-      .sort(
-        (a, b) =>
-          new Date(b.registeredAt).getTime() -
-          new Date(a.registeredAt).getTime(),
-      )[0] ?? null
-  );
 }
 
 // ─── Card Details Panel ───────────────────────────────────────────────────────
@@ -242,20 +229,18 @@ const panelStyles = StyleSheet.create({
 export default function StudentCardScreen() {
   const queryClient = useQueryClient();
   const studentQuery = useCurrentStudent();
-  const cardsQuery = useCards();
   const student = studentQuery.student;
-  const latestCard = student
-    ? getLatestCard(cardsQuery.data ?? [], student.id)
-    : null;
+  const cardQuery = useStudentCard(student?.id);
+  const latestCard = cardQuery.data ?? null;
 
   const reportLostMutation = useMutation({
     mutationFn: async () => {
       if (!student)
         throw new Error("No student record linked to this account.");
-      return reportLostCardForStudent(student.id);
+      throw new Error("Lost card reporting is not connected yet.");
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cards"] });
+      await queryClient.invalidateQueries({ queryKey: ["student-card"] });
       Alert.alert("Card Reported", "Your active card has been marked as lost.");
     },
     onError: (error) => {
@@ -268,8 +253,8 @@ export default function StudentCardScreen() {
     },
   });
 
-  const isLoading = studentQuery.isLoading || cardsQuery.isLoading;
-  const hasError = studentQuery.isError || cardsQuery.isError;
+  const isLoading = studentQuery.isLoading || cardQuery.isLoading;
+  const hasError = studentQuery.isError || cardQuery.isError;
   const canReportLost = latestCard?.status === "active";
 
   function handleReportLost() {

@@ -34,13 +34,6 @@ export const API_BASE_URL =
 export const USE_MOCK_API =
   process.env.EXPO_PUBLIC_USE_MOCK_API === "true" || !API_BASE_URL;
 
-
-console.log("App Environment:", APP_ENV);
-console.log("API Base URL:", API_BASE_URL);
-console.log("Using Mock API:", USE_MOCK_API);
-
-
-
 export const STORAGE_KEYS = {
   authToken: "auth_token",
 } as const;

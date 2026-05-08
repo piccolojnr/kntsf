@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getStudents } from "./student-api";
+import { getStudents, OperationsListParams } from "./student-api";
 
-export function useStudents() {
+export function useStudents(params?: OperationsListParams) {
   return useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", params],
+    queryFn: () => getStudents(params),
   });
 }

@@ -21,7 +21,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
-import { usePermits } from "@/features/permits/use-permits";
+import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -587,17 +587,13 @@ const tableStyles = StyleSheet.create({
 
 export default function StudentPermitsScreen() {
   const studentQuery = useCurrentStudent();
-  const permitsQuery = usePermits();
+  const student = studentQuery.student;
+  const permitsQuery = useStudentPermits(student?.id);
 
   const isLoading = studentQuery.isLoading || permitsQuery.isLoading;
   const hasError = studentQuery.isError || permitsQuery.isError;
-  const student = studentQuery.student;
 
-  const permits = student
-    ? sortPermits(
-        (permitsQuery.data ?? []).filter((p) => p.studentId === student.id),
-      )
-    : [];
+  const permits = sortPermits(permitsQuery.data ?? []);
   const activePermit = permits.find((p) => p.status === "active") ?? null;
 
   return (

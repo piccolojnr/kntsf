@@ -18,7 +18,11 @@ export default function OperationsStudentsScreen() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const studentsQuery = useStudents();
+  const studentsQuery = useStudents({
+    search: searchTerm,
+    page: 1,
+    limit: visibleCount,
+  });
 
   // Reset pagination when search changes
   useEffect(() => {
@@ -87,7 +91,7 @@ export default function OperationsStudentsScreen() {
                 student={student}
               />
             ))}
-            {visibleCount < filteredStudents.length && (
+            {filteredStudents.length >= visibleCount && (
               <TouchableOpacity
                 style={styles.showMoreBtn}
                 onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}

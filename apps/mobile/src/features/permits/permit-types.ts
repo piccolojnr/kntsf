@@ -1,3 +1,5 @@
+import { Student } from "@/features/students/student-types";
+
 export type PermitStatus = "active" | "expired" | "revoked";
 
 export type Permit = {
@@ -9,6 +11,7 @@ export type Permit = {
   expiryDate: string;
   amountPaid: number;
   qrCode?: string;
+  student?: Student | null;
 };
 
 export type PermitIssuanceConfig = {
@@ -19,5 +22,16 @@ export type PermitIssuanceConfig = {
   academicYear: string | null;
 };
 
-export type PermitDto = Permit;
+export type PermitDto = Partial<Permit> & {
+  id: string | number;
+  student_id?: string;
+  permit_code?: string;
+  code?: string;
+  start_date?: string;
+  expiry_date?: string;
+  expiresAt?: string;
+  amount_paid?: number;
+  amount?: number;
+  student?: Student | null;
+};
 export type PermitIssuanceConfigDto = PermitIssuanceConfig;
