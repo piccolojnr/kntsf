@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { issuePermitForStudent } from "@/features/permits/permit-api";
+import { USE_MOCK_API } from "@/constants/config";
 import { Permit } from "@/features/permits/permit-types";
 import {
   getStudentById,
@@ -11,6 +11,7 @@ import { normalizeApiError } from "@/lib/api/api-error";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
 import {
+  issuePermitWithVerification as issuePermitRequest,
   scanCardByUid,
   verifyPermitByStudentId,
 } from "./verification-api";
@@ -258,14 +259,18 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       const operationId = beginOperation({ phase: "issuing_permit" });
 
       try {
-        const student = await resolveStudentRecord(studentId, currentStudent);
+        const student = !USE_MOCK_API
+          ? currentStudent
+          : await resolveStudentRecord(studentId, currentStudent);
 
         if (!student) {
           throw new Error("No student record was found for this student ID.");
         }
 
-        const issuedPermit = await issuePermitForStudent(student.id);
-        const refreshedResult = await verifyPermitByStudentId(student.studentId);
+        const response = await issuePermitRequest(student.studentId ?? student.id);
+        const issuedPermit = response.permit;
+        const refreshedResult =
+          response.verification ?? (await verifyPermitByStudentId(student.studentId));
         const nextResult: VerificationResult = {
           ...refreshedResult,
           message: "Permit issued successfully.",

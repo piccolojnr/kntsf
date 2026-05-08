@@ -12,10 +12,12 @@ export type VerificationReason =
   | "card_not_registered"
   | "card_inactive"
   | "student_not_found"
+  | "permit_not_found"
+  | "permit_issuance_disabled"
   | "invalid_input"
   | "unknown_error";
 
-export type VerificationMethod = "student_id" | "card_uid";
+export type VerificationMethod = "student_id" | "card_uid" | "permit_code";
 
 export type VerificationDecision =
   | "allowed"

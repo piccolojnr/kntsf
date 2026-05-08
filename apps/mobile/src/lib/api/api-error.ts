@@ -49,11 +49,20 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
   if (isAxiosError(error)) {
     const statusCode = error.response?.status;
     const responseMessage = getErrorMessage(error.response?.data);
+    let fallbackMessage = error.response
+      ? DEFAULT_ERROR_MESSAGE
+      : NETWORK_ERROR_MESSAGE;
+
+    if (statusCode === 401) {
+      fallbackMessage = "Your session has expired. Please log in again.";
+    }
+
+    if (statusCode === 403) {
+      fallbackMessage = "You do not have permission to perform this action.";
+    }
 
     return {
-      message:
-        responseMessage ??
-        (error.response ? DEFAULT_ERROR_MESSAGE : NETWORK_ERROR_MESSAGE),
+      message: responseMessage ?? fallbackMessage,
       statusCode,
       isNetworkError: !error.response,
     };

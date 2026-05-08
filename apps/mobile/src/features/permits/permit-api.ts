@@ -144,7 +144,7 @@ export async function issuePermitForStudent(studentId: string) {
   const nextPermit: Permit = {
     id: `permit-${mockPermits.length + 1}`,
     studentId,
-    permitCode: createPermitCode(studentId, config.academicYear),
+    permitCode: createPermitCode(studentId, config.academicYear ?? "2025/2026"),
     status: "active",
     startDate: new Date().toISOString(),
     expiryDate: config.expiryDate,

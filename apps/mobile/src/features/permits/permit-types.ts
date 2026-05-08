@@ -8,13 +8,15 @@ export type Permit = {
   startDate: string;
   expiryDate: string;
   amountPaid: number;
+  qrCode?: string;
 };
 
 export type PermitIssuanceConfig = {
   enabled: boolean;
   defaultAmount: number;
+  currency?: string;
   expiryDate: string;
-  academicYear: string;
+  academicYear: string | null;
 };
 
 export type PermitDto = Permit;

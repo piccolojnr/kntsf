@@ -65,7 +65,7 @@ export default function OperationsSettingsScreen() {
             </View>
             <DetailRow
               label="Academic Year"
-              value={config.academicYear}
+              value={config.academicYear ?? "Unavailable"}
               helper="Applied automatically when a permit is issued."
             />
             <DetailRow

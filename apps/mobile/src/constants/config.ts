@@ -29,10 +29,15 @@ function getAppEnvironment(): AppEnvironment {
 export const APP_ENV = getAppEnvironment();
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
+  process.env.EXPO_PUBLIC_API_URL?.trim() ||
   ENVIRONMENT_CONFIG[APP_ENV].apiBaseUrl;
 export const USE_MOCK_API =
   process.env.EXPO_PUBLIC_USE_MOCK_API === "true" || !API_BASE_URL;
 
+
+console.log("App Environment:", APP_ENV);
+console.log("API Base URL:", API_BASE_URL);
+console.log("Using Mock API:", USE_MOCK_API);
 
 
 
