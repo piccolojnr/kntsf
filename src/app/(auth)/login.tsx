@@ -102,10 +102,7 @@ function InputField({
           selectionColor={colors.primary}
         />
         {onToggleSecure && (
-          <TouchableOpacity
-            onPress={onToggleSecure}
-            style={fieldStyles.eyeBtn}
-          >
+          <TouchableOpacity onPress={onToggleSecure} style={fieldStyles.eyeBtn}>
             {showSecure ? (
               <EyeOff size={16} color={colors.textMuted} strokeWidth={2} />
             ) : (
@@ -171,7 +168,7 @@ export default function LoginScreen() {
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      const payload: LoginPayload = { email: email.trim(), password };
+      const payload: LoginPayload = { username: email.trim(), password };
       const response = await login(payload);
       router.replace(getRoleRoute(response.user.role));
     } catch (error) {
@@ -216,14 +213,9 @@ export default function LoginScreen() {
               ]}
             >
               <View
-                style={[
-                  styles.pillDot,
-                  { backgroundColor: meta.accentColor },
-                ]}
+                style={[styles.pillDot, { backgroundColor: meta.accentColor }]}
               />
-              <Text
-                style={[styles.pillText, { color: meta.accentColor }]}
-              >
+              <Text style={[styles.pillText, { color: meta.accentColor }]}>
                 {meta.pill}
               </Text>
             </View>

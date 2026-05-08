@@ -1,10 +1,11 @@
 import { create } from "axios";
 
 import { API_BASE_URL } from "@/constants/config";
+import { toUserFacingError } from "@/lib/api/api-error";
 import { getStoredToken } from "@/lib/storage/secure-storage";
 
 export const apiClient = create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL || undefined,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -20,3 +21,8 @@ apiClient.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(toUserFacingError(error)),
+);
