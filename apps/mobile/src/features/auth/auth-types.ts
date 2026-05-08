@@ -19,3 +19,6 @@ export type LoginResponse = {
   user: AuthUser;
   role: UserRole;
 };
+
+export type AuthUserDto = AuthUser;
+export type LoginResponseDto = LoginResponse;

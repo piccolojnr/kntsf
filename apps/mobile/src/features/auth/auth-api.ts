@@ -1,21 +1,49 @@
 import { mockGetCurrentUser, mockLogin, mockLogout } from "@/lib/api/mock-api";
+import { toUserFacingError } from "@/lib/api/api-error";
 import {
   getStoredToken,
   removeStoredToken,
   setStoredToken,
 } from "@/lib/storage/secure-storage";
 
-import { LoginPayload } from "./auth-types";
+import {
+  AuthUserDto,
+  LoginPayload,
+  LoginResponse,
+  LoginResponseDto,
+} from "./auth-types";
+
+function normalizeLoginResponse(dto: LoginResponseDto): LoginResponse {
+  return {
+    token: dto.token,
+    user: { ...dto.user },
+    role: dto.role,
+  };
+}
+
+function normalizeAuthUser(dto: AuthUserDto | null) {
+  return dto ? { ...dto } : null;
+}
 
 export async function login(payload: LoginPayload) {
-  const response = await mockLogin(payload);
-  await setStoredToken(response.token);
-  return response;
+  try {
+    // TODO(real-api): replace mockLogin with apiClient.post("/api/mobile/auth/login").
+    const response = normalizeLoginResponse(await mockLogin(payload));
+    await setStoredToken(response.token);
+    return response;
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
 }
 
 export async function logout() {
-  await mockLogout();
-  await removeStoredToken();
+  try {
+    // TODO(real-api): replace mockLogout with backend logout endpoint if required.
+    await mockLogout();
+    await removeStoredToken();
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
 }
 
 export async function getCurrentUser() {
@@ -25,5 +53,10 @@ export async function getCurrentUser() {
     return null;
   }
 
-  return mockGetCurrentUser(token);
+  try {
+    // TODO(real-api): replace mockGetCurrentUser with apiClient.get("/api/mobile/me").
+    return normalizeAuthUser(await mockGetCurrentUser(token));
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
 }

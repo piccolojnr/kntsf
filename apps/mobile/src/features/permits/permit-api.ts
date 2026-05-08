@@ -1,6 +1,11 @@
 import { simulateDelay } from "@/lib/api/mock-api";
 
-import { Permit, PermitIssuanceConfig } from "./permit-types";
+import {
+  Permit,
+  PermitDto,
+  PermitIssuanceConfig,
+  PermitIssuanceConfigDto,
+} from "./permit-types";
 
 const mockPermits: Permit[] = [
   {
@@ -56,25 +61,52 @@ function clonePermitIssuanceConfig() {
   return { ...mockPermitIssuanceConfig };
 }
 
+function normalizePermit(dto: PermitDto): Permit {
+  return {
+    id: dto.id,
+    studentId: dto.studentId,
+    permitCode: dto.permitCode,
+    status: dto.status,
+    startDate: dto.startDate,
+    expiryDate: dto.expiryDate,
+    amountPaid: dto.amountPaid,
+  };
+}
+
+function normalizePermitIssuanceConfig(
+  dto: PermitIssuanceConfigDto,
+): PermitIssuanceConfig {
+  return {
+    enabled: dto.enabled,
+    defaultAmount: dto.defaultAmount,
+    expiryDate: dto.expiryDate,
+    academicYear: dto.academicYear,
+  };
+}
+
 export async function getPermits() {
+  // TODO(real-api): replace mockPermits with apiClient.get("/api/mobile/permits").
   await simulateDelay(250);
-  return mockPermits.map(clonePermit);
+  return mockPermits.map(clonePermit).map(normalizePermit);
 }
 
 export async function getPermitById(id: string) {
+  // TODO(real-api): replace lookup with apiClient.get(`/api/mobile/permits/${id}`).
   await simulateDelay(180);
 
   const permit = mockPermits.find((item) => item.id === id);
 
-  return permit ? clonePermit(permit) : null;
+  return permit ? normalizePermit(clonePermit(permit)) : null;
 }
 
 export async function getPermitsByStudentId(studentId: string) {
+  // TODO(real-api): replace lookup with student permit endpoint.
   await simulateDelay(180);
 
   return mockPermits
     .filter((item) => item.studentId === studentId)
-    .map(clonePermit);
+    .map(clonePermit)
+    .map(normalizePermit);
 }
 
 export async function getLatestPermitByStudentId(studentId: string) {
@@ -88,8 +120,9 @@ export async function getLatestPermitByStudentId(studentId: string) {
 }
 
 export async function getPermitIssuanceConfig() {
+  // TODO(real-api): replace mock config with backend permit issuance config.
   await simulateDelay(180);
-  return clonePermitIssuanceConfig();
+  return normalizePermitIssuanceConfig(clonePermitIssuanceConfig());
 }
 
 function createPermitCode(studentId: string, academicYear: string) {
@@ -99,6 +132,7 @@ function createPermitCode(studentId: string, academicYear: string) {
 }
 
 export async function issuePermitForStudent(studentId: string) {
+  // TODO(real-api): replace mock issuing with apiClient.post("/api/mobile/permits/issue").
   await simulateDelay(320);
 
   const config = clonePermitIssuanceConfig();
@@ -119,5 +153,5 @@ export async function issuePermitForStudent(studentId: string) {
 
   mockPermits.unshift(nextPermit);
 
-  return clonePermit(nextPermit);
+  return normalizePermit(clonePermit(nextPermit));
 }

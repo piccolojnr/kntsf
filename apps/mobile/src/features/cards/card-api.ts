@@ -1,7 +1,7 @@
-import { simulateDelay } from "@/lib/api/mock-api";
 import { getStudentById } from "@/features/students/student-api";
+import { simulateDelay } from "@/lib/api/mock-api";
 
-import { CardStatus, StudentCard } from "./card-types";
+import { CardStatus, StudentCard, StudentCardDto } from "./card-types";
 
 export type CardAssignmentMode = "register" | "replace";
 
@@ -60,6 +60,17 @@ function cloneCard(card: StudentCard) {
   return { ...card };
 }
 
+function normalizeCard(dto: StudentCardDto): StudentCard {
+  return {
+    id: dto.id,
+    studentId: dto.studentId,
+    uid: dto.uid,
+    type: dto.type,
+    status: dto.status,
+    registeredAt: dto.registeredAt,
+  };
+}
+
 function sortCardsByRegisteredAt(left: StudentCard, right: StudentCard) {
   return (
     new Date(right.registeredAt).getTime() - new Date(left.registeredAt).getTime()
@@ -100,44 +111,50 @@ function getConflictingActiveCard(studentId: string, uid: string) {
 }
 
 export async function getCards() {
+  // TODO(real-api): replace mockCards with apiClient.get("/api/mobile/cards").
   await simulateDelay(250);
-  return mockCards.map(cloneCard);
+  return mockCards.map(cloneCard).map(normalizeCard);
 }
 
 export async function getCardById(id: string) {
+  // TODO(real-api): replace lookup with apiClient.get(`/api/mobile/cards/${id}`).
   await simulateDelay(180);
 
   const card = mockCards.find((item) => item.id === id);
 
-  return card ? cloneCard(card) : null;
+  return card ? normalizeCard(cloneCard(card)) : null;
 }
 
 export async function getCardByUid(uid: string) {
+  // TODO(real-api): replace lookup with backend card UID endpoint.
   await simulateDelay(180);
 
   const normalizedUid = uid.trim().toUpperCase();
   const card = mockCards.find((item) => item.uid.toUpperCase() === normalizedUid);
 
-  return card ? cloneCard(card) : null;
+  return card ? normalizeCard(cloneCard(card)) : null;
 }
 
 export async function getCardsByStudentId(studentId: string) {
+  // TODO(real-api): replace lookup with backend student cards endpoint.
   await simulateDelay(180);
 
   return mockCards
     .filter((item) => item.studentId === studentId)
     .sort(sortCardsByRegisteredAt)
-    .map(cloneCard);
+    .map(cloneCard)
+    .map(normalizeCard);
 }
 
 export async function getCurrentCardByStudentId(studentId: string) {
+  // TODO(real-api): replace lookup with backend current student card endpoint.
   await simulateDelay(140);
 
   const cards = mockCards
     .filter((item) => item.studentId === studentId)
     .sort(sortCardsByRegisteredAt);
 
-  return cards[0] ? cloneCard(cards[0]) : null;
+  return cards[0] ? normalizeCard(cloneCard(cards[0])) : null;
 }
 
 async function updateActiveCardStatus(studentId: string, status: CardStatus) {
@@ -151,23 +168,25 @@ async function updateActiveCardStatus(studentId: string, status: CardStatus) {
 }
 
 export async function registerCardForStudent(studentId: string) {
+  // TODO(real-api): replace mock mutation with POST /api/mobile/cards/register.
   await simulateDelay(260);
 
   await updateActiveCardStatus(studentId, "revoked");
   const nextCard = createCardRecord(studentId);
   mockCards.unshift(nextCard);
 
-  return cloneCard(nextCard);
+  return normalizeCard(cloneCard(nextCard));
 }
 
 export async function replaceCardForStudent(studentId: string) {
+  // TODO(real-api): replace mock mutation with POST /api/mobile/cards/replace.
   await simulateDelay(260);
 
   await updateActiveCardStatus(studentId, "replaced");
   const nextCard = createCardRecord(studentId);
   mockCards.unshift(nextCard);
 
-  return cloneCard(nextCard);
+  return normalizeCard(cloneCard(nextCard));
 }
 
 export async function assignCardToStudent(input: {
@@ -175,6 +194,7 @@ export async function assignCardToStudent(input: {
   studentId: string;
   uid: string;
 }) {
+  // TODO(real-api): replace mock assignment with backend card assignment endpoint.
   await simulateDelay(220);
   const normalizedUid = input.uid.trim().toUpperCase();
 
@@ -205,10 +225,11 @@ export async function assignCardToStudent(input: {
 
   cardRecord.uid = normalizedUid;
 
-  return cloneCard(cardRecord);
+  return normalizeCard(cloneCard(cardRecord));
 }
 
 export async function revokeCardForStudent(studentId: string) {
+  // TODO(real-api): replace mock mutation with POST /api/mobile/cards/revoke.
   await simulateDelay(220);
 
   const activeCard = await updateActiveCardStatus(studentId, "revoked");
@@ -217,10 +238,11 @@ export async function revokeCardForStudent(studentId: string) {
     throw new Error("No active card is available to revoke.");
   }
 
-  return cloneCard(activeCard);
+  return normalizeCard(cloneCard(activeCard));
 }
 
 export async function reportLostCardForStudent(studentId: string) {
+  // TODO(real-api): replace mock mutation with backend lost card endpoint.
   await simulateDelay(220);
 
   const activeCard = await updateActiveCardStatus(studentId, "lost");
@@ -229,5 +251,5 @@ export async function reportLostCardForStudent(studentId: string) {
     throw new Error("No active card is available to report as lost.");
   }
 
-  return cloneCard(activeCard);
+  return normalizeCard(cloneCard(activeCard));
 }

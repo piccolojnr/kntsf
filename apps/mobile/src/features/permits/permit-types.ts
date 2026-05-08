@@ -16,3 +16,6 @@ export type PermitIssuanceConfig = {
   expiryDate: string;
   academicYear: string;
 };
+
+export type PermitDto = Permit;
+export type PermitIssuanceConfigDto = PermitIssuanceConfig;

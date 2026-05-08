@@ -67,7 +67,7 @@ function LoadingScreen() {
     ]);
     anim.start();
     return () => anim.stop();
-  }, []);
+  }, [dotScale1, dotScale2, dotScale3, opacity]);
 
   return (
     <SafeAreaView style={styles.screen}>

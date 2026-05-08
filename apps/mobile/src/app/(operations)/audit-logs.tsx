@@ -6,43 +6,7 @@ import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { getScanLogs } from "@/features/operations/scan-api";
-
-type AuditLogItem = {
-  id: string;
-  actor: string;
-  action: string;
-  timestamp: string;
-  detail: string;
-  tone: "primary" | "success" | "warning" | "danger";
-};
-
-const mockAdminLogs: AuditLogItem[] = [
-  {
-    id: "audit-1",
-    actor: "Admin User",
-    action: "Permit issued",
-    timestamp: "2026-05-03T09:20:00.000Z",
-    detail: "Issued a student permit from the operations workflow.",
-    tone: "success",
-  },
-  {
-    id: "audit-2",
-    actor: "Admin User",
-    action: "Card registered",
-    timestamp: "2026-05-03T09:42:00.000Z",
-    detail: "Registered a new active card for a student record.",
-    tone: "primary",
-  },
-  {
-    id: "audit-3",
-    actor: "Admin User",
-    action: "Card revoked",
-    timestamp: "2026-05-03T11:15:00.000Z",
-    detail: "Revoked a card after replacement or reported loss.",
-    tone: "danger",
-  },
-];
+import { AuditLogItem, getAuditLogs } from "@/features/operations/audit-api";
 
 function formatDateTime(dateString: string) {
   return new Date(dateString).toLocaleString(undefined, {
@@ -69,23 +33,10 @@ function getToneColor(tone: AuditLogItem["tone"]) {
 
 export default function OperationsAuditLogsScreen() {
   const logsQuery = useQuery({
-    queryKey: ["scan-logs"],
-    queryFn: getScanLogs,
+    queryKey: ["audit-logs"],
+    queryFn: getAuditLogs,
   });
-
-  const verificationLogs: AuditLogItem[] = (logsQuery.data ?? []).map((log) => ({
-    id: log.id,
-    actor: log.method === "card_uid" ? "NFC Verification" : "Staff User",
-    action: "Verification performed",
-    detail: log.message,
-    timestamp: log.scannedAt,
-    tone: log.decision === "allowed" ? "success" : "warning",
-  }));
-
-  const auditLogs = [...mockAdminLogs, ...verificationLogs].sort(
-    (left, right) =>
-      new Date(right.timestamp).getTime() - new Date(left.timestamp).getTime(),
-  );
+  const auditLogs = logsQuery.data ?? [];
 
   return (
     <AdminToolScreen

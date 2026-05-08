@@ -7,3 +7,5 @@ export type Student = {
   level: string;
   phone: string;
 };
+
+export type StudentDto = Student;

@@ -1,6 +1,5 @@
 import { Mail, Phone } from "lucide-react-native";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Linking } from "react-native";
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Student } from "@/features/students/student-types";

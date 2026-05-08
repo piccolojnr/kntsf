@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { useCards } from "@/features/cards/use-cards";
 import { usePermits } from "@/features/permits/use-permits";
-import { getScanLogs } from "@/features/operations/scan-api";
+import { getVerificationLogs } from "@/features/operations/verification-api";
 import { useStudents } from "@/features/students/use-students";
 import { useQuery } from "@tanstack/react-query";
 
@@ -28,8 +28,8 @@ export default function AdminDashboardScreen() {
   const permitsQuery = usePermits();
   const cardsQuery = useCards();
   const logsQuery = useQuery({
-    queryKey: ["scan-logs"],
-    queryFn: getScanLogs,
+    queryKey: ["verification-logs"],
+    queryFn: getVerificationLogs,
   });
 
   const isLoading =
@@ -53,7 +53,7 @@ export default function AdminDashboardScreen() {
   const inactiveCards = cards.filter(
     (card) => card.status === "revoked" || card.status === "lost",
   );
-  const todayVerifications = logs.filter((log) => isToday(log.scannedAt));
+  const todayVerifications = logs.filter((log) => isToday(log.checkedAt));
 
   return (
     <AdminToolScreen

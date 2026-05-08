@@ -7,7 +7,6 @@ import {
   ShieldAlert,
   Settings,
   Shield,
-  Users,
 } from "lucide-react-native";
 import { ScrollView, StyleSheet, View } from "react-native";
 

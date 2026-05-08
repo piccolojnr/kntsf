@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { colors, spacing } from "@/constants/theme";
+import { colors } from "@/constants/theme";
 
 type RadarPulseProps = {
   /** Whether the pulse animation is active */

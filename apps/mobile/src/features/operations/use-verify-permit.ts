@@ -7,13 +7,14 @@ import {
   getStudentByStudentId,
 } from "@/features/students/student-api";
 import { Student } from "@/features/students/student-types";
+import { normalizeApiError } from "@/lib/api/api-error";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
 import {
   scanCardByUid,
   verifyPermitByStudentId,
-} from "./scan-api";
-import { VerificationResult } from "./scan-types";
+} from "./verification-api";
+import { VerificationResult } from "./verification-types";
 
 export type VerificationPhase =
   | "idle"
@@ -173,8 +174,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
         commitSuccess(operationId, nextResult);
         return nextResult;
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Verification failed.";
+        const message = normalizeApiError(error).message;
         commitFailure(operationId, message);
         throw error;
       }
@@ -189,8 +189,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
         commitSuccess(operationId, nextResult);
         return nextResult;
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Verification failed.";
+        const message = normalizeApiError(error).message;
         commitFailure(operationId, message);
         throw error;
       }
@@ -276,8 +275,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
 
         return issuedPermit;
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Permit issuance failed.";
+        const message = normalizeApiError(error).message;
         commitFailure(operationId, message);
         throw error;
       }
