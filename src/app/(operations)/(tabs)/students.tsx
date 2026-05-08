@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -11,6 +12,7 @@ import { SearchField } from "@/components/ui/search-field";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useStudentsPage } from "@/features/students/use-students";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const PAGE_SIZE = 10;
 
@@ -49,10 +51,16 @@ export default function OperationsStudentsScreen() {
   const totalPages = Math.max(pagination?.totalPages ?? 1, 1);
   const canGoPrev = currentPage > 1;
   const canGoNext = currentPage < totalPages;
+  const refreshControl = usePullToRefresh(async () => {
+    await studentsQuery.refetch();
+  });
 
   return (
     <Screen scrolled>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
+      >
         <PageHeader
           badgeText={
             pagination ? String(pagination.total) : undefined

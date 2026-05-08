@@ -1,6 +1,6 @@
 import { Href } from "expo-router";
-import { PropsWithChildren } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { PropsWithChildren, ReactElement } from "react";
+import { RefreshControlProps, ScrollView, StyleSheet } from "react-native";
 
 import { RoleAccessGuard } from "@/components/layout/role-access-guard";
 import { PageHeader } from "@/components/ui/page-header";
@@ -8,12 +8,14 @@ import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
 
 type AdminToolScreenProps = PropsWithChildren<{
+  refreshControl?: ReactElement<RefreshControlProps>;
   subtitle: string;
   title: string;
 }>;
 
 export function AdminToolScreen({
   children,
+  refreshControl,
   subtitle,
   title,
 }: AdminToolScreenProps) {
@@ -25,6 +27,7 @@ export function AdminToolScreen({
       <Screen scrolled>
         <ScrollView
           contentContainerStyle={styles.content}
+          refreshControl={refreshControl}
           showsVerticalScrollIndicator={false}
         >
           <PageHeader eyebrow="Admin Tools" subtitle={subtitle} title={title} />

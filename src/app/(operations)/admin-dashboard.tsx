@@ -3,6 +3,7 @@ import { ShieldCheck } from "lucide-react-native";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -10,6 +11,7 @@ import { useCards } from "@/features/cards/use-cards";
 import { usePermits } from "@/features/permits/use-permits";
 import { getVerificationLogs } from "@/features/operations/verification-api";
 import { useStudents } from "@/features/students/use-students";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useQuery } from "@tanstack/react-query";
 
 function isToday(dateString: string) {
@@ -30,6 +32,14 @@ export default function AdminDashboardScreen() {
   const logsQuery = useQuery({
     queryKey: ["verification-logs"],
     queryFn: getVerificationLogs,
+  });
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([
+      studentsQuery.refetch(),
+      permitsQuery.refetch(),
+      cardsQuery.refetch(),
+      logsQuery.refetch(),
+    ]);
   });
 
   const isLoading =
@@ -59,6 +69,7 @@ export default function AdminDashboardScreen() {
     <AdminToolScreen
       title="Dashboard"
       subtitle="Review high-level operations metrics from the current workspace."
+      refreshControl={<AppRefreshControl {...refreshControl} />}
     >
       {isLoading ? (
         <LoadingState message="Loading admin dashboard..." />

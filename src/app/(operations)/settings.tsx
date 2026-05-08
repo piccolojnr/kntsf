@@ -4,11 +4,13 @@ import { StyleSheet, Switch, Text, View } from "react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { getPermitIssuanceConfig } from "@/features/permits/permit-api";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 function formatCurrency(amount: number) {
   return `GHS ${amount.toFixed(2)}`;
@@ -27,6 +29,9 @@ export default function OperationsSettingsScreen() {
     queryKey: ["permit-issuance-config"],
     queryFn: getPermitIssuanceConfig,
   });
+  const refreshControl = usePullToRefresh(async () => {
+    await configQuery.refetch();
+  });
 
   const config = configQuery.data;
 
@@ -34,6 +39,7 @@ export default function OperationsSettingsScreen() {
     <AdminToolScreen
       title="Settings"
       subtitle="Inspect permit issuance configuration for this workspace."
+      refreshControl={<AppRefreshControl {...refreshControl} />}
     >
       {configQuery.isLoading ? (
         <LoadingState message="Loading permit settings..." />

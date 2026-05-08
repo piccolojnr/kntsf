@@ -15,6 +15,7 @@ import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { LoadingState } from "@/components/ui/loading-state";
 import { NavigationListItem } from "@/components/ui/navigation-list-item";
 import { PageHeader } from "@/components/ui/page-header";
@@ -25,6 +26,7 @@ import { useCards } from "@/features/cards/use-cards";
 import { usePermits } from "@/features/permits/use-permits";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const adminTools: {
   description: string;
@@ -74,6 +76,13 @@ export default function OperationsProfileScreen() {
     studentsQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
   const hasError =
     studentsQuery.isError || cardsQuery.isError || permitsQuery.isError;
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([
+      studentsQuery.refetch(),
+      cardsQuery.refetch(),
+      permitsQuery.refetch(),
+    ]);
+  });
 
   const studentCount = (studentsQuery.data ?? []).length;
   const activePermitCount = (permitsQuery.data ?? []).filter(
@@ -87,6 +96,7 @@ export default function OperationsProfileScreen() {
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader

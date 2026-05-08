@@ -15,6 +15,7 @@ import {
 } from "react-native";
 
 import StudentPermitCard from "@/components/cards/student-permit-card";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -23,6 +24,7 @@ import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -595,11 +597,15 @@ export default function StudentPermitsScreen() {
 
   const permits = sortPermits(permitsQuery.data ?? []);
   const activePermit = permits.find((p) => p.status === "active") ?? null;
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([studentQuery.refetch(), permitsQuery.refetch()]);
+  });
 
   return (
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
