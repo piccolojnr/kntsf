@@ -6,13 +6,13 @@ type EnvironmentConfig = {
 
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
-    apiBaseUrl: "https://dev-api.example.com",
+    apiBaseUrl: "http://192.168.8.163:3001",
   },
   staging: {
-    apiBaseUrl: "https://staging-api.example.com",
+    apiBaseUrl: "",
   },
   production: {
-    apiBaseUrl: "https://api.example.com",
+    apiBaseUrl: "",
   },
 };
 
@@ -28,8 +28,13 @@ function getAppEnvironment(): AppEnvironment {
 
 export const APP_ENV = getAppEnvironment();
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ??
+  process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
   ENVIRONMENT_CONFIG[APP_ENV].apiBaseUrl;
+export const USE_MOCK_API =
+  process.env.EXPO_PUBLIC_USE_MOCK_API === "true" || !API_BASE_URL;
+
+
+
 
 export const STORAGE_KEYS = {
   authToken: "auth_token",

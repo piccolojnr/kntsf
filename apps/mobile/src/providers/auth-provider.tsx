@@ -47,7 +47,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
       return null;
     }
 
-    const currentUser = await getCurrentAuthUser();
+    let currentUser: AuthUser | null = null;
+
+    try {
+      currentUser = await getCurrentAuthUser();
+    } catch {
+      currentUser = null;
+    }
 
     setToken(storedToken);
     setUser(currentUser);
@@ -80,13 +86,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async function bootstrapAuth() {
       try {
         const storedToken = await getStoredToken();
-        const currentUser = await getCurrentAuthUser();
+        let currentUser: AuthUser | null = null;
+
+        try {
+          currentUser = await getCurrentAuthUser();
+        } catch {
+          currentUser = null;
+        }
 
         if (!isMounted) {
           return;
         }
 
-        setToken(storedToken);
+        setToken(currentUser ? storedToken : null);
         setUser(currentUser);
       } finally {
         if (isMounted) {

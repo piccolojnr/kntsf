@@ -1,7 +1,5 @@
 import {
   AuthUser,
-  LoginPayload,
-  LoginResponse,
   UserRole,
 } from "@/features/auth/auth-types";
 
@@ -51,32 +49,6 @@ const tokenToUser = new Map(
 
 export function simulateDelay(duration = 300) {
   return new Promise((resolve) => setTimeout(resolve, duration));
-}
-
-function cloneLoginResponse(record: MockUserRecord): LoginResponse {
-  return {
-    token: record.token,
-    user: { ...record.user },
-    role: record.user.role,
-  };
-}
-
-export async function mockLogin(
-  payload: LoginPayload,
-): Promise<LoginResponse> {
-  await simulateDelay();
-
-  const matchedUser = mockUsers.find(
-    (record) =>
-      record.user.email.toLowerCase() === payload.email.toLowerCase() &&
-      record.password === payload.password,
-  );
-
-  if (!matchedUser) {
-    throw new Error("Invalid email or password");
-  }
-
-  return cloneLoginResponse(matchedUser);
 }
 
 export async function mockLogout() {

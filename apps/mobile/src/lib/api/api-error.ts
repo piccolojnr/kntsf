@@ -8,6 +8,11 @@ export type NormalizedApiError = {
   isNetworkError: boolean;
 };
 
+export type UserFacingApiError = Error & {
+  statusCode?: number;
+  isNetworkError?: boolean;
+};
+
 const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 const NETWORK_ERROR_MESSAGE =
   "Unable to reach the server. Check your connection and try again.";
@@ -18,10 +23,26 @@ function getErrorMessage(data: unknown) {
   }
 
   const maybeError = data as Partial<ApiErrorResponse> & {
-    error?: string;
+    error?: string | { message?: unknown };
   };
 
-  return maybeError.message ?? maybeError.error ?? null;
+  if (typeof maybeError.message === "string") {
+    return maybeError.message;
+  }
+
+  if (typeof maybeError.error === "string") {
+    return maybeError.error;
+  }
+
+  if (
+    maybeError.error &&
+    typeof maybeError.error === "object" &&
+    typeof maybeError.error.message === "string"
+  ) {
+    return maybeError.error.message;
+  }
+
+  return null;
 }
 
 export function normalizeApiError(error: unknown): NormalizedApiError {
@@ -39,9 +60,27 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
   }
 
   if (error instanceof Error) {
+    const maybeApiError = error as UserFacingApiError;
+
     return {
       message: error.message || DEFAULT_ERROR_MESSAGE,
-      isNetworkError: false,
+      statusCode: maybeApiError.statusCode,
+      isNetworkError: Boolean(maybeApiError.isNetworkError),
+    };
+  }
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    const maybeApiError = error as Partial<UserFacingApiError>;
+
+    return {
+      message: error.message || DEFAULT_ERROR_MESSAGE,
+      statusCode: maybeApiError.statusCode,
+      isNetworkError: Boolean(maybeApiError.isNetworkError),
     };
   }
 
@@ -52,5 +91,13 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
 }
 
 export function toUserFacingError(error: unknown) {
-  return new Error(normalizeApiError(error).message);
+  const normalizedError = normalizeApiError(error);
+  const userFacingError = new Error(
+    normalizedError.message,
+  ) as UserFacingApiError;
+
+  userFacingError.statusCode = normalizedError.statusCode;
+  userFacingError.isNetworkError = normalizedError.isNetworkError;
+
+  return userFacingError;
 }

@@ -1,5 +1,7 @@
-import { mockGetCurrentUser, mockLogin, mockLogout } from "@/lib/api/mock-api";
-import { toUserFacingError } from "@/lib/api/api-error";
+import { USE_MOCK_API } from "@/constants/config";
+import { mockGetCurrentUser, mockLogout } from "@/lib/api/mock-api";
+import { apiClient } from "@/lib/api/api-client";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import {
   getStoredToken,
   removeStoredToken,
@@ -13,22 +15,60 @@ import {
   LoginResponseDto,
 } from "./auth-types";
 
-function normalizeLoginResponse(dto: LoginResponseDto): LoginResponse {
+type MobileAuthResponse<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+type BackendMeData = {
+  user?: AuthUserDto;
+} & Partial<AuthUserDto>;
+
+function normalizeAuthUser(dto: AuthUserDto | null | undefined) {
+  if (!dto) {
+    return null;
+  }
+
   return {
-    token: dto.token,
-    user: { ...dto.user },
+    id: String(dto.id),
+    name: dto.name,
+    email: dto.email,
     role: dto.role,
+    studentId: dto.studentId,
+    type: dto.type ?? (dto.role === "student" ? "student" : "staff"),
   };
 }
 
-function normalizeAuthUser(dto: AuthUserDto | null) {
-  return dto ? { ...dto } : null;
+function normalizeLoginResponse(dto: LoginResponseDto): LoginResponse {
+  const user = normalizeAuthUser(dto.user);
+
+  if (!user) {
+    throw new Error("Login response did not include a user.");
+  }
+
+  return {
+    token: dto.token,
+    user,
+    role: user.role,
+  };
+}
+
+function normalizeMeResponse(data: BackendMeData) {
+  return normalizeAuthUser(data.user ?? (data as AuthUserDto));
 }
 
 export async function login(payload: LoginPayload) {
   try {
-    // TODO(real-api): replace mockLogin with apiClient.post("/api/mobile/auth/login").
-    const response = normalizeLoginResponse(await mockLogin(payload));
+    const response = normalizeLoginResponse(
+      (
+        await apiClient.post<MobileAuthResponse<LoginResponseDto>>(
+          "/api/mobile/auth/login",
+          payload,
+        )
+      ).data.data,
+    );
+
     await setStoredToken(response.token);
     return response;
   } catch (error) {
@@ -38,11 +78,15 @@ export async function login(payload: LoginPayload) {
 
 export async function logout() {
   try {
-    // TODO(real-api): replace mockLogout with backend logout endpoint if required.
-    await mockLogout();
+    if (USE_MOCK_API) {
+      await mockLogout();
+    } else {
+      await apiClient.post("/api/mobile/auth/logout");
+    }
+  } catch {
+    // Logout must still clear local auth state if the server is unavailable.
+  } finally {
     await removeStoredToken();
-  } catch (error) {
-    throw toUserFacingError(error);
   }
 }
 
@@ -54,9 +98,22 @@ export async function getCurrentUser() {
   }
 
   try {
-    // TODO(real-api): replace mockGetCurrentUser with apiClient.get("/api/mobile/me").
-    return normalizeAuthUser(await mockGetCurrentUser(token));
+    if (USE_MOCK_API) {
+      return normalizeAuthUser(await mockGetCurrentUser(token));
+    }
+
+    const response =
+      await apiClient.get<MobileAuthResponse<BackendMeData>>("/api/mobile/me");
+
+    return normalizeMeResponse(response.data.data);
   } catch (error) {
-    throw toUserFacingError(error);
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 401) {
+      await removeStoredToken();
+      return null;
+    }
+
+    throw new Error(normalizedError.message);
   }
 }
