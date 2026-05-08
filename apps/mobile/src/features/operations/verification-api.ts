@@ -1,3 +1,4 @@
+import { getPermitIssuanceConfig } from "@/features/permits/permit-api";
 import { Permit } from "@/features/permits/permit-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
@@ -35,7 +36,32 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
 }
 
 function normalizeVerificationLog(dto: VerificationLogDto): VerificationLog {
-  return { ...dto };
+  const reason = dto.reason ?? "unknown_error";
+  const outcome = dto.outcome ?? getOutcomeFromReason(reason);
+  const decision = dto.decision ?? getDecisionFromReason(reason);
+  const checkedAt = dto.checkedAt ?? dto.createdAt ?? dto.scannedAt ?? "";
+
+  return {
+    ...dto,
+    id: String(dto.id),
+    method: dto.method ?? "student_id",
+    value: dto.value ?? "",
+    result: dto.result ?? outcome,
+    scannedAt: dto.scannedAt ?? checkedAt,
+    checkedAt,
+    createdAt: dto.createdAt ?? checkedAt,
+    outcome,
+    reason,
+    decision,
+    message: dto.message ?? "Verification completed.",
+    cardId: dto.cardId ?? dto.card?.id,
+    permitId: dto.permitId ?? dto.permit?.id,
+    studentId: dto.studentId ?? dto.student?.id,
+    student: dto.student ?? null,
+    permit: dto.permit ?? null,
+    card: dto.card ?? null,
+    verifier: dto.verifier ?? null,
+  };
 }
 
 function normalizeVerificationResult(
@@ -134,7 +160,13 @@ async function postVerification<TBody>(
       body,
     );
 
-    return normalizeVerificationResult(getMobileData(response.data));
+    const result = normalizeVerificationResult(getMobileData(response.data));
+
+    if (result.canIssuePermit && !result.issuanceConfig) {
+      result.issuanceConfig = await getPermitIssuanceConfig();
+    }
+
+    return result;
   } catch (error) {
     throw toUserFacingError(error);
   }
@@ -149,11 +181,17 @@ async function postIssuePermit(studentId: string) {
 
     const data = getMobileData(response.data);
 
+    const verification = (data.verificationResult ?? data.verification)
+      ? normalizeVerificationResult(data.verificationResult ?? data.verification!)
+      : null;
+
+    if (verification?.canIssuePermit && !verification.issuanceConfig) {
+      verification.issuanceConfig = await getPermitIssuanceConfig();
+    }
+
     return {
       permit: data.permit,
-      verification: (data.verificationResult ?? data.verification)
-        ? normalizeVerificationResult(data.verificationResult ?? data.verification!)
-        : null,
+      verification,
     };
   } catch (error) {
     const normalizedError = normalizeApiError(error);

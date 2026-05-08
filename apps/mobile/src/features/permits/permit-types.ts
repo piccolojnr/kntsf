@@ -20,6 +20,7 @@ export type PermitIssuanceConfig = {
   currency?: string;
   expiryDate: string;
   academicYear: string | null;
+  semester?: string | null;
 };
 
 export type PermitDto = Partial<Permit> & {
@@ -36,4 +37,14 @@ export type PermitDto = Partial<Permit> & {
   amount?: number;
   student?: Student | StudentDto | null;
 };
-export type PermitIssuanceConfigDto = PermitIssuanceConfig;
+export type PermitIssuanceConfigDto = Partial<PermitIssuanceConfig> & {
+  enabled?: boolean;
+  issuanceEnabled?: boolean;
+  defaultAmount?: number;
+  amount?: number;
+  expiryDate?: string;
+  expiry_date?: string;
+  expiresAt?: string;
+  academicYear?: string | null;
+  academic_year?: string | null;
+};

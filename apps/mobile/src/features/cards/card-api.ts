@@ -181,7 +181,20 @@ export async function revokeCardForStudent(cardId: string) {
 }
 
 export async function reportLostCardForStudent(_studentId: string) {
-  throw new Error("Lost card reporting is not connected to the backend yet.");
+  try {
+    const response = await apiClient.post<
+      MobileApiResponse<CardMutationResponse | { card: StudentCardDto | null }>
+    >("/api/mobile/student/card/report-lost");
+    const data = getMobileData(response.data);
+
+    if (!data || ("card" in data && !data.card)) {
+      return null;
+    }
+
+    return normalizeCard(unwrapCardMutationResponse(data as CardMutationResponse));
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
 }
 
 export async function getStudentCard(_studentId?: string) {

@@ -89,6 +89,9 @@ export function PermitIssueConfirmationModal({
               label="Academic Year"
               value={config.academicYear ?? "Unavailable"}
             />
+            {config.semester ? (
+              <InfoRow label="Semester" value={config.semester} />
+            ) : null}
           </View>
 
           <View style={styles.actions}>
