@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, ShieldAlert } from "lucide-react-native";
+import { ShieldAlert } from "lucide-react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
@@ -8,15 +8,15 @@ import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { useCards } from "@/features/cards/use-cards";
-import { getScanLogs } from "@/features/operations/scan-api";
+import { getVerificationLogs } from "@/features/operations/verification-api";
 import { usePermits } from "@/features/permits/use-permits";
 
 export default function OperationsReportsScreen() {
   const permitsQuery = usePermits();
   const cardsQuery = useCards();
   const logsQuery = useQuery({
-    queryKey: ["scan-logs"],
-    queryFn: getScanLogs,
+    queryKey: ["verification-logs"],
+    queryFn: getVerificationLogs,
   });
 
   const isLoading =
@@ -32,10 +32,10 @@ export default function OperationsReportsScreen() {
     (permit) => permit.status === "active" || permit.status === "expired",
   );
   const allowedVerifications = logs.filter(
-    (log) => log.decision === "allowed",
+    (log) => log.outcome === "allowed",
   );
   const deniedVerifications = logs.filter(
-    (log) => log.decision !== "allowed",
+    (log) => log.outcome !== "allowed",
   );
   const registeredCards = cards.filter((card) => card.status === "active");
   const revokedCards = cards.filter(

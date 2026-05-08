@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import {
-  Keyboard,
   Platform,
   Pressable,
   StyleSheet,

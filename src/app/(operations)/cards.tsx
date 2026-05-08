@@ -10,9 +10,10 @@ import { TextField } from "@/components/ui/text-field";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { CardStatus } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
+import { Student } from "@/features/students/student-types";
 import { useStudents } from "@/features/students/use-students";
 
-const statusFilters: Array<CardStatus | "all"> = [
+const statusFilters: (CardStatus | "all")[] = [
   "all",
   "active",
   "revoked",
@@ -41,7 +42,7 @@ export default function OperationsCardsScreen() {
   const [statusFilter, setStatusFilter] = useState<CardStatus | "all">("all");
 
   const studentsById = useMemo(() => {
-    const map = new Map<string, NonNullable<typeof studentsQuery.data>[number]>();
+    const map = new Map<string, Student>();
 
     for (const student of studentsQuery.data ?? []) {
       map.set(student.id, student);

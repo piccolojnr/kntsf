@@ -15,3 +15,5 @@ export type StudentCard = {
   status: CardStatus;
   registeredAt: string;
 };
+
+export type StudentCardDto = StudentCard;

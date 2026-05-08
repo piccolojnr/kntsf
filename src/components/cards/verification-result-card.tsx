@@ -1,5 +1,5 @@
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { VerificationResult } from "@/features/operations/scan-types";
+import { VerificationResult } from "@/features/operations/verification-types";
 import {
   AlertTriangle,
   CheckCircle2,

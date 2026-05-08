@@ -331,7 +331,6 @@ function InfoPanel({
   accentColor?: string;
   rows: { label: string; value: string; sub?: string }[];
 }) {
-  const accent = accentColor ?? colors.primary;
   return (
     <View style={panelStyles.card}>
       <View style={panelStyles.inner}>
