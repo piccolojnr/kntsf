@@ -47,11 +47,12 @@ function normalizePermitIssuanceConfig(
   dto: PermitIssuanceConfigDto,
 ): PermitIssuanceConfig {
   return {
-    enabled: dto.enabled,
-    defaultAmount: dto.defaultAmount,
+    enabled: dto.enabled ?? dto.issuanceEnabled ?? false,
+    defaultAmount: dto.defaultAmount ?? dto.amount ?? 0,
     currency: dto.currency,
-    expiryDate: dto.expiryDate,
-    academicYear: dto.academicYear,
+    expiryDate: dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "",
+    academicYear: dto.academicYear ?? dto.academic_year ?? null,
+    semester: dto.semester ?? null,
   };
 }
 

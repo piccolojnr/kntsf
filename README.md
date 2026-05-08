@@ -70,15 +70,9 @@ The app currently depends on these backend routes:
 - `GET /api/mobile/operations/students?search=&page=&limit=`
 - `GET /api/mobile/operations/permits?search=&status=&page=&limit=`
 - `GET /api/mobile/operations/cards?search=&status=&page=&limit=`
-
-Admin reporting screens also expect these backend routes. If they are not implemented yet, the app will show API errors instead of falling back to fake data:
-
 - `GET /api/mobile/operations/verifications?page=&limit=`
 - `GET /api/mobile/operations/audit-logs?page=&limit=`
 - `GET /api/mobile/operations/permit-config`
-
-Student lost-card reporting is not connected yet. Add a backend endpoint such as:
-
 - `POST /api/mobile/student/card/report-lost`
 
 ## API Rules

@@ -32,8 +32,10 @@ export type VerificationLog = {
   id: string;
   method: VerificationMethod;
   value: string;
+  result?: VerificationOutcome | VerificationDecision;
   scannedAt: string;
   checkedAt: string;
+  createdAt?: string;
   outcome: VerificationOutcome;
   reason: VerificationReason;
   decision: VerificationDecision;
@@ -41,6 +43,15 @@ export type VerificationLog = {
   cardId?: string;
   permitId?: string;
   studentId?: string;
+  student?: Student | null;
+  permit?: Permit | null;
+  card?: StudentCard | null;
+  verifier?: {
+    id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+  } | null;
 };
 
 export type VerificationResult = {

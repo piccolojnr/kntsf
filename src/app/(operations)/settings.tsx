@@ -68,6 +68,13 @@ export default function OperationsSettingsScreen() {
               value={config.academicYear ?? "Unavailable"}
               helper="Applied automatically when a permit is issued."
             />
+            {config.semester ? (
+              <DetailRow
+                label="Semester"
+                value={config.semester}
+                helper="Applied automatically when a permit is issued."
+              />
+            ) : null}
             <DetailRow
               label="Default Amount"
               value={formatCurrency(config.defaultAmount)}

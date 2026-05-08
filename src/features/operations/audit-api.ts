@@ -13,10 +13,17 @@ export type AuditLogItem = {
   tone: AuditLogTone;
 };
 
-type AuditLogDto = Partial<AuditLogItem> & {
+type AuditLogDto = Omit<Partial<AuditLogItem>, "actor"> & {
   id: string | number;
   createdAt?: string;
   message?: string;
+  description?: string;
+  metadata?: unknown;
+  actor?: string | { name?: string; email?: string; role?: string };
+  user?: { name?: string; email?: string; role?: string };
+  type?: string;
+  event?: string;
+  result?: string;
 };
 
 type MobileApiResponse<T> = {
@@ -34,12 +41,21 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
 }
 
 function normalizeAuditLog(dto: AuditLogDto): AuditLogItem {
+  const actor =
+    typeof dto.actor === "string"
+      ? dto.actor
+      : dto.actor?.name ??
+        dto.actor?.email ??
+        dto.user?.name ??
+        dto.user?.email ??
+        "System";
+
   return {
     id: String(dto.id),
-    actor: dto.actor ?? "System",
-    action: dto.action ?? "Activity recorded",
+    actor,
+    action: dto.action ?? dto.event ?? dto.type ?? "Activity recorded",
     timestamp: dto.timestamp ?? dto.createdAt ?? "",
-    detail: dto.detail ?? dto.message ?? "",
+    detail: dto.detail ?? dto.message ?? dto.description ?? "",
     tone: dto.tone ?? "primary",
   };
 }
