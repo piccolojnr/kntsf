@@ -1,3 +1,7 @@
+import { USE_MOCK_API } from "@/constants/config";
+import { apiClient } from "@/lib/api/api-client";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { ApiListResponse } from "@/lib/api/api-types";
 import { simulateDelay } from "@/lib/api/mock-api";
 
 import {
@@ -6,6 +10,19 @@ import {
   PermitIssuanceConfig,
   PermitIssuanceConfigDto,
 } from "./permit-types";
+
+type MobileApiResponse<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+export type OperationsPermitListParams = {
+  search?: string;
+  status?: Permit["status"] | "all";
+  page?: number;
+  limit?: number;
+};
 
 const mockPermits: Permit[] = [
   {
@@ -63,13 +80,14 @@ function clonePermitIssuanceConfig() {
 
 function normalizePermit(dto: PermitDto): Permit {
   return {
-    id: dto.id,
-    studentId: dto.studentId,
-    permitCode: dto.permitCode,
-    status: dto.status,
-    startDate: dto.startDate,
-    expiryDate: dto.expiryDate,
-    amountPaid: dto.amountPaid,
+    id: String(dto.id),
+    studentId: dto.studentId ?? dto.student_id ?? "",
+    permitCode: dto.permitCode ?? dto.permit_code ?? dto.code ?? "",
+    status: dto.status ?? "expired",
+    startDate: dto.startDate ?? dto.start_date ?? "",
+    expiryDate: dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "",
+    amountPaid: dto.amountPaid ?? dto.amount_paid ?? dto.amount ?? 0,
+    student: dto.student ?? null,
   };
 }
 
@@ -84,10 +102,59 @@ function normalizePermitIssuanceConfig(
   };
 }
 
-export async function getPermits() {
-  // TODO(real-api): replace mockPermits with apiClient.get("/api/mobile/permits").
+function getMobileData<T>(response: MobileApiResponse<T>) {
+  if (!response.success) {
+    throw new Error(response.message ?? "The request could not be completed.");
+  }
+
+  return response.data;
+}
+
+async function getMockPermits(params?: OperationsPermitListParams) {
   await simulateDelay(250);
-  return mockPermits.map(clonePermit).map(normalizePermit);
+  const search = params?.search?.trim().toLowerCase();
+  const status = params?.status === "all" ? undefined : params?.status;
+  const permits = mockPermits.map(clonePermit).map(normalizePermit);
+
+  return permits.filter((permit) => {
+    const matchesStatus = !status || permit.status === status;
+    const matchesSearch =
+      !search ||
+      permit.permitCode.toLowerCase().includes(search) ||
+      permit.studentId.toLowerCase().includes(search) ||
+      permit.student?.name?.toLowerCase().includes(search);
+
+    return matchesStatus && matchesSearch;
+  });
+}
+
+export async function getPermits(params?: OperationsPermitListParams) {
+  if (USE_MOCK_API) {
+    return getMockPermits(params);
+  }
+
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<PermitDto>>
+    >("/api/mobile/operations/permits", {
+      params: {
+        search: params?.search,
+        status: params?.status === "all" ? undefined : params?.status,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+
+    return getMobileData(response.data).items.map(normalizePermit);
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return getMockPermits(params);
+    }
+
+    throw toUserFacingError(error);
+  }
 }
 
 export async function getPermitById(id: string) {
@@ -154,4 +221,26 @@ export async function issuePermitForStudent(studentId: string) {
   mockPermits.unshift(nextPermit);
 
   return normalizePermit(clonePermit(nextPermit));
+}
+
+export async function getStudentPermits(studentId?: string) {
+  void studentId;
+
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<PermitDto[] | { permits: PermitDto[] }>
+    >("/api/mobile/student/permits");
+    const data = getMobileData(response.data);
+    const permits = Array.isArray(data) ? data : data.permits;
+
+    return permits.map(normalizePermit);
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return [];
+    }
+
+    throw toUserFacingError(error);
+  }
 }

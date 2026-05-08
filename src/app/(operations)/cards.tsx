@@ -36,10 +36,19 @@ function formatStatus(status: CardStatus | "all") {
 }
 
 export default function OperationsCardsScreen() {
-  const cardsQuery = useCards();
-  const studentsQuery = useStudents();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<CardStatus | "all">("all");
+  const cardsQuery = useCards({
+    search,
+    status: statusFilter,
+    page: 1,
+    limit: 100,
+  });
+  const studentsQuery = useStudents({
+    search,
+    page: 1,
+    limit: 100,
+  });
 
   const studentsById = useMemo(() => {
     const map = new Map<string, Student>();
@@ -55,7 +64,7 @@ export default function OperationsCardsScreen() {
     const normalizedSearch = search.trim().toLowerCase();
 
     return (cardsQuery.data ?? []).filter((card) => {
-      const student = studentsById.get(card.studentId);
+      const student = card.student ?? studentsById.get(card.studentId);
       const matchesStatus =
         statusFilter === "all" || card.status === statusFilter;
       const searchable = [
@@ -123,7 +132,7 @@ export default function OperationsCardsScreen() {
           <View style={styles.list}>
             {filteredCards.length ? (
               filteredCards.map((card) => {
-                const student = studentsById.get(card.studentId);
+                const student = card.student ?? studentsById.get(card.studentId);
 
                 return (
                   <View key={card.id} style={styles.cardRow}>

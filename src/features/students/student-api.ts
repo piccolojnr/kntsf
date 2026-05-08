@@ -1,6 +1,22 @@
+import { USE_MOCK_API } from "@/constants/config";
+import { apiClient } from "@/lib/api/api-client";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { ApiListResponse } from "@/lib/api/api-types";
 import { simulateDelay } from "@/lib/api/mock-api";
 
 import { Student, StudentDto } from "./student-types";
+
+type MobileApiResponse<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+export type OperationsListParams = {
+  search?: string;
+  page?: number;
+  limit?: number;
+};
 
 const mockStudents: Student[] = [
   {
@@ -56,20 +72,67 @@ function cloneStudent(student: Student) {
 
 function normalizeStudent(dto: StudentDto): Student {
   return {
-    id: dto.id,
-    studentId: dto.studentId,
-    name: dto.name,
-    email: dto.email,
-    course: dto.course,
-    level: dto.level,
-    phone: dto.phone,
+    id: String(dto.id),
+    studentId: dto.studentId ?? dto.student_id ?? "",
+    name: dto.name ?? "",
+    email: dto.email ?? "",
+    course: dto.course ?? dto.programme ?? dto.program ?? "",
+    level: dto.level ?? "",
+    phone: dto.phone ?? "",
   };
 }
 
-export async function getStudents() {
-  // TODO(real-api): replace mockStudents with apiClient.get("/api/mobile/students").
+function getMobileData<T>(response: MobileApiResponse<T>) {
+  if (!response.success) {
+    throw new Error(response.message ?? "The request could not be completed.");
+  }
+
+  return response.data;
+}
+
+async function getMockStudents(params?: OperationsListParams) {
   await simulateDelay(250);
-  return mockStudents.map(cloneStudent).map(normalizeStudent);
+  const search = params?.search?.trim().toLowerCase();
+  const students = mockStudents.map(cloneStudent).map(normalizeStudent);
+
+  if (!search) {
+    return students;
+  }
+
+  return students.filter((student) => {
+    return (
+      student.studentId.toLowerCase().includes(search) ||
+      student.name.toLowerCase().includes(search)
+    );
+  });
+}
+
+export async function getStudents(params?: OperationsListParams) {
+  if (USE_MOCK_API) {
+    return getMockStudents(params);
+  }
+
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<StudentDto>>
+    >("/api/mobile/operations/students", {
+      params: {
+        search: params?.search,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+
+    return getMobileData(response.data).items.map(normalizeStudent);
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return getMockStudents(params);
+    }
+
+    throw toUserFacingError(error);
+  }
 }
 
 export async function getStudentById(id: string) {
@@ -91,4 +154,30 @@ export async function getStudentByStudentId(studentId: string) {
   );
 
   return student ? normalizeStudent(cloneStudent(student)) : null;
+}
+
+export async function getStudentProfile(fallbackUser?: {
+  id: string;
+  email: string;
+  studentId?: string;
+}) {
+  void fallbackUser;
+
+  try {
+    const response =
+      await apiClient.get<MobileApiResponse<StudentDto | { student: StudentDto }>>(
+        "/api/mobile/student/profile",
+      );
+    const data = getMobileData(response.data);
+
+    return normalizeStudent("student" in data ? data.student : data);
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return null;
+    }
+
+    throw toUserFacingError(error);
+  }
 }

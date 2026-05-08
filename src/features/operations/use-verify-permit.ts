@@ -1,11 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { USE_MOCK_API } from "@/constants/config";
 import { Permit } from "@/features/permits/permit-types";
-import {
-  getStudentById,
-  getStudentByStudentId,
-} from "@/features/students/student-api";
 import { Student } from "@/features/students/student-types";
 import { normalizeApiError } from "@/lib/api/api-error";
 import { readCardUid } from "@/lib/nfc/nfc-service";
@@ -44,26 +39,6 @@ export type UseVerifyPermitReturn = UseVerifyPermitState & {
   issuePermit: (studentId: string) => Promise<Permit>;
   reset: () => void;
 };
-
-async function resolveStudentRecord(studentId: string, currentStudent?: Student | null) {
-  const normalizedStudentId = studentId.trim();
-
-  if (
-    currentStudent &&
-    (currentStudent.id === normalizedStudentId ||
-      currentStudent.studentId === normalizedStudentId)
-  ) {
-    return currentStudent;
-  }
-
-  const matchedByStudentId = await getStudentByStudentId(normalizedStudentId);
-
-  if (matchedByStudentId) {
-    return matchedByStudentId;
-  }
-
-  return getStudentById(normalizedStudentId);
-}
 
 function getSafeNfcErrorMessage(error: unknown) {
   if (!(error instanceof Error)) {
@@ -259,9 +234,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
       const operationId = beginOperation({ phase: "issuing_permit" });
 
       try {
-        const student = !USE_MOCK_API
-          ? currentStudent
-          : await resolveStudentRecord(studentId, currentStudent);
+        const student = currentStudent;
 
         if (!student) {
           throw new Error("No student record was found for this student ID.");

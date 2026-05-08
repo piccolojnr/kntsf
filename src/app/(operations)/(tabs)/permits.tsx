@@ -55,8 +55,17 @@ export default function OperationsPermitsScreen() {
     setVisibleCount(PAGE_SIZE);
   }, [searchTerm, activeFilter]);
 
-  const permitsQuery = usePermits();
-  const studentsQuery = useStudents();
+  const permitsQuery = usePermits({
+    search: searchTerm,
+    status: activeFilter,
+    page: 1,
+    limit: visibleCount,
+  });
+  const studentsQuery = useStudents({
+    search: searchTerm,
+    page: 1,
+    limit: visibleCount,
+  });
 
   const permitItems = useMemo<PermitListItem[]>(() => {
     const permits = permitsQuery.data ?? [];
@@ -64,7 +73,7 @@ export default function OperationsPermitsScreen() {
     const studentsById = new Map(students.map((s) => [s.id, s]));
 
     return permits.map((permit) => {
-      const student = studentsById.get(permit.studentId) ?? null;
+      const student = permit.student ?? studentsById.get(permit.studentId) ?? null;
       return {
         permit,
         student,
@@ -210,7 +219,7 @@ export default function OperationsPermitsScreen() {
                 student={item.student}
               />
             ))}
-            {visibleCount < filteredItems.length && (
+            {filteredItems.length >= visibleCount && (
               <TouchableOpacity
                 style={styles.showMoreBtn}
                 onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}

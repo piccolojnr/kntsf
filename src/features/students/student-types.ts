@@ -8,4 +8,9 @@ export type Student = {
   phone: string;
 };
 
-export type StudentDto = Student;
+export type StudentDto = Partial<Student> & {
+  id: string | number;
+  student_id?: string;
+  programme?: string;
+  program?: string;
+};

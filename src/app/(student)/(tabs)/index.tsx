@@ -18,10 +18,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { CardStatus, StudentCard } from "@/features/cards/card-types";
-import { useCards } from "@/features/cards/use-cards";
+import { CardStatus } from "@/features/cards/card-types";
+import { useStudentCard } from "@/features/cards/use-student-card";
 import { Permit } from "@/features/permits/permit-types";
-import { usePermits } from "@/features/permits/use-permits";
+import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -111,25 +111,12 @@ function getTodayLabel() {
   });
 }
 
-function getLatestPermit(permits: Permit[], studentId: string) {
+function getLatestPermit(permits: Permit[]) {
   return (
     permits
-      .filter((p) => p.studentId === studentId)
       .sort(
         (a, b) =>
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
-      )[0] ?? null
-  );
-}
-
-function getLatestCard(cards: StudentCard[], studentId: string) {
-  return (
-    cards
-      .filter((c) => c.studentId === studentId)
-      .sort(
-        (a, b) =>
-          new Date(b.registeredAt).getTime() -
-          new Date(a.registeredAt).getTime(),
       )[0] ?? null
   );
 }
@@ -322,24 +309,18 @@ function PermitHistorySection({ permits }: { permits: Permit[] }) {
 
 export default function StudentHomeScreen() {
   const studentQuery = useCurrentStudent();
-  const permitsQuery = usePermits();
-  const cardsQuery = useCards();
+  const student = studentQuery.student;
+  const permitsQuery = useStudentPermits(student?.id);
+  const cardQuery = useStudentCard(student?.id);
 
   const isLoading =
-    studentQuery.isLoading || permitsQuery.isLoading || cardsQuery.isLoading;
+    studentQuery.isLoading || permitsQuery.isLoading || cardQuery.isLoading;
   const hasError =
-    studentQuery.isError || permitsQuery.isError || cardsQuery.isError;
-  const student = studentQuery.student;
+    studentQuery.isError || permitsQuery.isError || cardQuery.isError;
 
-  const allPermits = student
-    ? (permitsQuery.data ?? []).filter((p) => p.studentId === student.id)
-    : [];
-  const latestPermit = student
-    ? getLatestPermit(permitsQuery.data ?? [], student.id)
-    : null;
-  const latestCard = student
-    ? getLatestCard(cardsQuery.data ?? [], student.id)
-    : null;
+  const allPermits = permitsQuery.data ?? [];
+  const latestPermit = student ? getLatestPermit(allPermits) : null;
+  const latestCard = cardQuery.data ?? null;
 
   const sortedPermits = [...allPermits].sort(
     (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),

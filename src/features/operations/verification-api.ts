@@ -1,18 +1,4 @@
-import { USE_MOCK_API } from "@/constants/config";
-import { getCardByUid } from "@/features/cards/card-api";
-import { StudentCard } from "@/features/cards/card-types";
-import {
-  getLatestPermitByStudentId,
-  getPermitIssuanceConfig,
-  getPermitsByStudentId,
-  issuePermitForStudent,
-} from "@/features/permits/permit-api";
 import { Permit } from "@/features/permits/permit-types";
-import {
-  getStudentById,
-  getStudentByStudentId,
-} from "@/features/students/student-api";
-import { Student } from "@/features/students/student-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import { simulateDelay } from "@/lib/api/mock-api";
@@ -243,239 +229,19 @@ async function postIssuePermit(studentId: string) {
   }
 }
 
-function buildVerificationLog(
-  method: VerificationMethod,
-  value: string,
-  reason: VerificationReason,
-  message: string,
-  extras?: {
-    card?: StudentCard | null;
-    permit?: Permit | null;
-    student?: Student | null;
-  },
-) {
-  const checkedAt = new Date().toISOString();
-  const log: ScanLog = {
-    id: `scan-log-${mockVerificationLogs.length + 1}`,
-    method,
-    value,
-    scannedAt: checkedAt,
-    checkedAt,
-    outcome: getOutcomeFromReason(reason),
-    reason,
-    decision: getDecisionFromReason(reason),
-    message,
-    cardId: extras?.card?.id,
-    permitId: extras?.permit?.id,
-    studentId: extras?.student?.id,
-  };
-
-  mockVerificationLogs.unshift(log);
-
-  return cloneVerificationLog(log);
-}
-
-function createResult(
-  method: VerificationMethod,
-  value: string,
-  reason: VerificationReason,
-  message: string,
-  context?: {
-    card?: StudentCard | null;
-    permit?: Permit | null;
-    student?: Student | null;
-  },
-): ScanCardResult {
-  const log = buildVerificationLog(method, value, reason, message, context);
-  const decision = getDecisionFromReason(reason);
-
-  return normalizeVerificationResult({
-    outcome: getOutcomeFromReason(reason),
-    reason,
-    checkedAt: log.checkedAt,
-    status: decision,
-    decision,
-    message,
-    method,
-    value,
-    student: context?.student ?? null,
-    card: context?.card ?? null,
-    permit: context?.permit ?? null,
-    canIssuePermit: false,
-    issuanceConfig: null,
-    log,
-  });
-}
-
-function validateStudentId(studentId: string) {
-  const normalizedStudentId = studentId.trim();
-
-  if (!/^\d+$/.test(normalizedStudentId)) {
-    throw new Error("Student ID must contain digits only.");
-  }
-
-  if (normalizedStudentId.length !== 8) {
-    throw new Error("Student ID should be 8 digits.");
-  }
-
-  return normalizedStudentId;
-}
-
-async function evaluatePermitForStudent(
-  method: VerificationMethod,
-  value: string,
-  student: Student,
-  extras?: {
-    card?: StudentCard | null;
-  },
-): Promise<ScanCardResult> {
-  const issuanceConfig = await getPermitIssuanceConfig();
-  const permits = await getPermitsByStudentId(student.id);
-  const activePermit = permits.find((permit) => permit.status === "active");
-
-  if (activePermit) {
-    return {
-      ...createResult(
-        method,
-        value,
-        "active_permit",
-        "Active permit verified. Access granted.",
-        {
-          card: extras?.card,
-          permit: activePermit,
-          student,
-        },
-      ),
-      issuanceConfig,
-    };
-  }
-
-  const latestPermit = await getLatestPermitByStudentId(student.id);
-
-  if (latestPermit?.status === "expired") {
-    return {
-      ...createResult(
-        method,
-        value,
-        "expired_permit",
-        "The student's latest permit has expired.",
-        {
-          card: extras?.card,
-          permit: latestPermit,
-          student,
-        },
-      ),
-      canIssuePermit: issuanceConfig.enabled,
-      issuanceConfig,
-    };
-  }
-
-  if (latestPermit?.status === "revoked") {
-    return {
-      ...createResult(
-        method,
-        value,
-        "revoked_permit",
-        "The student's latest permit was revoked.",
-        {
-          card: extras?.card,
-          permit: latestPermit,
-          student,
-        },
-      ),
-      canIssuePermit: issuanceConfig.enabled,
-      issuanceConfig,
-    };
-  }
-
-  return {
-    ...createResult(
-      method,
-      value,
-      "no_active_permit",
-      "Student found, but there is no active permit for entry.",
-      {
-        card: extras?.card,
-        permit: latestPermit,
-        student,
-      },
-    ),
-    canIssuePermit: issuanceConfig.enabled,
-    issuanceConfig,
-  };
-}
-
 export async function getVerificationLogs() {
   await simulateDelay(220);
   return mockVerificationLogs.map(cloneVerificationLog);
 }
 
 export async function scanCardByUid(uid: string): Promise<ScanCardResult> {
-  if (!USE_MOCK_API) {
-    return postVerification("/api/mobile/verify/card", { uid });
-  }
-
-  await simulateDelay(350);
-
-  const normalizedUid = uid.trim().toUpperCase();
-  const card = await getCardByUid(normalizedUid);
-
-  if (!card) {
-    return createResult(
-      "card_uid",
-      normalizedUid,
-      "card_not_registered",
-      "Card not registered in the system.",
-    );
-  }
-
-  if (card.status !== "active") {
-    return createResult(
-      "card_uid",
-      normalizedUid,
-      "card_inactive",
-      `This card is ${card.status} and cannot be used for entry.`,
-      { card },
-    );
-  }
-
-  const student = await getStudentById(card.studentId);
-
-  if (!student) {
-    return createResult(
-      "card_uid",
-      normalizedUid,
-      "student_not_found",
-      "No student record was found for this card.",
-      { card },
-    );
-  }
-
-  return evaluatePermitForStudent("card_uid", normalizedUid, student, { card });
+  return postVerification("/api/mobile/verify/card", { uid });
 }
 
 export async function verifyPermitByStudentId(
   studentId: string,
 ): Promise<ScanCardResult> {
-  if (!USE_MOCK_API) {
-    return postVerification("/api/mobile/verify/student", { studentId });
-  }
-
-  await simulateDelay(300);
-
-  const normalizedStudentId = validateStudentId(studentId);
-  const student = await getStudentByStudentId(normalizedStudentId);
-
-  if (!student) {
-    return createResult(
-      "student_id",
-      normalizedStudentId,
-      "student_not_found",
-      "No student record was found for this student ID. Please add the student in the dashboard system.",
-    );
-  }
-
-  return evaluatePermitForStudent("student_id", normalizedStudentId, student);
+  return postVerification("/api/mobile/verify/student", { studentId });
 }
 
 export async function verifyPermitByCardUid(uid: string) {
@@ -483,18 +249,7 @@ export async function verifyPermitByCardUid(uid: string) {
 }
 
 export async function verifyPermitByPermitCode(code: string) {
-  if (!USE_MOCK_API) {
-    return postVerification("/api/mobile/verify/permit-code", { code });
-  }
-
-  await simulateDelay(300);
-
-  return createResult(
-    "permit_code",
-    code.trim(),
-    "invalid_input",
-    "Permit code verification is only available when connected to the backend.",
-  );
+  return postVerification("/api/mobile/verify/permit-code", { code });
 }
 
 export async function verifyPermit(input: {
@@ -513,15 +268,7 @@ export async function verifyPermit(input: {
 }
 
 export async function issuePermitWithVerification(studentId: string) {
-  if (!USE_MOCK_API) {
-    return postIssuePermit(studentId);
-  }
-
-  const student = await getStudentByStudentId(studentId);
-  return {
-    permit: await issuePermitForStudent(student?.id ?? studentId),
-    verification: null,
-  };
+  return postIssuePermit(studentId);
 }
 
 export async function issuePermit(studentId: string) {
@@ -534,23 +281,13 @@ export async function issuePermitFromVerification(result: VerificationResult) {
     throw new Error("A student record is required before issuing a permit.");
   }
 
-  const issuanceConfig = await getPermitIssuanceConfig();
-
-  if (!issuanceConfig.enabled) {
-    throw new Error("Permit issuance is currently closed.");
-  }
-
   const studentId = result.student.studentId ?? result.student.id;
-  const response = !USE_MOCK_API
-    ? await issuePermitWithVerification(studentId)
-    : {
-        permit: await issuePermit(studentId),
-        verification: null,
-      };
+  const response = await issuePermitWithVerification(studentId);
 
   return {
     permit: response.permit,
-    issuanceConfig,
+    issuanceConfig:
+      response.verification?.issuanceConfig ?? result.issuanceConfig ?? null,
     verification: response.verification,
   };
 }

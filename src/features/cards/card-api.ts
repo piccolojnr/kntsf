@@ -1,9 +1,26 @@
+import { USE_MOCK_API } from "@/constants/config";
 import { getStudentById } from "@/features/students/student-api";
+import { apiClient } from "@/lib/api/api-client";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { ApiListResponse } from "@/lib/api/api-types";
 import { simulateDelay } from "@/lib/api/mock-api";
 
 import { CardStatus, StudentCard, StudentCardDto } from "./card-types";
 
 export type CardAssignmentMode = "register" | "replace";
+
+type MobileApiResponse<T> = {
+  success: boolean;
+  data: T;
+  message?: string;
+};
+
+export type OperationsCardListParams = {
+  search?: string;
+  status?: CardStatus | "all";
+  page?: number;
+  limit?: number;
+};
 
 const mockCards: StudentCard[] = [
   {
@@ -61,14 +78,26 @@ function cloneCard(card: StudentCard) {
 }
 
 function normalizeCard(dto: StudentCardDto): StudentCard {
+  const uidLast4 = dto.uidLast4 ?? dto.uid_last4;
+
   return {
-    id: dto.id,
-    studentId: dto.studentId,
-    uid: dto.uid,
-    type: dto.type,
-    status: dto.status,
-    registeredAt: dto.registeredAt,
+    id: String(dto.id),
+    studentId: dto.studentId ?? dto.student_id ?? "",
+    uid: dto.uid ?? (uidLast4 ? `•••• ${uidLast4}` : ""),
+    type: dto.type ?? "unknown",
+    status: dto.status ?? "active",
+    registeredAt: dto.registeredAt ?? dto.registered_at ?? "",
+    uidLast4,
+    student: dto.student ?? null,
   };
+}
+
+function getMobileData<T>(response: MobileApiResponse<T>) {
+  if (!response.success) {
+    throw new Error(response.message ?? "The request could not be completed.");
+  }
+
+  return response.data;
 }
 
 function sortCardsByRegisteredAt(left: StudentCard, right: StudentCard) {
@@ -110,10 +139,53 @@ function getConflictingActiveCard(studentId: string, uid: string) {
   );
 }
 
-export async function getCards() {
-  // TODO(real-api): replace mockCards with apiClient.get("/api/mobile/cards").
+async function getMockCards(params?: OperationsCardListParams) {
   await simulateDelay(250);
-  return mockCards.map(cloneCard).map(normalizeCard);
+  const search = params?.search?.trim().toLowerCase();
+  const status = params?.status === "all" ? undefined : params?.status;
+  const cards = mockCards.map(cloneCard).map(normalizeCard);
+
+  return cards.filter((card) => {
+    const matchesStatus = !status || card.status === status;
+    const matchesSearch =
+      !search ||
+      card.uid.toLowerCase().includes(search) ||
+      card.uidLast4?.toLowerCase().includes(search) ||
+      card.status.toLowerCase().includes(search) ||
+      card.student?.name?.toLowerCase().includes(search) ||
+      card.student?.studentId?.toLowerCase().includes(search);
+
+    return matchesStatus && matchesSearch;
+  });
+}
+
+export async function getCards(params?: OperationsCardListParams) {
+  if (USE_MOCK_API) {
+    return getMockCards(params);
+  }
+
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<StudentCardDto>>
+    >("/api/mobile/operations/cards", {
+      params: {
+        search: params?.search,
+        status: params?.status === "all" ? undefined : params?.status,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+
+    return getMobileData(response.data).items.map(normalizeCard);
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return getMockCards(params);
+    }
+
+    throw toUserFacingError(error);
+  }
 }
 
 export async function getCardById(id: string) {
@@ -252,4 +324,26 @@ export async function reportLostCardForStudent(studentId: string) {
   }
 
   return normalizeCard(cloneCard(activeCard));
+}
+
+export async function getStudentCard(studentId?: string) {
+  void studentId;
+
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<StudentCardDto | { card: StudentCardDto | null } | null>
+    >("/api/mobile/student/card");
+    const data = getMobileData(response.data);
+    const card = data && "card" in data ? data.card : data;
+
+    return card ? normalizeCard(card) : null;
+  } catch (error) {
+    const normalizedError = normalizeApiError(error);
+
+    if (normalizedError.statusCode === 404) {
+      return null;
+    }
+
+    throw toUserFacingError(error);
+  }
 }

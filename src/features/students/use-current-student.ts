@@ -1,32 +1,26 @@
-import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/use-auth";
 
-import { useStudents } from "./use-students";
+import { getStudentProfile } from "./student-api";
 
 export function useCurrentStudent() {
   const { user } = useAuth();
-  const studentsQuery = useStudents();
-
-  const student = useMemo(() => {
-    const students = studentsQuery.data ?? [];
-
-    if (!user || user.role !== "student") {
-      return null;
-    }
-
-    return (
-      students.find((item) => item.id === user.id) ??
-      students.find((item) => item.studentId === user.studentId) ??
-      students.find(
-        (item) => item.email.toLowerCase() === user.email.toLowerCase(),
-      ) ??
-      null
-    );
-  }, [studentsQuery.data, user]);
+  const studentQuery = useQuery({
+    enabled: Boolean(user && user.role === "student"),
+    queryKey: ["student-profile", user?.id, user?.studentId],
+    queryFn: () =>
+      user
+        ? getStudentProfile({
+            id: user.id,
+            email: user.email,
+            studentId: user.studentId,
+          })
+        : null,
+  });
 
   return {
-    ...studentsQuery,
-    student,
+    ...studentQuery,
+    student: studentQuery.data ?? null,
   };
 }

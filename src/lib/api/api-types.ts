@@ -10,6 +10,18 @@ export type ApiErrorResponse = {
   statusCode?: number;
 };
 
+export type ApiPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages?: number;
+};
+
+export type ApiListResponse<T> = {
+  items: T[];
+  pagination: ApiPagination;
+};
+
 export type AuthenticatedRequestConfig = AxiosRequestConfig & {
   requiresAuth?: boolean;
 };

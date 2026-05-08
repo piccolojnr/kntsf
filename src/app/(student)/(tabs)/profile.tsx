@@ -12,10 +12,10 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { CardStatus, StudentCard } from "@/features/cards/card-types";
-import { useCards } from "@/features/cards/use-cards";
+import { CardStatus } from "@/features/cards/card-types";
+import { useStudentCard } from "@/features/cards/use-student-card";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
-import { usePermits } from "@/features/permits/use-permits";
+import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -50,25 +50,12 @@ function getInitials(name: string) {
   );
 }
 
-function getLatestPermit(permits: Permit[], studentId: string) {
+function getLatestPermit(permits: Permit[]) {
   return (
     permits
-      .filter((p) => p.studentId === studentId)
       .sort(
         (a, b) =>
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
-      )[0] ?? null
-  );
-}
-
-function getLatestCard(cards: StudentCard[], studentId: string) {
-  return (
-    cards
-      .filter((c) => c.studentId === studentId)
-      .sort(
-        (a, b) =>
-          new Date(b.registeredAt).getTime() -
-          new Date(a.registeredAt).getTime(),
       )[0] ?? null
   );
 }
@@ -465,21 +452,17 @@ const logoutStyles = StyleSheet.create({
 export default function StudentProfileScreen() {
   const { logout, user } = useAuth();
   const studentQuery = useCurrentStudent();
-  const cardsQuery = useCards();
-  const permitsQuery = usePermits();
+  const student = studentQuery.student;
+  const cardQuery = useStudentCard(student?.id);
+  const permitsQuery = useStudentPermits(student?.id);
 
   const isLoading =
-    studentQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
+    studentQuery.isLoading || cardQuery.isLoading || permitsQuery.isLoading;
   const hasError =
-    studentQuery.isError || cardsQuery.isError || permitsQuery.isError;
+    studentQuery.isError || cardQuery.isError || permitsQuery.isError;
 
-  const student = studentQuery.student;
-  const latestCard = student
-    ? getLatestCard(cardsQuery.data ?? [], student.id)
-    : null;
-  const latestPermit = student
-    ? getLatestPermit(permitsQuery.data ?? [], student.id)
-    : null;
+  const latestCard = cardQuery.data ?? null;
+  const latestPermit = student ? getLatestPermit(permitsQuery.data ?? []) : null;
 
   return (
     <Screen scrolled>
