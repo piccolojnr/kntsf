@@ -22,6 +22,7 @@ import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
 import { RadarPulse } from "@/components/ui/radar-pulse";
@@ -34,6 +35,7 @@ import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
 import { useNfcAvailability } from "@/hooks/use-nfc-availability";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useScreenDensity } from "@/hooks/use-screen-density";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
@@ -63,7 +65,8 @@ export default function OperationsCardAssignmentScreen() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { fixedScreen, height, isCompact, width } = useScreenDensity();
-  const { isCheckingNfc, isNfcAvailable } = useNfcAvailability();
+  const { isCheckingNfc, isNfcAvailable, refreshNfcAvailability } =
+    useNfcAvailability();
   const queryClient = useQueryClient();
   const { mode, studentId } = useLocalSearchParams<{
     mode?: CardAssignmentMode;
@@ -135,6 +138,13 @@ export default function OperationsCardAssignmentScreen() {
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
   const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([
+      studentsQuery.refetch(),
+      cardsQuery.refetch(),
+      refreshNfcAvailability(),
+    ]);
+  });
 
   const runAssignment = useCallback(
     async (nextUid: string) => {
@@ -310,6 +320,7 @@ export default function OperationsCardAssignmentScreen() {
                   paddingTop: isCompact ? spacing.md : spacing.xl,
                 },
               ]}
+              refreshControl={<AppRefreshControl {...refreshControl} />}
               showsVerticalScrollIndicator={false}
             >
               {/* Success ring */}
@@ -376,6 +387,7 @@ export default function OperationsCardAssignmentScreen() {
                 paddingTop: isCompact ? spacing.sm : spacing.lg,
               },
             ]}
+            refreshControl={<AppRefreshControl {...refreshControl} />}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.radarCluster}>

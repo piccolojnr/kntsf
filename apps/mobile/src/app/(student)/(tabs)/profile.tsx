@@ -1,4 +1,5 @@
 import { LogOut, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -7,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -18,6 +20,7 @@ import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 import { useAuth } from "@/hooks/use-auth";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -469,11 +472,19 @@ export default function StudentProfileScreen() {
 
   const latestCard = cardQuery.data ?? null;
   const latestPermit = student ? getLatestPermit(permitsQuery.data ?? []) : null;
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([
+      studentQuery.refetch(),
+      cardQuery.refetch(),
+      permitsQuery.refetch(),
+    ]);
+  });
 
   return (
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader

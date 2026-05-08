@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { TextField } from "@/components/ui/text-field";
@@ -12,6 +13,7 @@ import { CardStatus } from "@/features/cards/card-types";
 import { useCards } from "@/features/cards/use-cards";
 import { Student } from "@/features/students/student-types";
 import { useStudents } from "@/features/students/use-students";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const statusFilters: (CardStatus | "all")[] = [
   "all",
@@ -83,11 +85,15 @@ export default function OperationsCardsScreen() {
 
   const isLoading = cardsQuery.isLoading || studentsQuery.isLoading;
   const hasError = cardsQuery.isError || studentsQuery.isError;
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([cardsQuery.refetch(), studentsQuery.refetch()]);
+  });
 
   return (
     <AdminToolScreen
       title="Cards"
       subtitle="Review card inventory, ownership, and lifecycle status."
+      refreshControl={<AppRefreshControl {...refreshControl} />}
     >
       {isLoading ? (
         <LoadingState message="Loading card records..." />

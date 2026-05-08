@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import {
@@ -22,6 +23,7 @@ import {
   UserRole,
 } from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -163,6 +165,9 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const refreshControl = usePullToRefresh(async () => {
+    setErrorMessage(null);
+  });
 
   async function handleLogin() {
     setIsSubmitting(true);
@@ -189,6 +194,7 @@ export default function LoginScreen() {
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
+          refreshControl={<AppRefreshControl {...refreshControl} />}
           showsVerticalScrollIndicator={false}
         >
           {/* Back */}

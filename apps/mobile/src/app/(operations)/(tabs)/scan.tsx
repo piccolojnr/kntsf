@@ -24,6 +24,7 @@ import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitIssueConfirmationModal } from "@/components/cards/permit-issue-confirmation-modal";
 import { VerificationResultCard } from "@/components/cards/verification-result-card";
 import { FloatingScanInput } from "@/components/forms/floating-scan-input";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -32,6 +33,7 @@ import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useVerifyPermit } from "@/features/operations/use-verify-permit";
 import { useNfcAvailability } from "@/hooks/use-nfc-availability";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useScreenDensity } from "@/hooks/use-screen-density";
 
 type ScreenState = "idle" | "loading" | "result";
@@ -67,7 +69,8 @@ export default function OperationsScanScreen() {
   const keyboardHeight = useKeyboardHeight();
   const keyboardOpen = keyboardHeight > 0;
   const { fixedScreen, isCompact } = useScreenDensity();
-  const { isCheckingNfc, isNfcAvailable } = useNfcAvailability();
+  const { isCheckingNfc, isNfcAvailable, refreshNfcAvailability } =
+    useNfcAvailability();
   const {
     error,
     issuePermit,
@@ -86,6 +89,14 @@ export default function OperationsScanScreen() {
   const [showIssueConfirm, setShowIssueConfirm] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const refreshControl = usePullToRefresh(async () => {
+    reset();
+    setValidationError(null);
+    setSuccessMessage(null);
+    setShowIssueConfirm(false);
+    setShowPermitDetails(false);
+    await refreshNfcAvailability();
+  });
 
   // Animate the pill's bottom offset
   const pillBottom = useSharedValue(
@@ -243,6 +254,7 @@ export default function OperationsScanScreen() {
                     fixedScreen.tabBarClearance + fixedScreen.bottomToastOffset,
                 },
               ]}
+              refreshControl={<AppRefreshControl {...refreshControl} />}
               showsVerticalScrollIndicator={false}
             >
               {successMessage ? (
@@ -295,11 +307,13 @@ export default function OperationsScanScreen() {
             </ScrollView>
           </Animated.View>
         ) : (
-          <View
-            style={[
+          <ScrollView
+            contentContainerStyle={[
               styles.radarZone,
               { paddingBottom: fixedScreen.heroBottomReserve },
             ]}
+            refreshControl={<AppRefreshControl {...refreshControl} />}
+            showsVerticalScrollIndicator={false}
           >
             <RadarPulse
               active={
@@ -361,7 +375,7 @@ export default function OperationsScanScreen() {
                   ) : null}
                 </View>
               ))}
-          </View>
+          </ScrollView>
         )}
       </Pressable>
 
@@ -411,6 +425,7 @@ const styles = StyleSheet.create({
   radarZone: {
     alignItems: "center",
     flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     paddingTop: spacing.md,
   },

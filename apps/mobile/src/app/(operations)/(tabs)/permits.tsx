@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,6 +14,7 @@ import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
 import { usePermitsPage } from "@/features/permits/use-permits";
 import { Student } from "@/features/students/student-types";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 type FilterTab = "all" | PermitStatus;
 
@@ -116,12 +118,16 @@ export default function OperationsPermitsScreen() {
   const totalPages = Math.max(pagination?.totalPages ?? 1, 1);
   const canGoPrev = currentPage > 1;
   const canGoNext = currentPage < totalPages;
+  const refreshControl = usePullToRefresh(async () => {
+    await permitsQuery.refetch();
+  });
 
   return (
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader

@@ -3,6 +3,7 @@ import { CreditCard, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import StudentIDCard from "@/components/cards/student-id-card";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,6 +14,7 @@ import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
 import { useStudentCard } from "@/features/cards/use-student-card";
 import { useCurrentStudent } from "@/features/students/use-current-student";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -263,6 +265,10 @@ export default function StudentCardScreen() {
   const isLoading = studentQuery.isLoading || cardQuery.isLoading;
   const hasError = studentQuery.isError || cardQuery.isError;
   const canReportLost = latestCard?.status === "active";
+  const displayCardStatus: CardStatus = latestCard?.status ?? "inactive";
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([studentQuery.refetch(), cardQuery.refetch()]);
+  });
 
   function handleReportLost() {
     Alert.alert(
@@ -283,6 +289,7 @@ export default function StudentCardScreen() {
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
@@ -317,9 +324,7 @@ export default function StudentCardScreen() {
                 validUntil: latestCard
                   ? formatDate(latestCard.registeredAt)
                   : undefined,
-                status: latestCard
-                  ? (latestCard.status as CardStatus)
-                  : undefined,
+                status: displayCardStatus,
               }}
             />
 

@@ -17,6 +17,7 @@ import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { StudentInfoCard } from "@/components/cards/student-info-card";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -25,6 +26,7 @@ import { revokeCardForStudent } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
 import { useStudents } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const statusConfig = {
   active: {
@@ -197,6 +199,9 @@ export default function OperationsStudentDetailsScreen() {
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const hasActiveCard = currentCard?.status === "active";
   const canManageCards = user?.role === "admin";
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([studentsQuery.refetch(), cardsQuery.refetch()]);
+  });
 
   return (
     <Screen scrolled>
@@ -207,6 +212,7 @@ export default function OperationsStudentDetailsScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Sheet header ── */}

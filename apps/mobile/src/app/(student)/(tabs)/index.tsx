@@ -14,6 +14,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import StudentIDCard from "@/components/cards/student-id-card";
 import { StudentPermitHistoryItem } from "@/components/cards/student-permit-history-item";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Screen } from "@/components/ui/screen";
@@ -23,6 +24,7 @@ import { useStudentCard } from "@/features/cards/use-student-card";
 import { Permit } from "@/features/permits/permit-types";
 import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -321,6 +323,14 @@ export default function StudentHomeScreen() {
   const allPermits = permitsQuery.data ?? [];
   const latestPermit = student ? getLatestPermit(allPermits) : null;
   const latestCard = cardQuery.data ?? null;
+  const displayCardStatus: CardStatus = latestCard?.status ?? "inactive";
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([
+      studentQuery.refetch(),
+      permitsQuery.refetch(),
+      cardQuery.refetch(),
+    ]);
+  });
 
   const sortedPermits = [...allPermits].sort(
     (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
@@ -330,6 +340,7 @@ export default function StudentHomeScreen() {
     <Screen scrolled>
       <ScrollView
         contentContainerStyle={styles.content}
+        refreshControl={<AppRefreshControl {...refreshControl} />}
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
@@ -364,9 +375,7 @@ export default function StudentHomeScreen() {
                 validUntil: latestCard
                   ? formatDate(latestCard.registeredAt)
                   : undefined,
-                status: latestCard
-                  ? (latestCard.status as CardStatus)
-                  : undefined,
+                status: displayCardStatus,
               }}
             />
 

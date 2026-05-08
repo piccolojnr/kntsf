@@ -3,10 +3,12 @@ import { FileCheck2, ShieldAlert } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
+import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { AuditLogItem, getAuditLogs } from "@/features/operations/audit-api";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 function formatDateTime(dateString: string) {
   return new Date(dateString).toLocaleString(undefined, {
@@ -36,12 +38,16 @@ export default function OperationsAuditLogsScreen() {
     queryKey: ["audit-logs"],
     queryFn: getAuditLogs,
   });
+  const refreshControl = usePullToRefresh(async () => {
+    await logsQuery.refetch();
+  });
   const auditLogs = logsQuery.data ?? [];
 
   return (
     <AdminToolScreen
       title="Audit Logs"
       subtitle="Review protected actions and verification activity in the operations workspace."
+      refreshControl={<AppRefreshControl {...refreshControl} />}
     >
       {logsQuery.isLoading ? (
         <LoadingState message="Loading audit logs..." />
