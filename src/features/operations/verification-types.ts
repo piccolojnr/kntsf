@@ -66,7 +66,3 @@ export type VerificationResult = {
 
 export type VerificationLogDto = VerificationLog;
 export type VerificationResultDto = VerificationResult;
-
-export type ScanDecision = VerificationDecision;
-export type ScanLog = VerificationLog;
-export type ScanCardResult = VerificationResult;

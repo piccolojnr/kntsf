@@ -6,6 +6,6 @@ export function useStudentPermits(studentId?: string | null) {
   return useQuery({
     enabled: Boolean(studentId),
     queryKey: ["student-permits", studentId],
-    queryFn: () => getStudentPermits(studentId ?? undefined),
+    queryFn: () => getStudentPermits(),
   });
 }

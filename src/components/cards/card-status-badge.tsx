@@ -23,10 +23,20 @@ const statusStyles: Record<
     background: colors.dangerSoft,
     label: "Revoked",
   },
+  inactive: {
+    accent: colors.textMuted,
+    background: colors.surfaceMuted,
+    label: "Inactive",
+  },
   lost: {
     accent: colors.warning,
     background: colors.warningSoft,
     label: "Lost",
+  },
+  stolen: {
+    accent: colors.danger,
+    background: colors.dangerSoft,
+    label: "Stolen",
   },
   blocked: {
     accent: colors.warning,
@@ -37,6 +47,11 @@ const statusStyles: Record<
     accent: colors.textMuted,
     background: colors.surfaceMuted,
     label: "Replaced",
+  },
+  damaged: {
+    accent: colors.warning,
+    background: colors.warningSoft,
+    label: "Damaged",
   },
   none: {
     accent: colors.textMuted,

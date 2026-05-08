@@ -9,14 +9,7 @@ export function useCurrentStudent() {
   const studentQuery = useQuery({
     enabled: Boolean(user && user.role === "student"),
     queryKey: ["student-profile", user?.id, user?.studentId],
-    queryFn: () =>
-      user
-        ? getStudentProfile({
-            id: user.id,
-            email: user.email,
-            studentId: user.studentId,
-          })
-        : null,
+    queryFn: () => (user ? getStudentProfile() : null),
   });
 
   return {

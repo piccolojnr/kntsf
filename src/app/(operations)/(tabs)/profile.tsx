@@ -91,7 +91,7 @@ export default function OperationsProfileScreen() {
       >
         <PageHeader
           eyebrow="Operations"
-          subtitle="Review your workspace identity, access level, and live mock record counts."
+          subtitle="Review your workspace identity, access level, and live record counts."
           title="Profile"
         />
         {isLoading ? (

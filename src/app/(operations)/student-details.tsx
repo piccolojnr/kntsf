@@ -63,6 +63,18 @@ const statusConfig = {
     label: "Revoked",
     Icon: XCircle,
   },
+  stolen: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Stolen",
+    Icon: ShieldAlert,
+  },
+  damaged: {
+    accent: colors.warning,
+    soft: colors.warningSoft,
+    label: "Damaged",
+    Icon: AlertTriangle,
+  },
 } as const;
 
 function formatDate(dateString: string) {
@@ -91,7 +103,12 @@ export default function OperationsStudentDetailsScreen() {
     if (!student) return null;
     return (
       (cardsQuery.data ?? [])
-        .filter((card) => card.studentId === student.id)
+        .filter(
+          (card) =>
+            card.studentId === student.id ||
+            card.studentId === student.studentId ||
+            card.student?.studentId === student.studentId,
+        )
         .sort(
           (l, r) =>
             new Date(r.registeredAt).getTime() -
@@ -114,7 +131,10 @@ export default function OperationsStudentDetailsScreen() {
         onPress: async () => {
           try {
             setActionLoading("revoke");
-            await revokeCardForStudent(student.id);
+            if (!currentCard) {
+              throw new Error("No active card is available to revoke.");
+            }
+            await revokeCardForStudent(currentCard.id);
             await refreshCards();
             Alert.alert("Done", "The active card has been revoked.");
           } catch (error) {

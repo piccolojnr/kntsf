@@ -1,50 +1,90 @@
-# Welcome to your Expo app 👋
+# Knutsford SRC Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo Router mobile app for Knutsford SRC permit verification, student self-service, and operations card management.
 
-## Get started
+## Requirements
 
-1. Install dependencies
+- Node.js and pnpm
+- Expo SDK 54 tooling
+- A running Knutsford backend with the mobile API routes enabled
+- `EXPO_PUBLIC_API_BASE_URL` configured before starting the app
 
-   ```bash
-   npm install
-   ```
+## Environment
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Create a local environment file or export the variable in your shell:
 
 ```bash
-npm run reset-project
+EXPO_PUBLIC_API_BASE_URL=http://<backend-host>:3001
+EXPO_PUBLIC_APP_ENV=development
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The app does not include a mock API fallback. If `EXPO_PUBLIC_API_BASE_URL` is missing, startup fails with a clear configuration error.
 
-## Learn more
+Android emulator backend URL:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:3001
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Physical device backend URL:
 
-## Join the community
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://<your-computer-lan-ip>:3001
+```
 
-Join our community of developers creating universal apps.
+The phone and backend machine must be on the same network, and the backend must listen on an address reachable from the device.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Development
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Start Expo:
+
+```bash
+pnpm expo start -c
+```
+
+Android NFC requires a development build because `react-native-nfc-manager` is a native module and is not available in Expo Go.
+
+## Backend Routes
+
+The app currently depends on these backend routes:
+
+- `POST /api/mobile/auth/login`
+- `POST /api/mobile/auth/logout`
+- `GET /api/mobile/me`
+- `GET /api/mobile/student/profile`
+- `GET /api/mobile/student/permits`
+- `GET /api/mobile/student/card`
+- `POST /api/mobile/verify/student`
+- `POST /api/mobile/verify/card`
+- `POST /api/mobile/verify/permit-code`
+- `POST /api/mobile/permits/issue`
+- `POST /api/mobile/cards/register`
+- `POST /api/mobile/cards/replace`
+- `POST /api/mobile/cards/revoke`
+- `GET /api/mobile/operations/students?search=&page=&limit=`
+- `GET /api/mobile/operations/permits?search=&status=&page=&limit=`
+- `GET /api/mobile/operations/cards?search=&status=&page=&limit=`
+
+Admin reporting screens also expect these backend routes. If they are not implemented yet, the app will show API errors instead of falling back to fake data:
+
+- `GET /api/mobile/operations/verifications?page=&limit=`
+- `GET /api/mobile/operations/audit-logs?page=&limit=`
+- `GET /api/mobile/operations/permit-config`
+
+Student lost-card reporting is not connected yet. Add a backend endpoint such as:
+
+- `POST /api/mobile/student/card/report-lost`
+
+## API Rules
+
+All network requests go through `src/lib/api/api-client.ts`.
+
+Feature-specific API wrappers live under `src/features/**`.
+
+Auth tokens are stored with Expo Secure Store and attached as `Authorization: Bearer <token>` by the API client.
