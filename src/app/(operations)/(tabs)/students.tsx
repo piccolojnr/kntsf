@@ -1,7 +1,7 @@
 import { Href, useRouter } from "expo-router";
-import { ChevronDown, Search, Users } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, Search, Users } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -10,27 +10,27 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SearchField } from "@/components/ui/search-field";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { useStudents } from "@/features/students/use-students";
+import { useStudentsPage } from "@/features/students/use-students";
 
 const PAGE_SIZE = 10;
 
 export default function OperationsStudentsScreen() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const studentsQuery = useStudents({
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsQuery = useStudentsPage({
     search: searchTerm,
-    page: 1,
-    limit: visibleCount,
+    page: currentPage,
+    limit: PAGE_SIZE,
   });
 
   // Reset pagination when search changes
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    setCurrentPage(1);
   }, [searchTerm]);
 
   const filteredStudents = useMemo(() => {
-    const students = studentsQuery.data ?? [];
+    const students = studentsQuery.data?.items ?? [];
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     if (!normalizedSearch) {
@@ -43,14 +43,19 @@ export default function OperationsStudentsScreen() {
         student.name.toLowerCase().includes(normalizedSearch)
       );
     });
-  }, [searchTerm, studentsQuery.data]);
+  }, [searchTerm, studentsQuery.data?.items]);
+
+  const pagination = studentsQuery.data?.pagination;
+  const totalPages = Math.max(pagination?.totalPages ?? 1, 1);
+  const canGoPrev = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
 
   return (
     <Screen scrolled>
       <ScrollView contentContainerStyle={styles.content}>
         <PageHeader
           badgeText={
-            studentsQuery.data ? String(studentsQuery.data.length) : undefined
+            pagination ? String(pagination.total) : undefined
           }
           eyebrow="Operations"
           subtitle="Search student records and manage NFC card assignments."
@@ -80,7 +85,7 @@ export default function OperationsStudentsScreen() {
           />
         ) : (
           <View style={styles.list}>
-            {filteredStudents.slice(0, visibleCount).map((student) => (
+            {filteredStudents.map((student) => (
               <StudentCard
                 key={student.id}
                 onPress={() =>
@@ -91,18 +96,35 @@ export default function OperationsStudentsScreen() {
                 student={student}
               />
             ))}
-            {filteredStudents.length >= visibleCount && (
-              <TouchableOpacity
-                style={styles.showMoreBtn}
-                onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                activeOpacity={0.75}
+            <View style={styles.paginationRow}>
+              <Pressable
+                disabled={!canGoPrev}
+                onPress={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                style={[
+                  styles.paginationBtn,
+                  !canGoPrev && styles.paginationBtnDisabled,
+                ]}
               >
-                <ChevronDown size={16} color={colors.primary} strokeWidth={2.5} />
-                <Text style={styles.showMoreText}>
-                  Show more · {filteredStudents.length - visibleCount} remaining
-                </Text>
-              </TouchableOpacity>
-            )}
+                <ChevronLeft size={16} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.paginationBtnText}>Prev</Text>
+              </Pressable>
+              <Text style={styles.paginationLabel}>
+                Page {pagination?.page ?? currentPage} of {totalPages}
+              </Text>
+              <Pressable
+                disabled={!canGoNext}
+                onPress={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                style={[
+                  styles.paginationBtn,
+                  !canGoNext && styles.paginationBtnDisabled,
+                ]}
+              >
+                <Text style={styles.paginationBtnText}>Next</Text>
+                <ChevronRight size={16} color={colors.primary} strokeWidth={2.2} />
+              </Pressable>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -121,19 +143,33 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.sm,
   },
-  showMoreBtn: {
+  paginationRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: spacing.sm,
+  },
+  paginationBtn: {
     alignItems: "center",
     backgroundColor: colors.primarySoft,
-    borderRadius: radius.lg,
-    borderWidth: 1,
     borderColor: `${colors.primary}30`,
+    borderRadius: radius.pill,
+    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.sm,
-    justifyContent: "center",
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  showMoreText: {
+  paginationBtnDisabled: {
+    opacity: 0.5,
+  },
+  paginationBtnText: {
     color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+  },
+  paginationLabel: {
+    color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "700",
   },

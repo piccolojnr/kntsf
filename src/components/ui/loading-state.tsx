@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
   },
   pill: {
     alignItems: "center",
-    backgroundColor: colors.surface,
     borderColor: colors.border,
     borderRadius: 999,
     borderWidth: 1,

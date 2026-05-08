@@ -40,6 +40,17 @@ const statusConfig = {
   },
 } as const;
 
+function resolvePermitStatus(status?: string) {
+  switch (status) {
+    case "active":
+    case "expired":
+    case "revoked":
+      return status;
+    default:
+      return "expired";
+  }
+}
+
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString(undefined, {
     day: "numeric",
@@ -114,7 +125,7 @@ export function PermitDetailModal({
     [],
   );
 
-  const currentStatus = permit?.status ?? "active";
+  const currentStatus = resolvePermitStatus(permit?.status);
   const config = statusConfig[currentStatus];
   const { Icon } = config;
 

@@ -77,6 +77,22 @@ const statusConfig = {
   },
 } as const;
 
+function resolveCardStatus(status?: string) {
+  switch (status) {
+    case "active":
+    case "inactive":
+    case "lost":
+    case "blocked":
+    case "replaced":
+    case "revoked":
+    case "stolen":
+    case "damaged":
+      return status;
+    default:
+      return "inactive";
+  }
+}
+
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString(undefined, {
     day: "numeric",
@@ -89,8 +105,24 @@ export default function OperationsStudentDetailsScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { studentId } = useLocalSearchParams<{ studentId?: string }>();
-  const studentsQuery = useStudents();
-  const cardsQuery = useCards();
+  const studentsQuery = useStudents(
+    studentId
+      ? {
+          search: studentId,
+          page: 1,
+          limit: 1,
+        }
+      : undefined,
+  );
+  const cardsQuery = useCards(
+    studentId
+      ? {
+          search: studentId,
+          page: 1,
+          limit: 100,
+        }
+      : undefined,
+  );
   const queryClient = useQueryClient();
   const [actionLoading, setActionLoading] = useState<"revoke" | null>(null);
 
@@ -159,7 +191,8 @@ export default function OperationsStudentDetailsScreen() {
     );
   }
 
-  const cardConfig = currentCard ? statusConfig[currentCard.status] : undefined;
+  const cardStatus = resolveCardStatus(currentCard?.status);
+  const cardConfig = currentCard ? statusConfig[cardStatus] : undefined;
   const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const hasActiveCard = currentCard?.status === "active";

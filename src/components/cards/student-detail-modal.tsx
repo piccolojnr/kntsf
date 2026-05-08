@@ -81,6 +81,22 @@ const statusConfig = {
   },
 } as const;
 
+function resolveCardStatus(status?: string) {
+  switch (status) {
+    case "active":
+    case "inactive":
+    case "lost":
+    case "blocked":
+    case "replaced":
+    case "revoked":
+    case "stolen":
+    case "damaged":
+      return status;
+    default:
+      return "inactive";
+  }
+}
+
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString(undefined, {
     day: "numeric",
@@ -99,7 +115,15 @@ export function StudentDetailModal({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["85%", "95%"], []);
   
-  const cardsQuery = useCards();
+  const cardsQuery = useCards(
+    student?.studentId
+      ? {
+          search: student.studentId,
+          page: 1,
+          limit: 100,
+        }
+      : undefined,
+  );
   const queryClient = useQueryClient();
   const [actionLoading, setActionLoading] = useState<"revoke" | null>(null);
 
@@ -179,7 +203,8 @@ export function StudentDetailModal({
     );
   }
 
-  const cardConfig = currentCard ? statusConfig[currentCard.status] : undefined;
+  const cardStatus = resolveCardStatus(currentCard?.status);
+  const cardConfig = currentCard ? statusConfig[cardStatus] : undefined;
 
   function openAssignmentFlow(mode: "register" | "replace") {
     if (!student) {

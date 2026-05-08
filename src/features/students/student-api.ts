@@ -16,6 +16,8 @@ export type OperationsListParams = {
   limit?: number;
 };
 
+export type StudentsListResult = ApiListResponse<Student>;
+
 function normalizeStudent(dto: StudentDto): Student {
   return {
     id: String(dto.id),
@@ -48,7 +50,33 @@ export async function getStudents(params?: OperationsListParams) {
       },
     });
 
-    return getMobileData(response.data).items.map(normalizeStudent);
+    const data = getMobileData(response.data);
+
+    return data.items.map(normalizeStudent);
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
+}
+
+export async function getStudentsPage(
+  params?: OperationsListParams,
+): Promise<StudentsListResult> {
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<StudentDto>>
+    >("/api/mobile/operations/students", {
+      params: {
+        search: params?.search,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+    const data = getMobileData(response.data);
+
+    return {
+      items: data.items.map(normalizeStudent),
+      pagination: data.pagination,
+    };
   } catch (error) {
     throw toUserFacingError(error);
   }
