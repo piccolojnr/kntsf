@@ -19,6 +19,8 @@ export type OperationsCardListParams = {
   limit?: number;
 };
 
+export type CardsListResult = ApiListResponse<StudentCard>;
+
 type CardMutationResponse =
   | StudentCardDto
   | {
@@ -31,7 +33,7 @@ function normalizeCard(dto: StudentCardDto): StudentCard {
 
   return {
     id: String(dto.id),
-    studentId: dto.studentId ?? dto.student_id ?? dto.student?.studentId ?? "",
+    studentId: String(dto.studentId ?? dto.student_id ?? dto.student?.studentId ?? ""),
     uid: dto.uid ?? (uidLast4 ? `.... ${uidLast4}` : ""),
     type: dto.type ?? "unknown",
     status: dto.status ?? "inactive",
@@ -78,7 +80,34 @@ export async function getCards(params?: OperationsCardListParams) {
       },
     });
 
-    return getMobileData(response.data).items.map(normalizeCard);
+    const data = getMobileData(response.data);
+
+    return data.items.map(normalizeCard);
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
+}
+
+export async function getCardsPage(
+  params?: OperationsCardListParams,
+): Promise<CardsListResult> {
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<StudentCardDto>>
+    >("/api/mobile/operations/cards", {
+      params: {
+        search: params?.search,
+        status: params?.status === "all" ? undefined : params?.status,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+    const data = getMobileData(response.data);
+
+    return {
+      items: data.items.map(normalizeCard),
+      pagination: data.pagination,
+    };
   } catch (error) {
     throw toUserFacingError(error);
   }

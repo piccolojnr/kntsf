@@ -1,6 +1,6 @@
-import { FileText, Search, ChevronDown } from "lucide-react-native";
+import { ChevronLeft, ChevronRight, FileText, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
@@ -11,9 +11,8 @@ import { Screen } from "@/components/ui/screen";
 import { SearchField } from "@/components/ui/search-field";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { Permit, PermitStatus } from "@/features/permits/permit-types";
-import { usePermits } from "@/features/permits/use-permits";
+import { usePermitsPage } from "@/features/permits/use-permits";
 import { Student } from "@/features/students/student-types";
-import { useStudents } from "@/features/students/use-students";
 
 type FilterTab = "all" | PermitStatus;
 
@@ -48,32 +47,25 @@ export default function OperationsPermitsScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [selectedPermitId, setSelectedPermitId] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Reset pagination when search or filter changes
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    setCurrentPage(1);
   }, [searchTerm, activeFilter]);
 
-  const permitsQuery = usePermits({
+  const permitsQuery = usePermitsPage({
     search: searchTerm,
     status: activeFilter,
-    page: 1,
-    limit: visibleCount,
-  });
-  const studentsQuery = useStudents({
-    search: searchTerm,
-    page: 1,
-    limit: visibleCount,
+    page: currentPage,
+    limit: PAGE_SIZE,
   });
 
   const permitItems = useMemo<PermitListItem[]>(() => {
-    const permits = permitsQuery.data ?? [];
-    const students = studentsQuery.data ?? [];
-    const studentsById = new Map(students.map((s) => [s.id, s]));
+    const permits = permitsQuery.data?.items ?? [];
 
     return permits.map((permit) => {
-      const student = permit.student ?? studentsById.get(permit.studentId) ?? null;
+      const student = permit.student ?? null;
       return {
         permit,
         student,
@@ -82,7 +74,7 @@ export default function OperationsPermitsScreen() {
         studentNameSearch: student?.name.toLowerCase() ?? "",
       };
     });
-  }, [permitsQuery.data, studentsQuery.data]);
+  }, [permitsQuery.data?.items]);
 
   const summary = useMemo(
     () =>
@@ -118,8 +110,12 @@ export default function OperationsPermitsScreen() {
         permitItems.find((i) => i.permit.id === selectedPermitId) ??
         null);
 
-  const isLoading = permitsQuery.isLoading || studentsQuery.isLoading;
-  const hasError = permitsQuery.isError || studentsQuery.isError;
+  const isLoading = permitsQuery.isLoading;
+  const hasError = permitsQuery.isError;
+  const pagination = permitsQuery.data?.pagination;
+  const totalPages = Math.max(pagination?.totalPages ?? 1, 1);
+  const canGoPrev = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
 
   return (
     <Screen scrolled>
@@ -211,7 +207,7 @@ export default function OperationsPermitsScreen() {
           />
         ) : (
           <View style={styles.list}>
-            {filteredItems.slice(0, visibleCount).map((item) => (
+            {filteredItems.map((item) => (
               <PermitLedgerRow
                 key={item.permit.id}
                 onPress={() => setSelectedPermitId(item.permit.id)}
@@ -219,18 +215,35 @@ export default function OperationsPermitsScreen() {
                 student={item.student}
               />
             ))}
-            {filteredItems.length >= visibleCount && (
-              <TouchableOpacity
-                style={styles.showMoreBtn}
-                onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                activeOpacity={0.75}
+            <View style={styles.paginationRow}>
+              <Pressable
+                disabled={!canGoPrev}
+                onPress={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                style={[
+                  styles.paginationBtn,
+                  !canGoPrev && styles.paginationBtnDisabled,
+                ]}
               >
-                <ChevronDown size={16} color={colors.primary} strokeWidth={2.5} />
-                <Text style={styles.showMoreText}>
-                  Show more · {filteredItems.length - visibleCount} remaining
-                </Text>
-              </TouchableOpacity>
-            )}
+                <ChevronLeft size={16} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.paginationBtnText}>Prev</Text>
+              </Pressable>
+              <Text style={styles.paginationLabel}>
+                Page {pagination?.page ?? currentPage} of {totalPages}
+              </Text>
+              <Pressable
+                disabled={!canGoNext}
+                onPress={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                style={[
+                  styles.paginationBtn,
+                  !canGoNext && styles.paginationBtnDisabled,
+                ]}
+              >
+                <Text style={styles.paginationBtnText}>Next</Text>
+                <ChevronRight size={16} color={colors.primary} strokeWidth={2.2} />
+              </Pressable>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -313,19 +326,33 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.sm,
   },
-  showMoreBtn: {
+  paginationRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: spacing.sm,
+  },
+  paginationBtn: {
     alignItems: "center",
     backgroundColor: colors.primarySoft,
-    borderRadius: radius.lg,
-    borderWidth: 1,
     borderColor: `${colors.primary}30`,
+    borderRadius: radius.pill,
+    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.sm,
-    justifyContent: "center",
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  showMoreText: {
+  paginationBtnDisabled: {
+    opacity: 0.5,
+  },
+  paginationBtnText: {
     color: colors.primary,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+  },
+  paginationLabel: {
+    color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "700",
   },

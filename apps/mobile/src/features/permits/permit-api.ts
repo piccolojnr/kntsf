@@ -22,6 +22,8 @@ export type OperationsPermitListParams = {
   limit?: number;
 };
 
+export type PermitsListResult = ApiListResponse<Permit>;
+
 function normalizePermit(dto: PermitDto): Permit {
   return {
     id: String(dto.id),
@@ -31,7 +33,6 @@ function normalizePermit(dto: PermitDto): Permit {
       dto.permitCode ??
       dto.permit_code ??
       dto.originalCode ??
-      dto.permitHash ??
       dto.code ??
       "",
     status: dto.status ?? "expired",
@@ -77,7 +78,34 @@ export async function getPermits(params?: OperationsPermitListParams) {
       },
     });
 
-    return getMobileData(response.data).items.map(normalizePermit);
+    const data = getMobileData(response.data);
+
+    return data.items.map(normalizePermit);
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
+}
+
+export async function getPermitsPage(
+  params?: OperationsPermitListParams,
+): Promise<PermitsListResult> {
+  try {
+    const response = await apiClient.get<
+      MobileApiResponse<ApiListResponse<PermitDto>>
+    >("/api/mobile/operations/permits", {
+      params: {
+        search: params?.search,
+        status: params?.status === "all" ? undefined : params?.status,
+        page: params?.page,
+        limit: params?.limit,
+      },
+    });
+    const data = getMobileData(response.data);
+
+    return {
+      items: data.items.map(normalizePermit),
+      pagination: data.pagination,
+    };
   } catch (error) {
     throw toUserFacingError(error);
   }

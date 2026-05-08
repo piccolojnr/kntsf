@@ -119,7 +119,6 @@ function getOutcomeFromReason(reason: VerificationReason): VerificationOutcome {
     case "expired_permit":
     case "revoked_permit":
     case "no_active_permit":
-    case "permit_not_found":
       return "warning";
     case "permit_issuance_disabled":
       return "warning";
@@ -137,8 +136,9 @@ function getDecisionFromReason(reason: VerificationReason): VerificationDecision
     case "revoked_permit":
       return "revoked_permit";
     case "no_active_permit":
-    case "permit_not_found":
       return "no_active_permit";
+    case "permit_not_found":
+      return "denied";
     case "card_not_registered":
       return "card_not_registered";
     case "card_inactive":

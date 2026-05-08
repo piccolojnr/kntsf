@@ -28,7 +28,6 @@ export type PermitDto = Partial<Permit> & {
   student_id?: string;
   permit_code?: string;
   originalCode?: string;
-  permitHash?: string;
   code?: string;
   start_date?: string;
   expiry_date?: string;
