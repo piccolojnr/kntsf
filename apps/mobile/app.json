@@ -7,9 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "kntsfapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.piccolojnr.kntsfapp"
     },
@@ -32,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo.png",
+          "image": "./assets/images/splash-icon.png",
           "imageWidth": 160,
           "resizeMode": "contain",
           "backgroundColor": "#f5f7fb"
