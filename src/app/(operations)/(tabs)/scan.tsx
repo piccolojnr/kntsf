@@ -1,4 +1,11 @@
-import { FileText, RotateCcw, ScanLine, ShieldAlert } from "lucide-react-native";
+import {
+  CheckCircle2,
+  FileText,
+  Nfc,
+  RotateCcw,
+  ScanLine,
+  ShieldAlert,
+} from "lucide-react-native";
 import { Href, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -34,6 +41,12 @@ import { useNfcAvailability } from "@/hooks/use-nfc-availability";
 import { useScreenDensity } from "@/hooks/use-screen-density";
 
 type ScreenState = "idle" | "loading" | "result";
+type ScanVisualState =
+  | "idle"
+  | "unavailable"
+  | "reading"
+  | "detected"
+  | "verifying";
 
 const ANIM_CONFIG = { duration: 280, easing: Easing.bezier(0.4, 0, 0.2, 1) };
 
@@ -210,6 +223,63 @@ export default function OperationsScanScreen() {
         : phase === "verifying_card_uid"
           ? "Checking permit..."
           : "Verifying permit...";
+  const scanVisualState: ScanVisualState =
+    !isNfcAvailable && !isCheckingNfc
+      ? "unavailable"
+      : phase === "reading_nfc"
+        ? "reading"
+        : phase === "nfc_read_success"
+          ? "detected"
+          : phase === "verifying_card_uid"
+            ? "verifying"
+            : "idle";
+  const scanVisual = {
+    idle: {
+      color: colors.primary,
+      duration: 2400,
+      intensity: 1,
+      title: "Verify Student Permit",
+      hint: "Enter student ID below",
+      Icon: ScanLine,
+      iconColor: "#ffffff",
+    },
+    unavailable: {
+      color: colors.textMuted,
+      duration: 2600,
+      intensity: 0.65,
+      title: "NFC unavailable",
+      hint: "Use student ID verification instead",
+      Icon: ScanLine,
+      iconColor: "#ffffff",
+    },
+    reading: {
+      color: "#0f766e",
+      duration: 1300,
+      intensity: 1.35,
+      title: "Hold card near reader",
+      hint: "Scanning NFC card",
+      Icon: Nfc,
+      iconColor: "#ffffff",
+    },
+    detected: {
+      color: colors.success,
+      duration: 900,
+      intensity: 1.45,
+      title: "Card detected",
+      hint: "Preparing verification",
+      Icon: CheckCircle2,
+      iconColor: "#ffffff",
+    },
+    verifying: {
+      color: "#1d4ed8",
+      duration: 1500,
+      intensity: 1.2,
+      title: "Checking permit",
+      hint: "Verifying card UID",
+      Icon: ScanLine,
+      iconColor: "#ffffff",
+    },
+  }[scanVisualState];
 
   return (
     <Screen>
@@ -308,15 +378,17 @@ export default function OperationsScanScreen() {
           >
             <RadarPulse
               active={
-                ((screenState === "idle" && !keyboardOpen) ||
-                  phase === "reading_nfc") &&
+                !keyboardOpen &&
                 isNfcAvailable
               }
+              color={scanVisual.color}
+              duration={scanVisual.duration}
+              intensity={scanVisual.intensity}
               size={fixedScreen.heroSize}
               ringCount={3}
             >
-              <ScanLine
-                color={isNfcAvailable ? "#ffffff" : colors.textMuted}
+              <scanVisual.Icon
+                color={scanVisual.iconColor}
                 size={fixedScreen.heroIconSize}
                 strokeWidth={2}
               />
@@ -340,9 +412,9 @@ export default function OperationsScanScreen() {
                       isCompact && styles.scanPromptCompact,
                     ]}
                   >
-                    Verify Student Permit
+                    {scanVisual.title}
                   </Text>
-                  <Text style={styles.scanHint}>Enter student ID below</Text>
+                  <Text style={styles.scanHint}>{scanVisual.hint}</Text>
                   <View style={styles.nfcAction}>
                     <Button
                       disabled={nfcUnavailable || isCheckingNfc}
