@@ -1,8 +1,19 @@
-import { CalendarDays, CreditCard, GraduationCap, LayoutGrid } from 'lucide-react';
+import {
+    CalendarDays,
+    CreditCard,
+    GraduationCap,
+    History,
+    LayoutGrid,
+    ShieldCheck,
+} from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
 import { index as permitsIndex } from '@/routes/permits';
 import { index as studentsIndex } from '@/routes/students';
+import {
+    index as verificationIndex,
+    logs as verificationLogs,
+} from '@/routes/verification';
 import type { NavItem } from '@/types';
 
 export const mainNavItems: NavItem[] = [
@@ -29,6 +40,18 @@ export const mainNavItems: NavItem[] = [
         href: permitsIndex(),
         icon: CreditCard,
         permission: 'permits.view',
+    },
+    {
+        title: 'Verification',
+        href: verificationIndex(),
+        icon: ShieldCheck,
+        permission: 'verification.perform',
+    },
+    {
+        title: 'Verification Logs',
+        href: verificationLogs(),
+        icon: History,
+        permission: 'verification.view_logs',
     },
 ];
 

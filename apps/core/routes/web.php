@@ -24,3 +24,4 @@ require __DIR__.'/settings.php';
 require __DIR__.'/academic-periods.php';
 require __DIR__.'/students.php';
 require __DIR__.'/permits.php';
+require __DIR__.'/verification.php';
