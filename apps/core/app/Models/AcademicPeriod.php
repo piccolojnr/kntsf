@@ -6,6 +6,7 @@ use Database\Factories\AcademicPeriodFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -21,6 +22,11 @@ class AcademicPeriod extends Model
 {
     /** @use HasFactory<AcademicPeriodFactory> */
     use HasFactory, SoftDeletes;
+
+    public function permits(): HasMany
+    {
+        return $this->hasMany(Permit::class);
+    }
 
     protected function casts(): array
     {

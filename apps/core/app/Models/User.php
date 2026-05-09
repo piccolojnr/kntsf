@@ -31,6 +31,16 @@ class User extends Authenticatable
         return $this->hasMany(AccountActivationToken::class);
     }
 
+    public function issuedPermits(): HasMany
+    {
+        return $this->hasMany(Permit::class, 'issued_by_id');
+    }
+
+    public function revokedPermits(): HasMany
+    {
+        return $this->hasMany(Permit::class, 'revoked_by_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
