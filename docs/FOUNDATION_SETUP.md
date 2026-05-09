@@ -97,7 +97,7 @@ resources/js/navigation
 resources/js/services
 ```
 
-These folders are intentionally empty or near-empty until real features need them. Business modules, tables, and models have not been created yet.
+These folders are intentionally empty or near-empty until real features need them. The first real domain module is documented separately in `docs/STUDENTS_MODULE.md`.
 
 ## Navigation
 
@@ -129,8 +129,8 @@ Queue tables already exist. No worker is started automatically. Media conversion
 
 ## Intentionally Not Implemented
 
-- No students, permits, NFC, payments, elections, polls, news, events, or reports modules.
-- No business tables beyond package infrastructure.
+- No permits, NFC, payments, elections, polls, news, events, or reports modules.
+- No student account activation, imports, media attachments, or student-facing auth flows.
 - No media collections attached to application models.
 - No Sanctum/API token setup.
 - No frontend permission filtering enforcement.

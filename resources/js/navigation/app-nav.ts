@@ -1,5 +1,6 @@
-import { BookOpen, Folder, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, FolderGit2, GraduationCap, LayoutGrid } from 'lucide-react';
 import { dashboard } from '@/routes';
+import { index as studentsIndex } from '@/routes/students';
 import type { NavItem } from '@/types';
 
 export const mainNavItems: NavItem[] = [
@@ -8,6 +9,12 @@ export const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
         permission: 'dashboard.view',
+    },
+    {
+        title: 'Students',
+        href: studentsIndex(),
+        icon: GraduationCap,
+        permission: 'students.view',
     },
 ];
 
