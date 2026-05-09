@@ -22,23 +22,29 @@ type RadarPulseProps = {
   ringCount?: number;
   /** Color of the rings */
   color?: string;
+  /** Pulse speed in milliseconds */
+  duration?: number;
+  /** Ring opacity multiplier */
+  intensity?: number;
   /** Content to render at the center */
   children?: React.ReactNode;
 };
-
-const RING_DURATION = 2400;
 
 function PulseRing({
   index,
   ringCount,
   size,
   color,
+  duration,
+  intensity,
   active,
 }: {
   index: number;
   ringCount: number;
   size: number;
   color: string;
+  duration: number;
+  intensity: number;
   active: boolean;
 }) {
   const progress = useSharedValue(0);
@@ -47,10 +53,10 @@ function PulseRing({
     if (active) {
       progress.value = 0;
       progress.value = withDelay(
-        index * (RING_DURATION / ringCount),
+        index * (duration / ringCount),
         withRepeat(
           withTiming(1, {
-            duration: RING_DURATION,
+            duration,
             easing: Easing.out(Easing.cubic),
           }),
           -1,
@@ -63,11 +69,15 @@ function PulseRing({
     }
 
     return () => cancelAnimation(progress);
-  }, [active, index, ringCount, progress]);
+  }, [active, duration, index, ringCount, progress]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const scale = interpolate(progress.value, [0, 1], [0.4, 1]);
-    const opacity = interpolate(progress.value, [0, 0.15, 0.8, 1], [0, 0.6, 0.3, 0]);
+    const opacity = interpolate(
+      progress.value,
+      [0, 0.15, 0.8, 1],
+      [0, 0.6 * intensity, 0.3 * intensity, 0],
+    );
 
     return {
       transform: [{ scale }],
@@ -96,6 +106,8 @@ export function RadarPulse({
   size = 260,
   ringCount = 3,
   color = colors.primary,
+  duration = 2400,
+  intensity = 1,
   children,
 }: RadarPulseProps) {
   return (
@@ -121,6 +133,8 @@ export function RadarPulse({
           ringCount={ringCount}
           size={size}
           color={color}
+          duration={duration}
+          intensity={intensity}
           active={active}
         />
       ))}
