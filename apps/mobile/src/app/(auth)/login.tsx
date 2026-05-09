@@ -1,6 +1,6 @@
-import { Href, useLocalSearchParams, useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -16,11 +16,7 @@ import {
 
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import {
-  AuthWorkspace,
-  LoginPayload,
-  UserRole,
-} from "@/features/auth/auth-types";
+import { LoginPayload, UserRole } from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -34,33 +30,6 @@ function getRoleRoute(role: UserRole): Href {
     case "admin":
       return "/(operations)/scan" as Href;
   }
-}
-
-const WORKSPACE_META: Record<
-  string,
-  { title: string; pill: string; accentColor: string }
-> = {
-  student: {
-    title: "Sign in",
-    pill: "Student",
-    accentColor: colors.primary,
-  },
-  operations: {
-    title: "Sign in",
-    pill: "Operations",
-    accentColor: "#0f766e",
-  },
-};
-
-function getWorkspaceMeta(workspace?: string | string[]) {
-  const ws = Array.isArray(workspace) ? workspace[0] : workspace;
-  return (
-    WORKSPACE_META[ws ?? ""] ?? {
-      title: "Sign in",
-      pill: "Workspace",
-      accentColor: colors.primary,
-    }
-  );
 }
 
 // ─── Input field ──────────────────────────────────────────────────────────────
@@ -154,14 +123,7 @@ const fieldStyles = StyleSheet.create({
 export default function LoginScreen() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
-  const { selectedWorkspace } = useLocalSearchParams<{
-    selectedWorkspace?: AuthWorkspace;
-  }>();
   const { login } = useAuth();
-  const meta = useMemo(
-    () => getWorkspaceMeta(selectedWorkspace),
-    [selectedWorkspace],
-  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -250,35 +212,24 @@ export default function LoginScreen() {
 
           {/* Header */}
           <View style={styles.header}>
-            {/* Workspace pill */}
-            <View
-              style={[
-                styles.pill,
-                { backgroundColor: `${meta.accentColor}15` },
-              ]}
-            >
-              <View
-                style={[styles.pillDot, { backgroundColor: meta.accentColor }]}
-              />
-              <Text style={[styles.pillText, { color: meta.accentColor }]}>
-                {meta.pill}
-              </Text>
+            <View style={styles.pill}>
+              <View style={styles.pillDot} />
+              <Text style={styles.pillText}>Secure access</Text>
             </View>
 
-            <Text style={styles.title}>{meta.title}</Text>
+            <Text style={styles.title}>Sign in</Text>
             <Text style={styles.subtitle}>
-              Enter your credentials to access the {meta.pill.toLowerCase()}{" "}
-              workspace.
+              Use your Knutsford SRC account credentials.
             </Text>
           </View>
 
           {/* Form */}
           <View style={styles.form}>
             <InputField
-              label="Email"
+              label="Username or email"
               value={email}
               onChangeText={setEmail}
-              placeholder="Enter your email"
+              placeholder="Enter username or email"
               autoCapitalize="none"
               keyboardType="email-address"
               onFocus={handleInputFocus}
@@ -355,15 +306,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
     marginBottom: spacing.xs,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: 5,
   },
   pillDot: {
+    backgroundColor: colors.primary,
     borderRadius: 4,
     height: 7,
     width: 7,
   },
   pillText: {
+    color: colors.primary,
     fontSize: fontSizes.xs,
     fontWeight: "700",
     letterSpacing: 0.3,
