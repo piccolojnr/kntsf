@@ -27,10 +27,20 @@ return [
             'students.activate_account',
         ],
 
+        'academic_periods' => [
+            'academic_periods.view',
+            'academic_periods.manage',
+        ],
+
         'permits' => [
             'permits.view',
             'permits.issue',
             'permits.revoke',
+        ],
+
+        'permit_settings' => [
+            'permit_settings.view',
+            'permit_settings.update',
         ],
 
         'nfc_cards' => [
@@ -75,9 +85,13 @@ return [
             'students.delete',
             'students.import',
             'students.activate_account',
+            'academic_periods.view',
+            'academic_periods.manage',
             'permits.view',
             'permits.issue',
             'permits.revoke',
+            'permit_settings.view',
+            'permit_settings.update',
             'nfc_cards.view',
             'nfc_cards.manage',
             'verification.perform',
@@ -93,6 +107,7 @@ return [
             'dashboard.view',
             'students.view',
             'students.update',
+            'academic_periods.view',
             'permits.view',
             'permits.issue',
             'permits.revoke',

@@ -1,5 +1,6 @@
-import { GraduationCap, LayoutGrid } from 'lucide-react';
+import { CalendarDays, GraduationCap, LayoutGrid } from 'lucide-react';
 import { dashboard } from '@/routes';
+import { index as academicPeriodsIndex } from '@/routes/academic-periods';
 import { index as studentsIndex } from '@/routes/students';
 import type { NavItem } from '@/types';
 
@@ -15,6 +16,12 @@ export const mainNavItems: NavItem[] = [
         href: studentsIndex(),
         icon: GraduationCap,
         permission: 'students.view',
+    },
+    {
+        title: 'Academic Periods',
+        href: academicPeriodsIndex(),
+        icon: CalendarDays,
+        permission: 'academic_periods.view',
     },
 ];
 
