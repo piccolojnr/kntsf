@@ -14,17 +14,26 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { store, update } from '@/routes/students';
-import type { Student } from '../types';
+import type { Student, StudentFormOptions } from '../types';
 
 type StudentFormDialogProps = {
     mode: 'create' | 'edit';
+    options: StudentFormOptions;
     student?: Student;
     trigger: ReactNode;
 };
 
 export function StudentFormDialog({
     mode,
+    options,
     student,
     trigger,
 }: StudentFormDialogProps) {
@@ -41,8 +50,8 @@ export function StudentFormDialog({
                 </DialogTitle>
                 <DialogDescription>
                     {isEditing
-                        ? 'Update the base student record.'
-                        : 'Add the base student details. Account activation comes later.'}
+                        ? 'Update the academic profile and contact details.'
+                        : 'Create the student profile before account activation.'}
                 </DialogDescription>
 
                 <Form
@@ -55,6 +64,8 @@ export function StudentFormDialog({
                     {({ processing, errors, resetAndClearErrors }) => (
                         <>
                             <StudentFields
+                                mode={mode}
+                                options={options}
                                 student={student}
                                 errors={errors}
                             />
@@ -82,92 +93,131 @@ export function StudentFormDialog({
 }
 
 function StudentFields({
+    mode,
+    options,
     student,
     errors,
 }: {
+    mode: 'create' | 'edit';
+    options: StudentFormOptions;
     student?: Student;
     errors: Record<string, string | undefined>;
 }) {
+    const fieldId = student?.id ?? 'new';
+
     return (
         <>
-            <div className="grid gap-2">
-                <Label htmlFor={`student_number_${student?.id ?? 'new'}`}>
-                    Student number
-                </Label>
-                <Input
-                    id={`student_number_${student?.id ?? 'new'}`}
-                    name="student_number"
-                    required
-                    maxLength={50}
-                    defaultValue={student?.student_number ?? ''}
-                />
-                <InputError message={errors.student_number} />
-            </div>
+            <div className="grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
+                <div className="grid gap-2">
+                    <Label htmlFor={`student_number_${fieldId}`}>
+                        Student number
+                    </Label>
+                    <Input
+                        id={`student_number_${fieldId}`}
+                        name="student_number"
+                        required
+                        maxLength={50}
+                        defaultValue={
+                            student?.student_number ??
+                            (mode === 'create'
+                                ? options.student_number_prefix
+                                : '')
+                        }
+                        placeholder={`${options.student_number_prefix}2859`}
+                    />
+                    <InputError message={errors.student_number} />
+                </div>
 
-            <div className="grid gap-2">
-                <Label htmlFor={`student_name_${student?.id ?? 'new'}`}>
-                    Name
-                </Label>
-                <Input
-                    id={`student_name_${student?.id ?? 'new'}`}
-                    name="name"
-                    maxLength={255}
-                    defaultValue={student?.name ?? ''}
-                />
-                <InputError message={errors.name} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor={`student_email_${student?.id ?? 'new'}`}>
-                    Email
-                </Label>
-                <Input
-                    id={`student_email_${student?.id ?? 'new'}`}
-                    name="email"
-                    type="email"
-                    maxLength={255}
-                    defaultValue={student?.email ?? ''}
-                />
-                <InputError message={errors.email} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor={`student_phone_${student?.id ?? 'new'}`}>
-                    Phone
-                </Label>
-                <Input
-                    id={`student_phone_${student?.id ?? 'new'}`}
-                    name="phone"
-                    maxLength={50}
-                    defaultValue={student?.phone ?? ''}
-                />
-                <InputError message={errors.phone} />
+                <div className="grid gap-2">
+                    <Label htmlFor={`student_name_${fieldId}`}>Name</Label>
+                    <Input
+                        id={`student_name_${fieldId}`}
+                        name="name"
+                        maxLength={255}
+                        defaultValue={student?.name ?? ''}
+                        placeholder="Student full name"
+                    />
+                    <InputError message={errors.name} />
+                </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
-                    <Label htmlFor={`student_course_${student?.id ?? 'new'}`}>
-                        Course
-                    </Label>
+                    <Label htmlFor={`student_email_${fieldId}`}>Email</Label>
                     <Input
-                        id={`student_course_${student?.id ?? 'new'}`}
-                        name="course"
+                        id={`student_email_${fieldId}`}
+                        name="email"
+                        type="email"
                         maxLength={255}
-                        defaultValue={student?.course ?? ''}
+                        defaultValue={student?.email ?? ''}
+                        placeholder="student@example.com"
                     />
+                    <InputError message={errors.email} />
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor={`student_phone_${fieldId}`}>Phone</Label>
+                    <Input
+                        id={`student_phone_${fieldId}`}
+                        name="phone"
+                        maxLength={50}
+                        defaultValue={student?.phone ?? ''}
+                        placeholder="Phone number"
+                    />
+                    <InputError message={errors.phone} />
+                </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                    <Label htmlFor={`student_course_${fieldId}`}>Course</Label>
+                    <Select
+                        name="course"
+                        defaultValue={student?.course ?? undefined}
+                    >
+                        <SelectTrigger
+                            id={`student_course_${fieldId}`}
+                            className="h-9 w-full text-sm"
+                        >
+                            <SelectValue placeholder="Select course" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {options.courses.map((course) => (
+                                <SelectItem
+                                    key={course.value}
+                                    value={course.value}
+                                >
+                                    {course.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <InputError message={errors.course} />
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor={`student_level_${student?.id ?? 'new'}`}>
-                        Level
-                    </Label>
-                    <Input
-                        id={`student_level_${student?.id ?? 'new'}`}
+                    <Label htmlFor={`student_level_${fieldId}`}>Level</Label>
+                    <Select
                         name="level"
-                        maxLength={100}
-                        defaultValue={student?.level ?? ''}
-                    />
+                        defaultValue={student?.level ?? undefined}
+                    >
+                        <SelectTrigger
+                            id={`student_level_${fieldId}`}
+                            className="h-9 w-full text-sm"
+                        >
+                            <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {options.levels.map((level) => (
+                                <SelectItem
+                                    key={level.value}
+                                    value={level.value}
+                                >
+                                    Level {level.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <InputError message={errors.level} />
                 </div>
             </div>

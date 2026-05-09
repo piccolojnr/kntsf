@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Students\StoreStudentRequest;
 use App\Http\Requests\Students\UpdateStudentRequest;
 use App\Models\Student;
+use App\Support\StudentOptions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class StudentController extends Controller
 {
+    public function __construct(private readonly StudentOptions $studentOptions) {}
+
     public function index(Request $request): Response
     {
         Gate::authorize('viewAny', Student::class);
@@ -42,6 +45,7 @@ class StudentController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'options' => $this->studentOptions->forFrontend(),
             'can' => [
                 'create' => $request->user()?->can('create', Student::class) ?? false,
                 'update' => $request->user()?->can('students.update') ?? false,
@@ -68,6 +72,7 @@ class StudentController extends Controller
 
         return Inertia::render('students/show', [
             'student' => $this->studentPayload($student),
+            'options' => $this->studentOptions->forFrontend(),
             'can' => [
                 'update' => $request->user()?->can('update', $student) ?? false,
                 'delete' => $request->user()?->can('delete', $student) ?? false,

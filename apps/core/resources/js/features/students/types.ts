@@ -34,3 +34,14 @@ export type StudentIndexPermissions = {
     delete: boolean;
     activateAccount: boolean;
 };
+
+export type StudentOption = {
+    value: string;
+    label: string;
+};
+
+export type StudentFormOptions = {
+    student_number_prefix: string;
+    courses: StudentOption[];
+    levels: StudentOption[];
+};

@@ -1,8 +1,14 @@
 import { Link } from '@inertiajs/react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Eye, KeyRound, Pencil, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { show } from '@/routes/students';
-import type { Paginated, Student, StudentIndexPermissions } from '../types';
+import type {
+    Paginated,
+    Student,
+    StudentFormOptions,
+    StudentIndexPermissions,
+} from '../types';
 import { StudentActivateAccountDialog } from './student-activate-account-dialog';
 import { StudentDeleteDialog } from './student-delete-dialog';
 import { StudentFormDialog } from './student-form-dialog';
@@ -10,15 +16,17 @@ import { StudentFormDialog } from './student-form-dialog';
 export function StudentList({
     students,
     can,
+    options,
 }: {
     students: Paginated<Student>;
     can: StudentIndexPermissions;
+    options: StudentFormOptions;
 }) {
     if (students.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed p-8 text-center">
-                <p className="text-sm font-medium">No students found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed bg-muted/20 p-10 text-center">
+                <p className="text-sm font-medium">No student records found</p>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
                     Create the first student record or adjust your search.
                 </p>
             </div>
@@ -27,76 +35,152 @@ export function StudentList({
 
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-md border">
-                <div className="min-w-[760px]">
-                    <div className="grid grid-cols-[1.1fr_1.2fr_1.3fr_1fr_0.8fr_1fr_1.6fr] border-b bg-muted/50 px-4 py-3 text-xs font-medium uppercase text-muted-foreground">
-                        <span>Student no.</span>
-                        <span>Name</span>
-                        <span>Email</span>
-                        <span>Course</span>
-                        <span>Level</span>
-                        <span>Status</span>
-                        <span className="text-right">Actions</span>
-                    </div>
-                    {students.data.map((student) => (
-                        <div
-                            key={student.id}
-                            className="grid grid-cols-[1.1fr_1.2fr_1.3fr_1fr_0.8fr_1fr_1.6fr] items-center border-b px-4 py-3 text-sm last:border-b-0"
-                        >
-                            <span className="font-medium">
-                                {student.student_number}
-                            </span>
-                            <span>{student.name ?? 'Unassigned'}</span>
-                            <span className="text-muted-foreground">
-                                {student.email ?? 'No email'}
-                            </span>
-                            <span>{student.course ?? 'No course'}</span>
-                            <span>{student.level ?? 'No level'}</span>
-                            <span>
-                                <AccountStatus student={student} />
-                            </span>
-                            <span className="flex justify-end gap-2">
-                                <Button asChild size="sm" variant="ghost">
-                                    <Link href={show(student.id)}>View</Link>
-                                </Button>
-
-                                {can.activateAccount &&
-                                    student.account_status !== 'activated' && (
-                                        <StudentActivateAccountDialog
-                                            student={student}
-                                        />
-                                    )}
-
-                                {can.update && (
-                                    <StudentFormDialog
-                                        mode="edit"
-                                        student={student}
-                                        trigger={
-                                            <Button size="sm" variant="outline">
-                                                <Pencil />
-                                                Edit
-                                            </Button>
-                                        }
-                                    />
-                                )}
-
-                                {can.delete && (
-                                    <StudentDeleteDialog
-                                        student={student}
-                                        trigger={
+            <div className="overflow-hidden rounded-lg border bg-card">
+                <div className="w-full overflow-x-auto">
+                    <table className="w-full min-w-[920px] table-auto text-sm">
+                        <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                            <tr>
+                                <th className="px-4 py-3 text-left font-medium">
+                                    Student
+                                </th>
+                                <th className="px-4 py-3 text-left font-medium">
+                                    Contact
+                                </th>
+                                <th className="px-4 py-3 text-left font-medium">
+                                    Course
+                                </th>
+                                <th className="px-4 py-3 text-left font-medium">
+                                    Level
+                                </th>
+                                <th className="px-4 py-3 text-left font-medium">
+                                    Account
+                                </th>
+                                <th className="px-4 py-3 text-right font-medium">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                            {students.data.map((student) => (
+                                <tr
+                                    key={student.id}
+                                    className="bg-card transition-colors hover:bg-muted/30"
+                                >
+                                    <td className="px-4 py-3 align-middle">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-muted/40 text-xs font-semibold">
+                                                {student.name
+                                                    ?.slice(0, 2)
+                                                    .toUpperCase() ?? 'ST'}
+                                            </div>
+                                            <div>
+                                                <Link
+                                                    href={show(student.id)}
+                                                    className="font-medium hover:underline"
+                                                >
+                                                    {student.name ??
+                                                        'Unnamed student'}
+                                                </Link>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {student.student_number}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 align-middle">
+                                        <div>
+                                            <p>
+                                                {student.email ?? 'No email'}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {student.phone ?? 'No phone'}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 align-middle">
+                                        {student.course ?? 'No course'}
+                                    </td>
+                                    <td className="px-4 py-3 align-middle">
+                                        {student.level ? (
+                                            <Badge variant="outline">
+                                                Level {student.level}
+                                            </Badge>
+                                        ) : (
+                                            <span className="text-muted-foreground">
+                                                No level
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 align-middle">
+                                        <AccountStatus student={student} />
+                                    </td>
+                                    <td className="px-4 py-3 align-middle">
+                                        <div className="flex justify-end gap-2">
                                             <Button
+                                                asChild
                                                 size="sm"
-                                                variant="destructive"
+                                                variant="ghost"
                                             >
-                                                <Trash2 />
-                                                Delete
+                                                <Link href={show(student.id)}>
+                                                    <Eye />
+                                                    View
+                                                </Link>
                                             </Button>
-                                        }
-                                    />
-                                )}
-                            </span>
-                        </div>
-                    ))}
+
+                                            {can.activateAccount &&
+                                                student.account_status !==
+                                                    'activated' && (
+                                                    <StudentActivateAccountDialog
+                                                        student={student}
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                            >
+                                                                <KeyRound />
+                                                                Activate
+                                                            </Button>
+                                                        }
+                                                    />
+                                                )}
+
+                                            {can.update && (
+                                                <StudentFormDialog
+                                                    mode="edit"
+                                                    options={options}
+                                                    student={student}
+                                                    trigger={
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                        >
+                                                            <Pencil />
+                                                            Edit
+                                                        </Button>
+                                                    }
+                                                />
+                                            )}
+
+                                            {can.delete && (
+                                                <StudentDeleteDialog
+                                                    student={student}
+                                                    trigger={
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                        >
+                                                            <Trash2 />
+                                                            Delete
+                                                        </Button>
+                                                    }
+                                                />
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -105,19 +189,22 @@ export function StudentList({
     );
 }
 
-function AccountStatus({ student }: { student: Student }) {
+export function AccountStatus({ student }: { student: Student }) {
     const className = {
-        activated: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300',
-        pending_setup: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300',
-        not_activated: 'border-muted bg-muted/50 text-muted-foreground',
+        activated:
+            'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300',
+        pending_setup:
+            'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300',
+        not_activated: 'border-border bg-muted/50 text-muted-foreground',
     }[student.account_status];
 
     return (
-        <span
-            className={`inline-flex rounded-md border px-2 py-1 text-xs font-medium ${className}`}
+        <Badge
+            variant="outline"
+            className={`rounded-md px-2 py-1 ${className}`}
         >
             {student.account_status_label}
-        </span>
+        </Badge>
     );
 }
 
