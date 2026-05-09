@@ -78,10 +78,8 @@ Resource routes:
 | Method | Route | Name | Purpose |
 | --- | --- | --- | --- |
 | `GET` | `/students` | `students.index` | List records with basic search. |
-| `GET` | `/students/create` | `students.create` | Create form. |
 | `POST` | `/students` | `students.store` | Store record. |
 | `GET` | `/students/{student}` | `students.show` | View record. |
-| `GET` | `/students/{student}/edit` | `students.edit` | Edit form. |
 | `PUT/PATCH` | `/students/{student}` | `students.update` | Update record. |
 | `DELETE` | `/students/{student}` | `students.destroy` | Soft delete record. |
 
@@ -96,11 +94,22 @@ resources/js/pages/students
 Current pages:
 
 - `index.tsx`
-- `create.tsx`
-- `edit.tsx`
 - `show.tsx`
 
-The pages use existing layout conventions, breadcrumbs, shadcn-style UI primitives, and Wayfinder route helpers.
+Create and edit are handled with dialogs on the index and show screens. The pages use existing layout conventions, breadcrumbs, shadcn-style UI primitives, and Wayfinder route helpers.
+
+Reusable student UI lives under:
+
+```text
+resources/js/features/students
+```
+
+Current feature files:
+
+- `components/student-form-dialog.tsx`
+- `components/student-delete-dialog.tsx`
+- `components/student-list.tsx`
+- `types.ts`
 
 ## Navigation
 

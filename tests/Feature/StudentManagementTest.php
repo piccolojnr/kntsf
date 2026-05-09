@@ -53,7 +53,7 @@ test('authorized user can create student', function () {
             'course' => 'Computer Science',
             'level' => '300',
         ])
-        ->assertRedirect();
+        ->assertRedirect(route('students.index'));
 
     $this->assertDatabaseHas('students', [
         'student_number' => 'STU-10002',
@@ -69,12 +69,12 @@ test('duplicate student number is rejected', function () {
     ]);
 
     $this->actingAs(userWithRole('admin'))
-        ->from(route('students.create'))
+        ->from(route('students.index'))
         ->post(route('students.store'), [
             'student_number' => 'STU-10003',
             'name' => 'Duplicate Student',
         ])
-        ->assertRedirect(route('students.create'))
+        ->assertRedirect(route('students.index'))
         ->assertSessionHasErrors('student_number');
 });
 
@@ -86,6 +86,7 @@ test('authorized user can update student', function () {
     ]);
 
     $this->actingAs($user)
+        ->from(route('students.index'))
         ->put(route('students.update', $student), [
             'student_number' => 'STU-10004',
             'name' => 'New Name',
@@ -94,7 +95,7 @@ test('authorized user can update student', function () {
             'course' => 'Information Technology',
             'level' => '400',
         ])
-        ->assertRedirect(route('students.show', $student));
+        ->assertRedirect(route('students.index'));
 
     $this->assertDatabaseHas('students', [
         'id' => $student->id,

@@ -43,15 +43,10 @@ class StudentController extends Controller
             ],
             'can' => [
                 'create' => $request->user()?->can('create', Student::class) ?? false,
+                'update' => $request->user()?->can('students.update') ?? false,
+                'delete' => $request->user()?->can('students.delete') ?? false,
             ],
         ]);
-    }
-
-    public function create(): Response
-    {
-        Gate::authorize('create', Student::class);
-
-        return Inertia::render('students/create');
     }
 
     public function store(StoreStudentRequest $request): RedirectResponse
@@ -62,7 +57,7 @@ class StudentController extends Controller
             'updated_by_id' => $request->user()?->id,
         ]);
 
-        return to_route('students.show', $student);
+        return to_route('students.index');
     }
 
     public function show(Request $request, Student $student): Response
@@ -78,15 +73,6 @@ class StudentController extends Controller
         ]);
     }
 
-    public function edit(Student $student): Response
-    {
-        Gate::authorize('update', $student);
-
-        return Inertia::render('students/edit', [
-            'student' => $this->studentPayload($student),
-        ]);
-    }
-
     public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
     {
         $student->update([
@@ -94,7 +80,7 @@ class StudentController extends Controller
             'updated_by_id' => $request->user()?->id,
         ]);
 
-        return to_route('students.show', $student);
+        return back();
     }
 
     public function destroy(Student $student): RedirectResponse
