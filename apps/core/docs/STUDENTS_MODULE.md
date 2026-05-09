@@ -11,7 +11,7 @@ Table: `students`
 | Column | Purpose |
 | --- | --- |
 | `id` | Primary key. |
-| `user_id` | Nullable unique link to `users.id`; set to null if the user is deleted. Reserved for future student account activation. |
+| `user_id` | Nullable unique link to `users.id`; set to null if the user is deleted. Used by account activation. |
 | `student_number` | Required unique institutional identifier. |
 | `name` | Optional display name for records that do not have a linked user yet. |
 | `email` | Optional indexed contact email. |
@@ -58,9 +58,11 @@ The module uses the existing Spatie Permission names from `config/app-permission
 | `students.update` | Edit student records. |
 | `students.delete` | Soft delete, restore, and force delete policy checks. |
 | `students.import` | Reserved for future import flow. |
-| `students.activate_account` | Reserved for future student account activation. |
+| `students.activate_account` | Activate or resend setup-password links for student accounts. |
 
 Authorization is enforced through `App\Policies\StudentPolicy` and Form Request authorization. Frontend button visibility is not authorization.
+
+`students.activate_account` now allows an admin/staff user to issue or resend a setup-password link for a student profile.
 
 ## Routes
 
@@ -82,6 +84,14 @@ Resource routes:
 | `GET` | `/students/{student}` | `students.show` | View record. |
 | `PUT/PATCH` | `/students/{student}` | `students.update` | Update record. |
 | `DELETE` | `/students/{student}` | `students.destroy` | Soft delete record. |
+| `POST` | `/students/{student}/activate-account` | `students.activate-account` | Create/link a student user and send setup-password email. |
+
+Account setup routes:
+
+| Method | Route | Name | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/account/setup-password/{token}` | `account.setup-password.show` | Display setup-password form for a valid token. |
+| `POST` | `/account/setup-password/{token}` | `account.setup-password.store` | Set the initial student password. |
 
 ## Inertia Pages
 
@@ -96,7 +106,7 @@ Current pages:
 - `index.tsx`
 - `show.tsx`
 
-Create and edit are handled with dialogs on the index and show screens. The pages use existing layout conventions, breadcrumbs, shadcn-style UI primitives, and Wayfinder route helpers.
+Create, edit, delete, and account activation are handled with dialogs on the index and show screens. The pages use existing layout conventions, breadcrumbs, shadcn-style UI primitives, and Wayfinder route helpers.
 
 Reusable student UI lives under:
 
@@ -108,8 +118,35 @@ Current feature files:
 
 - `components/student-form-dialog.tsx`
 - `components/student-delete-dialog.tsx`
+- `components/student-activate-account-dialog.tsx`
 - `components/student-list.tsx`
 - `types.ts`
+
+## Account Activation
+
+Student account activation uses the unified `users` table. There is no separate student auth table.
+
+Flow:
+
+1. A student profile must have an email address.
+2. An authorized admin/staff user clicks **Activate account**.
+3. The system creates a `users` record if the student is not linked yet.
+4. If a user already exists with the same email, it is linked only when it is not already linked to another student and does not carry non-student roles.
+5. The linked user receives the `student` role.
+6. Old unused setup-password tokens are marked used.
+7. A new hashed token is stored in `account_activation_tokens`.
+8. A queued setup-password notification is sent.
+9. The student sets their initial password through `/account/setup-password/{token}`.
+
+Account states exposed to the frontend:
+
+| State | Meaning |
+| --- | --- |
+| `not_activated` | No linked user. |
+| `pending_setup` | Linked user exists but `password` is null. |
+| `activated` | Linked user exists and has a password. |
+
+Setup tokens are stored as SHA-256 hashes. Raw tokens are only sent in the email link.
 
 ## Navigation
 
@@ -123,7 +160,6 @@ The item includes `permission: 'students.view'`, but frontend permission filteri
 
 ## Not Built Yet
 
-- Student account activation and user linking workflows.
 - Import UI or import jobs.
 - Student avatars or media collections.
 - Advanced filters, bulk actions, exports, or saved views.

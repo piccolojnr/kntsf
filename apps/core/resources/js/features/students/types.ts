@@ -7,6 +7,13 @@ export type Student = {
     course: string | null;
     level: string | null;
     created_at: string | null;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    } | null;
+    account_status: 'not_activated' | 'pending_setup' | 'activated';
+    account_status_label: string;
 };
 
 export type Paginated<T> = {
@@ -25,4 +32,5 @@ export type StudentIndexPermissions = {
     create: boolean;
     update: boolean;
     delete: boolean;
+    activateAccount: boolean;
 };
