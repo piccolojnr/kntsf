@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -214,7 +213,7 @@ export default function OperationsScanScreen() {
 
   return (
     <Screen>
-      <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
+      <View style={styles.flex}>
         <PageHeader
           eyebrow="Operations"
           subtitle="Verify a student's permit status from their student ID."
@@ -244,6 +243,7 @@ export default function OperationsScanScreen() {
                     fixedScreen.tabBarClearance + fixedScreen.bottomToastOffset,
                 },
               ]}
+              nestedScrollEnabled
               showsVerticalScrollIndicator={false}
             >
               {successMessage ? (
@@ -302,6 +302,8 @@ export default function OperationsScanScreen() {
               styles.radarZone,
               { paddingBottom: fixedScreen.heroBottomReserve },
             ]}
+            keyboardShouldPersistTaps="handled"
+            onScrollBeginDrag={Keyboard.dismiss}
             showsVerticalScrollIndicator={false}
           >
             <RadarPulse
@@ -366,7 +368,7 @@ export default function OperationsScanScreen() {
               ))}
           </ScrollView>
         )}
-      </Pressable>
+      </View>
 
       {/* ─── Floating Input Pill (absolutely positioned) ─── */}
       {screenState !== "result" && (

@@ -24,6 +24,7 @@ export function FloatingTabButton({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
+      android_ripple={null}
       style={styles.pressable}
       onLongPress={onLongPress}
       onPress={onPress}
@@ -50,10 +51,10 @@ export function FloatingTabButton({
         <Text
           numberOfLines={1}
           style={[
-            styles.label,
-            isSelected && styles.labelSelected,
-            isPrimary && styles.primaryLabel,
-          ]}
+          styles.label,
+          isPrimary && styles.primaryLabel,
+          isSelected && styles.labelSelected,
+        ]}
         >
           {label}
         </Text>
@@ -64,18 +65,21 @@ export function FloatingTabButton({
 
 const styles = StyleSheet.create({
   pressable: {
+    borderRadius: radius.pill,
     flex: 1,
     justifyContent: "center",
+    overflow: "hidden",
   },
   content: {
-    width: "100%",
-    minHeight: 48,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs + 2,
     borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: spacing.xs + 2,
+    height: 48,
+    justifyContent: "center",
+    overflow: "hidden",
     paddingHorizontal: spacing.xs,
+    width: "100%",
   },
   contentSelected: {
     backgroundColor: colors.primary,
