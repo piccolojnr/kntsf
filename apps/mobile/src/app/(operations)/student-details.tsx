@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Href, useLocalSearchParams, useRouter } from "expo-router";
 import {
   AlertTriangle,
+  ChevronLeft,
   CheckCircle2,
   CreditCard,
   Lock,
@@ -13,7 +14,7 @@ import {
   XCircle,
 } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { StudentInfoCard } from "@/components/cards/student-info-card";
@@ -218,6 +219,23 @@ export default function OperationsStudentDetailsScreen() {
       >
         {/* ── Sheet header ── */}
         <View style={styles.sheetHeader}>
+          <Pressable
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && styles.backButtonPressed,
+            ]}
+          >
+            <ChevronLeft
+              color={colors.textMuted}
+              size={18}
+              strokeWidth={2.5}
+            />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
           <Text style={styles.eyebrow}>STUDENT RECORD</Text>
           <Text style={styles.title}>Student Details</Text>
         </View>
@@ -379,6 +397,26 @@ const styles = StyleSheet.create({
   sheetHeader: {
     gap: spacing.xs,
     paddingBottom: spacing.md,
+  },
+  backButton: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 2,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  backButtonPressed: {
+    opacity: 0.65,
+  },
+  backButtonText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
   },
   eyebrow: {
     color: colors.primary,

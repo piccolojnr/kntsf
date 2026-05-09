@@ -1,12 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import {
+  ChevronLeft,
   CheckCircle2,
   CreditCard,
   Lock,
   ScanLine,
   ShieldAlert,
-  X,
 } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -256,8 +256,8 @@ export default function OperationsCardAssignmentScreen() {
         </View>
         <Button
           fullWidth={false}
-          icon={X}
-          label="Close"
+          icon={ChevronLeft}
+          label="Back"
           onPress={() => router.back()}
           size="compact"
           variant="secondary"

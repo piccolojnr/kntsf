@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { ChevronLeft } from "lucide-react-native";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 
@@ -7,6 +8,7 @@ type PageHeaderProps = {
   title: string;
   subtitle?: string;
   badgeText?: string;
+  onBack?: () => void;
   style?: ViewStyle;
 };
 
@@ -15,10 +17,26 @@ export function PageHeader({
   title,
   subtitle,
   badgeText,
+  onBack,
   style,
 }: PageHeaderProps) {
   return (
     <View style={[styles.container, style]}>
+      {onBack ? (
+        <Pressable
+          accessibilityLabel="Go back"
+          accessibilityRole="button"
+          hitSlop={8}
+          onPress={onBack}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && styles.backButtonPressed,
+          ]}
+        >
+          <ChevronLeft color={colors.textMuted} size={18} strokeWidth={2.5} />
+          <Text style={styles.backButtonText}>Back</Text>
+        </Pressable>
+      ) : null}
       <View style={styles.headerRow}>
         <View style={styles.dot} />
         <Text style={styles.eyebrow}>{eyebrow}</Text>
@@ -37,6 +55,26 @@ export function PageHeader({
 const styles = StyleSheet.create({
   container: {
     gap: spacing.xs,
+  },
+  backButton: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 2,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  backButtonPressed: {
+    opacity: 0.65,
+  },
+  backButtonText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
   },
   headerRow: {
     alignItems: "center",
