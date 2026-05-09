@@ -25,6 +25,8 @@ export type OperationsPermitListParams = {
 export type PermitsListResult = ApiListResponse<Permit>;
 
 function normalizePermit(dto: PermitDto): Permit {
+  const expiryDate = dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "";
+
   return {
     id: String(dto.id),
     studentId:
@@ -35,13 +37,31 @@ function normalizePermit(dto: PermitDto): Permit {
       dto.originalCode ??
       dto.code ??
       "",
-    status: dto.status ?? "expired",
+    status: normalizePermitStatus(dto.status, expiryDate),
     startDate: dto.startDate ?? dto.start_date ?? "",
-    expiryDate: dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "",
+    expiryDate,
     amountPaid: dto.amountPaid ?? dto.amount_paid ?? dto.amount ?? 0,
     qrCode: dto.qrCode,
     student: dto.student ?? null,
   };
+}
+
+function normalizePermitStatus(
+  status: PermitDto["status"],
+  expiryDate: string,
+): Permit["status"] {
+  const currentStatus = status ?? "expired";
+  const expiryTime = new Date(expiryDate).getTime();
+
+  if (
+    currentStatus === "active" &&
+    Number.isFinite(expiryTime) &&
+    expiryTime <= Date.now()
+  ) {
+    return "expired";
+  }
+
+  return currentStatus;
 }
 
 function normalizePermitIssuanceConfig(
