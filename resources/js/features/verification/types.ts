@@ -4,9 +4,11 @@ export type VerificationResult =
     | 'expired'
     | 'revoked'
     | 'not_found'
-    | 'error';
+    | 'error'
+    | 'card_inactive'
+    | 'mismatch';
 
-export type VerificationMethod = 'student_number' | 'permit_code';
+export type VerificationMethod = 'student_number' | 'permit_code' | 'nfc';
 
 export type VerificationStudent = {
     id: number;

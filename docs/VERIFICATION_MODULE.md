@@ -6,6 +6,7 @@ Phase 1 supports manual verification for staff/admin users:
 
 - verify by student number
 - verify by permit code
+- verify by NFC UID
 - log every attempt
 - protect logs from raw submitted identifiers
 
@@ -17,7 +18,7 @@ NFC, public verification endpoints, and mobile APIs are intentionally not includ
 
 | Column | Purpose |
 | --- | --- |
-| `method` | `student_number` or `permit_code` |
+| `method` | `student_number`, `permit_code`, or `nfc` |
 | `result` | `valid`, `invalid`, `expired`, `revoked`, `not_found`, or `error` |
 | `identifier_hash` | HMAC hash of the submitted identifier |
 | `reason` | Human-readable outcome note |
@@ -33,6 +34,7 @@ There is no `updated_at` column because logs are append-only audit records.
 ## Privacy Rule
 
 Raw submitted student numbers and permit codes must not be stored in verification logs.
+Raw NFC UIDs must not be stored either.
 
 The module stores:
 
@@ -40,6 +42,7 @@ The module stores:
 - resolved `student_id`
 - resolved `permit_id`
 - permit `code_last4` for display
+- NFC card metadata references, never the raw UID
 
 The full plaintext permit code is never stored.
 
@@ -66,7 +69,21 @@ The full plaintext permit code is never stored.
 4. Returns normalized result data.
 5. Marks active-but-expired permits as `expired`.
 
-`CreateVerificationLogAction` writes the final audit record for both flows.
+`CreateVerificationLogAction` writes the final audit record for all verification flows.
+
+### NFC UID
+
+`VerifyNfcUidAction`:
+
+1. Hashes the submitted NFC UID with `NfcUidHasher`.
+2. Finds the matching NFC card by `uid_hash`.
+3. Returns `not_found` if no card exists.
+4. Returns `card_inactive` if the card status is not `active`.
+5. Resolves the assigned student and checks the current permit.
+6. Returns `valid`, `expired`, `revoked`, or `invalid`.
+7. Logs the attempt using only the hashed UID.
+
+The dashboard NFC form is for internal testing only until mobile/NFC reader support is added.
 
 ## Permissions
 
@@ -84,6 +101,7 @@ Current seeding gives staff/admin operational access and keeps students out of t
 | `GET` | `/verification` | Manual verification page |
 | `POST` | `/verification/student-number` | Verify by student number |
 | `POST` | `/verification/permit-code` | Verify by permit code |
+| `POST` | `/verification/nfc` | Verify by NFC UID |
 | `GET` | `/verification/logs` | Audit log list |
 
 All routes are protected by `auth` and `verified`.
@@ -99,6 +117,7 @@ Feature components:
 
 - `student-number-verification-form.tsx`
 - `permit-code-verification-form.tsx`
+- `nfc-verification-form.tsx`
 - `verification-result-card.tsx`
 - `verification-log-list.tsx`
 - `verification-result-badge.tsx`

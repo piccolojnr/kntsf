@@ -6,4 +6,5 @@ enum VerificationMethod: string
 {
     case StudentNumber = 'student_number';
     case PermitCode = 'permit_code';
+    case Nfc = 'nfc';
 }

@@ -34,6 +34,8 @@ export function VerificationResultCard({
         revoked: ShieldX,
         not_found: CircleAlert,
         error: ShieldX,
+        card_inactive: CircleAlert,
+        mismatch: CircleAlert,
     }[result.result];
 
     return (

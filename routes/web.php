@@ -25,3 +25,4 @@ require __DIR__.'/academic-periods.php';
 require __DIR__.'/students.php';
 require __DIR__.'/permits.php';
 require __DIR__.'/verification.php';
+require __DIR__.'/nfc-cards.php';

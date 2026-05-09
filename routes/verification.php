@@ -14,6 +14,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('verification/permit-code', [VerificationController::class, 'verifyPermitCode'])
         ->name('verification.permit-code');
 
+    Route::post('verification/nfc', [VerificationController::class, 'verifyNfcUid'])
+        ->name('verification.nfc');
+
     Route::get('verification/logs', [VerificationLogController::class, 'index'])
         ->name('verification.logs');
 });
