@@ -8,14 +8,14 @@ import {
   Settings,
   Shield,
 } from "lucide-react-native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { ProfileHeaderCard } from "@/components/cards/profile-header-card";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { LoadingState } from "@/components/ui/loading-state";
 import { NavigationListItem } from "@/components/ui/navigation-list-item";
 import { PageHeader } from "@/components/ui/page-header";
@@ -94,9 +94,11 @@ export default function OperationsProfileScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
@@ -187,12 +189,15 @@ export default function OperationsProfileScreen() {
             />
           </>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingHorizontal: spacing.lg,

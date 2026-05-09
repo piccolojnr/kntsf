@@ -13,7 +13,6 @@ import {
   Keyboard,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -22,7 +21,7 @@ import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
 import { RadarPulse } from "@/components/ui/radar-pulse";
@@ -310,7 +309,8 @@ export default function OperationsCardAssignmentScreen() {
             exiting={FadeOut.duration(200)}
             style={styles.resultStage}
           >
-            <ScrollView
+            <AppRefreshableScrollView
+              style={styles.scrollView}
               contentContainerStyle={[
                 styles.resultContent,
                 {
@@ -320,7 +320,8 @@ export default function OperationsCardAssignmentScreen() {
                   paddingTop: isCompact ? spacing.md : spacing.xl,
                 },
               ]}
-              refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
               showsVerticalScrollIndicator={false}
             >
               {/* Success ring */}
@@ -373,11 +374,12 @@ export default function OperationsCardAssignmentScreen() {
                 label="Done"
                 onPress={() => router.back()}
               />
-            </ScrollView>
+            </AppRefreshableScrollView>
           </Animated.View>
         ) : (
           /* ── Idle / scanning state ── */
-          <ScrollView
+          <AppRefreshableScrollView
+            style={styles.scrollView}
             contentContainerStyle={[
               styles.assignmentContent,
               {
@@ -387,7 +389,8 @@ export default function OperationsCardAssignmentScreen() {
                 paddingTop: isCompact ? spacing.sm : spacing.lg,
               },
             ]}
-            refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.radarCluster}>
@@ -487,7 +490,7 @@ export default function OperationsCardAssignmentScreen() {
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </AppRefreshableScrollView>
         )}
       </Pressable>
     </View>
@@ -496,6 +499,9 @@ export default function OperationsCardAssignmentScreen() {
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
 

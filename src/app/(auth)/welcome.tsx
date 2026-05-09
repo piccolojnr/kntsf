@@ -1,17 +1,11 @@
 import { useRouter } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
 import React from "react";
-import {
-  Image,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { AuthWorkspace } from "@/features/auth/auth-types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Workspace tile ───────────────────────────────────────────────────────────
 

@@ -1,14 +1,13 @@
 import { LogOut, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
 import React from "react";
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -482,9 +481,11 @@ export default function StudentProfileScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
@@ -602,12 +603,15 @@ export default function StudentProfileScreen() {
             <LogoutButton onPress={logout} />
           </>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingHorizontal: spacing.lg,

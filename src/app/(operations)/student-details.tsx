@@ -13,11 +13,11 @@ import {
   XCircle,
 } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { StudentInfoCard } from "@/components/cards/student-info-card";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -209,10 +209,11 @@ export default function OperationsStudentDetailsScreen() {
       <View style={styles.dragHandle} />
 
       {/* ── Scrollable body ── */}
-      <ScrollView
+      <AppRefreshableScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Sheet header ── */}
@@ -359,7 +360,7 @@ export default function OperationsStudentDetailsScreen() {
             height: 32,
           }}
         />
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }

@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 
 import { CardStatusBadge } from "@/components/cards/card-status-badge";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { TextField } from "@/components/ui/text-field";
@@ -93,7 +92,8 @@ export default function OperationsCardsScreen() {
     <AdminToolScreen
       title="Cards"
       subtitle="Review card inventory, ownership, and lifecycle status."
-      refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
     >
       {isLoading ? (
         <LoadingState message="Loading card records..." />

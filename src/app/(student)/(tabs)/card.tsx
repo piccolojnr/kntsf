@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreditCard, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 import StudentIDCard from "@/components/cards/student-id-card";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -287,9 +287,11 @@ export default function StudentCardScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
@@ -344,12 +346,15 @@ export default function StudentCardScreen() {
             />
           </>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingBottom: spacing.xxl + 72,

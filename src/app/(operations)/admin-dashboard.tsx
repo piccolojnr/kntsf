@@ -3,7 +3,6 @@ import { ShieldCheck } from "lucide-react-native";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -69,7 +68,8 @@ export default function AdminDashboardScreen() {
     <AdminToolScreen
       title="Dashboard"
       subtitle="Review high-level operations metrics from the current workspace."
-      refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
     >
       {isLoading ? (
         <LoadingState message="Loading admin dashboard..." />

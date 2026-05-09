@@ -10,11 +10,11 @@ import {
   UserRound,
 } from "lucide-react-native";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import StudentIDCard from "@/components/cards/student-id-card";
 import { StudentPermitHistoryItem } from "@/components/cards/student-permit-history-item";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Screen } from "@/components/ui/screen";
@@ -338,9 +338,11 @@ export default function StudentHomeScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
@@ -392,7 +394,7 @@ export default function StudentHomeScreen() {
             <PermitHistorySection permits={sortedPermits} />
           </>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }
@@ -400,6 +402,9 @@ export default function StudentHomeScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingBottom: spacing.xxl + 72,
