@@ -12,6 +12,7 @@ type MobileApiResponse<T> = {
 
 export type OperationsListParams = {
   search?: string;
+  studentId?: string;
   page?: number;
   limit?: number;
 };
@@ -45,6 +46,7 @@ export async function getStudents(params?: OperationsListParams) {
     >("/api/mobile/operations/students", {
       params: {
         search: params?.search,
+        studentId: params?.studentId,
         page: params?.page,
         limit: params?.limit,
       },
@@ -67,6 +69,7 @@ export async function getStudentsPage(
     >("/api/mobile/operations/students", {
       params: {
         search: params?.search,
+        studentId: params?.studentId,
         page: params?.page,
         limit: params?.limit,
       },
@@ -91,21 +94,22 @@ export async function getStudentByStudentId(studentId: string) {
   const normalizedStudentId = studentId.trim();
   const students = await getStudents({
     search: normalizedStudentId,
+    studentId: normalizedStudentId,
     page: 1,
     limit: 20,
   });
 
   return (
-    students.find((student) => student.studentId === normalizedStudentId) ?? null
+    students.find((student) => student.studentId === normalizedStudentId) ??
+    null
   );
 }
 
 export async function getStudentProfile() {
   try {
-    const response =
-      await apiClient.get<MobileApiResponse<StudentDto | { student: StudentDto }>>(
-        "/api/mobile/student/profile",
-      );
+    const response = await apiClient.get<
+      MobileApiResponse<StudentDto | { student: StudentDto }>
+    >("/api/mobile/student/profile");
     const data = getMobileData(response.data);
 
     return normalizeStudent("student" in data ? data.student : data);

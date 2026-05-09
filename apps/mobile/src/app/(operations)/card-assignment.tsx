@@ -31,7 +31,7 @@ import {
   CardAssignmentMode,
 } from "@/features/cards/card-api";
 import { useCards } from "@/features/cards/use-cards";
-import { useStudents } from "@/features/students/use-students";
+import { useStudentByStudentId } from "@/features/students/use-students";
 import { useAuth } from "@/hooks/use-auth";
 import { useNfcAvailability } from "@/hooks/use-nfc-availability";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -71,19 +71,12 @@ export default function OperationsCardAssignmentScreen() {
     mode?: CardAssignmentMode;
     studentId?: string;
   }>();
-  const studentsQuery = useStudents(
-    studentId
-      ? {
-          search: studentId,
-          page: 1,
-          limit: 20,
-        }
-      : undefined,
-  );
+  const requestedStudentId = studentId?.trim() ?? "";
+  const studentQuery = useStudentByStudentId(requestedStudentId);
   const cardsQuery = useCards(
-    studentId
+    requestedStudentId
       ? {
-          search: studentId,
+          search: requestedStudentId,
           page: 1,
           limit: 100,
         }
@@ -109,9 +102,10 @@ export default function OperationsCardAssignmentScreen() {
     Math.max(insets.bottom, spacing.md) + spacing.xl;
 
   const student = useMemo(() => {
-    const students = studentsQuery.data ?? [];
-    return students.find((item) => item.studentId === studentId) ?? null;
-  }, [studentId, studentsQuery.data]);
+    return studentQuery.data?.studentId === requestedStudentId
+      ? studentQuery.data
+      : null;
+  }, [requestedStudentId, studentQuery.data]);
 
   const currentCard = useMemo(() => {
     if (!student) return null;
@@ -150,21 +144,21 @@ export default function OperationsCardAssignmentScreen() {
     assignmentMode === "replace" ? "Replace Card" : "Register Card";
 
   const isResolvingStudent = Boolean(
-    studentId &&
-    !student &&
-    (studentsQuery.isLoading || studentsQuery.isFetching),
+    requestedStudentId &&
+      !student &&
+      (studentQuery.isLoading || studentQuery.isFetching),
   );
   const isLoading =
-    !studentId ||
+    !requestedStudentId ||
     isResolvingStudent ||
-    studentsQuery.isLoading ||
+    studentQuery.isLoading ||
     cardsQuery.isLoading;
-  const hasError = studentsQuery.isError || cardsQuery.isError;
+  const hasError = studentQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
   const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
   const refreshControl = usePullToRefresh(async () => {
     await Promise.all([
-      studentsQuery.refetch(),
+      studentQuery.refetch(),
       cardsQuery.refetch(),
       refreshNfcAvailability(),
     ]);

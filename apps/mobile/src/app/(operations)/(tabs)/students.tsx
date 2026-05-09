@@ -64,16 +64,17 @@ export default function OperationsStudentsScreen() {
         refreshing={refreshControl.refreshing}
       >
         <PageHeader
-          badgeText={
-            pagination ? String(pagination.total) : undefined
-          }
+          badgeText={pagination ? String(pagination.total) : undefined}
           eyebrow="Operations"
           subtitle="Search student records and manage NFC card assignments."
           title="Students"
         />
 
         <SearchField
-          onChangeText={setSearchTerm}
+          onChangeText={(value) => {
+            setCurrentPage(1);
+            setSearchTerm(value);
+          }}
           placeholder="Search by student ID or name…"
           value={searchTerm}
         />
@@ -115,7 +116,11 @@ export default function OperationsStudentsScreen() {
                   !canGoPrev && styles.paginationBtnDisabled,
                 ]}
               >
-                <ChevronLeft size={16} color={colors.primary} strokeWidth={2.2} />
+                <ChevronLeft
+                  size={16}
+                  color={colors.primary}
+                  strokeWidth={2.2}
+                />
                 <Text style={styles.paginationBtnText}>Prev</Text>
               </Pressable>
               <Text style={styles.paginationLabel}>
@@ -132,7 +137,11 @@ export default function OperationsStudentsScreen() {
                 ]}
               >
                 <Text style={styles.paginationBtnText}>Next</Text>
-                <ChevronRight size={16} color={colors.primary} strokeWidth={2.2} />
+                <ChevronRight
+                  size={16}
+                  color={colors.primary}
+                  strokeWidth={2.2}
+                />
               </Pressable>
             </View>
           </View>
