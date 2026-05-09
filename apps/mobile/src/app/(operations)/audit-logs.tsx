@@ -3,7 +3,6 @@ import { FileCheck2, ShieldAlert } from "lucide-react-native";
 import { StyleSheet, Text, View } from "react-native";
 
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
@@ -47,7 +46,8 @@ export default function OperationsAuditLogsScreen() {
     <AdminToolScreen
       title="Audit Logs"
       subtitle="Review protected actions and verification activity in the operations workspace."
-      refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
     >
       {logsQuery.isLoading ? (
         <LoadingState message="Loading audit logs..." />

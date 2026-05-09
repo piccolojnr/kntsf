@@ -1,21 +1,24 @@
 import { Href } from "expo-router";
-import { PropsWithChildren, ReactElement } from "react";
-import { RefreshControlProps, ScrollView, StyleSheet } from "react-native";
+import { PropsWithChildren } from "react";
+import { StyleSheet } from "react-native";
 
 import { RoleAccessGuard } from "@/components/layout/role-access-guard";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { PageHeader } from "@/components/ui/page-header";
 import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
 
 type AdminToolScreenProps = PropsWithChildren<{
-  refreshControl?: ReactElement<RefreshControlProps>;
+  onRefresh: () => void;
+  refreshing: boolean;
   subtitle: string;
   title: string;
 }>;
 
 export function AdminToolScreen({
   children,
-  refreshControl,
+  onRefresh,
+  refreshing,
   subtitle,
   title,
 }: AdminToolScreenProps) {
@@ -25,20 +28,25 @@ export function AdminToolScreen({
       getForbiddenHref={() => "/(operations)/(tabs)/scan" as Href}
     >
       <Screen scrolled>
-        <ScrollView
+        <AppRefreshableScrollView
+          style={styles.scrollView}
           contentContainerStyle={styles.content}
-          refreshControl={refreshControl}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
           showsVerticalScrollIndicator={false}
         >
           <PageHeader eyebrow="Admin Tools" subtitle={subtitle} title={title} />
           {children}
-        </ScrollView>
+        </AppRefreshableScrollView>
       </Screen>
     </RoleAccessGuard>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingBottom: spacing.xxl + 72,

@@ -1,10 +1,10 @@
 import { Href, useRouter } from "expo-router";
 import { ChevronLeft, ChevronRight, Search, Users } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { StudentCard } from "@/components/cards/student-card";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -57,9 +57,11 @@ export default function OperationsStudentsScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
       >
         <PageHeader
           badgeText={
@@ -135,12 +137,15 @@ export default function OperationsStudentsScreen() {
             </View>
           </View>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingHorizontal: spacing.lg,

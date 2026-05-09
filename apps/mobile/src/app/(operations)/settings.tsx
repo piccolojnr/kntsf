@@ -4,7 +4,6 @@ import { StyleSheet, Switch, Text, View } from "react-native";
 
 import { SectionCard } from "@/components/cards/section-card";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -39,7 +38,8 @@ export default function OperationsSettingsScreen() {
     <AdminToolScreen
       title="Settings"
       subtitle="Inspect permit issuance configuration for this workspace."
-      refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
     >
       {configQuery.isLoading ? (
         <LoadingState message="Loading permit settings..." />

@@ -6,7 +6,7 @@ type EnvironmentConfig = {
 
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
-    apiBaseUrl: "",
+    apiBaseUrl: "http://192.168.100.249:3001",
   },
   staging: {
     apiBaseUrl: "",

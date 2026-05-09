@@ -4,7 +4,6 @@ import { ShieldAlert } from "lucide-react-native";
 import { SectionCard } from "@/components/cards/section-card";
 import { StatusCard } from "@/components/cards/status-card";
 import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -55,7 +54,8 @@ export default function OperationsReportsScreen() {
     <AdminToolScreen
       title="Reports"
       subtitle="Read simple operational summaries before charting is added."
-      refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
     >
       {isLoading ? (
         <LoadingState message="Loading reports..." />

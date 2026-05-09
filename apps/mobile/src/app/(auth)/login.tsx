@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,7 +13,6 @@ import {
   View,
 } from "react-native";
 
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import {
@@ -23,7 +21,7 @@ import {
   UserRole,
 } from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
-import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -165,9 +163,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const refreshControl = usePullToRefresh(async () => {
-    setErrorMessage(null);
-  });
 
   async function handleLogin() {
     setIsSubmitting(true);
@@ -189,12 +184,12 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.screen}>
       <KeyboardAvoidingView
         style={styles.keyboard}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          style={styles.scrollView}
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
-          refreshControl={<AppRefreshControl {...refreshControl} />}
           showsVerticalScrollIndicator={false}
         >
           {/* Back */}
@@ -277,6 +272,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   keyboard: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
   scroll: {

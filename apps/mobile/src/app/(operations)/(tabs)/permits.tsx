@@ -1,10 +1,10 @@
 import { ChevronLeft, ChevronRight, FileText, Search } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitLedgerRow } from "@/components/cards/permit-ledger-row";
-import { AppRefreshControl } from "@/components/ui/app-refresh-control";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -124,10 +124,12 @@ export default function OperationsPermitsScreen() {
 
   return (
     <Screen scrolled>
-      <ScrollView
+      <AppRefreshableScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
-        refreshControl={<AppRefreshControl {...refreshControl} />}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
         showsVerticalScrollIndicator={false}
       >
         <PageHeader
@@ -252,7 +254,7 @@ export default function OperationsPermitsScreen() {
             </View>
           </View>
         )}
-      </ScrollView>
+      </AppRefreshableScrollView>
 
       <PermitDetailModal
         onClose={() => setSelectedPermitId(null)}
@@ -265,6 +267,9 @@ export default function OperationsPermitsScreen() {
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     paddingHorizontal: spacing.lg,
