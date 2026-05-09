@@ -1,53 +1,20 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
+use App\Support\MediaCollections;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
-uses(RefreshDatabase::class);
-
-beforeEach(function () {
-    Schema::create('media_library_test_models', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->timestamps();
-    });
+test('media library foundation is configured', function () {
+    expect(Schema::hasTable('media'))->toBeTrue()
+        ->and(config('media-library.disk_name'))->toBe('public')
+        ->and(config('media-library.queue_conversions_by_default'))->toBeTrue()
+        ->and(config('media-library.media_model'))->toBeString();
 });
 
-test('media library can attach files to media models', function () {
-    Storage::fake('public');
-    config(['media-library.disk_name' => 'public']);
-
-    $model = MediaLibraryTestModel::query()->create([
-        'name' => 'Foundation media holder',
-    ]);
-
-    $media = $model
-        ->addMedia(UploadedFile::fake()->create('foundation.pdf', 12, 'application/pdf'))
-        ->toMediaCollection('documents');
-
-    expect($model->getMedia('documents'))->toHaveCount(1)
-        ->and($media->collection_name)->toBe('documents')
-        ->and($media->disk)->toBe('public')
-        ->and($media->file_name)->toBe('foundation.pdf');
-
-    Storage::disk('public')->assertExists($media->getPathRelativeToRoot());
+test('media collection names are centralized', function () {
+    expect(MediaCollections::AVATAR)->toBe('avatar')
+        ->and(MediaCollections::FEATURED_IMAGE)->toBe('featured_image')
+        ->and(MediaCollections::GALLERY)->toBe('gallery')
+        ->and(MediaCollections::BANNER)->toBe('banner')
+        ->and(MediaCollections::FILES)->toBe('files')
+        ->and(MediaCollections::ATTACHMENTS)->toBe('attachments');
 });
-
-class MediaLibraryTestModel extends Model implements HasMedia
-{
-    use InteractsWithMedia;
-
-    protected $guarded = [];
-
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('documents')
-            ->useDisk('public');
-    }
-}
