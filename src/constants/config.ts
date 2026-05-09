@@ -1,4 +1,4 @@
-export type AppEnvironment = "development" | "staging" | "production";
+export type AppEnvironment = "development" | "preview" | "production";
 
 type EnvironmentConfig = {
   apiBaseUrl: string;
@@ -6,20 +6,21 @@ type EnvironmentConfig = {
 
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
-    apiBaseUrl: "http://192.168.100.249:3001",
+    // apiBaseUrl: "http://192.168.100.249:3001",
+    apiBaseUrl: "https://admin.knutsfordsrc.com",
   },
-  staging: {
-    apiBaseUrl: "",
+  preview: {
+    apiBaseUrl: "https://admin.knutsfordsrc.com",
   },
   production: {
-    apiBaseUrl: "",
+    apiBaseUrl: "https://admin.knutsfordsrc.com",
   },
 };
 
 function getAppEnvironment(): AppEnvironment {
   const value = process.env.EXPO_PUBLIC_APP_ENV;
 
-  if (value === "development" || value === "staging" || value === "production") {
+  if (value === "development" || value === "preview" || value === "production") {
     return value;
   }
 
