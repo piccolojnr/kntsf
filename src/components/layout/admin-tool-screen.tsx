@@ -1,4 +1,4 @@
-import { Href } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { PropsWithChildren } from "react";
 import { StyleSheet } from "react-native";
 
@@ -22,6 +22,8 @@ export function AdminToolScreen({
   subtitle,
   title,
 }: AdminToolScreenProps) {
+  const router = useRouter();
+
   return (
     <RoleAccessGuard
       allowedRoles={["admin"]}
@@ -35,7 +37,12 @@ export function AdminToolScreen({
           refreshing={refreshing}
           showsVerticalScrollIndicator={false}
         >
-          <PageHeader eyebrow="Admin Tools" subtitle={subtitle} title={title} />
+          <PageHeader
+            eyebrow="Admin Tools"
+            onBack={() => router.back()}
+            subtitle={subtitle}
+            title={title}
+          />
           {children}
         </AppRefreshableScrollView>
       </Screen>
