@@ -10,4 +10,6 @@ enum VerificationResult: string
     case Revoked = 'revoked';
     case NotFound = 'not_found';
     case Error = 'error';
+    case CardInactive = 'card_inactive';
+    case Mismatch = 'mismatch';
 }

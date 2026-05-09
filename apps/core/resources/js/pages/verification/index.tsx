@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { History, ShieldCheck } from 'lucide-react';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
+import { NfcVerificationForm } from '@/features/verification/components/nfc-verification-form';
 import { PermitCodeVerificationForm } from '@/features/verification/components/permit-code-verification-form';
 import { StudentNumberVerificationForm } from '@/features/verification/components/student-number-verification-form';
 import { VerificationResultCard } from '@/features/verification/components/verification-result-card';
@@ -36,9 +37,10 @@ export default function VerificationIndex({
                     )}
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-4 xl:grid-cols-3">
                     <StudentNumberVerificationForm />
                     <PermitCodeVerificationForm />
+                    <NfcVerificationForm />
                 </div>
 
                 <VerificationResultCard result={result} />

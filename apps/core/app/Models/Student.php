@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -45,6 +46,16 @@ class Student extends Model
     public function permits(): HasMany
     {
         return $this->hasMany(Permit::class);
+    }
+
+    public function nfcCards(): HasMany
+    {
+        return $this->hasMany(NfcCard::class);
+    }
+
+    public function activeNfcCard(): HasOne
+    {
+        return $this->hasOne(NfcCard::class)->where('status', 'active');
     }
 
     protected function casts(): array

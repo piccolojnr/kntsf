@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Verification;
 
 use App\Actions\Verification\CreateVerificationLogAction;
+use App\Actions\Verification\VerifyNfcUidAction;
 use App\Actions\Verification\VerifyPermitCodeAction;
 use App\Actions\Verification\VerifyStudentNumberAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Verification\VerifyNfcUidRequest;
 use App\Http\Requests\Verification\VerifyPermitCodeRequest;
 use App\Http\Requests\Verification\VerifyStudentNumberRequest;
 use Illuminate\Http\RedirectResponse;
@@ -46,6 +48,18 @@ class VerificationController extends Controller
         CreateVerificationLogAction $createVerificationLog,
     ): RedirectResponse {
         $attempt = $verifyPermitCode->handle($request->validated('permit_code'));
+
+        $createVerificationLog->handle($attempt, $request);
+
+        return back()->with('verificationResult', $attempt->toPayload());
+    }
+
+    public function verifyNfcUid(
+        VerifyNfcUidRequest $request,
+        VerifyNfcUidAction $verifyNfcUid,
+        CreateVerificationLogAction $createVerificationLog,
+    ): RedirectResponse {
+        $attempt = $verifyNfcUid->handle($request->validated('uid'));
 
         $createVerificationLog->handle($attempt, $request);
 
