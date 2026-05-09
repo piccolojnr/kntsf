@@ -33,6 +33,7 @@ export function FloatingScanInput({
   helperText,
 }: FloatingScanInputProps) {
   const shouldShowGhost = studentId.length < 8;
+  const ghostRemainder = "26102859".slice(studentId.length);
 
   return (
     <View style={styles.wrapper}>
@@ -40,11 +41,14 @@ export function FloatingScanInput({
         <View style={styles.inputArea}>
           <Text style={styles.prefix}>ID</Text>
           <View style={styles.inputStack}>
-            {shouldShowGhost ? (
-              <Text style={styles.ghostText} numberOfLines={1}>
-                26102859
-              </Text>
-            ) : null}
+            <Text style={styles.displayText} numberOfLines={1}>
+              {studentId ? (
+                <Text style={styles.valueText}>{studentId}</Text>
+              ) : null}
+              {shouldShowGhost ? (
+                <Text style={styles.ghostText}>{ghostRemainder}</Text>
+              ) : null}
+            </Text>
             <TextInput
               autoCorrect={false}
               keyboardType="number-pad"
@@ -55,6 +59,7 @@ export function FloatingScanInput({
               onSubmitEditing={onSubmit}
               returnKeyType="done"
               style={styles.input}
+              caretHidden={false}
               value={studentId}
             />
           </View>
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
   },
   inputStack: {
     flex: 1,
-    height: 28,
+    height: 32,
     justifyContent: "center",
   },
   prefix: {
@@ -159,32 +164,37 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 1,
   },
-  ghostText: {
-    color: colors.textMuted,
+  displayText: {
     fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
     fontSize: fontSizes.lg,
     fontWeight: "700",
     includeFontPadding: false,
-    left: 0,
     letterSpacing: 3,
-    lineHeight: 28,
-    opacity: 0.45,
-    position: "absolute",
-    right: 0,
+    lineHeight: 32,
     textAlignVertical: "center",
+  },
+  valueText: {
+    color: colors.text,
+  },
+  ghostText: {
+    color: colors.textMuted,
+    opacity: 0.45,
   },
   input: {
     backgroundColor: colors.transparent,
-    color: colors.text,
+    color: colors.transparent,
     flex: 1,
     fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
     fontSize: fontSizes.lg,
     fontWeight: "700",
     includeFontPadding: false,
     letterSpacing: 3,
-    lineHeight: 28,
+    lineHeight: 32,
+    margin: 0,
+    padding: 0,
     paddingHorizontal: 0,
     paddingVertical: 0,
+    ...StyleSheet.absoluteFillObject,
     textAlignVertical: "center",
   },
 
