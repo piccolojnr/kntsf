@@ -1,4 +1,5 @@
 import { edit as editAppearance } from '@/routes/appearance';
+import { edit as editPermitSettings } from '@/routes/permit-settings';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
@@ -21,5 +22,11 @@ export const settingsNavItems: NavItem[] = [
         href: editAppearance(),
         icon: null,
         permission: 'settings.view',
+    },
+    {
+        title: 'Permit settings',
+        href: editPermitSettings(),
+        icon: null,
+        permission: 'permit_settings.view',
     },
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\PermitSettingsController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/security', [SecurityController::class, 'edit'])->name('security.edit');
+
+    Route::get('settings/permit-settings', [PermitSettingsController::class, 'edit'])
+        ->name('permit-settings.edit');
+
+    Route::patch('settings/permit-settings', [PermitSettingsController::class, 'update'])
+        ->name('permit-settings.update');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
         ->middleware('throttle:6,1')
