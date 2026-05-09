@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Auth } from '@/types/auth';
 import type { BreadcrumbItem } from '@/types/navigation';
 
 export type AppLayoutProps = {
@@ -18,4 +19,11 @@ export type AuthLayoutProps = {
     name?: string;
     title?: string;
     description?: string;
+};
+
+export type SharedPageProps = {
+    name: string;
+    auth: Auth;
+    sidebarOpen: boolean;
+    [key: string]: unknown;
 };

@@ -99,6 +99,20 @@ resources/js/services
 
 These folders are intentionally empty or near-empty until real features need them. The first real domain module is documented separately in `docs/STUDENTS_MODULE.md`.
 
+Feature-specific React components should live under `resources/js/features/{feature}`. Inertia page entry points should stay under `resources/js/pages`.
+
+Global starter components are grouped by purpose:
+
+```text
+resources/js/components/app
+resources/js/components/navigation
+resources/js/components/settings
+resources/js/components/shared
+resources/js/components/ui
+```
+
+Keep `components/ui` for shadcn-style primitives only. Domain-specific forms, lists, dialogs, and tables should live in their feature folder.
+
 ## Navigation
 
 Navigation definitions are centralized under:
@@ -112,6 +126,20 @@ resources/js/navigation/filter-nav-items.ts
 The navigation item shape supports `title`, `href`, `icon`, `permission`, `roles`, and `children`. The sidebar, header, mobile menu, and settings layout now import their navigation items from these files.
 
 Permission-aware filtering is prepared through `filterNavItemsForUser()`, but it currently returns all items. Backend authorization remains the source of truth, and frontend filtering should only be added after safe role/permission props are shared with Inertia.
+
+Starter repository/documentation footer links have been removed from the app navigation to reduce template noise.
+
+## Frontend Tooling
+
+This project uses `pnpm` for JavaScript dependencies and scripts:
+
+```bash
+pnpm install
+pnpm run types:check
+pnpm run lint
+```
+
+Do not use npm for this project, and do not commit `package-lock.json`.
 
 ## Dashboard Shell
 

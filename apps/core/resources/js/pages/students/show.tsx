@@ -1,6 +1,6 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -9,18 +9,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { destroy, edit, index } from '@/routes/students';
-
-type Student = {
-    id: number;
-    student_number: string;
-    name: string | null;
-    email: string | null;
-    phone: string | null;
-    course: string | null;
-    level: string | null;
-    created_at: string | null;
-};
+import { StudentDeleteDialog } from '@/features/students/components/student-delete-dialog';
+import { StudentFormDialog } from '@/features/students/components/student-form-dialog';
+import type { Student } from '@/features/students/types';
+import { index } from '@/routes/students';
 
 export default function ShowStudent({
     student,
@@ -44,26 +36,28 @@ export default function ShowStudent({
 
                     <div className="flex gap-2">
                         {can.update && (
-                            <Button asChild variant="outline">
-                                <Link href={edit(student.id)}>
-                                    <Pencil />
-                                    Edit
-                                </Link>
-                            </Button>
+                            <StudentFormDialog
+                                mode="edit"
+                                student={student}
+                                trigger={
+                                    <Button variant="outline">
+                                        <Pencil />
+                                        Edit
+                                    </Button>
+                                }
+                            />
                         )}
 
                         {can.delete && (
-                            <Form {...destroy.form(student.id)}>
-                                {({ processing }) => (
-                                    <Button
-                                        variant="destructive"
-                                        disabled={processing}
-                                    >
+                            <StudentDeleteDialog
+                                student={student}
+                                trigger={
+                                    <Button variant="destructive">
                                         <Trash2 />
                                         Delete
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         )}
                     </div>
                 </div>
@@ -78,7 +72,10 @@ export default function ShowStudent({
                     </CardHeader>
                     <CardContent>
                         <dl className="grid gap-4 sm:grid-cols-2">
-                            <Detail label="Student number" value={student.student_number} />
+                            <Detail
+                                label="Student number"
+                                value={student.student_number}
+                            />
                             <Detail label="Name" value={student.name} />
                             <Detail label="Email" value={student.email} />
                             <Detail label="Phone" value={student.phone} />
