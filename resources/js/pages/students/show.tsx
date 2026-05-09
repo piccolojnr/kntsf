@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { KeyRound, Pencil, Trash2 } from 'lucide-react';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { StudentActivateAccountDialog } from '@/features/students/components/student-activate-account-dialog';
 import { StudentDeleteDialog } from '@/features/students/components/student-delete-dialog';
 import { StudentFormDialog } from '@/features/students/components/student-form-dialog';
 import type { Student } from '@/features/students/types';
@@ -19,7 +20,7 @@ export default function ShowStudent({
     can,
 }: {
     student: Student;
-    can: { update: boolean; delete: boolean };
+    can: { update: boolean; delete: boolean; activateAccount: boolean };
 }) {
     return (
         <>
@@ -35,6 +36,22 @@ export default function ShowStudent({
                     />
 
                     <div className="flex gap-2">
+                        {can.activateAccount &&
+                            student.account_status !== 'activated' && (
+                                <StudentActivateAccountDialog
+                                    student={student}
+                                    trigger={
+                                        <Button variant="secondary">
+                                            <KeyRound />
+                                            {student.account_status ===
+                                            'pending_setup'
+                                                ? 'Resend setup'
+                                                : 'Activate account'}
+                                        </Button>
+                                    }
+                                />
+                            )}
+
                         {can.update && (
                             <StudentFormDialog
                                 mode="edit"
@@ -73,8 +90,16 @@ export default function ShowStudent({
                     <CardContent>
                         <dl className="grid gap-4 sm:grid-cols-2">
                             <Detail
+                                label="Account status"
+                                value={student.account_status_label}
+                            />
+                            <Detail
                                 label="Student number"
                                 value={student.student_number}
+                            />
+                            <Detail
+                                label="Linked user"
+                                value={student.user?.email ?? null}
                             />
                             <Detail label="Name" value={student.name} />
                             <Detail label="Email" value={student.email} />

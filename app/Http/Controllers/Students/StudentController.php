@@ -22,7 +22,8 @@ class StudentController extends Controller
         $search = $request->string('search')->trim()->toString();
 
         $students = Student::query()
-            ->select(['id', 'student_number', 'name', 'email', 'phone', 'course', 'level', 'created_at'])
+            ->select(['id', 'user_id', 'student_number', 'name', 'email', 'phone', 'course', 'level', 'created_at'])
+            ->with('user:id,name,email,password')
             ->when($search !== '', function (Builder $query) use ($search) {
                 $query->where(function (Builder $query) use ($search) {
                     $query->where('student_number', 'like', "%{$search}%")
@@ -45,6 +46,7 @@ class StudentController extends Controller
                 'create' => $request->user()?->can('create', Student::class) ?? false,
                 'update' => $request->user()?->can('students.update') ?? false,
                 'delete' => $request->user()?->can('students.delete') ?? false,
+                'activateAccount' => $request->user()?->can('students.activate_account') ?? false,
             ],
         ]);
     }
@@ -69,6 +71,7 @@ class StudentController extends Controller
             'can' => [
                 'update' => $request->user()?->can('update', $student) ?? false,
                 'delete' => $request->user()?->can('delete', $student) ?? false,
+                'activateAccount' => $request->user()?->can('activateAccount', $student) ?? false,
             ],
         ]);
     }
@@ -93,10 +96,12 @@ class StudentController extends Controller
     }
 
     /**
-     * @return array{id: int, student_number: string, name: string|null, email: string|null, phone: string|null, course: string|null, level: string|null, created_at: string|null}
+     * @return array{id: int, student_number: string, name: string|null, email: string|null, phone: string|null, course: string|null, level: string|null, created_at: string|null, user: array{id: int, name: string, email: string}|null, account_status: string, account_status_label: string}
      */
     private function studentPayload(Student $student): array
     {
+        $student->loadMissing('user:id,name,email,password');
+
         return [
             'id' => $student->id,
             'student_number' => $student->student_number,
@@ -106,6 +111,26 @@ class StudentController extends Controller
             'course' => $student->course,
             'level' => $student->level,
             'created_at' => $student->created_at?->toISOString(),
+            'user' => $student->user === null ? null : [
+                'id' => $student->user->id,
+                'name' => $student->user->name,
+                'email' => $student->user->email,
+            ],
+            'account_status' => $this->accountStatus($student),
+            'account_status_label' => match ($this->accountStatus($student)) {
+                'activated' => 'Activated',
+                'pending_setup' => 'Pending setup',
+                default => 'Not activated',
+            },
         ];
+    }
+
+    private function accountStatus(Student $student): string
+    {
+        if ($student->user === null) {
+            return 'not_activated';
+        }
+
+        return $student->user->password === null ? 'pending_setup' : 'activated';
     }
 }
