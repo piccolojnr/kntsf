@@ -46,3 +46,27 @@ The password is hashed by the `User` model cast. Do not hardcode credentials in 
 ## Authorization Warning
 
 Frontend visibility is not authorization. Hiding sidebar items or buttons is only a user experience concern. Every protected action still needs backend authorization through middleware, policies, gates, or Form Request authorization.
+
+## Media Library
+
+Spatie Media Library is installed for future uploads, images, documents, thumbnails, responsive images, and named media collections.
+
+Published foundation files:
+
+```text
+config/media-library.php
+database/migrations/*_create_media_table.php
+```
+
+Default environment examples:
+
+```env
+MEDIA_DISK=public
+MEDIA_QUEUE=media
+QUEUE_CONVERSIONS_BY_DEFAULT=true
+QUEUE_CONVERSIONS_AFTER_DB_COMMIT=true
+```
+
+Future models that accept media must explicitly implement `Spatie\MediaLibrary\HasMedia` and use `Spatie\MediaLibrary\InteractsWithMedia`. Do not attach media behavior to models until the related upload workflow exists.
+
+Use named collections such as `avatar`, `documents`, `images`, or `attachments` on the model that owns the files. Validate all uploads with Form Requests before adding files to a media collection.
