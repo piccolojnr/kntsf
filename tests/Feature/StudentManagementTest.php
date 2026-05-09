@@ -32,6 +32,8 @@ test('authorized user can view students index', function () {
             ->component('students/index')
             ->where('students.data.0.id', $student->id)
             ->where('students.data.0.student_number', 'STU-10001')
+            ->where('options.student_number_prefix', '2610')
+            ->where('options.levels.0.value', '100')
             ->where('can.create', true));
 });
 
@@ -76,6 +78,19 @@ test('duplicate student number is rejected', function () {
         ])
         ->assertRedirect(route('students.index'))
         ->assertSessionHasErrors('student_number');
+});
+
+test('configured course and level values are enforced', function () {
+    $this->actingAs(userWithRole('admin'))
+        ->from(route('students.index'))
+        ->post(route('students.store'), [
+            'student_number' => 'STU-10005',
+            'name' => 'Invalid Options',
+            'course' => 'Unconfigured Course',
+            'level' => '900',
+        ])
+        ->assertRedirect(route('students.index'))
+        ->assertSessionHasErrors(['course', 'level']);
 });
 
 test('authorized user can update student', function () {

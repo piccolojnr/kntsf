@@ -1,6 +1,18 @@
-import { Head } from '@inertiajs/react';
-import { KeyRound, Pencil, Trash2 } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    BookOpen,
+    KeyRound,
+    Mail,
+    Pencil,
+    Phone,
+    Trash2,
+    UserRound
+    
+} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import Heading from '@/components/shared/heading';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,27 +24,35 @@ import {
 import { StudentActivateAccountDialog } from '@/features/students/components/student-activate-account-dialog';
 import { StudentDeleteDialog } from '@/features/students/components/student-delete-dialog';
 import { StudentFormDialog } from '@/features/students/components/student-form-dialog';
-import type { Student } from '@/features/students/types';
+import { AccountStatus } from '@/features/students/components/student-list';
+import type { Student, StudentFormOptions } from '@/features/students/types';
 import { index } from '@/routes/students';
 
 export default function ShowStudent({
     student,
+    options,
     can,
 }: {
     student: Student;
+    options: StudentFormOptions;
     can: { update: boolean; delete: boolean; activateAccount: boolean };
 }) {
     return (
         <>
             <Head title={student.student_number} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+                <Button asChild variant="ghost" className="w-fit">
+                    <Link href={index()}>
+                        <ArrowLeft />
+                        Back to students
+                    </Link>
+                </Button>
+
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <Heading
-                        title={student.student_number}
-                        description={
-                            student.name ?? 'Base student record details'
-                        }
+                        title={student.name ?? 'Unnamed student'}
+                        description={`Student number ${student.student_number}`}
                     />
 
                     <div className="flex gap-2">
@@ -55,6 +75,7 @@ export default function ShowStudent({
                         {can.update && (
                             <StudentFormDialog
                                 mode="edit"
+                                options={options}
                                 student={student}
                                 trigger={
                                     <Button variant="outline">
@@ -79,34 +100,111 @@ export default function ShowStudent({
                     </div>
                 </div>
 
-                <Card className="max-w-3xl">
-                    <CardHeader>
-                        <CardTitle>Student information</CardTitle>
-                        <CardDescription>
-                            Account, permit, NFC, and payment workflows are not
-                            attached yet.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <dl className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                    <Card className="gap-0 py-0">
+                        <CardHeader className="border-b py-4">
+                            <CardTitle>Student profile</CardTitle>
+                            <CardDescription>
+                                Core profile fields used across student
+                                operations.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid gap-4 py-4 sm:grid-cols-2">
                             <Detail
-                                label="Account status"
-                                value={student.account_status_label}
-                            />
-                            <Detail
+                                icon={UserRound}
                                 label="Student number"
                                 value={student.student_number}
                             />
                             <Detail
+                                icon={BookOpen}
+                                label="Course"
+                                value={student.course}
+                            />
+                            <Detail
+                                icon={BookOpen}
+                                label="Level"
+                                value={
+                                    student.level
+                                        ? `Level ${student.level}`
+                                        : null
+                                }
+                            />
+                            <Detail
+                                icon={Mail}
+                                label="Email"
+                                value={student.email}
+                            />
+                            <Detail
+                                icon={Phone}
+                                label="Phone"
+                                value={student.phone}
+                            />
+                            <Detail
+                                icon={UserRound}
                                 label="Linked user"
                                 value={student.user?.email ?? null}
                             />
-                            <Detail label="Name" value={student.name} />
-                            <Detail label="Email" value={student.email} />
-                            <Detail label="Phone" value={student.phone} />
-                            <Detail label="Course" value={student.course} />
-                            <Detail label="Level" value={student.level} />
-                        </dl>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="gap-0 py-0">
+                        <CardHeader className="border-b py-4">
+                            <CardTitle>Account readiness</CardTitle>
+                            <CardDescription>
+                                Student login access is handled through account
+                                activation.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4 py-4">
+                            <div className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
+                                <div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Current state
+                                    </p>
+                                    <p className="mt-1 text-sm font-medium">
+                                        {student.account_status_label}
+                                    </p>
+                                </div>
+                                <AccountStatus student={student} />
+                            </div>
+
+                            <div className="space-y-2 text-sm">
+                                <ReadinessRow
+                                    label="Email available"
+                                    complete={student.email !== null}
+                                />
+                                <ReadinessRow
+                                    label="User linked"
+                                    complete={student.user !== null}
+                                />
+                                <ReadinessRow
+                                    label="Password setup complete"
+                                    complete={
+                                        student.account_status === 'activated'
+                                    }
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card className="max-w-3xl gap-0 py-0">
+                    <CardHeader className="py-4">
+                        <CardTitle>Configured options</CardTitle>
+                        <CardDescription>
+                            These lists come from app settings and can be
+                            expanded later from a settings screen.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap gap-2 border-t py-4">
+                        {options.levels.map((level) => (
+                            <Badge key={level.value} variant="outline">
+                                Level {level.label}
+                            </Badge>
+                        ))}
+                        <Badge variant="secondary">
+                            Prefix {options.student_number_prefix}
+                        </Badge>
                     </CardContent>
                 </Card>
             </div>
@@ -114,17 +212,46 @@ export default function ShowStudent({
     );
 }
 
-function Detail({ label, value }: { label: string; value: string | null }) {
+function Detail({
+    icon: Icon,
+    label,
+    value,
+}: {
+    icon: LucideIcon;
+    label: string;
+    value: string | null;
+}) {
     return (
-        <div className="rounded-md border p-4">
-            <dt className="text-sm font-medium text-muted-foreground">
-                {label}
-            </dt>
-            <dd className="mt-1 text-sm">{value ?? 'Not provided'}</dd>
+        <div className="flex gap-3 rounded-lg border p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                <Icon className="size-4" />
+            </div>
+            <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">{label}</dt>
+                <dd className="mt-1 truncate text-sm font-medium">
+                    {value ?? 'Not provided'}
+                </dd>
+            </div>
         </div>
     );
 }
 
+function ReadinessRow({
+    label,
+    complete,
+}: {
+    label: string;
+    complete: boolean;
+}) {
+    return (
+        <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">{label}</span>
+            <Badge variant={complete ? 'secondary' : 'outline'}>
+                {complete ? 'Ready' : 'Pending'}
+            </Badge>
+        </div>
+    );
+}
 ShowStudent.layout = {
     breadcrumbs: [
         {
