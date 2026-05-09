@@ -1,7 +1,8 @@
 import { Href, useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -72,6 +73,7 @@ function InputField({
   secureTextEntry,
   autoCapitalize,
   keyboardType,
+  onFocus,
   onToggleSecure,
   showSecure,
 }: {
@@ -82,6 +84,7 @@ function InputField({
   secureTextEntry?: boolean;
   autoCapitalize?: "none" | "sentences";
   keyboardType?: "email-address" | "default";
+  onFocus?: () => void;
   onToggleSecure?: () => void;
   showSecure?: boolean;
 }) {
@@ -99,6 +102,7 @@ function InputField({
           autoCapitalize={autoCapitalize ?? "sentences"}
           keyboardType={keyboardType ?? "default"}
           autoCorrect={false}
+          onFocus={onFocus}
           selectionColor={colors.primary}
         />
         {onToggleSecure && (
@@ -149,6 +153,7 @@ const fieldStyles = StyleSheet.create({
 
 export default function LoginScreen() {
   const router = useRouter();
+  const scrollViewRef = useRef<ScrollView>(null);
   const { selectedWorkspace } = useLocalSearchParams<{
     selectedWorkspace?: AuthWorkspace;
   }>();
@@ -163,6 +168,38 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [androidKeyboardInset, setAndroidKeyboardInset] = useState(0);
+
+  useEffect(() => {
+    if (Platform.OS !== "android") {
+      return;
+    }
+
+    const showSubscription = Keyboard.addListener("keyboardDidShow", (event) => {
+      setAndroidKeyboardInset(event.endCoordinates.height + spacing.md);
+      requestAnimationFrame(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      });
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setAndroidKeyboardInset(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  function handleInputFocus() {
+    if (Platform.OS !== "android") {
+      return;
+    }
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 120);
+  }
 
   async function handleLogin() {
     setIsSubmitting(true);
@@ -187,8 +224,15 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={[
+            styles.scroll,
+            androidKeyboardInset > 0 && {
+              justifyContent: "flex-start",
+              paddingBottom: androidKeyboardInset,
+            },
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -237,6 +281,7 @@ export default function LoginScreen() {
               placeholder="Enter your email"
               autoCapitalize="none"
               keyboardType="email-address"
+              onFocus={handleInputFocus}
             />
 
             <InputField
@@ -245,6 +290,7 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               placeholder="Enter your password"
               secureTextEntry={!showPassword}
+              onFocus={handleInputFocus}
               onToggleSecure={() => setShowPassword((v) => !v)}
               showSecure={showPassword}
             />
