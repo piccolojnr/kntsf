@@ -70,3 +70,67 @@ QUEUE_CONVERSIONS_AFTER_DB_COMMIT=true
 Future models that accept media must explicitly implement `Spatie\MediaLibrary\HasMedia` and use `Spatie\MediaLibrary\InteractsWithMedia`. Do not attach media behavior to models until the related upload workflow exists.
 
 Use named collections such as `avatar`, `documents`, `images`, or `attachments` on the model that owns the files. Validate all uploads with Form Requests before adding files to a media collection.
+
+More detail is documented in `docs/MEDIA_STRATEGY.md`.
+
+## Project Folders
+
+Backend foundation folders:
+
+```text
+app/Actions
+app/Enums
+app/Events
+app/Jobs
+app/Mail
+app/Notifications
+app/Policies
+app/Services
+app/Support
+```
+
+Frontend foundation folders:
+
+```text
+resources/js/features
+resources/js/navigation
+resources/js/services
+```
+
+These folders are intentionally empty or near-empty until real features need them. Business modules, tables, and models have not been created yet.
+
+## Navigation
+
+Navigation definitions are centralized under:
+
+```text
+resources/js/navigation/app-nav.ts
+resources/js/navigation/settings-nav.ts
+resources/js/navigation/filter-nav-items.ts
+```
+
+The navigation item shape supports `title`, `href`, `icon`, `permission`, `roles`, and `children`. The sidebar, header, mobile menu, and settings layout now import their navigation items from these files.
+
+Permission-aware filtering is prepared through `filterNavItemsForUser()`, but it currently returns all items. Backend authorization remains the source of truth, and frontend filtering should only be added after safe role/permission props are shared with Inertia.
+
+## Dashboard Shell
+
+The starter placeholder dashboard has been replaced with a minimal operations shell. It includes a welcome section, quick action placeholders, operational overview placeholders, and a recent activity placeholder. No business data, tables, or workflows are implemented yet.
+
+## Queue Setup
+
+Database queues are the default foundation queue driver:
+
+```env
+QUEUE_CONNECTION=database
+```
+
+Queue tables already exist. No worker is started automatically. Media conversions should be queued when conversions are introduced.
+
+## Intentionally Not Implemented
+
+- No students, permits, NFC, payments, elections, polls, news, events, or reports modules.
+- No business tables beyond package infrastructure.
+- No media collections attached to application models.
+- No Sanctum/API token setup.
+- No frontend permission filtering enforcement.
