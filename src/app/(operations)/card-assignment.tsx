@@ -71,8 +71,24 @@ export default function OperationsCardAssignmentScreen() {
     mode?: CardAssignmentMode;
     studentId?: string;
   }>();
-  const studentsQuery = useStudents();
-  const cardsQuery = useCards();
+  const studentsQuery = useStudents(
+    studentId
+      ? {
+          search: studentId,
+          page: 1,
+          limit: 20,
+        }
+      : undefined,
+  );
+  const cardsQuery = useCards(
+    studentId
+      ? {
+          search: studentId,
+          page: 1,
+          limit: 100,
+        }
+      : undefined,
+  );
 
   const [screenState, setScreenState] = useState<ScreenState>("idle");
   const [assignmentPhase, setAssignmentPhase] =
@@ -133,7 +149,16 @@ export default function OperationsCardAssignmentScreen() {
   const actionLabel =
     assignmentMode === "replace" ? "Replace Card" : "Register Card";
 
-  const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
+  const isResolvingStudent = Boolean(
+    studentId &&
+    !student &&
+    (studentsQuery.isLoading || studentsQuery.isFetching),
+  );
+  const isLoading =
+    !studentId ||
+    isResolvingStudent ||
+    studentsQuery.isLoading ||
+    cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const canManageCards = user?.role === "admin";
   const nfcUnavailable = !isCheckingNfc && !isNfcAvailable;
@@ -320,8 +345,8 @@ export default function OperationsCardAssignmentScreen() {
                   paddingTop: isCompact ? spacing.md : spacing.xl,
                 },
               ]}
-        onRefresh={refreshControl.onRefresh}
-        refreshing={refreshControl.refreshing}
+              onRefresh={refreshControl.onRefresh}
+              refreshing={refreshControl.refreshing}
               showsVerticalScrollIndicator={false}
             >
               {/* Success ring */}
@@ -389,8 +414,8 @@ export default function OperationsCardAssignmentScreen() {
                 paddingTop: isCompact ? spacing.sm : spacing.lg,
               },
             ]}
-        onRefresh={refreshControl.onRefresh}
-        refreshing={refreshControl.refreshing}
+            onRefresh={refreshControl.onRefresh}
+            refreshing={refreshControl.refreshing}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.radarCluster}>

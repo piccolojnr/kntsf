@@ -113,7 +113,7 @@ export default function OperationsStudentDetailsScreen() {
       ? {
           search: studentId,
           page: 1,
-          limit: 1,
+          limit: 20,
         }
       : undefined,
   );
@@ -196,7 +196,16 @@ export default function OperationsStudentDetailsScreen() {
 
   const cardStatus = resolveCardStatus(currentCard?.status);
   const cardConfig = currentCard ? statusConfig[cardStatus] : undefined;
-  const isLoading = studentsQuery.isLoading || cardsQuery.isLoading;
+  const isResolvingStudent = Boolean(
+    studentId &&
+    !student &&
+    (studentsQuery.isLoading || studentsQuery.isFetching),
+  );
+  const isLoading =
+    !studentId ||
+    isResolvingStudent ||
+    studentsQuery.isLoading ||
+    cardsQuery.isLoading;
   const hasError = studentsQuery.isError || cardsQuery.isError;
   const hasActiveCard = currentCard?.status === "active";
   const canManageCards = user?.role === "admin";
@@ -229,11 +238,7 @@ export default function OperationsStudentDetailsScreen() {
               pressed && styles.backButtonPressed,
             ]}
           >
-            <ChevronLeft
-              color={colors.textMuted}
-              size={18}
-              strokeWidth={2.5}
-            />
+            <ChevronLeft color={colors.textMuted} size={18} strokeWidth={2.5} />
             <Text style={styles.backButtonText}>Back</Text>
           </Pressable>
           <Text style={styles.eyebrow}>STUDENT RECORD</Text>
