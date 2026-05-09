@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
   },
   inputStack: {
     flex: 1,
+    height: 28,
     justifyContent: "center",
   },
   prefix: {
@@ -163,11 +164,14 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
     fontSize: fontSizes.lg,
     fontWeight: "700",
+    includeFontPadding: false,
     left: 0,
     letterSpacing: 3,
+    lineHeight: 28,
     opacity: 0.45,
     position: "absolute",
     right: 0,
+    textAlignVertical: "center",
   },
   input: {
     backgroundColor: colors.transparent,
@@ -176,8 +180,12 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
     fontSize: fontSizes.lg,
     fontWeight: "700",
+    includeFontPadding: false,
     letterSpacing: 3,
+    lineHeight: 28,
+    paddingHorizontal: 0,
     paddingVertical: 0,
+    textAlignVertical: "center",
   },
 
   /* ── Go button ── */
