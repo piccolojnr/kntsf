@@ -48,6 +48,11 @@ class Student extends Model
         return $this->hasMany(Permit::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function nfcCards(): HasMany
     {
         return $this->hasMany(NfcCard::class);
