@@ -1,5 +1,6 @@
-import { Form, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Eye, RotateCcw, ShieldX, Trash2, TriangleAlert } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import { destroy, markLost, revoke, show } from '@/routes/nfc-cards';
 import type { NfcCard, Paginated } from '../types';
@@ -90,55 +91,56 @@ export function NfcCardList({
                                                         </Button>
                                                     }
                                                 />
-                                                <Form
-                                                    {...markLost.form(card.id)}
-                                                    options={{ preserveScroll: true }}
-                                                >
-                                                    {({ processing }) => (
+                                                <ConfirmActionDialog
+                                                    form={markLost.form(card.id)}
+                                                    title="Mark NFC card as lost?"
+                                                    description="This will deactivate the card and prevent it from verifying as valid."
+                                                    confirmLabel="Mark lost"
+                                                    variant="outline"
+                                                    trigger={
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
-                                                            disabled={processing}
                                                         >
                                                             <TriangleAlert />
                                                             Lost
                                                         </Button>
-                                                    )}
-                                                </Form>
-                                                <Form
-                                                    {...revoke.form(card.id)}
-                                                    options={{ preserveScroll: true }}
-                                                >
-                                                    {({ processing }) => (
+                                                    }
+                                                />
+                                                <ConfirmActionDialog
+                                                    form={revoke.form(card.id)}
+                                                    title="Revoke NFC card?"
+                                                    description="This will revoke the card and prevent future NFC verification with this UID."
+                                                    confirmLabel="Revoke card"
+                                                    trigger={
                                                         <Button
                                                             size="sm"
-                                                            variant="outline"
-                                                            disabled={processing}
+                                                            variant="destructive"
                                                         >
                                                             <ShieldX />
                                                             Revoke
                                                         </Button>
-                                                    )}
-                                                </Form>
+                                                    }
+                                                />
                                             </>
                                         )}
 
                                         {canManage && (
-                                            <Form
-                                                {...destroy.form(card.id)}
-                                                options={{ preserveScroll: true }}
-                                            >
-                                                {({ processing }) => (
+                                            <ConfirmActionDialog
+                                                form={destroy.form(card.id)}
+                                                title="Delete NFC card?"
+                                                description="This will remove the NFC card from normal card records. Revoke or mark lost is usually preferred for lifecycle history."
+                                                confirmLabel="Delete card"
+                                                trigger={
                                                     <Button
                                                         size="sm"
                                                         variant="destructive"
-                                                        disabled={processing}
                                                     >
                                                         <Trash2 />
                                                         Delete
                                                     </Button>
-                                                )}
-                                            </Form>
+                                                }
+                                            />
                                         )}
                                     </div>
                                 </td>

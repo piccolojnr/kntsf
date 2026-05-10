@@ -1,5 +1,6 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -48,20 +49,20 @@ export default function RolesShow({
                             />
                         )}
                         {can.delete && (
-                            <Form
-                                {...destroy.form(role.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
+                            <ConfirmActionDialog
+                                form={destroy.form(role.id)}
+                                title="Delete role?"
+                                description={`This will delete the ${role.label} role. Protected starter roles cannot be deleted.`}
+                                confirmLabel="Delete role"
+                                trigger={
                                     <Button
                                         variant="destructive"
-                                        disabled={processing}
                                     >
                                         <Trash2 />
                                         Delete
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         )}
                     </div>
                 </div>

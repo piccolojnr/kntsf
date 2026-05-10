@@ -1,5 +1,6 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, RotateCcw, ShieldX, TriangleAlert } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -80,28 +81,31 @@ export default function NfcCardShow({
                                     </Button>
                                 }
                             />
-                            <Form
-                                {...markLost.form(card.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                            <ConfirmActionDialog
+                                form={markLost.form(card.id)}
+                                title="Mark NFC card as lost?"
+                                description="This will deactivate the card and prevent it from verifying as valid."
+                                confirmLabel="Mark lost"
+                                variant="outline"
+                                trigger={
+                                    <Button variant="outline">
                                         <TriangleAlert />
                                         Mark lost
                                     </Button>
-                                )}
-                            </Form>
-                            <Form
-                                {...revoke.form(card.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                                }
+                            />
+                            <ConfirmActionDialog
+                                form={revoke.form(card.id)}
+                                title="Revoke NFC card?"
+                                description="This will revoke the card and prevent future NFC verification with this UID."
+                                confirmLabel="Revoke card"
+                                trigger={
+                                    <Button variant="destructive">
                                         <ShieldX />
                                         Revoke
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         </CardContent>
                     </Card>
                 )}

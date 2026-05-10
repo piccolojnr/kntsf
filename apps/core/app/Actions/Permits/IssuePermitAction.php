@@ -3,13 +3,17 @@
 namespace App\Actions\Permits;
 
 use App\Actions\Audit\CreateAuditLogAction;
+use App\Enums\PaymentStatus;
 use App\Enums\PermitStatus;
 use App\Models\AcademicPeriod;
+use App\Models\Payment;
 use App\Models\Permit;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\Payments\PaymentSuccessfulNotification;
 use App\Notifications\Permits\PermitIssuedNotification;
 use App\Support\AuditEvents;
+use App\Support\PaymentReferenceGenerator;
 use App\Support\PermitCodeHasher;
 use App\Support\PermitSettings;
 use App\Support\StudentNotifier;
@@ -26,10 +30,11 @@ class IssuePermitAction
         private readonly PermitSettings $permitSettings,
         private readonly CreateAuditLogAction $createAuditLog,
         private readonly StudentNotifier $studentNotifier,
+        private readonly PaymentReferenceGenerator $paymentReferenceGenerator,
     ) {}
 
     /**
-     * @param  array{student_email?: string|null, academic_period_id?: int|null, starts_at?: CarbonInterface|string|null, expires_at?: CarbonInterface|string|null, amount_paid?: numeric-string|int|float|null, currency?: string|null}  $attributes
+     * @param  array{student_email?: string|null, academic_period_id?: int|null, starts_at?: CarbonInterface|string|null, expires_at?: CarbonInterface|string|null, amount_paid?: numeric-string|int|float|null, currency?: string|null, create_payment?: bool|null}  $attributes
      */
     public function handle(Student $student, User $issuedBy, array $attributes = []): IssuedPermit
     {
@@ -86,8 +91,62 @@ class IssuePermitAction
 
             $this->studentNotifier->notify($student, new PermitIssuedNotification($permit));
 
+            if ($attributes['create_payment'] ?? true) {
+                $payment = $this->createManualSuccessfulPayment($permit, $student, $issuedBy);
+
+                $this->studentNotifier->notify($student, new PaymentSuccessfulNotification($payment));
+            }
+
             return new IssuedPermit($permit->load(['student', 'academicPeriod', 'issuedBy']), $code);
         });
+    }
+
+    private function createManualSuccessfulPayment(Permit $permit, Student $student, User $createdBy): Payment
+    {
+        $payment = Payment::query()->create([
+            'student_id' => $student->id,
+            'permit_id' => $permit->id,
+            'reference' => $this->paymentReferenceGenerator->generate(),
+            'gateway' => 'manual',
+            'status' => PaymentStatus::Success,
+            'amount' => $permit->amount_paid,
+            'currency' => $permit->currency,
+            'paid_at' => now(),
+            'verified_at' => now(),
+            'metadata' => [
+                'source' => 'permit_issue',
+                'notes' => 'Created automatically when permit was issued manually.',
+            ],
+            'created_by_id' => $createdBy->id,
+        ]);
+
+        $this->createAuditLog->handle(
+            actor: $createdBy,
+            event: AuditEvents::PaymentCreated,
+            auditable: $payment,
+            subject: $student,
+            description: 'Manual payment invoice created for issued permit.',
+            metadata: [
+                'reference' => $payment->reference,
+                'permit_id' => $permit->id,
+            ],
+            newValues: $payment->only(['student_id', 'permit_id', 'reference', 'gateway', 'status', 'amount', 'currency', 'created_by_id']),
+        );
+
+        $this->createAuditLog->handle(
+            actor: $createdBy,
+            event: AuditEvents::PaymentSuccessful,
+            auditable: $payment,
+            subject: $student,
+            description: 'Manual payment invoice marked successful for issued permit.',
+            metadata: [
+                'reference' => $payment->reference,
+                'permit_id' => $permit->id,
+            ],
+            newValues: $payment->only(['status', 'paid_at', 'verified_at', 'permit_id']),
+        );
+
+        return $payment->load(['student', 'permit', 'createdBy']);
     }
 
     private function academicPeriod(int|string|null $academicPeriodId): AcademicPeriod

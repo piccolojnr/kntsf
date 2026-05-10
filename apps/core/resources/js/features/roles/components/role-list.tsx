@@ -1,5 +1,6 @@
-import { Form, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Eye, Trash2 } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import { destroy, show } from '@/routes/roles';
 import type { PermissionGroups, RoleRecord } from '../types';
@@ -70,21 +71,21 @@ export function RoleList({
                                             />
                                         )}
                                         {canManage && !role.is_protected && (
-                                            <Form
-                                                {...destroy.form(role.id)}
-                                                options={{ preserveScroll: true }}
-                                            >
-                                                {({ processing }) => (
+                                            <ConfirmActionDialog
+                                                form={destroy.form(role.id)}
+                                                title="Delete role?"
+                                                description={`This will delete the ${role.label} role. Protected starter roles cannot be deleted.`}
+                                                confirmLabel="Delete role"
+                                                trigger={
                                                     <Button
                                                         size="sm"
                                                         variant="destructive"
-                                                        disabled={processing}
                                                     >
                                                         <Trash2 />
                                                         Delete
                                                     </Button>
-                                                )}
-                                            </Form>
+                                                }
+                                            />
                                         )}
                                     </div>
                                 </td>

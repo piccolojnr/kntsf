@@ -1,5 +1,6 @@
 import { Form, Link } from '@inertiajs/react';
 import { CheckCircle2, Eye, Trash2, XCircle } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import { destroy, markCardDelivered, show } from '@/routes/permits';
 import type { Paginated, Permit, PermitPermissions } from '../types';
@@ -136,25 +137,21 @@ export function PermitList({
                                                 )}
 
                                             {can.delete && (
-                                                <Form
-                                                    {...destroy.form(permit.id)}
-                                                    options={{
-                                                        preserveScroll: true,
-                                                    }}
-                                                >
-                                                    {({ processing }) => (
+                                                <ConfirmActionDialog
+                                                    form={destroy.form(permit.id)}
+                                                    title="Delete permit?"
+                                                    description={`This will remove permit ending ${permit.code_last4 ?? '----'} from normal permit records. Revocation is preferred when the permit should remain auditable.`}
+                                                    confirmLabel="Delete permit"
+                                                    trigger={
                                                         <Button
                                                             size="sm"
                                                             variant="destructive"
-                                                            disabled={
-                                                                processing
-                                                            }
                                                         >
                                                             <Trash2 />
                                                             Delete
                                                         </Button>
-                                                    )}
-                                                </Form>
+                                                    }
+                                                />
                                             )}
                                         </div>
                                     </td>

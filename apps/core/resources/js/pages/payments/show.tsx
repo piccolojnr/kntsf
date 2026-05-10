@@ -1,5 +1,6 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Ban, CheckCircle2, Trash2, XCircle } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -124,20 +125,20 @@ export default function PaymentShow({
                                 </>
                             )}
 
-                            <Form
-                                {...destroy.form(payment.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
+                            <ConfirmActionDialog
+                                form={destroy.form(payment.id)}
+                                title="Delete payment?"
+                                description={`This will remove payment ${payment.reference} from normal payment records. This is a destructive action.`}
+                                confirmLabel="Delete payment"
+                                trigger={
                                     <Button
                                         variant="destructive"
-                                        disabled={processing}
                                     >
                                         <Trash2 />
                                         Delete
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         </CardContent>
                     </Card>
                 )}

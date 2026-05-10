@@ -46,8 +46,8 @@ export function PermitIssueDialog({
             <DialogContent className="sm:max-w-lg">
                 <DialogTitle>Issue permit</DialogTitle>
                 <DialogDescription>
-                    A permit code will be generated once and will not be stored
-                    in plaintext.
+                    A permit code will be generated once, and a linked manual
+                    payment invoice will be recorded as successful.
                 </DialogDescription>
 
                 <Form
@@ -115,7 +115,9 @@ export function PermitIssueDialog({
                                     }
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Currency: {options.issue_defaults.currency}
+                                    Currency: {options.issue_defaults.currency}.
+                                    This amount will be used for the linked
+                                    payment invoice.
                                 </p>
                                 <InputError message={errors.amount_paid} />
                             </div>
