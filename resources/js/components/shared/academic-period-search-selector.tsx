@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import InputError from '@/components/shared/input-error';
 import {
     Combobox,
@@ -29,12 +29,13 @@ export function AcademicPeriodSearchSelector({
     id = 'academic_period_id',
     name = 'academic_period_id',
 }: AcademicPeriodSearchSelectorProps) {
+    const portalContainerRef = useRef<HTMLDivElement | null>(null);
     const activePeriod = periods.find((period) => period.is_active);
     const [selectedPeriod, setSelectedPeriod] =
         useState<AcademicPeriodSelectorOption | null>(activePeriod ?? null);
 
     return (
-        <div className="grid gap-2">
+        <div ref={portalContainerRef} className="grid gap-2">
             <Label htmlFor={id}>Academic period</Label>
             <input
                 type="hidden"
@@ -54,7 +55,7 @@ export function AcademicPeriodSearchSelector({
                     showClear
                     className="w-full"
                 />
-                <ComboboxContent>
+                <ComboboxContent portalContainer={portalContainerRef}>
                     <ComboboxEmpty>No matching academic periods</ComboboxEmpty>
                     <ComboboxList>
                         {periods.map((period) => (
