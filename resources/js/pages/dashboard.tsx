@@ -1,10 +1,13 @@
 import { Head } from '@inertiajs/react';
 import {
     Activity,
-    BadgeCheck,
     ClipboardList,
     CreditCard,
+    IdCard,
+    ShieldAlert,
+    ShieldCheck,
     Users,
+    Wifi,
 } from 'lucide-react';
 import {
     Card,
@@ -16,54 +19,133 @@ import {
 import type { ActivityItem } from '@/features/audit-logs/types';
 import { dashboard } from '@/routes';
 
+type DashboardSummary = {
+    total_students: number;
+    activated_student_accounts: number;
+    pending_setup_student_accounts: number;
+    active_permits: number;
+    expired_permits: number;
+    revoked_permits: number;
+    active_nfc_cards: number;
+    pending_payments: number;
+    successful_payments: number;
+    verification_attempts_today: number;
+    failed_verification_attempts_today: number;
+};
+
+type DashboardWarning = {
+    key: string;
+    title: string;
+    description: string;
+    severity: 'high' | 'medium' | 'low' | string;
+    count?: number;
+};
+
 const quickActions = [
     {
         title: 'Review student records',
-        description: 'Student operations will appear here once modules are added.',
+        description: 'Find profiles, update details, and activate accounts.',
         icon: Users,
     },
     {
         title: 'Manage permits',
-        description: 'Permit workflows will connect here in a later feature pass.',
-        icon: BadgeCheck,
+        description: 'Issue permits, mark cards delivered, and revoke when needed.',
+        icon: IdCard,
     },
     {
         title: 'Check payments',
-        description: 'Payment status shortcuts will be wired after payment setup.',
+        description: 'Confirm manual payments and review linked permits.',
         icon: CreditCard,
     },
 ];
 
-const overviewItems = [
-    'Student account activity',
-    'Permit issuance queue',
-    'NFC verification status',
-    'Payment reconciliation',
-];
-
 export default function Dashboard({
+    summary,
+    warnings = [],
     recentActivity = [],
 }: {
+    summary: DashboardSummary;
+    warnings?: DashboardWarning[];
     recentActivity?: ActivityItem[];
 }) {
+    const summaryCards = [
+        {
+            title: 'Students',
+            value: summary.total_students,
+            detail: `${summary.activated_student_accounts} activated, ${summary.pending_setup_student_accounts} pending setup`,
+            icon: Users,
+        },
+        {
+            title: 'Active permits',
+            value: summary.active_permits,
+            detail: `${summary.expired_permits} expired, ${summary.revoked_permits} revoked`,
+            icon: IdCard,
+        },
+        {
+            title: 'NFC cards',
+            value: summary.active_nfc_cards,
+            detail: 'Active cards assigned to students',
+            icon: Wifi,
+        },
+        {
+            title: 'Payments',
+            value: summary.successful_payments,
+            detail: `${summary.pending_payments} pending payments`,
+            icon: CreditCard,
+        },
+        {
+            title: 'Verification today',
+            value: summary.verification_attempts_today,
+            detail: `${summary.failed_verification_attempts_today} failed attempts`,
+            icon: ShieldCheck,
+        },
+    ];
+
     return (
         <>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4">
                 <section className="rounded-lg border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border">
-                    <div className="max-w-3xl space-y-2">
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Dashboard
-                        </p>
-                        <h1 className="text-2xl font-semibold tracking-normal">
-                            Welcome to the operations workspace
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            This shell is ready for students, permits, NFC,
-                            payments, verification, and reporting modules as
-                            they are built.
-                        </p>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-3xl space-y-2">
+                            <p className="text-sm font-medium text-muted-foreground">
+                                Dashboard
+                            </p>
+                            <h1 className="text-2xl font-semibold tracking-normal">
+                                Operations overview
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Monitor students, permits, NFC cards, payments,
+                                verification attempts, and recent audited
+                                activity.
+                            </p>
+                        </div>
+                        <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                            {warnings.length} operational warning
+                            {warnings.length === 1 ? '' : 's'}
+                        </div>
                     </div>
+                </section>
+
+                <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                    {summaryCards.map((item) => (
+                        <Card key={item.title} className="gap-3">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
+                                <CardTitle className="text-sm font-medium">
+                                    {item.title}
+                                </CardTitle>
+                                <item.icon className="size-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-2xl font-semibold">
+                                    {item.value}
+                                </p>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    {item.detail}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    ))}
                 </section>
 
                 <section className="grid gap-4 md:grid-cols-3">
@@ -89,24 +171,52 @@ export default function Dashboard({
                 <section className="grid gap-4 lg:grid-cols-[2fr_1fr]">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Operational overview</CardTitle>
+                            <CardTitle>Operational warnings</CardTitle>
                             <CardDescription>
-                                High-level queue and workload indicators will
-                                be placed here.
+                                Items that may need administrative attention.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                {overviewItems.map((item) => (
+                            {warnings.length === 0 ? (
+                                <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">
+                                    No operational warnings right now.
+                                </div>
+                            ) : (
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    {warnings.map((item) => (
+                                        <div
+                                            key={item.key}
+                                            className="flex items-start gap-3 rounded-md border p-3"
+                                        >
+                                            <ShieldAlert className="mt-0.5 size-4 text-muted-foreground" />
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium">
+                                                        {item.title}
+                                                    </span>
+                                                    {item.count !== undefined && (
+                                                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                                                            {item.count}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="mt-1 text-xs text-muted-foreground">
+                                                    {item.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
                                     <div
-                                        key={item}
+                                        key="summary"
                                         className="flex items-center gap-3 rounded-md border p-3"
                                     >
                                         <ClipboardList className="size-4 text-muted-foreground" />
-                                        <span className="text-sm">{item}</span>
+                                        <span className="text-sm">
+                                            Review reports for grouped counts.
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 

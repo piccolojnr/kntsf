@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\SetupPasswordController;
 use App\Support\ActivityFeed;
+use App\Support\DashboardSummary;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -11,8 +12,10 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function (ActivityFeed $activityFeed) {
+    Route::get('dashboard', function (ActivityFeed $activityFeed, DashboardSummary $dashboardSummary) {
         return Inertia::render('dashboard', [
+            'summary' => $dashboardSummary->counts(),
+            'warnings' => $dashboardSummary->warnings(),
             'recentActivity' => $activityFeed->items(8),
         ]);
     })->name('dashboard');
@@ -34,3 +37,4 @@ require __DIR__.'/verification.php';
 require __DIR__.'/nfc-cards.php';
 require __DIR__.'/payments.php';
 require __DIR__.'/audit-logs.php';
+require __DIR__.'/reports.php';

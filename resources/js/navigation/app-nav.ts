@@ -1,5 +1,6 @@
 import {
     CalendarDays,
+    ChartColumn,
     CircleDollarSign,
     CreditCard,
     GraduationCap,
@@ -15,6 +16,7 @@ import { index as auditLogsIndex } from '@/routes/audit-logs';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitsIndex } from '@/routes/permits';
+import { index as reportsIndex } from '@/routes/reports';
 import { index as studentsIndex } from '@/routes/students';
 import {
     index as verificationIndex,
@@ -58,6 +60,12 @@ export const mainNavItems: NavItem[] = [
         href: paymentsIndex(),
         icon: CircleDollarSign,
         permission: 'payments.view',
+    },
+    {
+        title: 'Reports',
+        href: reportsIndex(),
+        icon: ChartColumn,
+        permission: 'reports.view',
     },
     {
         title: 'Verification',

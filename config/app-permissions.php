@@ -66,6 +66,10 @@ return [
         'audit_logs' => [
             'audit_logs.view',
         ],
+
+        'reports' => [
+            'reports.view',
+        ],
     ],
 
     'roles' => [
@@ -101,6 +105,7 @@ return [
             'settings.view',
             'settings.update',
             'audit_logs.view',
+            'reports.view',
         ],
 
         'staff' => [
@@ -116,6 +121,7 @@ return [
             'verification.view_logs',
             'payments.view',
             'settings.view',
+            'reports.view',
         ],
 
         'student' => [
