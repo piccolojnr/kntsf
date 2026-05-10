@@ -2,11 +2,13 @@
 
 namespace App\Actions\Payments;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Actions\Permits\IssuePermitAction;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\AuditEvents;
 use App\Support\PaymentReferenceGenerator;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -16,6 +18,7 @@ class CreateManualPaymentAction
     public function __construct(
         private readonly PaymentReferenceGenerator $paymentReferenceGenerator,
         private readonly IssuePermitAction $issuePermit,
+        private readonly CreateAuditLogAction $createAuditLog,
     ) {}
 
     /**
@@ -50,6 +53,18 @@ class CreateManualPaymentAction
                 'created_by_id' => $createdBy->id,
             ]);
 
+            $this->createAuditLog->handle(
+                actor: $createdBy,
+                event: AuditEvents::PaymentCreated,
+                auditable: $payment,
+                subject: $student,
+                description: 'Manual payment created.',
+                metadata: [
+                    'reference' => $payment->reference,
+                ],
+                newValues: $payment->only(['student_id', 'reference', 'gateway', 'status', 'amount', 'currency', 'created_by_id']),
+            );
+
             if ($status === PaymentStatus::Success && ($attributes['issue_permit'] ?? false)) {
                 $issuedPermit = $this->issuePermit->handle($student, $createdBy, [
                     'academic_period_id' => $attributes['academic_period_id'] ?? null,
@@ -60,6 +75,21 @@ class CreateManualPaymentAction
                 $payment->forceFill([
                     'permit_id' => $issuedPermit->permit->id,
                 ])->save();
+            }
+
+            if ($status === PaymentStatus::Success) {
+                $this->createAuditLog->handle(
+                    actor: $createdBy,
+                    event: AuditEvents::PaymentSuccessful,
+                    auditable: $payment,
+                    subject: $student,
+                    description: 'Manual payment marked successful.',
+                    metadata: [
+                        'reference' => $payment->reference,
+                        'permit_id' => $payment->permit_id,
+                    ],
+                    newValues: $payment->only(['status', 'paid_at', 'verified_at', 'permit_id']),
+                );
             }
 
             return $payment->refresh()->load(['student', 'permit', 'createdBy']);

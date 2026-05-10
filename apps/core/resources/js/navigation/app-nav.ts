@@ -5,11 +5,13 @@ import {
     GraduationCap,
     History,
     LayoutGrid,
+    ScrollText,
     ShieldCheck,
     Wifi,
 } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
+import { index as auditLogsIndex } from '@/routes/audit-logs';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitsIndex } from '@/routes/permits';
@@ -68,6 +70,12 @@ export const mainNavItems: NavItem[] = [
         href: verificationLogs(),
         icon: History,
         permission: 'verification.view_logs',
+    },
+    {
+        title: 'Audit Logs',
+        href: auditLogsIndex(),
+        icon: ScrollText,
+        permission: 'audit_logs.view',
     },
 ];
 

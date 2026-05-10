@@ -2,10 +2,12 @@
 
 namespace App\Actions\Payments;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Actions\Permits\IssuePermitAction;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\User;
+use App\Support\AuditEvents;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -13,6 +15,7 @@ class MarkPaymentSuccessfulAction
 {
     public function __construct(
         private readonly IssuePermitAction $issuePermit,
+        private readonly CreateAuditLogAction $createAuditLog,
     ) {}
 
     /**
@@ -30,6 +33,8 @@ class MarkPaymentSuccessfulAction
             if ($payment->status === PaymentStatus::Success) {
                 return $payment->load(['student', 'permit', 'createdBy']);
             }
+
+            $oldValues = $payment->only(['status', 'paid_at', 'verified_at', 'failure_reason', 'permit_id']);
 
             $payment->forceFill([
                 'status' => PaymentStatus::Success,
@@ -53,6 +58,20 @@ class MarkPaymentSuccessfulAction
                     'permit_id' => $issuedPermit->permit->id,
                 ])->save();
             }
+
+            $this->createAuditLog->handle(
+                actor: $verifiedBy,
+                event: AuditEvents::PaymentSuccessful,
+                auditable: $payment,
+                subject: $payment->student,
+                description: 'Payment marked successful.',
+                metadata: [
+                    'reference' => $payment->reference,
+                    'permit_id' => $payment->permit_id,
+                ],
+                oldValues: $oldValues,
+                newValues: $payment->only(['status', 'paid_at', 'verified_at', 'failure_reason', 'permit_id']),
+            );
 
             return $payment->refresh()->load(['student', 'permit', 'createdBy']);
         });

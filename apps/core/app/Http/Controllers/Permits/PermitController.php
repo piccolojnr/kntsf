@@ -128,12 +128,13 @@ class PermitController extends Controller
     }
 
     public function markCardDelivered(
+        Request $request,
         Permit $permit,
         MarkPermitCardDeliveredAction $markPermitCardDelivered
     ): RedirectResponse {
         Gate::authorize('markCardDelivered', $permit);
 
-        $markPermitCardDelivered->handle($permit);
+        $markPermitCardDelivered->handle($permit, $request->user());
 
         return back();
     }

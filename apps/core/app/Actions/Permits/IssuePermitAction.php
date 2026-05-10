@@ -2,11 +2,13 @@
 
 namespace App\Actions\Permits;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\PermitStatus;
 use App\Models\AcademicPeriod;
 use App\Models\Permit;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\AuditEvents;
 use App\Support\PermitCodeHasher;
 use App\Support\PermitSettings;
 use Carbon\CarbonInterface;
@@ -20,6 +22,7 @@ class IssuePermitAction
         private readonly GeneratePermitCodeAction $generatePermitCode,
         private readonly PermitCodeHasher $permitCodeHasher,
         private readonly PermitSettings $permitSettings,
+        private readonly CreateAuditLogAction $createAuditLog,
     ) {}
 
     /**
@@ -64,6 +67,19 @@ class IssuePermitAction
                 'currency' => mb_strtoupper($attributes['currency'] ?? $settings['currency']),
                 'metadata' => [],
             ]);
+
+            $this->createAuditLog->handle(
+                actor: $issuedBy,
+                event: AuditEvents::PermitIssued,
+                auditable: $permit,
+                subject: $student,
+                description: 'Permit issued.',
+                metadata: [
+                    'academic_period_id' => $academicPeriod->id,
+                    'code_last4' => $permit->code_last4,
+                ],
+                newValues: $permit->only(['student_id', 'academic_period_id', 'status', 'starts_at', 'expires_at', 'amount_paid', 'currency']),
+            );
 
             return new IssuedPermit($permit->load(['student', 'academicPeriod', 'issuedBy']), $code);
         });

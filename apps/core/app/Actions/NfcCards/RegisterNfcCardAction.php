@@ -2,10 +2,12 @@
 
 namespace App\Actions\NfcCards;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\NfcCardStatus;
 use App\Models\NfcCard;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\AuditEvents;
 use App\Support\NfcUidHasher;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -14,11 +16,12 @@ class RegisterNfcCardAction
 {
     public function __construct(
         private readonly NfcUidHasher $nfcUidHasher,
+        private readonly CreateAuditLogAction $createAuditLog,
     ) {}
 
-    public function handle(Student $student, string $uid, ?User $createdBy = null): NfcCard
+    public function handle(Student $student, string $uid, ?User $createdBy = null, bool $logRegistration = true): NfcCard
     {
-        return DB::transaction(function () use ($student, $uid, $createdBy): NfcCard {
+        return DB::transaction(function () use ($student, $uid, $createdBy, $logRegistration): NfcCard {
             $uidHash = $this->nfcUidHasher->hash($uid);
 
             if (NfcCard::query()->where('uid_hash', $uidHash)->exists()) {
@@ -34,7 +37,7 @@ class RegisterNfcCardAction
                     'replaced_at' => now(),
                 ])->save());
 
-            return NfcCard::query()->create([
+            $card = NfcCard::query()->create([
                 'student_id' => $student->id,
                 'uid_hash' => $uidHash,
                 'uid_last4' => $this->nfcUidHasher->lastFour($uid),
@@ -44,6 +47,22 @@ class RegisterNfcCardAction
                 'created_by_id' => $createdBy?->id,
                 'metadata' => [],
             ]);
+
+            if ($logRegistration) {
+                $this->createAuditLog->handle(
+                    actor: $createdBy,
+                    event: AuditEvents::NfcRegistered,
+                    auditable: $card,
+                    subject: $student,
+                    description: 'NFC card registered.',
+                    metadata: [
+                        'uid_last4' => $card->uid_last4,
+                    ],
+                    newValues: $card->only(['student_id', 'uid_last4', 'status', 'issued_at', 'activated_at', 'created_by_id']),
+                );
+            }
+
+            return $card;
         });
     }
 }

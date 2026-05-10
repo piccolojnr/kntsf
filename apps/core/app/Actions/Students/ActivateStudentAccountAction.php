@@ -2,11 +2,13 @@
 
 namespace App\Actions\Students;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Actions\Auth\CreateAccountActivationTokenAction;
 use App\Enums\AccountActivationPurpose;
 use App\Models\Student;
 use App\Models\User;
 use App\Notifications\Auth\SetupPasswordNotification;
+use App\Support\AuditEvents;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +17,7 @@ class ActivateStudentAccountAction
 {
     public function __construct(
         private readonly CreateAccountActivationTokenAction $createAccountActivationToken,
+        private readonly CreateAuditLogAction $createAuditLog,
     ) {}
 
     public function handle(Student $student, User $activatedBy): User
@@ -47,6 +50,21 @@ class ActivateStudentAccountAction
                 'user_id' => $user->id,
                 'activated_by_id' => $activatedBy->id,
             ]);
+
+            $this->createAuditLog->handle(
+                actor: $activatedBy,
+                event: AuditEvents::StudentAccountActivated,
+                auditable: $student,
+                subject: $user,
+                description: 'Student account activated.',
+                metadata: [
+                    'student_id' => $student->id,
+                    'user_id' => $user->id,
+                ],
+                newValues: [
+                    'user_id' => $user->id,
+                ],
+            );
 
             return [
                 'user' => $user,
