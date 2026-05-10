@@ -94,14 +94,16 @@ function ComboboxContent({
   align = "start",
   alignOffset = 0,
   anchor,
+  portalContainer,
   ...props
 }: ComboboxPrimitive.Popup.Props &
   Pick<
     ComboboxPrimitive.Positioner.Props,
     "side" | "align" | "sideOffset" | "alignOffset" | "anchor"
-  >) {
-  return (
-    <ComboboxPrimitive.Portal>
+  > & {
+    portalContainer?: React.ComponentProps<typeof ComboboxPrimitive.Portal>["container"]
+  }) {
+  const content = (
       <ComboboxPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}
@@ -117,6 +119,11 @@ function ComboboxContent({
           {...props}
         />
       </ComboboxPrimitive.Positioner>
+  )
+
+  return (
+    <ComboboxPrimitive.Portal container={portalContainer}>
+      {content}
     </ComboboxPrimitive.Portal>
   )
 }

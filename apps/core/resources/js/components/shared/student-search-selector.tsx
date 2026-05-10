@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import InputError from '@/components/shared/input-error';
 import {
     Combobox,
@@ -38,6 +38,7 @@ export function StudentSearchSelector({
     emailFieldName = 'student_email',
     showEmailInput = false,
 }: StudentSearchSelectorProps) {
+    const portalContainerRef = useRef<HTMLDivElement | null>(null);
     const [selectedStudent, setSelectedStudent] =
         useState<StudentSelectorOption | null>(null);
     const [studentEmail, setStudentEmail] = useState('');
@@ -48,7 +49,7 @@ export function StudentSearchSelector({
     }
 
     return (
-        <div className="space-y-4">
+        <div ref={portalContainerRef} className="space-y-4">
             <div className="grid gap-2">
                 <Label htmlFor={id}>Student</Label>
                 <input
@@ -73,7 +74,7 @@ export function StudentSearchSelector({
                         showClear
                         className="w-full"
                     />
-                    <ComboboxContent>
+                    <ComboboxContent portalContainer={portalContainerRef}>
                         <ComboboxEmpty>No matching students</ComboboxEmpty>
                         <ComboboxList>
                             {students.map((student) => (
