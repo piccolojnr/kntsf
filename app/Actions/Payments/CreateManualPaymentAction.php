@@ -74,6 +74,8 @@ class CreateManualPaymentAction
                     'academic_period_id' => $attributes['academic_period_id'] ?? null,
                     'amount_paid' => $payment->amount,
                     'currency' => $payment->currency,
+                    'student_email' => $attributes['student_email'] ?? null,
+                    'create_payment' => false,
                 ]);
 
                 $payment->forceFill([

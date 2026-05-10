@@ -1,5 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { KeyRound, Power, PowerOff, Trash2 } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -75,17 +76,19 @@ export default function ExecutivesShow({
                             </Form>
                         )}
                         {can.deactivate && executive.is_active && (
-                            <Form
-                                {...deactivate.form(executive.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                            <ConfirmActionDialog
+                                form={deactivate.form(executive.id)}
+                                title="Deactivate executive?"
+                                description={`This will prevent ${executive.name} from using the dashboard until reactivated.`}
+                                confirmLabel="Deactivate"
+                                variant="outline"
+                                trigger={
+                                    <Button variant="outline">
                                         <PowerOff />
                                         Deactivate
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         )}
                         {can.activate && !executive.is_active && (
                             <Form
@@ -101,20 +104,20 @@ export default function ExecutivesShow({
                             </Form>
                         )}
                         {can.delete && (
-                            <Form
-                                {...destroy.form(executive.id)}
-                                options={{ preserveScroll: true }}
-                            >
-                                {({ processing }) => (
+                            <ConfirmActionDialog
+                                form={destroy.form(executive.id)}
+                                title="Delete executive?"
+                                description={`This will delete ${executive.name}'s executive account. This is a destructive action.`}
+                                confirmLabel="Delete executive"
+                                trigger={
                                     <Button
                                         variant="destructive"
-                                        disabled={processing}
                                     >
                                         <Trash2 />
                                         Delete
                                     </Button>
-                                )}
-                            </Form>
+                                }
+                            />
                         )}
                     </div>
                 </div>

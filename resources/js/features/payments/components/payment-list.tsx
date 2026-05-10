@@ -1,5 +1,6 @@
-import { Form, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Ban, CheckCircle2, Eye, Trash2, XCircle } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import { destroy, show } from '@/routes/payments';
 import type { Paginated, Payment, PaymentOptions } from '../types';
@@ -134,21 +135,21 @@ export function PaymentList({
                                         )}
 
                                         {canManage && (
-                                            <Form
-                                                {...destroy.form(payment.id)}
-                                                options={{ preserveScroll: true }}
-                                            >
-                                                {({ processing }) => (
+                                            <ConfirmActionDialog
+                                                form={destroy.form(payment.id)}
+                                                title="Delete payment?"
+                                                description={`This will remove payment ${payment.reference} from normal payment records. This is a destructive action.`}
+                                                confirmLabel="Delete payment"
+                                                trigger={
                                                     <Button
                                                         size="sm"
                                                         variant="destructive"
-                                                        disabled={processing}
                                                     >
                                                         <Trash2 />
                                                         Delete
                                                     </Button>
-                                                )}
-                                            </Form>
+                                                }
+                                            />
                                         )}
                                     </div>
                                 </td>

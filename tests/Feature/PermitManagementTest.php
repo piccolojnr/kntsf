@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\PaymentStatus;
 use App\Enums\PermitStatus;
 use App\Models\AcademicPeriod;
+use App\Models\Payment;
 use App\Models\Permit;
 use App\Models\Student;
 use App\Models\User;
@@ -43,6 +45,30 @@ test('authorized user can issue permit', function () {
         ->and($permit->academic_period_id)->toBe($period->id)
         ->and($permit->issued_by_id)->toBe($user->id)
         ->and($permit->status)->toBe(PermitStatus::Active);
+});
+
+test('issuing permit creates linked manual successful payment invoice', function () {
+    $student = Student::factory()->create();
+    $user = permitUserWithRole('admin');
+    AcademicPeriod::factory()->active()->create();
+
+    $this->actingAs($user)
+        ->post(route('permits.store'), [
+            'student_id' => $student->id,
+            'amount_paid' => '30.00',
+        ])
+        ->assertRedirect();
+
+    $permit = Permit::query()->firstOrFail();
+    $payment = Payment::query()->firstOrFail();
+
+    expect($payment->student_id)->toBe($student->id)
+        ->and($payment->permit_id)->toBe($permit->id)
+        ->and($payment->gateway)->toBe('manual')
+        ->and($payment->reference)->toStartWith('PAY-'.now()->format('Y').'-')
+        ->and($payment->status)->toBe(PaymentStatus::Success)
+        ->and($payment->amount)->toBe('30.00')
+        ->and($payment->created_by_id)->toBe($user->id);
 });
 
 test('issue form receives settings defaults and student emails', function () {
