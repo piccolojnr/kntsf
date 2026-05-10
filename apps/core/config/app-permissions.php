@@ -13,6 +13,15 @@ return [
             'users.delete',
         ],
 
+        'executives' => [
+            'executives.view',
+            'executives.create',
+            'executives.update',
+            'executives.delete',
+            'executives.activate',
+            'executives.manage_profiles',
+        ],
+
         'roles' => [
             'roles.view',
             'roles.manage',
@@ -81,6 +90,12 @@ return [
             'users.create',
             'users.update',
             'users.delete',
+            'executives.view',
+            'executives.create',
+            'executives.update',
+            'executives.delete',
+            'executives.activate',
+            'executives.manage_profiles',
             'roles.view',
             'roles.manage',
             'students.view',

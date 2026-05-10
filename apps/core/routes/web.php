@@ -5,10 +5,9 @@ use App\Support\ActivityFeed;
 use App\Support\DashboardSummary;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
+    'canRegister' => false,
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -38,3 +37,5 @@ require __DIR__.'/nfc-cards.php';
 require __DIR__.'/payments.php';
 require __DIR__.'/audit-logs.php';
 require __DIR__.'/reports.php';
+require __DIR__.'/executives.php';
+require __DIR__.'/roles.php';

@@ -47,6 +47,12 @@ The password is hashed by the `User` model cast. Do not hardcode credentials in 
 
 Frontend visibility is not authorization. Hiding sidebar items or buttons is only a user experience concern. Every protected action still needs backend authorization through middleware, policies, gates, or Form Request authorization.
 
+## Account Management
+
+Public registration is disabled. Dashboard users are created through executive management, while students are linked through the student activation flow.
+
+Executives, admins, and staff remain records in the `users` table. SRC/public profile details live in `executive_profiles`.
+
 ## Media Library
 
 Spatie Media Library is installed for future uploads, images, documents, thumbnails, responsive images, and named media collections.

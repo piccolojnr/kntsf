@@ -9,14 +9,10 @@ import {
     
 } from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
-import { dashboard, login, register } from '@/routes';
+import { dashboard, login } from '@/routes';
 import type { SharedPageProps } from '@/types';
 
-export default function Welcome({
-    canRegister = true,
-}: {
-    canRegister?: boolean;
-}) {
+export default function Welcome() {
     const { auth } = usePage<SharedPageProps>().props;
 
     return (
@@ -59,14 +55,6 @@ export default function Welcome({
                                 >
                                     Log in
                                 </Link>
-                                {canRegister && (
-                                    <Link
-                                        href={register()}
-                                        className="inline-flex h-9 items-center rounded-md bg-primary px-3 font-medium text-primary-foreground hover:bg-primary/90"
-                                    >
-                                        Register
-                                    </Link>
-                                )}
                             </>
                         )}
                     </nav>
@@ -96,14 +84,6 @@ export default function Welcome({
                                 {auth.user ? 'Open dashboard' : 'Log in'}
                                 <ArrowRight className="size-4" />
                             </Link>
-                            {canRegister && !auth.user && (
-                                <Link
-                                    href={register()}
-                                    className="inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-                                >
-                                    Create account
-                                </Link>
-                            )}
                         </div>
                     </div>
 

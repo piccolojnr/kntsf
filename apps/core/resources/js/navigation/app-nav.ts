@@ -8,15 +8,19 @@ import {
     LayoutGrid,
     ScrollText,
     ShieldCheck,
+    ShieldPlus,
+    UsersRound,
     Wifi,
 } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
 import { index as auditLogsIndex } from '@/routes/audit-logs';
+import { index as executivesIndex } from '@/routes/executives';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitsIndex } from '@/routes/permits';
 import { index as reportsIndex } from '@/routes/reports';
+import { index as rolesIndex } from '@/routes/roles';
 import { index as studentsIndex } from '@/routes/students';
 import {
     index as verificationIndex,
@@ -36,6 +40,12 @@ export const mainNavItems: NavItem[] = [
         href: studentsIndex(),
         icon: GraduationCap,
         permission: 'students.view',
+    },
+    {
+        title: 'Executives',
+        href: executivesIndex(),
+        icon: UsersRound,
+        permission: 'executives.view',
     },
     {
         title: 'Academic Periods',
@@ -66,6 +76,12 @@ export const mainNavItems: NavItem[] = [
         href: reportsIndex(),
         icon: ChartColumn,
         permission: 'reports.view',
+    },
+    {
+        title: 'Roles & Permissions',
+        href: rolesIndex(),
+        icon: ShieldPlus,
+        permission: 'roles.view',
     },
     {
         title: 'Verification',

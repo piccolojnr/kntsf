@@ -34,11 +34,17 @@ Old unused setup-password tokens are invalidated when a new activation email is 
 
 ## Login
 
-Pending student users cannot log in because their password is null. After setting the initial password, Fortify handles normal login through the existing `/login` endpoint.
+Pending users cannot log in because their password is null. Inactive users also cannot log in. After setting the initial password, Fortify handles normal login through the existing `/login` endpoint.
+
+## Public Registration
+
+Public registration is disabled. Accounts are created by administrators from dashboard management screens.
+
+Executive, admin, and staff users are created through executive management. Student users are created through student account activation.
 
 ## Not Built Yet
 
 - Mobile/API auth.
-- Student account self-registration.
+- Public account self-registration.
 - Student profile claiming.
 - Permit, NFC, or payment auth flows.
