@@ -32,6 +32,7 @@ class StoreManualPaymentRequest extends FormRequest
     {
         return [
             'student_id' => ['required', Rule::exists('students', 'id')],
+            'student_email' => ['nullable', 'email', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'size:3'],
             'status' => ['nullable', Rule::in([PaymentStatus::Pending->value, PaymentStatus::Success->value])],

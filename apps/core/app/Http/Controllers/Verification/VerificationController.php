@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Verification\VerifyNfcUidRequest;
 use App\Http\Requests\Verification\VerifyPermitCodeRequest;
 use App\Http\Requests\Verification\VerifyStudentNumberRequest;
+use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,6 +25,20 @@ class VerificationController extends Controller
 
         return Inertia::render('verification/index', [
             'result' => $request->session()->get('verificationResult'),
+            'options' => [
+                'students' => Student::query()
+                    ->orderBy('student_number')
+                    ->get(['id', 'student_number', 'name', 'email'])
+                    ->map(fn (Student $student): array => [
+                        'id' => $student->id,
+                        'student_number' => $student->student_number,
+                        'name' => $student->name,
+                        'email' => $student->email,
+                        'label' => trim($student->student_number.' - '.($student->name ?? 'Unnamed student')),
+                    ])
+                    ->values()
+                    ->all(),
+            ],
             'can' => [
                 'view_logs' => $request->user()?->can('verification.view_logs') ?? false,
             ],

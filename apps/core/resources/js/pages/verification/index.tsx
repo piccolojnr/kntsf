@@ -6,14 +6,19 @@ import { NfcVerificationForm } from '@/features/verification/components/nfc-veri
 import { PermitCodeVerificationForm } from '@/features/verification/components/permit-code-verification-form';
 import { StudentNumberVerificationForm } from '@/features/verification/components/student-number-verification-form';
 import { VerificationResultCard } from '@/features/verification/components/verification-result-card';
-import type { VerificationAttemptResult } from '@/features/verification/types';
+import type {
+    VerificationAttemptResult,
+    VerificationOptions,
+} from '@/features/verification/types';
 import { index, logs } from '@/routes/verification';
 
 export default function VerificationIndex({
     result,
+    options,
     can,
 }: {
     result: VerificationAttemptResult | null;
+    options: VerificationOptions;
     can: { view_logs: boolean };
 }) {
     return (
@@ -38,7 +43,7 @@ export default function VerificationIndex({
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-3">
-                    <StudentNumberVerificationForm />
+                    <StudentNumberVerificationForm options={options} />
                     <PermitCodeVerificationForm />
                     <NfcVerificationForm />
                 </div>

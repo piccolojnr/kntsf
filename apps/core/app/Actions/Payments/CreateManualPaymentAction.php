@@ -19,7 +19,7 @@ class CreateManualPaymentAction
     ) {}
 
     /**
-     * @param  array{amount: numeric-string|int|float, currency?: string|null, status?: string|null, issue_permit?: bool|null, academic_period_id?: int|null, notes?: string|null}  $attributes
+     * @param  array{amount: numeric-string|int|float, student_email?: string|null, currency?: string|null, status?: string|null, issue_permit?: bool|null, academic_period_id?: int|null, notes?: string|null}  $attributes
      */
     public function handle(Student $student, User $createdBy, array $attributes): Payment
     {
@@ -29,6 +29,10 @@ class CreateManualPaymentAction
 
             if (! in_array($status, [PaymentStatus::Pending, PaymentStatus::Success], true)) {
                 throw new RuntimeException('Manual payments can only be created as pending or successful.');
+            }
+
+            if (array_key_exists('student_email', $attributes) && $student->email !== $attributes['student_email']) {
+                $student->forceFill(['email' => $attributes['student_email']])->save();
             }
 
             $payment = Payment::query()->create([

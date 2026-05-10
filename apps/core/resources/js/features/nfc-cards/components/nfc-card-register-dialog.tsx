@@ -2,6 +2,7 @@ import { Form } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/shared/input-error';
+import { StudentSearchSelector } from '@/components/shared/student-search-selector';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,13 +15,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { store } from '@/routes/nfc-cards';
 import type { NfcCardOptions } from '../types';
 
@@ -54,25 +48,10 @@ export function NfcCardRegisterDialog({
                 >
                     {({ processing, errors, resetAndClearErrors }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="student_id">Student</Label>
-                                <Select name="student_id">
-                                    <SelectTrigger id="student_id" className="w-full">
-                                        <SelectValue placeholder="Select student" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {options.students.map((student) => (
-                                            <SelectItem
-                                                key={student.id}
-                                                value={student.id.toString()}
-                                            >
-                                                {student.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.student_id} />
-                            </div>
+                            <StudentSearchSelector
+                                students={options.students}
+                                errors={errors}
+                            />
 
                             <div className="grid gap-2">
                                 <Label htmlFor="uid">NFC UID</Label>

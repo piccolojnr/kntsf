@@ -66,6 +66,22 @@ test('authorized user can create successful manual payment', function () {
         ->and($payment->verified_at)->not->toBeNull();
 });
 
+test('creating manual payment can update selected student email', function () {
+    $student = Student::factory()->create([
+        'email' => 'old@example.com',
+    ]);
+
+    $this->actingAs(paymentUserWithRole('admin'))
+        ->post(route('payments.store'), [
+            'student_id' => $student->id,
+            'student_email' => 'new@example.com',
+            'amount' => '40.00',
+        ])
+        ->assertRedirect();
+
+    expect($student->refresh()->email)->toBe('new@example.com');
+});
+
 test('unauthorized user cannot manage payments', function () {
     $student = Student::factory()->create();
 
