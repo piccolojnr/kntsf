@@ -26,83 +26,130 @@ import {
     index as verificationIndex,
     logs as verificationLogs,
 } from '@/routes/verification';
-import type { NavItem } from '@/types';
+import type { NavGroup, NavItem } from '@/types';
+
+const dashboardNavItem: NavItem = {
+    title: 'Dashboard',
+    href: dashboard(),
+    icon: LayoutGrid,
+    permission: 'dashboard.view',
+};
+
+const studentsNavItem: NavItem = {
+    title: 'Students',
+    href: studentsIndex(),
+    icon: GraduationCap,
+    permission: 'students.view',
+};
+
+const executivesNavItem: NavItem = {
+    title: 'Executives',
+    href: executivesIndex(),
+    icon: UsersRound,
+    permission: 'executives.view',
+};
+
+const academicPeriodsNavItem: NavItem = {
+    title: 'Academic Periods',
+    href: academicPeriodsIndex(),
+    icon: CalendarDays,
+    permission: 'academic_periods.view',
+};
+
+const permitsNavItem: NavItem = {
+    title: 'Permits',
+    href: permitsIndex(),
+    icon: CreditCard,
+    permission: 'permits.view',
+};
+
+const nfcCardsNavItem: NavItem = {
+    title: 'NFC Cards',
+    href: nfcCardsIndex(),
+    icon: Wifi,
+    permission: 'nfc_cards.view',
+};
+
+const paymentsNavItem: NavItem = {
+    title: 'Payments',
+    href: paymentsIndex(),
+    icon: CircleDollarSign,
+    permission: 'payments.view',
+};
+
+const reportsNavItem: NavItem = {
+    title: 'Reports',
+    href: reportsIndex(),
+    icon: ChartColumn,
+    permission: 'reports.view',
+};
+
+const rolesNavItem: NavItem = {
+    title: 'Roles & Permissions',
+    href: rolesIndex(),
+    icon: ShieldPlus,
+    permission: 'roles.view',
+};
+
+const verificationNavItem: NavItem = {
+    title: 'Verification',
+    href: verificationIndex(),
+    icon: ShieldCheck,
+    permission: 'verification.perform',
+};
+
+const verificationLogsNavItem: NavItem = {
+    title: 'Verification Logs',
+    href: verificationLogs(),
+    icon: History,
+    permission: 'verification.view_logs',
+};
+
+const auditLogsNavItem: NavItem = {
+    title: 'Audit Logs',
+    href: auditLogsIndex(),
+    icon: ScrollText,
+    permission: 'audit_logs.view',
+};
 
 export const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-        permission: 'dashboard.view',
-    },
-    {
-        title: 'Students',
-        href: studentsIndex(),
-        icon: GraduationCap,
-        permission: 'students.view',
-    },
-    {
-        title: 'Executives',
-        href: executivesIndex(),
-        icon: UsersRound,
-        permission: 'executives.view',
-    },
-    {
-        title: 'Academic Periods',
-        href: academicPeriodsIndex(),
-        icon: CalendarDays,
-        permission: 'academic_periods.view',
-    },
-    {
-        title: 'Permits',
-        href: permitsIndex(),
-        icon: CreditCard,
-        permission: 'permits.view',
-    },
-    {
-        title: 'NFC Cards',
-        href: nfcCardsIndex(),
-        icon: Wifi,
-        permission: 'nfc_cards.view',
-    },
-    {
-        title: 'Payments',
-        href: paymentsIndex(),
-        icon: CircleDollarSign,
-        permission: 'payments.view',
-    },
-    {
-        title: 'Reports',
-        href: reportsIndex(),
-        icon: ChartColumn,
-        permission: 'reports.view',
-    },
-    {
-        title: 'Roles & Permissions',
-        href: rolesIndex(),
-        icon: ShieldPlus,
-        permission: 'roles.view',
-    },
-    {
-        title: 'Verification',
-        href: verificationIndex(),
-        icon: ShieldCheck,
-        permission: 'verification.perform',
-    },
-    {
-        title: 'Verification Logs',
-        href: verificationLogs(),
-        icon: History,
-        permission: 'verification.view_logs',
-    },
-    {
-        title: 'Audit Logs',
-        href: auditLogsIndex(),
-        icon: ScrollText,
-        permission: 'audit_logs.view',
-    },
+    dashboardNavItem,
+    studentsNavItem,
+    executivesNavItem,
+    academicPeriodsNavItem,
+    permitsNavItem,
+    nfcCardsNavItem,
+    paymentsNavItem,
+    reportsNavItem,
+    rolesNavItem,
+    verificationNavItem,
+    verificationLogsNavItem,
+    auditLogsNavItem,
 ];
 
 export const sidebarFooterNavItems: NavItem[] = [];
 
 export const headerExternalNavItems: NavItem[] = [];
+
+export const sidebarNavGroups: NavGroup[] = [
+    {
+        title: 'Overview',
+        items: [dashboardNavItem, reportsNavItem],
+    },
+    {
+        title: 'Records',
+        items: [studentsNavItem, executivesNavItem, academicPeriodsNavItem],
+    },
+    {
+        title: 'Operations',
+        items: [permitsNavItem, nfcCardsNavItem, paymentsNavItem],
+    },
+    {
+        title: 'Verification',
+        items: [verificationNavItem, verificationLogsNavItem],
+    },
+    {
+        title: 'Administration',
+        items: [rolesNavItem, auditLogsNavItem],
+    },
+];

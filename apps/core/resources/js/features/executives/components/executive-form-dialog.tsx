@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { Executive, ExecutiveOptions } from '../types';
 import { store, update } from '@/routes/executives';
+import type { Executive, ExecutiveOptions } from '../types';
 
 export function ExecutiveFormDialog({
     executive,

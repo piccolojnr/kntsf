@@ -15,3 +15,8 @@ export type NavItem = {
     children?: NavItem[];
     isActive?: boolean;
 };
+
+export type NavGroup = {
+    title: string;
+    items: NavItem[];
+};
