@@ -13,6 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import type { ActivityItem } from '@/features/audit-logs/types';
 import { dashboard } from '@/routes';
 
 const quickActions = [
@@ -40,7 +41,11 @@ const overviewItems = [
     'Payment reconciliation',
 ];
 
-export default function Dashboard() {
+export default function Dashboard({
+    recentActivity = [],
+}: {
+    recentActivity?: ActivityItem[];
+}) {
     return (
         <>
             <Head title="Dashboard" />
@@ -109,27 +114,64 @@ export default function Dashboard() {
                         <CardHeader>
                             <CardTitle>Recent activity</CardTitle>
                             <CardDescription>
-                                Audit and workflow activity will appear here
-                                after the first modules are added.
+                                Latest audited operational events.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex min-h-40 flex-col items-center justify-center rounded-md border border-dashed text-center">
-                                <Activity className="mb-3 size-5 text-muted-foreground" />
-                                <p className="text-sm font-medium">
-                                    No activity yet
-                                </p>
-                                <p className="mt-1 max-w-48 text-xs text-muted-foreground">
-                                    Future system events will be summarized in
-                                    this panel.
-                                </p>
-                            </div>
+                            {recentActivity.length === 0 ? (
+                                <div className="flex min-h-40 flex-col items-center justify-center rounded-md border border-dashed text-center">
+                                    <Activity className="mb-3 size-5 text-muted-foreground" />
+                                    <p className="text-sm font-medium">
+                                        No activity yet
+                                    </p>
+                                    <p className="mt-1 max-w-48 text-xs text-muted-foreground">
+                                        Audited system events will be summarized
+                                        in this panel.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {recentActivity.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="rounded-md border p-3"
+                                        >
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div>
+                                                    <p className="text-sm font-medium">
+                                                        {item.label}
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-muted-foreground">
+                                                        {item.description ??
+                                                            'System activity'}
+                                                    </p>
+                                                </div>
+                                                <span className="shrink-0 text-xs text-muted-foreground">
+                                                    {formatActivityDate(
+                                                        item.created_at,
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-xs text-muted-foreground">
+                                                {item.actor?.name ?? 'System'}
+                                                {item.subject
+                                                    ? ` -> ${item.subject.label}`
+                                                    : ''}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </section>
             </div>
         </>
     );
+}
+
+function formatActivityDate(value: string | null) {
+    return value === null ? 'Now' : new Date(value).toLocaleDateString();
 }
 
 Dashboard.layout = {

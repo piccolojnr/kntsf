@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Students;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Students\StoreStudentRequest;
 use App\Http\Requests\Students\UpdateStudentRequest;
 use App\Models\Student;
+use App\Support\AuditEvents;
 use App\Support\StudentOptions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -55,13 +57,23 @@ class StudentController extends Controller
         ]);
     }
 
-    public function store(StoreStudentRequest $request): RedirectResponse
+    public function store(StoreStudentRequest $request, CreateAuditLogAction $createAuditLog): RedirectResponse
     {
         $student = Student::create([
             ...$request->validated(),
             'created_by_id' => $request->user()?->id,
             'updated_by_id' => $request->user()?->id,
         ]);
+
+        $createAuditLog->handle(
+            actor: $request->user(),
+            event: AuditEvents::StudentCreated,
+            auditable: $student,
+            subject: $student,
+            description: 'Student record created.',
+            newValues: $student->only(['student_number', 'name', 'email', 'phone', 'course', 'level']),
+            request: $request,
+        );
 
         return to_route('students.index');
     }
@@ -81,21 +93,46 @@ class StudentController extends Controller
         ]);
     }
 
-    public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
+    public function update(UpdateStudentRequest $request, Student $student, CreateAuditLogAction $createAuditLog): RedirectResponse
     {
+        $oldValues = $student->only(['student_number', 'name', 'email', 'phone', 'course', 'level']);
+
         $student->update([
             ...$request->validated(),
             'updated_by_id' => $request->user()?->id,
         ]);
 
+        $createAuditLog->handle(
+            actor: $request->user(),
+            event: AuditEvents::StudentUpdated,
+            auditable: $student,
+            subject: $student,
+            description: 'Student record updated.',
+            oldValues: $oldValues,
+            newValues: $student->only(['student_number', 'name', 'email', 'phone', 'course', 'level']),
+            request: $request,
+        );
+
         return back();
     }
 
-    public function destroy(Student $student): RedirectResponse
+    public function destroy(Request $request, Student $student, CreateAuditLogAction $createAuditLog): RedirectResponse
     {
         Gate::authorize('delete', $student);
 
+        $oldValues = $student->only(['student_number', 'name', 'email', 'phone', 'course', 'level']);
+
         $student->delete();
+
+        $createAuditLog->handle(
+            actor: $request->user(),
+            event: AuditEvents::StudentDeleted,
+            auditable: $student,
+            subject: $student,
+            description: 'Student record deleted.',
+            oldValues: $oldValues,
+            request: $request,
+        );
 
         return to_route('students.index');
     }

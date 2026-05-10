@@ -116,12 +116,12 @@ class NfcCardController extends Controller
         return to_route('nfc-cards.show', $newCard);
     }
 
-    public function markLost(NfcCard $nfcCard, MarkNfcCardLostAction $markNfcCardLost): RedirectResponse
+    public function markLost(Request $request, NfcCard $nfcCard, MarkNfcCardLostAction $markNfcCardLost): RedirectResponse
     {
         Gate::authorize('markLost', $nfcCard);
 
         try {
-            $markNfcCardLost->handle($nfcCard);
+            $markNfcCardLost->handle($nfcCard, $request->user());
         } catch (RuntimeException $exception) {
             return back()->withErrors(['card' => $exception->getMessage()]);
         }
@@ -129,12 +129,12 @@ class NfcCardController extends Controller
         return back();
     }
 
-    public function revoke(NfcCard $nfcCard, RevokeNfcCardAction $revokeNfcCard): RedirectResponse
+    public function revoke(Request $request, NfcCard $nfcCard, RevokeNfcCardAction $revokeNfcCard): RedirectResponse
     {
         Gate::authorize('revoke', $nfcCard);
 
         try {
-            $revokeNfcCard->handle($nfcCard);
+            $revokeNfcCard->handle($nfcCard, $request->user());
         } catch (RuntimeException $exception) {
             return back()->withErrors(['card' => $exception->getMessage()]);
         }

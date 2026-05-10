@@ -122,7 +122,7 @@ class PaymentController extends Controller
         MarkPaymentFailedAction $markPaymentFailed,
     ): RedirectResponse {
         try {
-            $markPaymentFailed->handle($payment, $request->validated());
+            $markPaymentFailed->handle($payment, $request->validated(), $request->user());
         } catch (RuntimeException $exception) {
             return back()->withErrors(['payment' => $exception->getMessage()]);
         }
@@ -136,7 +136,7 @@ class PaymentController extends Controller
         CancelPaymentAction $cancelPayment,
     ): RedirectResponse {
         try {
-            $cancelPayment->handle($payment, $request->validated());
+            $cancelPayment->handle($payment, $request->validated(), $request->user());
         } catch (RuntimeException $exception) {
             return back()->withErrors(['payment' => $exception->getMessage()]);
         }

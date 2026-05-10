@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Verification;
 
+use App\Actions\Audit\CreateAuditLogAction;
 use App\Actions\Verification\CreateVerificationLogAction;
+use App\Actions\Verification\VerificationAttempt;
 use App\Actions\Verification\VerifyNfcUidAction;
 use App\Actions\Verification\VerifyPermitCodeAction;
 use App\Actions\Verification\VerifyStudentNumberAction;
@@ -11,6 +13,8 @@ use App\Http\Requests\Verification\VerifyNfcUidRequest;
 use App\Http\Requests\Verification\VerifyPermitCodeRequest;
 use App\Http\Requests\Verification\VerifyStudentNumberRequest;
 use App\Models\Student;
+use App\Models\VerificationLog;
+use App\Support\AuditEvents;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -49,10 +53,12 @@ class VerificationController extends Controller
         VerifyStudentNumberRequest $request,
         VerifyStudentNumberAction $verifyStudentNumber,
         CreateVerificationLogAction $createVerificationLog,
+        CreateAuditLogAction $createAuditLog,
     ): RedirectResponse {
         $attempt = $verifyStudentNumber->handle($request->validated('student_number'));
+        $log = $createVerificationLog->handle($attempt, $request);
 
-        $createVerificationLog->handle($attempt, $request);
+        $this->auditVerification($request, $createAuditLog, $log, $attempt);
 
         return back()->with('verificationResult', $attempt->toPayload());
     }
@@ -61,10 +67,12 @@ class VerificationController extends Controller
         VerifyPermitCodeRequest $request,
         VerifyPermitCodeAction $verifyPermitCode,
         CreateVerificationLogAction $createVerificationLog,
+        CreateAuditLogAction $createAuditLog,
     ): RedirectResponse {
         $attempt = $verifyPermitCode->handle($request->validated('permit_code'));
+        $log = $createVerificationLog->handle($attempt, $request);
 
-        $createVerificationLog->handle($attempt, $request);
+        $this->auditVerification($request, $createAuditLog, $log, $attempt);
 
         return back()->with('verificationResult', $attempt->toPayload());
     }
@@ -73,11 +81,34 @@ class VerificationController extends Controller
         VerifyNfcUidRequest $request,
         VerifyNfcUidAction $verifyNfcUid,
         CreateVerificationLogAction $createVerificationLog,
+        CreateAuditLogAction $createAuditLog,
     ): RedirectResponse {
         $attempt = $verifyNfcUid->handle($request->validated('uid'));
+        $log = $createVerificationLog->handle($attempt, $request);
 
-        $createVerificationLog->handle($attempt, $request);
+        $this->auditVerification($request, $createAuditLog, $log, $attempt);
 
         return back()->with('verificationResult', $attempt->toPayload());
+    }
+
+    private function auditVerification(
+        Request $request,
+        CreateAuditLogAction $createAuditLog,
+        VerificationLog $log,
+        VerificationAttempt $attempt,
+    ): void {
+        $createAuditLog->handle(
+            actor: $request->user(),
+            event: AuditEvents::VerificationPerformed,
+            auditable: $log,
+            subject: $attempt->student ?? $attempt->permit,
+            description: 'Manual verification performed.',
+            metadata: [
+                'method' => $attempt->method->value,
+                'result' => $attempt->result->value,
+                'verification_log_id' => $log->id,
+            ],
+            request: $request,
+        );
     }
 }
