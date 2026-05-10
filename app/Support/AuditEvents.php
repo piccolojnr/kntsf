@@ -36,6 +36,26 @@ final class AuditEvents
 
     public const VerificationPerformed = 'verification.performed';
 
+    public const ExecutiveCreated = 'executive.created';
+
+    public const ExecutiveUpdated = 'executive.updated';
+
+    public const ExecutiveDeleted = 'executive.deleted';
+
+    public const ExecutiveActivated = 'executive.activated';
+
+    public const ExecutiveDeactivated = 'executive.deactivated';
+
+    public const ExecutiveSetupLinkSent = 'executive.setup_link_sent';
+
+    public const RoleCreated = 'role.created';
+
+    public const RoleUpdated = 'role.updated';
+
+    public const RoleDeleted = 'role.deleted';
+
+    public const RolePermissionsChanged = 'role.permissions_changed';
+
     /**
      * @return array<int, string>
      */
@@ -58,6 +78,16 @@ final class AuditEvents
             self::NfcLost,
             self::NfcRevoked,
             self::VerificationPerformed,
+            self::ExecutiveCreated,
+            self::ExecutiveUpdated,
+            self::ExecutiveDeleted,
+            self::ExecutiveActivated,
+            self::ExecutiveDeactivated,
+            self::ExecutiveSetupLinkSent,
+            self::RoleCreated,
+            self::RoleUpdated,
+            self::RoleDeleted,
+            self::RolePermissionsChanged,
         ];
     }
 }
