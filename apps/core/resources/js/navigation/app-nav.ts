@@ -1,5 +1,6 @@
 import {
     CalendarDays,
+    CircleDollarSign,
     CreditCard,
     GraduationCap,
     History,
@@ -10,6 +11,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
+import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitsIndex } from '@/routes/permits';
 import { index as studentsIndex } from '@/routes/students';
 import {
@@ -48,6 +50,12 @@ export const mainNavItems: NavItem[] = [
         href: nfcCardsIndex(),
         icon: Wifi,
         permission: 'nfc_cards.view',
+    },
+    {
+        title: 'Payments',
+        href: paymentsIndex(),
+        icon: CircleDollarSign,
+        permission: 'payments.view',
     },
     {
         title: 'Verification',

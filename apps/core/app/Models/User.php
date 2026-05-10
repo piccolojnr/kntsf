@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $this->hasMany(Permit::class, 'revoked_by_id');
     }
 
+    public function createdPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'created_by_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
