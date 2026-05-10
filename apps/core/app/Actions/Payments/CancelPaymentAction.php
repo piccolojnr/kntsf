@@ -6,12 +6,17 @@ use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\Payments\PaymentCancelledNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use RuntimeException;
 
 class CancelPaymentAction
 {
-    public function __construct(private readonly CreateAuditLogAction $createAuditLog) {}
+    public function __construct(
+        private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
+    ) {}
 
     /**
      * @param  array{notes?: string|null}  $attributes
@@ -49,6 +54,8 @@ class CancelPaymentAction
             oldValues: $oldValues,
             newValues: $payment->only(['status']),
         );
+
+        $this->studentNotifier->notify($payment->student, new PaymentCancelledNotification($payment));
 
         return $payment;
     }

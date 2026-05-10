@@ -3,15 +3,18 @@ export type User = {
     name: string;
     email: string;
     avatar?: string;
+    is_active?: boolean;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
+    roles: string[];
+    permissions: string[];
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
 };
 
 export type Auth = {
-    user: User;
+    user: User | null;
 };
 
 export type TwoFactorSetupData = {

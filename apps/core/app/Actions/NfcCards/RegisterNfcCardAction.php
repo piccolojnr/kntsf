@@ -7,8 +7,10 @@ use App\Enums\NfcCardStatus;
 use App\Models\NfcCard;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\NfcCards\NfcCardRegisteredNotification;
 use App\Support\AuditEvents;
 use App\Support\NfcUidHasher;
+use App\Support\StudentNotifier;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -17,6 +19,7 @@ class RegisterNfcCardAction
     public function __construct(
         private readonly NfcUidHasher $nfcUidHasher,
         private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
     ) {}
 
     public function handle(Student $student, string $uid, ?User $createdBy = null, bool $logRegistration = true): NfcCard
@@ -61,6 +64,8 @@ class RegisterNfcCardAction
                     newValues: $card->only(['student_id', 'uid_last4', 'status', 'issued_at', 'activated_at', 'created_by_id']),
                 );
             }
+
+            $this->studentNotifier->notify($student, new NfcCardRegisteredNotification($card));
 
             return $card;
         });

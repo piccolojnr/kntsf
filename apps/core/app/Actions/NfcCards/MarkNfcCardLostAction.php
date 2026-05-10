@@ -6,12 +6,17 @@ use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\NfcCardStatus;
 use App\Models\NfcCard;
 use App\Models\User;
+use App\Notifications\NfcCards\NfcCardLostNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use RuntimeException;
 
 class MarkNfcCardLostAction
 {
-    public function __construct(private readonly CreateAuditLogAction $createAuditLog) {}
+    public function __construct(
+        private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
+    ) {}
 
     public function handle(NfcCard $card, ?User $actor = null): NfcCard
     {
@@ -41,6 +46,8 @@ class MarkNfcCardLostAction
             oldValues: $oldValues,
             newValues: $card->only(['status', 'lost_at', 'deactivated_at']),
         );
+
+        $this->studentNotifier->notify($card->student, new NfcCardLostNotification($card));
 
         return $card;
     }

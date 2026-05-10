@@ -8,9 +8,11 @@ use App\Models\AcademicPeriod;
 use App\Models\Permit;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\Permits\PermitIssuedNotification;
 use App\Support\AuditEvents;
 use App\Support\PermitCodeHasher;
 use App\Support\PermitSettings;
+use App\Support\StudentNotifier;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,7 @@ class IssuePermitAction
         private readonly PermitCodeHasher $permitCodeHasher,
         private readonly PermitSettings $permitSettings,
         private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
     ) {}
 
     /**
@@ -80,6 +83,8 @@ class IssuePermitAction
                 ],
                 newValues: $permit->only(['student_id', 'academic_period_id', 'status', 'starts_at', 'expires_at', 'amount_paid', 'currency']),
             );
+
+            $this->studentNotifier->notify($student, new PermitIssuedNotification($permit));
 
             return new IssuedPermit($permit->load(['student', 'academicPeriod', 'issuedBy']), $code);
         });

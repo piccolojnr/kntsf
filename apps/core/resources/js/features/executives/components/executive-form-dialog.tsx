@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { store, update } from '@/routes/executives';
 import type { Executive, ExecutiveOptions } from '../types';
+import { store, update } from '@/routes/executives';
 
 export function ExecutiveFormDialog({
     executive,
@@ -27,7 +27,9 @@ export function ExecutiveFormDialog({
     trigger?: React.ReactNode;
 }) {
     const [open, setOpen] = useState(false);
-    const selectedRoles = executive?.roles.map((role) => role.name) ?? ['staff'];
+    const selectedRoles = executive?.roles.map((role) => role.name) ?? [
+        'staff',
+    ];
     const action = executive ? update.form(executive.id) : store.form();
 
     return (

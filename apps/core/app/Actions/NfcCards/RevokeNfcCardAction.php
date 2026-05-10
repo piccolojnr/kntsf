@@ -6,12 +6,17 @@ use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\NfcCardStatus;
 use App\Models\NfcCard;
 use App\Models\User;
+use App\Notifications\NfcCards\NfcCardRevokedNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use RuntimeException;
 
 class RevokeNfcCardAction
 {
-    public function __construct(private readonly CreateAuditLogAction $createAuditLog) {}
+    public function __construct(
+        private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
+    ) {}
 
     public function handle(NfcCard $card, ?User $actor = null): NfcCard
     {
@@ -40,6 +45,8 @@ class RevokeNfcCardAction
             oldValues: $oldValues,
             newValues: $card->only(['status', 'deactivated_at']),
         );
+
+        $this->studentNotifier->notify($card->student, new NfcCardRevokedNotification($card));
 
         return $card;
     }
