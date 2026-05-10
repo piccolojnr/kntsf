@@ -12,14 +12,19 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { mainNavItems, sidebarFooterNavItems } from '@/navigation/app-nav';
+import { sidebarFooterNavItems, sidebarNavGroups } from '@/navigation/app-nav';
 import { filterNavItemsForUser } from '@/navigation/filter-nav-items';
 import { dashboard } from '@/routes';
 import type { SharedPageProps } from '@/types';
 
 export function AppSidebar() {
     const { auth } = usePage<SharedPageProps>().props;
-    const visibleMainNavItems = filterNavItemsForUser(mainNavItems, auth);
+    const visibleNavGroups = sidebarNavGroups
+        .map((group) => ({
+            ...group,
+            items: filterNavItemsForUser(group.items, auth),
+        }))
+        .filter((group) => group.items.length > 0);
     const visibleFooterNavItems = filterNavItemsForUser(
         sidebarFooterNavItems,
         auth,
@@ -48,7 +53,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="gap-3 px-1 py-3">
-                <NavMain items={visibleMainNavItems} />
+                <NavMain groups={visibleNavGroups} />
             </SidebarContent>
 
             <SidebarFooter className="border-t border-sidebar-border/60 p-3">
