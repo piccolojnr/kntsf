@@ -8,8 +8,11 @@ use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\Payments\PaymentDueNotification;
+use App\Notifications\Payments\PaymentSuccessfulNotification;
 use App\Support\AuditEvents;
 use App\Support\PaymentReferenceGenerator;
+use App\Support\StudentNotifier;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -19,6 +22,7 @@ class CreateManualPaymentAction
         private readonly PaymentReferenceGenerator $paymentReferenceGenerator,
         private readonly IssuePermitAction $issuePermit,
         private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
     ) {}
 
     /**
@@ -90,6 +94,10 @@ class CreateManualPaymentAction
                     ],
                     newValues: $payment->only(['status', 'paid_at', 'verified_at', 'permit_id']),
                 );
+
+                $this->studentNotifier->notify($student, new PaymentSuccessfulNotification($payment->refresh()));
+            } else {
+                $this->studentNotifier->notify($student, new PaymentDueNotification($payment));
             }
 
             return $payment->refresh()->load(['student', 'permit', 'createdBy']);

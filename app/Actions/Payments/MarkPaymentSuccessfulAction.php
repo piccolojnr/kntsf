@@ -7,7 +7,9 @@ use App\Actions\Permits\IssuePermitAction;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\Payments\PaymentSuccessfulNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -16,6 +18,7 @@ class MarkPaymentSuccessfulAction
     public function __construct(
         private readonly IssuePermitAction $issuePermit,
         private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
     ) {}
 
     /**
@@ -72,6 +75,8 @@ class MarkPaymentSuccessfulAction
                 oldValues: $oldValues,
                 newValues: $payment->only(['status', 'paid_at', 'verified_at', 'failure_reason', 'permit_id']),
             );
+
+            $this->studentNotifier->notify($payment->student, new PaymentSuccessfulNotification($payment));
 
             return $payment->refresh()->load(['student', 'permit', 'createdBy']);
         });

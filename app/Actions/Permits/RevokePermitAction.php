@@ -6,12 +6,17 @@ use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\PermitStatus;
 use App\Models\Permit;
 use App\Models\User;
+use App\Notifications\Permits\PermitRevokedNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use RuntimeException;
 
 class RevokePermitAction
 {
-    public function __construct(private readonly CreateAuditLogAction $createAuditLog) {}
+    public function __construct(
+        private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
+    ) {}
 
     public function handle(Permit $permit, User $revokedBy, ?string $reason = null): Permit
     {
@@ -42,6 +47,8 @@ class RevokePermitAction
             oldValues: $oldValues,
             newValues: $permit->only(['status', 'revoked_at', 'revoked_by_id', 'revocation_reason']),
         );
+
+        $this->studentNotifier->notify($permit->student, new PermitRevokedNotification($permit));
 
         return $permit;
     }

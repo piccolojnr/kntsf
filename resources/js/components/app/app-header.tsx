@@ -33,6 +33,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { headerExternalNavItems, mainNavItems } from '@/navigation/app-nav';
+import { filterNavItemsForUser } from '@/navigation/filter-nav-items';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, SharedPageProps } from '@/types';
 
@@ -48,6 +49,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth } = page.props;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+    const visibleMainNavItems = filterNavItemsForUser(mainNavItems, auth);
+    const visibleExternalNavItems = filterNavItemsForUser(
+        headerExternalNavItems,
+        auth,
+    );
 
     return (
         <>
@@ -78,7 +84,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {visibleMainNavItems.map((item) => (
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
@@ -93,20 +99,24 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
-                                            {headerExternalNavItems.map((item) => (
-                                                <a
-                                                    key={item.title}
-                                                    href={toUrl(item.href)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center space-x-2 font-medium"
-                                                >
-                                                    {item.icon && (
-                                                        <item.icon className="h-5 w-5" />
-                                                    )}
-                                                    <span>{item.title}</span>
-                                                </a>
-                                            ))}
+                                            {visibleExternalNavItems.map(
+                                                (item) => (
+                                                    <a
+                                                        key={item.title}
+                                                        href={toUrl(item.href)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center space-x-2 font-medium"
+                                                    >
+                                                        {item.icon && (
+                                                            <item.icon className="h-5 w-5" />
+                                                        )}
+                                                        <span>
+                                                            {item.title}
+                                                        </span>
+                                                    </a>
+                                                ),
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -126,7 +136,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {visibleMainNavItems.map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
                                         className="relative flex h-full items-center"
@@ -166,7 +176,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
-                                {headerExternalNavItems.map((item) => (
+                                {visibleExternalNavItems.map((item) => (
                                     <Tooltip key={item.title}>
                                         <TooltipTrigger>
                                             <a
@@ -199,7 +209,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <Avatar className="size-8 overflow-hidden rounded-full">
                                         <AvatarImage
                                             src={auth.user?.avatar}
-                                            alt={auth.user?.name}
+                                            alt={auth.user?.name ?? ''}
                                         />
                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                             {getInitials(auth.user?.name ?? '')}

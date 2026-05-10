@@ -6,12 +6,17 @@ use App\Actions\Audit\CreateAuditLogAction;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\Payments\PaymentFailedNotification;
 use App\Support\AuditEvents;
+use App\Support\StudentNotifier;
 use RuntimeException;
 
 class MarkPaymentFailedAction
 {
-    public function __construct(private readonly CreateAuditLogAction $createAuditLog) {}
+    public function __construct(
+        private readonly CreateAuditLogAction $createAuditLog,
+        private readonly StudentNotifier $studentNotifier,
+    ) {}
 
     /**
      * @param  array{failure_reason: string, notes?: string|null}  $attributes
@@ -50,6 +55,8 @@ class MarkPaymentFailedAction
             oldValues: $oldValues,
             newValues: $payment->only(['status', 'failure_reason']),
         );
+
+        $this->studentNotifier->notify($payment->student, new PaymentFailedNotification($payment));
 
         return $payment;
     }
