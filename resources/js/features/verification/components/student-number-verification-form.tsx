@@ -1,6 +1,6 @@
 import { Form } from '@inertiajs/react';
 import { Search } from 'lucide-react';
-import InputError from '@/components/shared/input-error';
+import { StudentSearchSelector } from '@/components/shared/student-search-selector';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -9,11 +9,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { studentNumber } from '@/routes/verification';
+import type { VerificationOptions } from '../types';
 
-export function StudentNumberVerificationForm() {
+export function StudentNumberVerificationForm({
+    options,
+}: {
+    options: VerificationOptions;
+}) {
     return (
         <Card className="gap-0 py-0">
             <CardHeader className="py-4">
@@ -30,19 +33,13 @@ export function StudentNumberVerificationForm() {
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="student_number">
-                                    Student number
-                                </Label>
-                                <Input
-                                    id="student_number"
-                                    name="student_number"
-                                    maxLength={50}
-                                    placeholder="26102859"
-                                    required
-                                />
-                                <InputError message={errors.student_number} />
-                            </div>
+                            <StudentSearchSelector
+                                id="student_number"
+                                students={options.students}
+                                errors={errors}
+                                studentFieldName="student_number"
+                                valueField="student_number"
+                            />
 
                             <Button disabled={processing}>
                                 <Search />

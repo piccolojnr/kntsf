@@ -58,6 +58,16 @@ export type VerificationLog = {
     } | null;
 };
 
+export type VerificationOptions = {
+    students: {
+        id: number;
+        student_number: string;
+        name: string | null;
+        email: string | null;
+        label: string;
+    }[];
+};
+
 export type Paginated<T> = {
     data: T[];
     links: {

@@ -1,7 +1,9 @@
 import { Form } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { AcademicPeriodSearchSelector } from '@/components/shared/academic-period-search-selector';
 import InputError from '@/components/shared/input-error';
+import { StudentSearchSelector } from '@/components/shared/student-search-selector';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -15,13 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { store } from '@/routes/payments';
 import type { PaymentOptions } from '../types';
 
@@ -53,25 +49,11 @@ export function PaymentCreateDialog({ options }: { options: PaymentOptions }) {
                         <>
                             <InputError message={errors.payment} />
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="student_id">Student</Label>
-                                <Select name="student_id">
-                                    <SelectTrigger id="student_id" className="w-full">
-                                        <SelectValue placeholder="Select student" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {options.students.map((student) => (
-                                            <SelectItem
-                                                key={student.id}
-                                                value={student.id.toString()}
-                                            >
-                                                {student.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.student_id} />
-                            </div>
+                            <StudentSearchSelector
+                                students={options.students}
+                                errors={errors}
+                                showEmailInput
+                            />
 
                             <div className="grid gap-4 md:grid-cols-[1fr_0.55fr]">
                                 <div className="grid gap-2">
@@ -112,31 +94,10 @@ export function PaymentCreateDialog({ options }: { options: PaymentOptions }) {
                                 <InputError message={errors.status} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="academic_period_id">
-                                    Academic period
-                                </Label>
-                                <Select name="academic_period_id">
-                                    <SelectTrigger
-                                        id="academic_period_id"
-                                        className="w-full"
-                                    >
-                                        <SelectValue placeholder="Use active period" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {options.academic_periods.map((period) => (
-                                            <SelectItem
-                                                key={period.id}
-                                                value={period.id.toString()}
-                                            >
-                                                {period.label}
-                                                {period.is_active ? ' (active)' : ''}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.academic_period_id} />
-                            </div>
+                            <AcademicPeriodSearchSelector
+                                periods={options.academic_periods}
+                                errors={errors}
+                            />
 
                             <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-3">
                                 <input type="hidden" name="issue_permit" value="0" />
