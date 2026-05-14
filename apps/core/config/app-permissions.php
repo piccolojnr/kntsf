@@ -87,6 +87,14 @@ return [
             'announcements.publish',
             'announcements.delete',
         ],
+
+        'events' => [
+            'events.view',
+            'events.create',
+            'events.update',
+            'events.publish',
+            'events.delete',
+        ],
     ],
 
     'roles' => [
@@ -134,6 +142,11 @@ return [
             'announcements.update',
             'announcements.publish',
             'announcements.delete',
+            'events.view',
+            'events.create',
+            'events.update',
+            'events.publish',
+            'events.delete',
         ],
 
         'staff' => [
@@ -151,6 +164,7 @@ return [
             'settings.view',
             'reports.view',
             'announcements.view',
+            'events.view',
         ],
 
         'student' => [

@@ -9,6 +9,7 @@ use App\Enums\PublishStatus;
 use App\Enums\VerificationResult;
 use App\Models\AcademicPeriod;
 use App\Models\Announcement;
+use App\Models\Event;
 use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
@@ -154,7 +155,7 @@ class DashboardSummary
                 'key' => 'events',
                 'title' => 'Event publishing',
                 'description' => $settings['allow_public_events']
-                    ? 'Public event publishing is enabled for future event modules.'
+                    ? Event::query()->where('status', PublishStatus::Published->value)->count().' published events, '.Event::query()->where('status', PublishStatus::Draft->value)->count().' drafts, '.Event::query()->where('status', PublishStatus::Published->value)->where('starts_at', '>=', now())->count().' upcoming.'
                     : 'Public event publishing is currently disabled.',
                 'ready' => $settings['allow_public_events'],
             ],
