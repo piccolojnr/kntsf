@@ -4,6 +4,7 @@ import {
     ClipboardList,
     CreditCard,
     IdCard,
+    Newspaper,
     ShieldAlert,
     ShieldCheck,
     Users,
@@ -41,6 +42,13 @@ type DashboardWarning = {
     count?: number;
 };
 
+type ContentReadinessItem = {
+    key: string;
+    title: string;
+    description: string;
+    ready: boolean;
+};
+
 const quickActions = [
     {
         title: 'Review student records',
@@ -62,10 +70,12 @@ const quickActions = [
 export default function Dashboard({
     summary,
     warnings = [],
+    contentReadiness = [],
     recentActivity = [],
 }: {
     summary: DashboardSummary;
     warnings?: DashboardWarning[];
+    contentReadiness?: ContentReadinessItem[];
     recentActivity?: ActivityItem[];
 }) {
     const summaryCards = [
@@ -275,6 +285,46 @@ export default function Dashboard({
                         </CardContent>
                     </Card>
                 </section>
+
+                {contentReadiness.length > 0 && (
+                    <section>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Content readiness</CardTitle>
+                                <CardDescription>
+                                    Publishing infrastructure is prepared before
+                                    news, events, and document modules are
+                                    added.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-3 md:grid-cols-3">
+                                {contentReadiness.map((item) => (
+                                    <div
+                                        key={item.key}
+                                        className="flex items-start gap-3 rounded-md border p-3"
+                                    >
+                                        <Newspaper className="mt-0.5 size-4 text-muted-foreground" />
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm font-medium">
+                                                    {item.title}
+                                                </p>
+                                                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                                                    {item.ready
+                                                        ? 'Ready'
+                                                        : 'Internal'}
+                                                </span>
+                                            </div>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                {item.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </section>
+                )}
             </div>
         </>
     );
