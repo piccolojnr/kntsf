@@ -9,6 +9,7 @@ use App\Enums\PublishStatus;
 use App\Enums\VerificationResult;
 use App\Models\AcademicPeriod;
 use App\Models\Announcement;
+use App\Models\Document;
 use App\Models\Event;
 use App\Models\NfcCard;
 use App\Models\Payment;
@@ -163,7 +164,7 @@ class DashboardSummary
                 'key' => 'documents',
                 'title' => 'Document publishing',
                 'description' => $settings['allow_public_documents']
-                    ? 'Public document publishing is enabled for future document modules.'
+                    ? Document::query()->where('status', PublishStatus::Published->value)->count().' published documents, '.Document::query()->where('status', PublishStatus::Draft->value)->count().' drafts, '.Document::query()->where('is_featured', true)->count().' featured.'
                     : 'Documents are internal-first until public access is explicitly enabled.',
                 'ready' => $settings['allow_public_documents'],
             ],

@@ -95,6 +95,14 @@ return [
             'events.publish',
             'events.delete',
         ],
+
+        'documents' => [
+            'documents.view',
+            'documents.create',
+            'documents.update',
+            'documents.publish',
+            'documents.delete',
+        ],
     ],
 
     'roles' => [
@@ -147,6 +155,11 @@ return [
             'events.update',
             'events.publish',
             'events.delete',
+            'documents.view',
+            'documents.create',
+            'documents.update',
+            'documents.publish',
+            'documents.delete',
         ],
 
         'staff' => [
@@ -165,6 +178,7 @@ return [
             'reports.view',
             'announcements.view',
             'events.view',
+            'documents.view',
         ],
 
         'student' => [

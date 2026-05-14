@@ -42,3 +42,4 @@ require __DIR__.'/executives.php';
 require __DIR__.'/roles.php';
 require __DIR__.'/announcements.php';
 require __DIR__.'/events.php';
+require __DIR__.'/documents.php';

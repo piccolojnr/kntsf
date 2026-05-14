@@ -61,6 +61,11 @@ class User extends Authenticatable
         return $this->hasMany(Event::class, 'organizer_id');
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'author_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
