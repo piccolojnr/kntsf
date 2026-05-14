@@ -86,6 +86,20 @@ final class AuditEvents
 
     public const DocumentDeleted = 'document.deleted';
 
+    public const PollCreated = 'poll.created';
+
+    public const PollUpdated = 'poll.updated';
+
+    public const PollPublished = 'poll.published';
+
+    public const PollArchived = 'poll.archived';
+
+    public const PollDeleted = 'poll.deleted';
+
+    public const PollVoteCast = 'poll.vote_cast';
+
+    public const PollOptionMerged = 'poll.option_merged';
+
     /**
      * @return array<int, string>
      */
@@ -133,6 +147,13 @@ final class AuditEvents
             self::DocumentPublished,
             self::DocumentArchived,
             self::DocumentDeleted,
+            self::PollCreated,
+            self::PollUpdated,
+            self::PollPublished,
+            self::PollArchived,
+            self::PollDeleted,
+            self::PollVoteCast,
+            self::PollOptionMerged,
         ];
     }
 }

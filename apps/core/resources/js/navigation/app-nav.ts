@@ -9,6 +9,7 @@ import {
     History,
     LayoutGrid,
     Megaphone,
+    ListChecks,
     ScrollText,
     ShieldCheck,
     ShieldPlus,
@@ -25,6 +26,7 @@ import { index as executivesIndex } from '@/routes/executives';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitsIndex } from '@/routes/permits';
+import { index as pollsIndex } from '@/routes/polls';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as rolesIndex } from '@/routes/roles';
 import { index as studentsIndex } from '@/routes/students';
@@ -111,6 +113,13 @@ const documentsNavItem: NavItem = {
     permission: 'documents.view',
 };
 
+const pollsNavItem: NavItem = {
+    title: 'Polls',
+    href: pollsIndex(),
+    icon: ListChecks,
+    permission: 'polls.view',
+};
+
 const rolesNavItem: NavItem = {
     title: 'Roles & Permissions',
     href: rolesIndex(),
@@ -150,6 +159,7 @@ export const mainNavItems: NavItem[] = [
     announcementsNavItem,
     eventsNavItem,
     documentsNavItem,
+    pollsNavItem,
     reportsNavItem,
     rolesNavItem,
     verificationNavItem,
@@ -174,6 +184,7 @@ export const sidebarNavGroups: NavGroup[] = [
             announcementsNavItem,
             eventsNavItem,
             documentsNavItem,
+            pollsNavItem,
             academicPeriodsNavItem,
         ],
     },
