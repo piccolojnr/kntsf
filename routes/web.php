@@ -44,3 +44,4 @@ require __DIR__.'/announcements.php';
 require __DIR__.'/events.php';
 require __DIR__.'/documents.php';
 require __DIR__.'/polls.php';
+require __DIR__.'/elections.php';

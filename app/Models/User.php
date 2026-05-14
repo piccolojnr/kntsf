@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(Poll::class, 'created_by_id');
     }
 
+    public function elections(): HasMany
+    {
+        return $this->hasMany(Election::class, 'created_by_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

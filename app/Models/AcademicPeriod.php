@@ -28,6 +28,11 @@ class AcademicPeriod extends Model
         return $this->hasMany(Permit::class);
     }
 
+    public function elections(): HasMany
+    {
+        return $this->hasMany(Election::class);
+    }
+
     protected function casts(): array
     {
         return [
