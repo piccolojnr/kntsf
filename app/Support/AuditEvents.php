@@ -66,6 +66,16 @@ final class AuditEvents
 
     public const AnnouncementDeleted = 'announcement.deleted';
 
+    public const EventCreated = 'event.created';
+
+    public const EventUpdated = 'event.updated';
+
+    public const EventPublished = 'event.published';
+
+    public const EventArchived = 'event.archived';
+
+    public const EventDeleted = 'event.deleted';
+
     /**
      * @return array<int, string>
      */
@@ -103,6 +113,11 @@ final class AuditEvents
             self::AnnouncementPublished,
             self::AnnouncementArchived,
             self::AnnouncementDeleted,
+            self::EventCreated,
+            self::EventUpdated,
+            self::EventPublished,
+            self::EventArchived,
+            self::EventDeleted,
         ];
     }
 }

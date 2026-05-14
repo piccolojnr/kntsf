@@ -56,6 +56,11 @@ class User extends Authenticatable
         return $this->hasMany(Announcement::class, 'author_id');
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class, 'organizer_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

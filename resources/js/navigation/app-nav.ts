@@ -1,5 +1,6 @@
 import {
     CalendarDays,
+    CalendarCheck,
     ChartColumn,
     CircleDollarSign,
     CreditCard,
@@ -17,6 +18,7 @@ import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
 import { index as announcementsIndex } from '@/routes/announcements';
 import { index as auditLogsIndex } from '@/routes/audit-logs';
+import { index as eventsIndex } from '@/routes/events';
 import { index as executivesIndex } from '@/routes/executives';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
@@ -93,6 +95,13 @@ const announcementsNavItem: NavItem = {
     permission: 'announcements.view',
 };
 
+const eventsNavItem: NavItem = {
+    title: 'Events',
+    href: eventsIndex(),
+    icon: CalendarCheck,
+    permission: 'events.view',
+};
+
 const rolesNavItem: NavItem = {
     title: 'Roles & Permissions',
     href: rolesIndex(),
@@ -130,6 +139,7 @@ export const mainNavItems: NavItem[] = [
     nfcCardsNavItem,
     paymentsNavItem,
     announcementsNavItem,
+    eventsNavItem,
     reportsNavItem,
     rolesNavItem,
     verificationNavItem,
@@ -152,6 +162,7 @@ export const sidebarNavGroups: NavGroup[] = [
             studentsNavItem,
             executivesNavItem,
             announcementsNavItem,
+            eventsNavItem,
             academicPeriodsNavItem,
         ],
     },
