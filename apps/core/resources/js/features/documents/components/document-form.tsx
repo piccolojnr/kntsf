@@ -2,19 +2,18 @@ import { Form } from '@inertiajs/react';
 import { Save } from 'lucide-react';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { PublishStatusSelect } from '@/features/content/components/publish-status-select';
+import { ContentFormShell } from '@/features/content/components/content-form-shell';
+import { FormSection } from '@/features/content/components/form-section';
+import { ImageUploadField } from '@/features/content/components/image-upload-field';
+import { MultipleFileUploadField } from '@/features/content/components/multiple-file-upload-field';
+import {
+    PublishingSettings,
+} from '@/features/content/components/publishing-settings';
 import { RichTextEditor } from '@/features/content/components/rich-text-editor';
+import { SlugField } from '@/features/content/components/slug-field';
 import { store, update } from '@/routes/documents';
 import type { Document, DocumentDefaults } from '../types';
 import { DocumentFileList } from './document-file-list';
@@ -35,111 +34,81 @@ export function DocumentForm({ document, defaults }: DocumentFormProps) {
         >
             {({ processing, errors }) => (
                 <>
-                    <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-                        <div className="space-y-5">
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    defaultValue={document?.title}
-                                    required
-                                    maxLength={255}
-                                    placeholder="Document title"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
+                    <ContentFormShell
+                        main={
+                            <FormSection
+                                title="Document content"
+                                description="Describe the file so dashboard users know what they are downloading."
+                            >
+                                <div className="grid gap-2">
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        defaultValue={document?.title}
+                                        required
+                                        maxLength={255}
+                                        placeholder="Document title"
+                                    />
+                                    <InputError message={errors.title} />
+                                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
+                                <SlugField
                                     defaultValue={document?.slug}
-                                    maxLength={255}
-                                    placeholder="Leave blank to generate from title"
+                                    error={errors.slug}
                                 />
-                                <InputError message={errors.slug} />
-                            </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
-                                <Textarea
-                                    id="excerpt"
-                                    name="excerpt"
-                                    defaultValue={document?.excerpt ?? ''}
-                                    rows={3}
-                                    placeholder="Short summary for document lists"
-                                />
-                                <InputError message={errors.excerpt} />
-                            </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="excerpt">Excerpt</Label>
+                                    <Textarea
+                                        id="excerpt"
+                                        name="excerpt"
+                                        defaultValue={document?.excerpt ?? ''}
+                                        rows={3}
+                                        placeholder="Short summary for document lists"
+                                    />
+                                    <InputError message={errors.excerpt} />
+                                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
-                                <RichTextEditor
-                                    id="description"
-                                    name="description"
-                                    defaultValue={document?.description ?? ''}
-                                    rows={10}
-                                />
-                                <InputError message={errors.description} />
-                            </div>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label>Status</Label>
-                                        <PublishStatusSelect
-                                            defaultValue={
-                                                document?.status ??
-                                                defaults.status
-                                            }
-                                        />
-                                        <InputError message={errors.status} />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label>Visibility</Label>
-                                        <Select
-                                            name="visibility"
-                                            defaultValue={
-                                                document?.visibility ??
-                                                defaults.visibility
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="public">
-                                                    Public
-                                                </SelectItem>
-                                                <SelectItem value="internal">
-                                                    Internal
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.visibility} />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="published_at">
-                                            Published at
-                                        </Label>
-                                        <Input
-                                            id="published_at"
-                                            name="published_at"
-                                            type="datetime-local"
-                                            defaultValue={toDatetimeLocal(
-                                                document?.published_at,
-                                            )}
-                                        />
-                                        <InputError
-                                            message={errors.published_at}
-                                        />
-                                    </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="description">
+                                        Description
+                                    </Label>
+                                    <RichTextEditor
+                                        id="description"
+                                        name="description"
+                                        label="Document description"
+                                        defaultValue={
+                                            document?.description ?? ''
+                                        }
+                                        rows={12}
+                                    />
+                                    <InputError message={errors.description} />
+                                </div>
+                            </FormSection>
+                        }
+                        sidebar={
+                            <>
+                                <FormSection
+                                    title="Publishing"
+                                    description="Documents need at least one file before publishing."
+                                >
+                                    <PublishingSettings
+                                        status={
+                                            document?.status ?? defaults.status
+                                        }
+                                        visibility={
+                                            document?.visibility ??
+                                            defaults.visibility
+                                        }
+                                        publishedAt={document?.published_at}
+                                        isFeatured={
+                                            document?.is_featured ??
+                                            defaults.is_featured
+                                        }
+                                        featuredLabel="Featured document"
+                                        errors={errors}
+                                    />
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="category">
@@ -156,74 +125,42 @@ export function DocumentForm({ document, defaults }: DocumentFormProps) {
                                         />
                                         <InputError message={errors.category} />
                                     </div>
+                                </FormSection>
 
-                                    <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
-                                        <input
-                                            type="hidden"
-                                            name="is_featured"
-                                            value="0"
-                                        />
-                                        <Checkbox
-                                            id="is_featured"
-                                            name="is_featured"
-                                            value="1"
-                                            defaultChecked={
-                                                document?.is_featured ??
-                                                defaults.is_featured
-                                            }
-                                        />
-                                        <Label htmlFor="is_featured">
-                                            Featured document
-                                        </Label>
-                                    </div>
-                                </div>
-                            </div>
+                                <FormSection
+                                    title="Files"
+                                    description="Upload dashboard-accessible document files and an optional image."
+                                >
+                                    <MultipleFileUploadField
+                                        id="files"
+                                        name="files[]"
+                                        label="Document files"
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                        description="PDF, Word, Excel, and PowerPoint files up to 10 MB each."
+                                        error={errors.files}
+                                    />
 
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="files">
-                                            Document files
-                                        </Label>
-                                        <Input
-                                            id="files"
-                                            name="files[]"
-                                            type="file"
-                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                                            multiple
-                                        />
-                                        <p className="text-xs text-muted-foreground">
-                                            PDF, Word, Excel, and PowerPoint
-                                            files up to 10 MB each.
-                                        </p>
-                                        <InputError message={errors.files} />
-                                    </div>
+                                    <ImageUploadField
+                                        id="featured_image"
+                                        name="featured_image"
+                                        label="Featured image"
+                                        existingUrl={
+                                            document?.featured_image_url
+                                        }
+                                        error={errors.featured_image}
+                                    />
+                                </FormSection>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="featured_image">
-                                            Featured image
-                                        </Label>
-                                        <Input
-                                            id="featured_image"
-                                            name="featured_image"
-                                            type="file"
-                                            accept="image/*"
+                                {isEditing && (
+                                    <FormSection title="Attached files">
+                                        <DocumentFileList
+                                            files={document.files}
                                         />
-                                        <InputError
-                                            message={errors.featured_image}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {isEditing && (
-                                <div className="space-y-2">
-                                    <Label>Attached files</Label>
-                                    <DocumentFileList files={document.files} />
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                                    </FormSection>
+                                )}
+                            </>
+                        }
+                    />
 
                     <div className="flex justify-end">
                         <Button disabled={processing}>
@@ -235,12 +172,4 @@ export function DocumentForm({ document, defaults }: DocumentFormProps) {
             )}
         </Form>
     );
-}
-
-function toDatetimeLocal(value?: string | null) {
-    if (!value) {
-        return '';
-    }
-
-    return new Date(value).toISOString().slice(0, 16);
 }

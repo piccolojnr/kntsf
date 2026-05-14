@@ -10,6 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { ElectionPositionList } from '@/features/elections/components/election-position-list';
 import { ElectionResults } from '@/features/elections/components/election-results';
 import { ElectionStatusBadge } from '@/features/elections/components/election-status-badge';
@@ -70,6 +71,19 @@ export default function ShowElection({
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
                     <div className="space-y-4">
+                        {election.description && (
+                            <Card className="gap-0 py-0">
+                                <CardHeader className="border-b py-4">
+                                    <CardTitle>Election overview</CardTitle>
+                                </CardHeader>
+                                <CardContent className="py-4">
+                                    <RichTextViewer
+                                        value={election.description}
+                                    />
+                                </CardContent>
+                            </Card>
+                        )}
+
                         <ElectionPositionList election={election} can={can} />
                         <Card>
                             <CardHeader>

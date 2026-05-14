@@ -12,6 +12,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { DocumentFileList } from '@/features/documents/components/document-file-list';
 import { DocumentStatusBadge } from '@/features/documents/components/document-status-badge';
@@ -124,8 +125,11 @@ export default function ShowDocument({
                                     downloadable document.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="max-w-none whitespace-pre-wrap py-4 text-sm leading-6">
-                                {document.description ?? 'No description set.'}
+                            <CardContent className="max-w-none py-4">
+                                <RichTextViewer
+                                    value={document.description}
+                                    emptyText="No description set."
+                                />
                             </CardContent>
                         </Card>
 

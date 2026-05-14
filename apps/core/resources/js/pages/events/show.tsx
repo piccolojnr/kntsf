@@ -11,6 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { EventFeaturedBadge } from '@/features/events/components/event-featured-badge';
 import { EventStatusBadge } from '@/features/events/components/event-status-badge';
@@ -111,8 +112,8 @@ export default function ShowEvent({
                                 Event details as currently stored.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="max-w-none whitespace-pre-wrap py-4 text-sm leading-6">
-                            {event.description}
+                        <CardContent className="max-w-none py-4">
+                            <RichTextViewer value={event.description} />
                         </CardContent>
                     </Card>
 

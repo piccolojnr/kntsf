@@ -6,7 +6,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-type PublishStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+export type PublishStatus = 'draft' | 'scheduled' | 'published' | 'archived';
 
 const statuses: Array<{ value: PublishStatus; label: string }> = [
     { value: 'draft', label: 'Draft' },
@@ -24,7 +24,7 @@ type PublishStatusSelectProps = {
 };
 
 export function PublishStatusSelect({
-    name = 'publish_status',
+    name = 'status',
     value,
     defaultValue = 'draft',
     placeholder = 'Select status',

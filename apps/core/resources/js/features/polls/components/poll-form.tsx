@@ -13,7 +13,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ContentFormShell } from '@/features/content/components/content-form-shell';
+import { FormSection } from '@/features/content/components/form-section';
+import { OptionsBuilder } from '@/features/content/components/options-builder';
 import { PublishStatusSelect } from '@/features/content/components/publish-status-select';
+import { SlugField } from '@/features/content/components/slug-field';
 import { store, update } from '@/routes/polls';
 import type { Poll, PollDefaults } from '../types';
 
@@ -37,83 +41,75 @@ export function PollForm({
         >
             {({ processing, errors }) => (
                 <>
-                    <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-                        <div className="space-y-5">
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    defaultValue={poll?.title}
-                                    required
-                                    maxLength={255}
-                                    placeholder="Poll title"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
+                    <ContentFormShell
+                        main={
+                            <div className="space-y-5">
+                                <FormSection
+                                    title="Poll content"
+                                    description="Set the question and context voters will see."
+                                >
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="title">Title</Label>
+                                        <Input
+                                            id="title"
+                                            name="title"
+                                            defaultValue={poll?.title}
+                                            required
+                                            maxLength={255}
+                                            placeholder="Poll title"
+                                        />
+                                        <InputError message={errors.title} />
+                                    </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
-                                    defaultValue={poll?.slug}
-                                    maxLength={255}
-                                    placeholder="Leave blank to generate from title"
-                                />
-                                <InputError message={errors.slug} />
-                            </div>
+                                    <SlugField
+                                        defaultValue={poll?.slug}
+                                        error={errors.slug}
+                                    />
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    defaultValue={poll?.description ?? ''}
-                                    rows={5}
-                                    placeholder="What should voters know?"
-                                />
-                                <InputError message={errors.description} />
-                            </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="description">
+                                            Description
+                                        </Label>
+                                        <Textarea
+                                            id="description"
+                                            name="description"
+                                            defaultValue={
+                                                poll?.description ?? ''
+                                            }
+                                            rows={5}
+                                            placeholder="What should voters know?"
+                                        />
+                                        <InputError
+                                            message={errors.description}
+                                        />
+                                    </div>
+                                </FormSection>
 
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="mb-3">
-                                    <p className="text-sm font-medium">Options</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        Fixed polls need at least two active options
-                                        before publishing.
-                                    </p>
-                                </div>
-                                <div className="space-y-3">
-                                    {options.map((option, index) => (
-                                        <div key={option?.id ?? `new-${index}`}>
-                                            {option?.id && (
-                                                <input
-                                                    type="hidden"
-                                                    name={`options[${index}][id]`}
-                                                    value={option.id}
-                                                />
-                                            )}
-                                            <Input
-                                                name={`options[${index}][text]`}
-                                                defaultValue={option?.text ?? ''}
-                                                placeholder={`Option ${index + 1}`}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                                <InputError message={errors.options} />
+                                <FormSection
+                                    title="Options"
+                                    description="Fixed polls need at least two active options before publishing."
+                                >
+                                    <OptionsBuilder
+                                        name="options"
+                                        options={options}
+                                        error={errors.options}
+                                    />
+                                </FormSection>
                             </div>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
+                        }
+                        sidebar={
+                            <>
+                                <FormSection
+                                    title="Publishing"
+                                    description="Control poll type, timing, and visibility."
+                                >
                                     <div className="grid gap-2">
                                         <Label>Type</Label>
                                         <Select
                                             name="type"
-                                            defaultValue={poll?.type ?? defaults.type}
+                                            defaultValue={
+                                                poll?.type ?? defaults.type
+                                            }
                                         >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue />
@@ -165,7 +161,9 @@ export function PollForm({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="starts_at">Starts at</Label>
+                                        <Label htmlFor="starts_at">
+                                            Starts at
+                                        </Label>
                                         <Input
                                             id="starts_at"
                                             name="starts_at"
@@ -189,11 +187,12 @@ export function PollForm({
                                         />
                                         <InputError message={errors.ends_at} />
                                     </div>
-                                </div>
-                            </div>
+                                </FormSection>
 
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-3">
+                                <FormSection
+                                    title="Voting behavior"
+                                    description="These settings affect how results and vote changes work."
+                                >
                                     <ToggleField
                                         id="show_results"
                                         label="Show results"
@@ -210,10 +209,10 @@ export function PollForm({
                                             defaults.allow_vote_change
                                         }
                                     />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </FormSection>
+                            </>
+                        }
+                    />
 
                     <div className="flex justify-end">
                         <Button disabled={processing}>
