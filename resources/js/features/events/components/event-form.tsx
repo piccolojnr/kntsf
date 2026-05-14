@@ -2,19 +2,19 @@ import { Form } from '@inertiajs/react';
 import { Save } from 'lucide-react';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { PublishStatusSelect } from '@/features/content/components/publish-status-select';
+import { ContentFormShell } from '@/features/content/components/content-form-shell';
+import { FormSection } from '@/features/content/components/form-section';
+import { ImageUploadField } from '@/features/content/components/image-upload-field';
+import { MultipleFileUploadField } from '@/features/content/components/multiple-file-upload-field';
+import {
+    PublishingSettings,
+    toDatetimeLocal,
+} from '@/features/content/components/publishing-settings';
 import { RichTextEditor } from '@/features/content/components/rich-text-editor';
+import { SlugField } from '@/features/content/components/slug-field';
 import { store, update } from '@/routes/events';
 import type { Event, EventDefaults } from '../types';
 
@@ -34,94 +34,78 @@ export function EventForm({ event, defaults }: EventFormProps) {
         >
             {({ processing, errors }) => (
                 <>
-                    <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-                        <div className="space-y-5">
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    defaultValue={event?.title}
-                                    required
-                                    maxLength={255}
-                                    placeholder="Event title"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
+                    <ContentFormShell
+                        main={
+                            <FormSection
+                                title="Event content"
+                                description="Describe the event clearly enough for students to decide whether to attend."
+                            >
+                                <div className="grid gap-2">
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        defaultValue={event?.title}
+                                        required
+                                        maxLength={255}
+                                        placeholder="Event title"
+                                    />
+                                    <InputError message={errors.title} />
+                                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
+                                <SlugField
                                     defaultValue={event?.slug}
-                                    maxLength={255}
-                                    placeholder="Leave blank to generate from title"
+                                    error={errors.slug}
                                 />
-                                <InputError message={errors.slug} />
-                            </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
-                                <Textarea
-                                    id="excerpt"
-                                    name="excerpt"
-                                    defaultValue={event?.excerpt ?? ''}
-                                    rows={3}
-                                    placeholder="Short summary for listings"
-                                />
-                                <InputError message={errors.excerpt} />
-                            </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="excerpt">Excerpt</Label>
+                                    <Textarea
+                                        id="excerpt"
+                                        name="excerpt"
+                                        defaultValue={event?.excerpt ?? ''}
+                                        rows={3}
+                                        placeholder="Short summary for listings"
+                                    />
+                                    <InputError message={errors.excerpt} />
+                                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
-                                <RichTextEditor
-                                    id="description"
-                                    name="description"
-                                    defaultValue={event?.description ?? ''}
-                                    rows={12}
-                                    required
-                                />
-                                <InputError message={errors.description} />
-                            </div>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label>Status</Label>
-                                        <PublishStatusSelect
-                                            defaultValue={
-                                                event?.status ?? defaults.status
-                                            }
-                                        />
-                                        <InputError message={errors.status} />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label>Visibility</Label>
-                                        <Select
-                                            name="visibility"
-                                            defaultValue={
-                                                event?.visibility ??
-                                                defaults.visibility
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="public">
-                                                    Public
-                                                </SelectItem>
-                                                <SelectItem value="internal">
-                                                    Internal
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.visibility} />
-                                    </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="description">
+                                        Description
+                                    </Label>
+                                    <RichTextEditor
+                                        id="description"
+                                        name="description"
+                                        label="Event description"
+                                        defaultValue={event?.description ?? ''}
+                                        rows={14}
+                                        required
+                                    />
+                                    <InputError message={errors.description} />
+                                </div>
+                            </FormSection>
+                        }
+                        sidebar={
+                            <>
+                                <FormSection
+                                    title="Schedule"
+                                    description="Set the event timing and publishing state."
+                                >
+                                    <PublishingSettings
+                                        status={event?.status ?? defaults.status}
+                                        visibility={
+                                            event?.visibility ??
+                                            defaults.visibility
+                                        }
+                                        publishedAt={event?.published_at}
+                                        isFeatured={
+                                            event?.is_featured ??
+                                            defaults.is_featured
+                                        }
+                                        featuredLabel="Featured event"
+                                        errors={errors}
+                                    />
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="starts_at">
@@ -151,47 +135,12 @@ export function EventForm({ event, defaults }: EventFormProps) {
                                         />
                                         <InputError message={errors.ends_at} />
                                     </div>
+                                </FormSection>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="published_at">
-                                            Published at
-                                        </Label>
-                                        <Input
-                                            id="published_at"
-                                            name="published_at"
-                                            type="datetime-local"
-                                            defaultValue={toDatetimeLocal(
-                                                event?.published_at,
-                                            )}
-                                        />
-                                        <InputError
-                                            message={errors.published_at}
-                                        />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="max_attendees">
-                                            Max attendees
-                                        </Label>
-                                        <Input
-                                            id="max_attendees"
-                                            name="max_attendees"
-                                            type="number"
-                                            min={1}
-                                            defaultValue={
-                                                event?.max_attendees ?? ''
-                                            }
-                                            placeholder="Optional"
-                                        />
-                                        <InputError
-                                            message={errors.max_attendees}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
+                                <FormSection
+                                    title="Event details"
+                                    description="Operational details shown with the event."
+                                >
                                     <div className="grid gap-2">
                                         <Label htmlFor="location">
                                             Location
@@ -220,56 +169,51 @@ export function EventForm({ event, defaults }: EventFormProps) {
                                         <InputError message={errors.category} />
                                     </div>
 
-                                    <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
-                                        <input
-                                            type="hidden"
-                                            name="is_featured"
-                                            value="0"
-                                        />
-                                        <Checkbox
-                                            id="is_featured"
-                                            name="is_featured"
-                                            value="1"
-                                            defaultChecked={
-                                                event?.is_featured ??
-                                                defaults.is_featured
-                                            }
-                                        />
-                                        <Label htmlFor="is_featured">
-                                            Featured event
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="max_attendees">
+                                            Max attendees
                                         </Label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="banner">Banner</Label>
                                         <Input
-                                            id="banner"
-                                            name="banner"
-                                            type="file"
-                                            accept="image/*"
+                                            id="max_attendees"
+                                            name="max_attendees"
+                                            type="number"
+                                            min={1}
+                                            defaultValue={
+                                                event?.max_attendees ?? ''
+                                            }
+                                            placeholder="Optional"
                                         />
-                                        <InputError message={errors.banner} />
+                                        <InputError
+                                            message={errors.max_attendees}
+                                        />
                                     </div>
+                                </FormSection>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="gallery">Gallery</Label>
-                                        <Input
-                                            id="gallery"
-                                            name="gallery[]"
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                        />
-                                        <InputError message={errors.gallery} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                <FormSection
+                                    title="Media"
+                                    description="Use a banner first, then optional gallery images."
+                                >
+                                    <ImageUploadField
+                                        id="banner"
+                                        name="banner"
+                                        label="Banner"
+                                        existingUrl={event?.banner_url}
+                                        error={errors.banner}
+                                    />
+
+                                    <MultipleFileUploadField
+                                        id="gallery"
+                                        name="gallery[]"
+                                        label="Gallery"
+                                        accept="image/*"
+                                        variant="images"
+                                        description="Select one or more event images."
+                                        error={errors.gallery}
+                                    />
+                                </FormSection>
+                            </>
+                        }
+                    />
 
                     <div className="flex justify-end">
                         <Button disabled={processing}>
@@ -281,12 +225,4 @@ export function EventForm({ event, defaults }: EventFormProps) {
             )}
         </Form>
     );
-}
-
-function toDatetimeLocal(value?: string | null) {
-    if (!value) {
-        return '';
-    }
-
-    return new Date(value).toISOString().slice(0, 16);
 }

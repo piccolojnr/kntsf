@@ -17,6 +17,7 @@ import type {
     Announcement,
     AnnouncementPermissions,
 } from '@/features/announcements/types';
+import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { archive, destroy, edit, index, publish } from '@/routes/announcements';
 
@@ -116,8 +117,8 @@ export default function ShowAnnouncement({
                                 Announcement body as currently stored.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="max-w-none whitespace-pre-wrap py-4 text-sm leading-6">
-                            {announcement.content}
+                        <CardContent className="max-w-none py-4">
+                            <RichTextViewer value={announcement.content} />
                         </CardContent>
                     </Card>
 

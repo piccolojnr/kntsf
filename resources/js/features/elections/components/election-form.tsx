@@ -13,8 +13,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ContentFormShell } from '@/features/content/components/content-form-shell';
+import { FormSection } from '@/features/content/components/form-section';
+import { SlugField } from '@/features/content/components/slug-field';
 import { store, update } from '@/routes/elections';
 import type { AcademicPeriodOption, Election } from '../types';
+import { ElectionPositionBuilder } from './election-position-builder';
 
 export function ElectionForm({
     election,
@@ -36,139 +40,123 @@ export function ElectionForm({
         >
             {({ processing, errors }) => (
                 <>
-                    <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-                        <div className="space-y-5">
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    defaultValue={election?.title}
-                                    required
-                                    placeholder="SRC General Elections"
-                                />
-                                <InputError message={errors.title} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
-                                    defaultValue={election?.slug}
-                                    placeholder="Leave blank to generate"
-                                />
-                                <InputError message={errors.slug} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="description">Description</Label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    defaultValue={election?.description ?? ''}
-                                    rows={5}
-                                />
-                                <InputError message={errors.description} />
-                            </div>
-
-                            <div className="rounded-lg border bg-card p-4">
-                                <p className="mb-3 text-sm font-medium">
-                                    Positions
-                                </p>
-                                <div className="space-y-3">
-                                    {positions.map((position, index) => (
-                                        <div
-                                            key={position?.id ?? `new-${index}`}
-                                            className="grid gap-2 rounded-md border p-3"
-                                        >
-                                            {position?.id && (
-                                                <input
-                                                    type="hidden"
-                                                    name={`positions[${index}][id]`}
-                                                    value={position.id}
-                                                />
-                                            )}
-                                            <Input
-                                                name={`positions[${index}][title]`}
-                                                defaultValue={position?.title ?? ''}
-                                                placeholder={`Position ${index + 1}`}
-                                            />
-                                            <Input
-                                                name={`positions[${index}][max_winners]`}
-                                                type="number"
-                                                min={1}
-                                                defaultValue={
-                                                    position?.max_winners ?? 1
-                                                }
-                                                placeholder="Max winners"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div className="rounded-lg border bg-card p-4">
-                                <div className="space-y-4">
+                    <ContentFormShell
+                        main={
+                            <>
+                                <FormSection
+                                    title="Election content"
+                                    description="Set the public election information shown to voters and managers."
+                                >
                                     <div className="grid gap-2">
-                                        <Label>Academic period</Label>
-                                        <Select
-                                            name="academic_period_id"
-                                            defaultValue={election?.academic_period_id.toString()}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select period" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {academicPeriods.map((period) => (
-                                                    <SelectItem
-                                                        key={period.id}
-                                                        value={period.id.toString()}
-                                                    >
-                                                        {period.name} ·{' '}
-                                                        {period.academic_year}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError
-                                            message={errors.academic_period_id}
+                                        <Label htmlFor="title">Title</Label>
+                                        <Input
+                                            id="title"
+                                            name="title"
+                                            defaultValue={election?.title}
+                                            required
+                                            placeholder="SRC General Elections"
                                         />
+                                        <InputError message={errors.title} />
                                     </div>
-                                    <DateInput
-                                        id="starts_at"
-                                        label="Starts at"
-                                        value={election?.starts_at}
-                                        error={errors.starts_at}
+
+                                    <SlugField
+                                        defaultValue={election?.slug}
+                                        error={errors.slug}
                                     />
-                                    <DateInput
-                                        id="ends_at"
-                                        label="Ends at"
-                                        value={election?.ends_at}
-                                        error={errors.ends_at}
-                                    />
-                                    <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
-                                        <input
-                                            type="hidden"
-                                            name="results_visible"
-                                            value="0"
-                                        />
-                                        <Checkbox
-                                            id="results_visible"
-                                            name="results_visible"
-                                            value="1"
-                                            defaultChecked={
-                                                election?.results_visible ?? false
-                                            }
-                                        />
-                                        <Label htmlFor="results_visible">
-                                            Results visible
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="description">
+                                            Description
                                         </Label>
+                                        <Textarea
+                                            id="description"
+                                            name="description"
+                                            defaultValue={
+                                                election?.description ?? ''
+                                            }
+                                            rows={6}
+                                            placeholder="Election scope, eligibility, and instructions"
+                                        />
+                                        <InputError
+                                            message={errors.description}
+                                        />
                                     </div>
+                                </FormSection>
+
+                                <FormSection
+                                    title="Positions"
+                                    description="Each position can receive one immutable student vote."
+                                >
+                                    <ElectionPositionBuilder
+                                        positions={positions}
+                                        error={errors.positions}
+                                    />
+                                </FormSection>
+                            </>
+                        }
+                        sidebar={
+                            <FormSection
+                                title="Schedule and access"
+                                description="Elections belong to an academic period and can expose results when ready."
+                            >
+                                <div className="grid gap-2">
+                                    <Label>Academic period</Label>
+                                    <Select
+                                        name="academic_period_id"
+                                        defaultValue={election?.academic_period_id.toString()}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select period" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {academicPeriods.map((period) => (
+                                                <SelectItem
+                                                    key={period.id}
+                                                    value={period.id.toString()}
+                                                >
+                                                    {period.name} ·{' '}
+                                                    {period.academic_year}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError
+                                        message={errors.academic_period_id}
+                                    />
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                                <DateInput
+                                    id="starts_at"
+                                    label="Starts at"
+                                    value={election?.starts_at}
+                                    error={errors.starts_at}
+                                />
+                                <DateInput
+                                    id="ends_at"
+                                    label="Ends at"
+                                    value={election?.ends_at}
+                                    error={errors.ends_at}
+                                />
+                                <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+                                    <input
+                                        type="hidden"
+                                        name="results_visible"
+                                        value="0"
+                                    />
+                                    <Checkbox
+                                        id="results_visible"
+                                        name="results_visible"
+                                        value="1"
+                                        defaultChecked={
+                                            election?.results_visible ?? false
+                                        }
+                                    />
+                                    <Label htmlFor="results_visible">
+                                        Results visible
+                                    </Label>
+                                </div>
+                            </FormSection>
+                        }
+                    />
                     <div className="flex justify-end">
                         <Button disabled={processing}>
                             <Save />

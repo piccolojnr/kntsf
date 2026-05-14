@@ -11,6 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { PollResults } from '@/features/polls/components/poll-results';
 import { PollStatusBadge } from '@/features/polls/components/poll-status-badge';
@@ -104,6 +105,17 @@ export default function ShowPoll({
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
                     <div className="space-y-4">
+                        {poll.description && (
+                            <Card className="gap-0 py-0">
+                                <CardHeader className="border-b py-4">
+                                    <CardTitle>About this poll</CardTitle>
+                                </CardHeader>
+                                <CardContent className="py-4">
+                                    <RichTextViewer value={poll.description} />
+                                </CardContent>
+                            </Card>
+                        )}
+
                         <Card className="gap-0 py-0">
                             <CardHeader className="border-b py-4">
                                 <CardTitle>Vote</CardTitle>
