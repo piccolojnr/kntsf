@@ -63,6 +63,11 @@ class Student extends Model
         return $this->hasOne(NfcCard::class)->where('status', 'active');
     }
 
+    public function pollVotes(): HasMany
+    {
+        return $this->hasMany(PollVote::class);
+    }
+
     protected function casts(): array
     {
         return [

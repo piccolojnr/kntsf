@@ -66,6 +66,11 @@ class User extends Authenticatable
         return $this->hasMany(Document::class, 'author_id');
     }
 
+    public function polls(): HasMany
+    {
+        return $this->hasMany(Poll::class, 'created_by_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

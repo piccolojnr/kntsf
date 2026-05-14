@@ -103,6 +103,16 @@ return [
             'documents.publish',
             'documents.delete',
         ],
+
+        'polls' => [
+            'polls.view',
+            'polls.create',
+            'polls.update',
+            'polls.publish',
+            'polls.delete',
+            'polls.vote',
+            'polls.view_results',
+        ],
     ],
 
     'roles' => [
@@ -160,6 +170,13 @@ return [
             'documents.update',
             'documents.publish',
             'documents.delete',
+            'polls.view',
+            'polls.create',
+            'polls.update',
+            'polls.publish',
+            'polls.delete',
+            'polls.vote',
+            'polls.view_results',
         ],
 
         'staff' => [
@@ -179,12 +196,15 @@ return [
             'announcements.view',
             'events.view',
             'documents.view',
+            'polls.view',
         ],
 
         'student' => [
             'dashboard.view',
             'permits.view',
             'payments.view',
+            'polls.view',
+            'polls.vote',
             'settings.view',
             'settings.update',
         ],
