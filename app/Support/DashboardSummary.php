@@ -5,8 +5,10 @@ namespace App\Support;
 use App\Enums\NfcCardStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PermitStatus;
+use App\Enums\PublishStatus;
 use App\Enums\VerificationResult;
 use App\Models\AcademicPeriod;
+use App\Models\Announcement;
 use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
@@ -144,7 +146,7 @@ class DashboardSummary
                 'key' => 'news',
                 'title' => 'News publishing',
                 'description' => $settings['allow_public_news']
-                    ? 'Public news publishing is enabled for future news modules.'
+                    ? Announcement::query()->where('status', PublishStatus::Published->value)->count().' published announcements, '.Announcement::query()->where('status', PublishStatus::Draft->value)->count().' drafts.'
                     : 'Public news publishing is currently disabled.',
                 'ready' => $settings['allow_public_news'],
             ],
@@ -163,6 +165,12 @@ class DashboardSummary
                     ? 'Public document publishing is enabled for future document modules.'
                     : 'Documents are internal-first until public access is explicitly enabled.',
                 'ready' => $settings['allow_public_documents'],
+            ],
+            [
+                'key' => 'featured_announcements',
+                'title' => 'Featured announcements',
+                'description' => Announcement::query()->where('is_featured', true)->count().' announcements are marked as featured.',
+                'ready' => Announcement::query()->where('is_featured', true)->exists(),
             ],
         ];
     }

@@ -56,6 +56,16 @@ final class AuditEvents
 
     public const RolePermissionsChanged = 'role.permissions_changed';
 
+    public const AnnouncementCreated = 'announcement.created';
+
+    public const AnnouncementUpdated = 'announcement.updated';
+
+    public const AnnouncementPublished = 'announcement.published';
+
+    public const AnnouncementArchived = 'announcement.archived';
+
+    public const AnnouncementDeleted = 'announcement.deleted';
+
     /**
      * @return array<int, string>
      */
@@ -88,6 +98,11 @@ final class AuditEvents
             self::RoleUpdated,
             self::RoleDeleted,
             self::RolePermissionsChanged,
+            self::AnnouncementCreated,
+            self::AnnouncementUpdated,
+            self::AnnouncementPublished,
+            self::AnnouncementArchived,
+            self::AnnouncementDeleted,
         ];
     }
 }

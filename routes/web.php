@@ -40,3 +40,4 @@ require __DIR__.'/audit-logs.php';
 require __DIR__.'/reports.php';
 require __DIR__.'/executives.php';
 require __DIR__.'/roles.php';
+require __DIR__.'/announcements.php';

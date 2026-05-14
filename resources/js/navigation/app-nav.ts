@@ -6,6 +6,7 @@ import {
     GraduationCap,
     History,
     LayoutGrid,
+    Megaphone,
     ScrollText,
     ShieldCheck,
     ShieldPlus,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as academicPeriodsIndex } from '@/routes/academic-periods';
+import { index as announcementsIndex } from '@/routes/announcements';
 import { index as auditLogsIndex } from '@/routes/audit-logs';
 import { index as executivesIndex } from '@/routes/executives';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
@@ -84,6 +86,13 @@ const reportsNavItem: NavItem = {
     permission: 'reports.view',
 };
 
+const announcementsNavItem: NavItem = {
+    title: 'Announcements',
+    href: announcementsIndex(),
+    icon: Megaphone,
+    permission: 'announcements.view',
+};
+
 const rolesNavItem: NavItem = {
     title: 'Roles & Permissions',
     href: rolesIndex(),
@@ -120,6 +129,7 @@ export const mainNavItems: NavItem[] = [
     permitsNavItem,
     nfcCardsNavItem,
     paymentsNavItem,
+    announcementsNavItem,
     reportsNavItem,
     rolesNavItem,
     verificationNavItem,
@@ -138,7 +148,12 @@ export const sidebarNavGroups: NavGroup[] = [
     },
     {
         title: 'Records',
-        items: [studentsNavItem, executivesNavItem, academicPeriodsNavItem],
+        items: [
+            studentsNavItem,
+            executivesNavItem,
+            announcementsNavItem,
+            academicPeriodsNavItem,
+        ],
     },
     {
         title: 'Operations',
