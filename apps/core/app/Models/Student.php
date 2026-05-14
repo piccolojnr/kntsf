@@ -68,6 +68,16 @@ class Student extends Model
         return $this->hasMany(PollVote::class);
     }
 
+    public function electionCandidates(): HasMany
+    {
+        return $this->hasMany(ElectionCandidate::class);
+    }
+
+    public function electionVotes(): HasMany
+    {
+        return $this->hasMany(ElectionVote::class);
+    }
+
     protected function casts(): array
     {
         return [

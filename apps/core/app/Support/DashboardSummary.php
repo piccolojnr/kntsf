@@ -10,6 +10,9 @@ use App\Enums\VerificationResult;
 use App\Models\AcademicPeriod;
 use App\Models\Announcement;
 use App\Models\Document;
+use App\Models\Election;
+use App\Models\ElectionCandidate;
+use App\Models\ElectionVote;
 use App\Models\Event;
 use App\Models\NfcCard;
 use App\Models\Payment;
@@ -62,6 +65,9 @@ class DashboardSummary
                 ->whereDate('created_at', today())
                 ->where('result', '!=', VerificationResult::Valid)
                 ->count(),
+            'active_elections' => Election::query()->where('status', 'active')->count(),
+            'pending_candidates' => ElectionCandidate::query()->where('status', 'pending')->count(),
+            'election_votes_today' => ElectionVote::query()->whereDate('cast_at', today())->count(),
         ];
     }
 

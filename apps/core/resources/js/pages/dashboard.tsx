@@ -3,6 +3,7 @@ import {
     Activity,
     ClipboardList,
     CreditCard,
+    Crown,
     IdCard,
     Newspaper,
     ShieldAlert,
@@ -32,6 +33,9 @@ type DashboardSummary = {
     successful_payments: number;
     verification_attempts_today: number;
     failed_verification_attempts_today: number;
+    active_elections: number;
+    pending_candidates: number;
+    election_votes_today: number;
 };
 
 type DashboardWarning = {
@@ -109,6 +113,12 @@ export default function Dashboard({
             detail: `${summary.failed_verification_attempts_today} failed attempts`,
             icon: ShieldCheck,
         },
+        {
+            title: 'Elections',
+            value: summary.active_elections,
+            detail: `${summary.pending_candidates} pending candidates, ${summary.election_votes_today} votes today`,
+            icon: Crown,
+        },
     ];
 
     return (
@@ -137,7 +147,7 @@ export default function Dashboard({
                     </div>
                 </section>
 
-                <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
                     {summaryCards.map((item) => (
                         <Card key={item.title} className="gap-3">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">

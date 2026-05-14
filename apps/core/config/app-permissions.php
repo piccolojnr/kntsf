@@ -113,6 +113,17 @@ return [
             'polls.vote',
             'polls.view_results',
         ],
+
+        'elections' => [
+            'elections.view',
+            'elections.create',
+            'elections.update',
+            'elections.publish',
+            'elections.manage_candidates',
+            'elections.vote',
+            'elections.view_results',
+            'elections.delete',
+        ],
     ],
 
     'roles' => [
@@ -177,6 +188,14 @@ return [
             'polls.delete',
             'polls.vote',
             'polls.view_results',
+            'elections.view',
+            'elections.create',
+            'elections.update',
+            'elections.publish',
+            'elections.manage_candidates',
+            'elections.vote',
+            'elections.view_results',
+            'elections.delete',
         ],
 
         'staff' => [
@@ -197,6 +216,8 @@ return [
             'events.view',
             'documents.view',
             'polls.view',
+            'elections.view',
+            'elections.manage_candidates',
         ],
 
         'student' => [
@@ -205,6 +226,8 @@ return [
             'payments.view',
             'polls.view',
             'polls.vote',
+            'elections.view',
+            'elections.vote',
             'settings.view',
             'settings.update',
         ],

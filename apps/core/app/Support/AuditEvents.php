@@ -100,6 +100,26 @@ final class AuditEvents
 
     public const PollOptionMerged = 'poll.option_merged';
 
+    public const ElectionCreated = 'election.created';
+
+    public const ElectionUpdated = 'election.updated';
+
+    public const ElectionPublished = 'election.published';
+
+    public const ElectionStarted = 'election.started';
+
+    public const ElectionClosed = 'election.closed';
+
+    public const ElectionArchived = 'election.archived';
+
+    public const CandidateApproved = 'candidate.approved';
+
+    public const CandidateRejected = 'candidate.rejected';
+
+    public const CandidateWithdrawn = 'candidate.withdrawn';
+
+    public const ElectionVoteCast = 'election.vote_cast';
+
     /**
      * @return array<int, string>
      */
@@ -154,6 +174,16 @@ final class AuditEvents
             self::PollDeleted,
             self::PollVoteCast,
             self::PollOptionMerged,
+            self::ElectionCreated,
+            self::ElectionUpdated,
+            self::ElectionPublished,
+            self::ElectionStarted,
+            self::ElectionClosed,
+            self::ElectionArchived,
+            self::CandidateApproved,
+            self::CandidateRejected,
+            self::CandidateWithdrawn,
+            self::ElectionVoteCast,
         ];
     }
 }
