@@ -79,6 +79,14 @@ return [
         'reports' => [
             'reports.view',
         ],
+
+        'announcements' => [
+            'announcements.view',
+            'announcements.create',
+            'announcements.update',
+            'announcements.publish',
+            'announcements.delete',
+        ],
     ],
 
     'roles' => [
@@ -121,6 +129,11 @@ return [
             'settings.update',
             'audit_logs.view',
             'reports.view',
+            'announcements.view',
+            'announcements.create',
+            'announcements.update',
+            'announcements.publish',
+            'announcements.delete',
         ],
 
         'staff' => [
@@ -137,6 +150,7 @@ return [
             'payments.view',
             'settings.view',
             'reports.view',
+            'announcements.view',
         ],
 
         'student' => [

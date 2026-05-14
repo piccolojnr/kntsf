@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class, 'created_by_id');
     }
 
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class, 'author_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
