@@ -76,6 +76,16 @@ final class AuditEvents
 
     public const EventDeleted = 'event.deleted';
 
+    public const DocumentCreated = 'document.created';
+
+    public const DocumentUpdated = 'document.updated';
+
+    public const DocumentPublished = 'document.published';
+
+    public const DocumentArchived = 'document.archived';
+
+    public const DocumentDeleted = 'document.deleted';
+
     /**
      * @return array<int, string>
      */
@@ -118,6 +128,11 @@ final class AuditEvents
             self::EventPublished,
             self::EventArchived,
             self::EventDeleted,
+            self::DocumentCreated,
+            self::DocumentUpdated,
+            self::DocumentPublished,
+            self::DocumentArchived,
+            self::DocumentDeleted,
         ];
     }
 }
