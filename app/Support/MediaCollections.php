@@ -15,4 +15,17 @@ final class MediaCollections
     public const FILES = 'files';
 
     public const ATTACHMENTS = 'attachments';
+
+    /**
+     * @return array<int, string>
+     */
+    public static function contentCollections(): array
+    {
+        return [
+            self::FEATURED_IMAGE,
+            self::BANNER,
+            self::GALLERY,
+            self::ATTACHMENTS,
+        ];
+    }
 }

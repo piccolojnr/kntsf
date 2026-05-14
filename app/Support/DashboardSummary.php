@@ -15,7 +15,10 @@ use App\Models\VerificationLog;
 
 class DashboardSummary
 {
-    public function __construct(private readonly PermitSettings $permitSettings) {}
+    public function __construct(
+        private readonly PermitSettings $permitSettings,
+        private readonly ContentSettings $contentSettings,
+    ) {}
 
     /**
      * @return array<string, int>
@@ -127,6 +130,41 @@ class DashboardSummary
         }
 
         return $warnings;
+    }
+
+    /**
+     * @return array<int, array{key: string, title: string, description: string, ready: bool}>
+     */
+    public function contentReadiness(): array
+    {
+        $settings = $this->contentSettings->all();
+
+        return [
+            [
+                'key' => 'news',
+                'title' => 'News publishing',
+                'description' => $settings['allow_public_news']
+                    ? 'Public news publishing is enabled for future news modules.'
+                    : 'Public news publishing is currently disabled.',
+                'ready' => $settings['allow_public_news'],
+            ],
+            [
+                'key' => 'events',
+                'title' => 'Event publishing',
+                'description' => $settings['allow_public_events']
+                    ? 'Public event publishing is enabled for future event modules.'
+                    : 'Public event publishing is currently disabled.',
+                'ready' => $settings['allow_public_events'],
+            ],
+            [
+                'key' => 'documents',
+                'title' => 'Document publishing',
+                'description' => $settings['allow_public_documents']
+                    ? 'Public document publishing is enabled for future document modules.'
+                    : 'Documents are internal-first until public access is explicitly enabled.',
+                'ready' => $settings['allow_public_documents'],
+            ],
+        ];
     }
 
     /**
