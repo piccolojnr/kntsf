@@ -16,6 +16,8 @@ final class MediaCollections
 
     public const ATTACHMENTS = 'attachments';
 
+    public const POSTER = 'poster';
+
     /**
      * @return array<int, string>
      */

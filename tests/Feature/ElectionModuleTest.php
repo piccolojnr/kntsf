@@ -15,6 +15,8 @@ use App\Models\Student;
 use App\Models\User;
 use App\Support\AuditEvents;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
@@ -72,9 +74,6 @@ test('authorized user can create election', function () {
         ->post(route('elections.store'), [
             'academic_period_id' => $period->id,
             'title' => 'SRC General Elections',
-            'positions' => [
-                ['title' => 'SRC President'],
-            ],
         ])
         ->assertRedirect();
 
@@ -83,7 +82,45 @@ test('authorized user can create election', function () {
     expect($election->created_by_id)->toBe($user->id)
         ->and($election->academic_period_id)->toBe($period->id)
         ->and($election->slug)->toBe('src-general-elections')
-        ->and($election->positions)->toHaveCount(1);
+        ->and($election->positions)->toHaveCount(0);
+});
+
+test('authorized user can add election position after creating election', function () {
+    $election = Election::factory()->create();
+
+    $this->actingAs(electionUserWithRole('admin'))
+        ->post(route('elections.positions.store', $election), [
+            'title' => 'SRC President',
+            'description' => 'Leads the SRC executive council.',
+            'max_winners' => 1,
+        ])
+        ->assertRedirect();
+
+    $position = $election->positions()->firstOrFail();
+
+    expect($position->title)->toBe('SRC President')
+        ->and(AuditLog::query()->where('event', AuditEvents::ElectionPositionCreated)->exists())->toBeTrue();
+});
+
+test('authorized user can add candidate with poster to a position', function () {
+    Storage::fake('public');
+
+    [, $election, $position] = activeElectionFixture();
+    $student = Student::factory()->create();
+
+    $this->actingAs(electionUserWithRole('admin'))
+        ->post(route('elections.candidates.store', [$election, $position]), [
+            'student_id' => $student->id,
+            'slogan' => 'Service with integrity',
+            'manifesto' => 'I will improve student representation.',
+            'poster' => UploadedFile::fake()->image('candidate.jpg'),
+        ])
+        ->assertRedirect();
+
+    $candidate = $position->candidates()->where('student_id', $student->id)->firstOrFail();
+
+    expect($candidate->getFirstMedia('poster'))->not->toBeNull()
+        ->and(AuditLog::query()->where('event', AuditEvents::CandidateCreated)->exists())->toBeTrue();
 });
 
 test('election requires academic period', function () {
@@ -153,6 +190,24 @@ test('election closes correctly', function () {
         ->assertRedirect();
 
     expect($election->refresh()->status)->toBe(ElectionStatus::Closed);
+});
+
+test('election cannot publish until every position has approved candidate', function () {
+    $election = Election::factory()->create();
+
+    $this->actingAs(electionUserWithRole('admin'))
+        ->post(route('elections.publish', $election))
+        ->assertSessionHasErrors('election');
+
+    $position = ElectionPosition::factory()->create(['election_id' => $election->id]);
+    ElectionCandidate::factory()->create([
+        'election_position_id' => $position->id,
+        'status' => CandidateStatus::Pending,
+    ]);
+
+    $this->actingAs(electionUserWithRole('admin'))
+        ->post(route('elections.publish', $election))
+        ->assertSessionHasErrors('election');
 });
 
 test('candidate approval flow works', function () {

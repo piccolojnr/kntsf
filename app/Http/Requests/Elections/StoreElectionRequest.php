@@ -31,10 +31,6 @@ class StoreElectionRequest extends FormRequest
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'results_visible' => ['boolean'],
-            'positions' => ['nullable', 'array'],
-            'positions.*.title' => ['nullable', 'string', 'max:255'],
-            'positions.*.description' => ['nullable', 'string'],
-            'positions.*.max_winners' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

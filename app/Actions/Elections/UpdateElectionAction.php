@@ -39,8 +39,6 @@ class UpdateElectionAction
                 'results_visible' => (bool) ($attributes['results_visible'] ?? false),
             ]);
 
-            $this->syncPositions($election, $attributes['positions'] ?? []);
-
             $this->createAuditLog->handle(
                 actor: $actor,
                 event: AuditEvents::ElectionUpdated,
@@ -53,37 +51,5 @@ class UpdateElectionAction
 
             return $election->refresh()->load('academicPeriod', 'creator', 'positions');
         });
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $positions
-     */
-    private function syncPositions(Election $election, array $positions): void
-    {
-        foreach (array_values($positions) as $index => $position) {
-            $title = trim((string) ($position['title'] ?? ''));
-
-            if ($title === '') {
-                continue;
-            }
-
-            if (! empty($position['id'])) {
-                $election->positions()->whereKey($position['id'])->update([
-                    'title' => $title,
-                    'description' => $position['description'] ?? null,
-                    'max_winners' => $position['max_winners'] ?? 1,
-                    'sort_order' => $index,
-                ]);
-
-                continue;
-            }
-
-            $election->positions()->create([
-                'title' => $title,
-                'description' => $position['description'] ?? null,
-                'max_winners' => $position['max_winners'] ?? 1,
-                'sort_order' => $index,
-            ]);
-        }
     }
 }

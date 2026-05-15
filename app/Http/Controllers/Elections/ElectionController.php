@@ -15,18 +15,17 @@ use App\Actions\Elections\UpdateElectionAction;
 use App\Actions\Elections\WithdrawCandidateAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Elections\CastElectionVoteRequest;
-use App\Http\Requests\Elections\StoreElectionCandidateRequest;
 use App\Http\Requests\Elections\StoreElectionRequest;
 use App\Http\Requests\Elections\UpdateElectionRequest;
 use App\Models\AcademicPeriod;
 use App\Models\Election;
 use App\Models\ElectionCandidate;
 use App\Models\ElectionPosition;
+use App\Models\Student;
 use App\Support\AuditEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -89,6 +88,7 @@ class ElectionController extends Controller
 
         return Inertia::render('elections/show', [
             'election' => $this->payload($election->load('academicPeriod', 'creator', 'positions.candidates.student', 'positions.candidates.votes'), $request),
+            'options' => $this->formOptions(),
             'can' => $this->permissions($request, $election),
         ]);
     }
@@ -139,24 +139,6 @@ class ElectionController extends Controller
     {
         Gate::authorize('publish', $election);
         $action->handle($election, $request->user());
-
-        return back();
-    }
-
-    public function storeCandidate(StoreElectionCandidateRequest $request, Election $election, ElectionPosition $position): RedirectResponse
-    {
-        DB::transaction(function () use ($request, $position): void {
-            $candidate = $position->candidates()->create([
-                'student_id' => $request->integer('student_id'),
-                'slogan' => $request->validated('slogan'),
-                'manifesto' => $request->validated('manifesto'),
-                'metadata' => [],
-            ]);
-
-            if ($request->hasFile('poster')) {
-                $candidate->addMedia($request->file('poster'))->toMediaCollection('poster');
-            }
-        });
 
         return back();
     }
@@ -249,6 +231,7 @@ class ElectionController extends Controller
                     'slogan' => $candidate->slogan,
                     'manifesto' => $candidate->manifesto,
                     'status' => $candidate->status->value,
+                    'poster_url' => $candidate->getFirstMediaUrl('poster') ?: null,
                     'votes_count' => $canViewResults ? $candidate->votes->count() : null,
                 ])->values()->all(),
             ])->values()->all(),
@@ -276,6 +259,27 @@ class ElectionController extends Controller
             'vote' => $election ? ($request->user()?->can('vote', $election) ?? false) : ($request->user()?->can('elections.vote') ?? false),
             'view_results' => $election ? ($request->user()?->can('viewResults', $election) ?? false) : ($request->user()?->can('elections.view_results') ?? false),
             'delete' => $election ? ($request->user()?->can('delete', $election) ?? false) : ($request->user()?->can('elections.delete') ?? false),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function formOptions(): array
+    {
+        return [
+            'students' => Student::query()
+                ->orderBy('student_number')
+                ->get(['id', 'student_number', 'name', 'email'])
+                ->map(fn (Student $student): array => [
+                    'id' => $student->id,
+                    'student_number' => $student->student_number,
+                    'name' => $student->name,
+                    'email' => $student->email,
+                    'label' => trim($student->student_number.' - '.($student->name ?? 'Unnamed student')),
+                ])
+                ->values()
+                ->all(),
         ];
     }
 }

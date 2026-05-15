@@ -112,6 +112,16 @@ final class AuditEvents
 
     public const ElectionArchived = 'election.archived';
 
+    public const ElectionPositionCreated = 'election.position_created';
+
+    public const ElectionPositionUpdated = 'election.position_updated';
+
+    public const ElectionPositionDeleted = 'election.position_deleted';
+
+    public const CandidateCreated = 'candidate.created';
+
+    public const CandidateUpdated = 'candidate.updated';
+
     public const CandidateApproved = 'candidate.approved';
 
     public const CandidateRejected = 'candidate.rejected';
@@ -180,6 +190,11 @@ final class AuditEvents
             self::ElectionStarted,
             self::ElectionClosed,
             self::ElectionArchived,
+            self::ElectionPositionCreated,
+            self::ElectionPositionUpdated,
+            self::ElectionPositionDeleted,
+            self::CandidateCreated,
+            self::CandidateUpdated,
             self::CandidateApproved,
             self::CandidateRejected,
             self::CandidateWithdrawn,

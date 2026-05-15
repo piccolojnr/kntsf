@@ -27,6 +27,7 @@ type StudentSearchSelectorProps = {
     valueField?: 'id' | 'student_number';
     emailFieldName?: string;
     showEmailInput?: boolean;
+    defaultStudentId?: number | null;
 };
 
 export function StudentSearchSelector({
@@ -37,11 +38,14 @@ export function StudentSearchSelector({
     valueField = 'id',
     emailFieldName = 'student_email',
     showEmailInput = false,
+    defaultStudentId = null,
 }: StudentSearchSelectorProps) {
     const portalContainerRef = useRef<HTMLDivElement | null>(null);
+    const defaultStudent =
+        students.find((student) => student.id === defaultStudentId) ?? null;
     const [selectedStudent, setSelectedStudent] =
-        useState<StudentSelectorOption | null>(null);
-    const [studentEmail, setStudentEmail] = useState('');
+        useState<StudentSelectorOption | null>(defaultStudent);
+    const [studentEmail, setStudentEmail] = useState(defaultStudent?.email ?? '');
 
     function updateStudent(student: StudentSelectorOption | null) {
         setSelectedStudent(student);

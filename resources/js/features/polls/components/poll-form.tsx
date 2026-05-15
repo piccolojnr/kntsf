@@ -29,9 +29,7 @@ export function PollForm({
     defaults: PollDefaults;
 }) {
     const isEditing = poll !== undefined;
-    const options = isEditing
-        ? [...poll.options, ...Array.from({ length: 2 }, () => null)]
-        : Array.from({ length: 4 }, () => null);
+    const options = isEditing ? poll.options : Array.from({ length: 4 }, () => null);
 
     return (
         <Form
@@ -92,6 +90,7 @@ export function PollForm({
                                     <OptionsBuilder
                                         name="options"
                                         options={options}
+                                        minimumRows={2}
                                         error={errors.options}
                                     />
                                 </FormSection>

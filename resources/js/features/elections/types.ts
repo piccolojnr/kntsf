@@ -9,6 +9,7 @@ export type ElectionCandidate = {
     slogan: string | null;
     manifesto: string | null;
     status: CandidateStatus;
+    poster_url: string | null;
     votes_count: number | null;
 };
 
@@ -59,4 +60,16 @@ export type AcademicPeriodOption = {
     name: string;
     academic_year: string;
     semester: string | null;
+};
+
+export type StudentOption = {
+    id: number;
+    student_number: string;
+    name: string | null;
+    email: string | null;
+    label: string;
+};
+
+export type ElectionFormOptions = {
+    students: StudentOption[];
 };

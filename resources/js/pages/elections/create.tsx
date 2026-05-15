@@ -18,7 +18,7 @@ export default function CreateElection({
                 <div className="flex justify-between gap-4">
                     <Heading
                         title="Create election"
-                        description="Create an election and define its positions."
+                        description="Create the election details first. Positions and candidates are added in the setup workspace after saving."
                     />
                     <Button asChild variant="outline">
                         <Link href={index()}>
