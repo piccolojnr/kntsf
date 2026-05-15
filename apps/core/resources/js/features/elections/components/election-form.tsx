@@ -18,7 +18,6 @@ import { FormSection } from '@/features/content/components/form-section';
 import { SlugField } from '@/features/content/components/slug-field';
 import { store, update } from '@/routes/elections';
 import type { AcademicPeriodOption, Election } from '../types';
-import { ElectionPositionBuilder } from './election-position-builder';
 
 export function ElectionForm({
     election,
@@ -28,9 +27,6 @@ export function ElectionForm({
     academicPeriods: AcademicPeriodOption[];
 }) {
     const isEditing = election !== undefined;
-    const positions = isEditing
-        ? [...election.positions, ...Array.from({ length: 1 }, () => null)]
-        : Array.from({ length: 3 }, () => null);
 
     return (
         <Form
@@ -83,15 +79,6 @@ export function ElectionForm({
                                     </div>
                                 </FormSection>
 
-                                <FormSection
-                                    title="Positions"
-                                    description="Each position can receive one immutable student vote."
-                                >
-                                    <ElectionPositionBuilder
-                                        positions={positions}
-                                        error={errors.positions}
-                                    />
-                                </FormSection>
                             </>
                         }
                         sidebar={

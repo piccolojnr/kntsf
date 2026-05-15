@@ -36,8 +36,6 @@ class CreateElectionAction
                 'metadata' => [],
             ]);
 
-            $this->syncPositions($election, $attributes['positions'] ?? []);
-
             $this->createAuditLog->handle(
                 actor: $creator,
                 event: AuditEvents::ElectionCreated,
@@ -49,26 +47,5 @@ class CreateElectionAction
 
             return $election->load('academicPeriod', 'creator', 'positions');
         });
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $positions
-     */
-    private function syncPositions(Election $election, array $positions): void
-    {
-        foreach (array_values($positions) as $index => $position) {
-            $title = trim((string) ($position['title'] ?? ''));
-
-            if ($title === '') {
-                continue;
-            }
-
-            $election->positions()->create([
-                'title' => $title,
-                'description' => $position['description'] ?? null,
-                'max_winners' => $position['max_winners'] ?? 1,
-                'sort_order' => $index,
-            ]);
-        }
     }
 }

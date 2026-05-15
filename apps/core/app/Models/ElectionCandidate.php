@@ -52,7 +52,7 @@ class ElectionCandidate extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('poster')->singleFile();
+        $this->addMediaCollection(MediaCollections::POSTER)->singleFile();
         $this->addMediaCollection(MediaCollections::GALLERY);
     }
 
