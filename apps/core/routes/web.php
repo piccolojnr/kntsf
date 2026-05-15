@@ -6,9 +6,7 @@ use App\Support\DashboardSummary;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => false,
-])->name('home');
+require __DIR__.'/public.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function (ActivityFeed $activityFeed, DashboardSummary $dashboardSummary) {

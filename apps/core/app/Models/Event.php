@@ -7,6 +7,8 @@ use App\Enums\Visibility;
 use App\Support\MediaCollections;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,6 +49,35 @@ class Event extends Model implements HasMedia
     {
         $this->addMediaCollection(MediaCollections::BANNER)->singleFile();
         $this->addMediaCollection(MediaCollections::GALLERY);
+    }
+
+    #[Scope]
+    protected function published(Builder $query): void
+    {
+        $query->where('status', PublishStatus::Published)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+    }
+
+    #[Scope]
+    protected function publicVisible(Builder $query): void
+    {
+        $query->where('visibility', Visibility::Public);
+    }
+
+    #[Scope]
+    protected function featured(Builder $query): void
+    {
+        $query->where('is_featured', true);
+    }
+
+    #[Scope]
+    protected function upcoming(Builder $query): void
+    {
+        $query->where(function (Builder $query): void {
+            $query->whereNull('starts_at')
+                ->orWhere('starts_at', '>=', now()->startOfDay());
+        });
     }
 
     /**

@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\ElectionStatus;
 use Database\Factories\ElectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,6 +48,16 @@ class Election extends Model
     public function votes(): HasMany
     {
         return $this->hasMany(ElectionVote::class);
+    }
+
+    #[Scope]
+    protected function publicVisible(Builder $query): void
+    {
+        $query->whereIn('status', [
+            ElectionStatus::Scheduled,
+            ElectionStatus::Active,
+            ElectionStatus::Closed,
+        ]);
     }
 
     public function isOpenForVoting(): bool

@@ -7,6 +7,8 @@ use App\Enums\Visibility;
 use App\Support\MediaCollections;
 use Database\Factories\AnnouncementFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,6 +44,26 @@ class Announcement extends Model implements HasMedia
     {
         $this->addMediaCollection(MediaCollections::FEATURED_IMAGE)->singleFile();
         $this->addMediaCollection(MediaCollections::GALLERY);
+    }
+
+    #[Scope]
+    protected function published(Builder $query): void
+    {
+        $query->where('status', PublishStatus::Published)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+    }
+
+    #[Scope]
+    protected function publicVisible(Builder $query): void
+    {
+        $query->where('visibility', Visibility::Public);
+    }
+
+    #[Scope]
+    protected function featured(Builder $query): void
+    {
+        $query->where('is_featured', true);
     }
 
     /**
