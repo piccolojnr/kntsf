@@ -20,9 +20,10 @@ export default function SetupPassword({ token, email }: Props) {
             <Form
                 {...store.form(token)}
                 resetOnSuccess={['password', 'password_confirmation']}
+                className="space-y-5"
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
+                    <div className="grid gap-5">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
@@ -30,7 +31,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 type="email"
                                 value={email}
                                 readOnly
-                                className="mt-1 block w-full"
+                                className="h-10 bg-app-surface-muted"
                             />
                         </div>
 
@@ -40,7 +41,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 id="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
+                                className="h-10 bg-app-surface"
                                 autoFocus
                                 placeholder="Password"
                             />
@@ -55,7 +56,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
+                                className="h-10 bg-app-surface"
                                 placeholder="Confirm password"
                             />
                             <InputError
@@ -65,7 +66,7 @@ export default function SetupPassword({ token, email }: Props) {
 
                         <Button
                             type="submit"
-                            className="mt-4 w-full"
+                            className="mt-2 h-10 w-full"
                             disabled={processing}
                         >
                             {processing && <Spinner />}
