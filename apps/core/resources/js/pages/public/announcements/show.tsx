@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Newspaper } from 'lucide-react';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
+import { formatPublicDate } from '@/features/public/content-card';
 import { index } from '@/routes/public/announcements';
 import type { AnnouncementDetail } from '../types';
 
@@ -19,66 +20,68 @@ export default function PublicAnnouncementShow({
                 />
             </Head>
 
-            <article className="mx-auto w-full max-w-3xl px-4 py-10 md:px-6">
-                {/* Back link */}
-                <Link
-                    href={index()}
-                    className="mb-6 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                    <ArrowLeft className="size-3.5" />
-                    All announcements
-                </Link>
+            <article>
+                <section className="relative overflow-hidden border-b border-[#1f2a24]/10 bg-[#efe3c6] dark:border-white/10 dark:bg-[#111712]">
+                    <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1fr_24rem] lg:py-16">
+                        <div>
+                            <Link
+                                href={index()}
+                                className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                            >
+                                <ArrowLeft className="size-4" />
+                                All announcements
+                            </Link>
+                            <div className="flex flex-wrap items-center gap-3">
+                                {announcement.category && (
+                                    <span className="bg-[#b7352d] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
+                                        {announcement.category}
+                                    </span>
+                                )}
+                                <span className="text-xs font-black uppercase tracking-[0.22em] text-[#596257] dark:text-[#b8c3b8]">
+                                    {formatPublicDate(announcement.published_at, true) ?? 'Published'}
+                                </span>
+                            </div>
+                            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.95] tracking-normal md:text-7xl">
+                                {announcement.title}
+                            </h1>
+                            {announcement.excerpt && (
+                                <p className="mt-6 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                                    {announcement.excerpt}
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex items-end">
+                            {announcement.image_url ? (
+                                <img
+                                    src={announcement.image_url}
+                                    alt=""
+                                    className="aspect-[4/5] w-full object-cover shadow-[12px_12px_0_#d8a329]"
+                                />
+                            ) : (
+                                <div className="grid aspect-[4/5] w-full place-items-center border border-[#17211b] bg-[#17211b] text-[#f5ead2] shadow-[12px_12px_0_#d8a329]">
+                                    <Newspaper className="size-16 text-[#d8a329]" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
 
-                {/* Featured image */}
-                {announcement.image_url && (
-                    <img
-                        src={announcement.image_url}
-                        alt=""
-                        className="mb-8 aspect-video w-full rounded-lg object-cover"
-                    />
-                )}
-
-                {/* Meta */}
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                    {announcement.category && (
-                        <span className="inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
-                            {announcement.category}
-                        </span>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                        {formatDate(announcement.published_at)}
-                    </span>
-                    {announcement.author && (
-                        <span className="text-xs text-muted-foreground">
-                            · {announcement.author.name}
-                        </span>
-                    )}
-                </div>
-
-                {/* Title */}
-                <h1 className="text-2xl font-bold leading-snug tracking-tight md:text-3xl">
-                    {announcement.title}
-                </h1>
-
-                {/* Excerpt */}
-                {announcement.excerpt && (
-                    <p className="mt-4 text-base leading-7 text-muted-foreground">
-                        {announcement.excerpt}
-                    </p>
-                )}
-
-                {/* Divider */}
-                <hr className="my-8" />
-
-                {/* Body */}
-                <RichTextViewer value={announcement.content} />
+                <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_1fr]">
+                    <aside className="hidden lg:block">
+                        <div className="sticky top-28 border-l-4 border-[#b7352d] pl-5">
+                            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                                Author
+                            </p>
+                            <p className="mt-2 font-black">
+                                {announcement.author?.name ?? 'Knutsford SRC'}
+                            </p>
+                        </div>
+                    </aside>
+                    <div className="max-w-3xl border-t border-[#1f2a24]/10 pt-10 dark:border-white/10">
+                        <RichTextViewer value={announcement.content} />
+                    </div>
+                </section>
             </article>
         </>
     );
-}
-
-function formatDate(value: string | null) {
-    return value
-        ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-        : 'Published';
 }

@@ -1,6 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { CalendarDays } from 'lucide-react';
-import { PublicContentCard, PublicContentEmpty } from '@/features/public/content-card';
+import {
+    formatPublicDate,
+    PublicContentCard,
+    PublicContentEmpty,
+    PublicPageHeader,
+    PublicPagination,
+} from '@/features/public/content-card';
 import { show } from '@/routes/public/events';
 import type { EventSummary, Paginated } from '../types';
 
@@ -14,23 +20,14 @@ export default function PublicEventsIndex({
     return (
         <>
             <Head title="Events" />
-
-            {/* Page header */}
-            <div className="border-b bg-muted/30">
-                <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
-                    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
-                        SRC Portal
-                    </p>
-                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Events</h1>
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                        Upcoming campus events, activities, and programmes organised by the Student Representative Council.
-                    </p>
-                </div>
-            </div>
-
-            {/* Grid */}
-            <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <PublicPageHeader
+                eyebrow="Campus Calendar"
+                title="Events"
+                description="Upcoming campus activities, civic gatherings, and programmes organised by the Student Representative Council."
+                count={items.length}
+            />
+            <section className="mx-auto w-full max-w-7xl px-5 py-14 md:px-8">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {items.length === 0 ? (
                         <PublicContentEmpty
                             icon={<CalendarDays className="size-8" />}
@@ -43,22 +40,18 @@ export default function PublicEventsIndex({
                                 title={event.title}
                                 description={event.excerpt}
                                 imageUrl={event.image_url}
-                                meta={[formatDate(event.starts_at), event.location]
+                                meta={[formatPublicDate(event.starts_at), event.location]
                                     .filter(Boolean)
-                                    .join(' · ')}
+                                    .join(' / ')}
                                 category={event.category}
                                 href={show(event.slug)}
+                                tone="gold"
                             />
                         ))
                     )}
                 </div>
-            </div>
+                <PublicPagination links={events.links} />
+            </section>
         </>
     );
-}
-
-function formatDate(value: string | null) {
-    return value
-        ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-        : null;
 }

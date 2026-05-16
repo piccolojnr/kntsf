@@ -1,6 +1,11 @@
 import { Head } from '@inertiajs/react';
 import { Vote } from 'lucide-react';
-import { PublicContentCard, PublicContentEmpty } from '@/features/public/content-card';
+import {
+    PublicContentCard,
+    PublicContentEmpty,
+    PublicPageHeader,
+    PublicPagination,
+} from '@/features/public/content-card';
 import { show } from '@/routes/public/elections';
 import type { ElectionSummary, Paginated } from '../types';
 
@@ -14,23 +19,14 @@ export default function PublicElectionsIndex({
     return (
         <>
             <Head title="Elections" />
-
-            {/* Page header */}
-            <div className="border-b bg-muted/30">
-                <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
-                    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
-                        SRC Portal
-                    </p>
-                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Elections</h1>
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                        Public election information and candidate details. Voting takes place through the student portal.
-                    </p>
-                </div>
-            </div>
-
-            {/* Grid */}
-            <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <PublicPageHeader
+                eyebrow="Civic Process"
+                title="Elections"
+                description="Public election information, approved candidates, and visible results where the election rules allow them."
+                count={items.length}
+            />
+            <section className="mx-auto w-full max-w-7xl px-5 py-14 md:px-8">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {items.length === 0 ? (
                         <PublicContentEmpty
                             icon={<Vote className="size-8" />}
@@ -45,11 +41,13 @@ export default function PublicElectionsIndex({
                                 meta={election.academic_period.name}
                                 category={election.status}
                                 href={show(election.slug)}
+                                tone="red"
                             />
                         ))
                     )}
                 </div>
-            </div>
+                <PublicPagination links={elections.links} />
+            </section>
         </>
     );
 }

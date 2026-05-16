@@ -1,7 +1,16 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, Bell, CalendarDays, FileText, Users, Vote } from 'lucide-react';
+import {
+    ArrowRight,
+    Bell,
+    CalendarDays,
+    FileText,
+    Landmark,
+    Users,
+    Vote,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
+    formatPublicDate,
     PublicContentCard,
     PublicContentEmpty,
 } from '@/features/public/content-card';
@@ -30,6 +39,13 @@ export default function PublicHome({
     executives: ExecutiveSummary[];
     elections: ElectionSummary[];
 }) {
+    const announcementItems = normalizeList(announcements);
+    const eventItems = normalizeList(events);
+    const documentItems = normalizeList(documents);
+    const executiveItems = normalizeList(executives);
+    const electionItems = normalizeList(elections);
+    const featured = announcementItems[0];
+
     return (
         <>
             <Head>
@@ -40,181 +56,247 @@ export default function PublicHome({
                 />
             </Head>
 
-            {/* ── Page header ──────────────────────────────────────────── */}
-            <section className="border-b bg-muted/30">
-                <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
-                    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
-                        Knutsford University
-                    </p>
-                    <h1 className="max-w-xl text-2xl font-bold tracking-tight md:text-3xl">
-                        Student Representative Council
-                    </h1>
-                    <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                        Official announcements, upcoming events, public documents, and student leadership — all in one place.
-                    </p>
+            <section className="relative overflow-hidden border-b border-[#1f2a24]/10 bg-[#efe3c6] dark:border-white/10 dark:bg-[#111712]">
+                <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,#17211b_1px,transparent_1px),linear-gradient(#17211b_1px,transparent_1px)] [background-size:44px_44px]" />
+                <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-end gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div className="pb-6">
+                        <p className="inline-flex items-center gap-2 border border-[#17211b]/15 bg-[#fffaf0] px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-[#b7352d] dark:border-white/10 dark:bg-[#0b100d]">
+                            <Landmark className="size-4" />
+                            Knutsford University
+                        </p>
+                        <h1 className="mt-7 max-w-4xl text-6xl font-black leading-[0.88] tracking-normal text-[#17211b] dark:text-[#f5ead2] md:text-8xl">
+                            SRC public record.
+                        </h1>
+                        <p className="mt-7 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                            Official notices, campus programmes, public documents,
+                            leadership profiles, and election information in one
+                            civic portal built for students.
+                        </p>
+                        <div className="mt-8 flex flex-wrap gap-3">
+                            <PortalLink href="/announcements" label="Read updates" />
+                            <PortalLink href="/events/public" label="Find events" variant="light" />
+                        </div>
+                    </div>
 
-                    {/* Stats strip */}
-                    <div className="mt-6 flex flex-wrap gap-3">
-                        {[
-                            { icon: <Bell className="size-3.5" />, label: 'Announcements', value: announcements.length },
-                            { icon: <CalendarDays className="size-3.5" />, label: 'Events', value: events.length },
-                            { icon: <FileText className="size-3.5" />, label: 'Documents', value: documents.length },
-                            { icon: <Vote className="size-3.5" />, label: 'Elections', value: elections.length },
-                            { icon: <Users className="size-3.5" />, label: 'Executives', value: executives.length },
-                        ].map(({ icon, label, value }) => (
-                            <div
-                                key={label}
-                                className="flex items-center gap-2 rounded border bg-card px-3 py-1.5"
-                            >
-                                <span className="text-muted-foreground">{icon}</span>
-                                <span className="text-xs text-muted-foreground">{label}</span>
-                                <span className="text-xs font-bold">{value}</span>
+                    <div className="pb-6">
+                        <div className="border border-[#17211b] bg-[#17211b] p-5 text-[#f5ead2] shadow-[14px_14px_0_#d8a329]">
+                            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                                Portal count
+                            </p>
+                            <div className="mt-6 grid grid-cols-2 gap-px bg-[#f5ead2]/15">
+                                <Metric icon={<Bell />} label="Announcements" value={announcementItems.length} />
+                                <Metric icon={<CalendarDays />} label="Events" value={eventItems.length} />
+                                <Metric icon={<FileText />} label="Documents" value={documentItems.length} />
+                                <Metric icon={<Vote />} label="Elections" value={electionItems.length} />
                             </div>
-                        ))}
+                            <div className="mt-6 border-t border-[#f5ead2]/15 pt-5">
+                                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                                    Featured notice
+                                </p>
+                                <p className="mt-3 text-2xl font-black leading-tight">
+                                    {featured?.title ?? 'No featured announcement yet'}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── Content sections ─────────────────────────────────────── */}
-            <div className="mx-auto w-full max-w-6xl space-y-12 px-4 py-12 md:px-6">
-
-                {/* Announcements */}
-                <Section
-                    title="Latest Announcements"
-                    icon={<Bell className="size-4" />}
+            <div className="mx-auto w-full max-w-7xl space-y-20 px-5 py-16 md:px-8">
+                <PublicSection
+                    title="Latest announcements"
+                    kicker="Bulletin"
                     href="/announcements"
-                    empty={announcements.length === 0}
+                    empty={announcementItems.length === 0}
                     emptyMessage="No announcements have been published yet."
                     emptyIcon={<Bell className="size-8" />}
                 >
-                    {announcements.map((a) => (
+                    {announcementItems.map((announcement, index) => (
                         <PublicContentCard
-                            key={a.id}
-                            title={a.title}
-                            description={a.excerpt}
-                            imageUrl={a.image_url}
-                            meta={formatDate(a.published_at)}
-                            category={a.category}
-                            href={announcementShow(a.slug)}
+                            key={announcement.id}
+                            title={announcement.title}
+                            description={announcement.excerpt}
+                            imageUrl={announcement.image_url}
+                            meta={formatPublicDate(announcement.published_at)}
+                            category={announcement.category}
+                            href={announcementShow(announcement.slug)}
+                            tone={index === 0 ? 'red' : 'green'}
                         />
                     ))}
-                </Section>
+                </PublicSection>
 
-                {/* Events */}
-                <Section
-                    title="Upcoming Events"
-                    icon={<CalendarDays className="size-4" />}
+                <PublicSection
+                    title="Upcoming events"
+                    kicker="Campus calendar"
                     href="/events/public"
-                    empty={events.length === 0}
+                    empty={eventItems.length === 0}
                     emptyMessage="No upcoming events are listed."
                     emptyIcon={<CalendarDays className="size-8" />}
                 >
-                    {events.map((e) => (
+                    {eventItems.map((event) => (
                         <PublicContentCard
-                            key={e.id}
-                            title={e.title}
-                            description={e.excerpt}
-                            imageUrl={e.image_url}
-                            meta={[formatDate(e.starts_at), e.location].filter(Boolean).join(' · ')}
-                            category={e.category}
-                            href={eventShow(e.slug)}
+                            key={event.id}
+                            title={event.title}
+                            description={event.excerpt}
+                            imageUrl={event.image_url}
+                            meta={[formatPublicDate(event.starts_at), event.location]
+                                .filter(Boolean)
+                                .join(' / ')}
+                            category={event.category}
+                            href={eventShow(event.slug)}
+                            tone="gold"
                         />
                     ))}
-                </Section>
+                </PublicSection>
 
-                {/* SRC Leadership — only show if there are executives */}
-                {executives.length > 0 && (
-                    <section>
-                        <SectionHeader
-                            title="SRC Leadership"
-                            icon={<Users className="size-4" />}
-                            href="/executives/public"
-                        />
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                            {executives.map((executive) => (
-                                <div
+                {executiveItems.length > 0 && (
+                    <section className="border-y border-[#1f2a24]/10 py-12 dark:border-white/10">
+                        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                            <div>
+                                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                                    Leadership
+                                </p>
+                                <h2 className="mt-2 text-4xl font-black tracking-normal">
+                                    SRC executives
+                                </h2>
+                            </div>
+                            <Link
+                                href="/executives/public"
+                                className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                            >
+                                View all
+                                <ArrowRight className="size-4" />
+                            </Link>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            {executiveItems.map((executive) => (
+                                <article
                                     key={executive.id}
-                                    className="flex items-center gap-3 rounded-md border bg-card p-3"
+                                    className="border border-[#1f2a24]/10 bg-[#fffaf0] p-4 dark:border-white/10 dark:bg-[#111712]"
                                 >
-                                    <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted ring-1 ring-border">
-                                        {executive.avatar_url ? (
-                                            <img
-                                                src={executive.avatar_url}
-                                                alt=""
-                                                className="size-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-sm font-bold text-muted-foreground">
-                                                {executive.name?.slice(0, 1) ?? 'E'}
-                                            </span>
-                                        )}
+                                    <div className="flex items-center gap-4">
+                                        <Avatar executive={executive} />
+                                        <div className="min-w-0">
+                                            <p className="truncate font-black">
+                                                {executive.name}
+                                            </p>
+                                            <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-[#b7352d]">
+                                                {executive.position}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="truncate text-sm font-semibold leading-snug">
-                                            {executive.name}
-                                        </p>
-                                        <p className="truncate text-xs text-muted-foreground">
-                                            {executive.position}
-                                        </p>
-                                    </div>
-                                </div>
+                                </article>
                             ))}
                         </div>
                     </section>
                 )}
 
-                {/* Documents */}
-                <Section
-                    title="Public Documents"
-                    icon={<FileText className="size-4" />}
+                <PublicSection
+                    title="Public documents"
+                    kicker="Downloads"
                     href="/documents/public"
-                    empty={documents.length === 0}
+                    empty={documentItems.length === 0}
                     emptyMessage="No documents have been published yet."
                     emptyIcon={<FileText className="size-8" />}
                 >
-                    {documents.map((d) => (
+                    {documentItems.map((document) => (
                         <PublicContentCard
-                            key={d.id}
-                            title={d.title}
-                            description={d.excerpt}
-                            imageUrl={d.image_url}
-                            meta={formatDate(d.published_at)}
-                            category={d.category}
-                            href={documentShow(d.slug)}
+                            key={document.id}
+                            title={document.title}
+                            description={document.excerpt}
+                            imageUrl={document.image_url}
+                            meta={formatPublicDate(document.published_at)}
+                            category={document.category}
+                            href={documentShow(document.slug)}
+                            tone="ink"
                         />
                     ))}
-                </Section>
+                </PublicSection>
 
-                {/* Elections */}
-                <Section
+                <PublicSection
                     title="Elections"
-                    icon={<Vote className="size-4" />}
+                    kicker="Civic process"
                     href="/elections/public"
-                    empty={elections.length === 0}
+                    empty={electionItems.length === 0}
                     emptyMessage="No elections are currently listed."
                     emptyIcon={<Vote className="size-8" />}
                 >
-                    {elections.map((el) => (
+                    {electionItems.map((election) => (
                         <PublicContentCard
-                            key={el.id}
-                            title={el.title}
-                            description={el.description}
-                            meta={el.academic_period.name}
-                            category={el.status}
-                            href={electionShow(el.slug)}
+                            key={election.id}
+                            title={election.title}
+                            description={election.description}
+                            meta={election.academic_period.name}
+                            category={election.status}
+                            href={electionShow(election.slug)}
+                            tone="red"
                         />
                     ))}
-                </Section>
+                </PublicSection>
             </div>
         </>
     );
 }
 
-// ── Helper components ──────────────────────────────────────────────────────
+function normalizeList<T>(value: T[] | Record<string, T> | null | undefined): T[] {
+    if (Array.isArray(value)) {
+        return value;
+    }
 
-function Section({
-    title,
+    if (value && typeof value === 'object') {
+        return Object.values(value);
+    }
+
+    return [];
+}
+
+function PortalLink({
+    href,
+    label,
+    variant = 'dark',
+}: {
+    href: string;
+    label: string;
+    variant?: 'dark' | 'light';
+}) {
+    return (
+        <Link
+            href={href}
+            className={`inline-flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
+                variant === 'dark'
+                    ? 'bg-[#17211b] text-[#f5ead2] hover:bg-[#b7352d]'
+                    : 'border border-[#17211b]/20 bg-[#fffaf0] text-[#17211b] hover:border-[#b7352d] dark:border-white/10 dark:bg-[#111712] dark:text-[#f5ead2]'
+            }`}
+        >
+            {label}
+            <ArrowRight className="size-4" />
+        </Link>
+    );
+}
+
+function Metric({
     icon,
+    label,
+    value,
+}: {
+    icon: ReactNode;
+    label: string;
+    value: number;
+}) {
+    return (
+        <div className="bg-[#17211b] p-4">
+            <div className="mb-4 text-[#d8a329] [&_svg]:size-5">{icon}</div>
+            <p className="text-4xl font-black">{value}</p>
+            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#c9c0aa]">
+                {label}
+            </p>
+        </div>
+    );
+}
+
+function PublicSection({
+    title,
+    kicker,
     href,
     empty,
     emptyMessage,
@@ -222,17 +304,33 @@ function Section({
     children,
 }: {
     title: string;
-    icon: ReactNode;
+    kicker: string;
     href: string;
     empty: boolean;
     emptyMessage: string;
-    emptyIcon?: ReactNode;
+    emptyIcon: ReactNode;
     children: ReactNode;
 }) {
     return (
         <section>
-            <SectionHeader title={title} icon={icon} href={href} />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                    <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                        {kicker}
+                    </p>
+                    <h2 className="mt-2 text-4xl font-black leading-none tracking-normal md:text-5xl">
+                        {title}
+                    </h2>
+                </div>
+                <Link
+                    href={href}
+                    className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                >
+                    View all
+                    <ArrowRight className="size-4" />
+                </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {empty ? (
                     <PublicContentEmpty icon={emptyIcon} message={emptyMessage} />
                 ) : (
@@ -243,37 +341,18 @@ function Section({
     );
 }
 
-function SectionHeader({
-    title,
-    icon,
-    href,
-}: {
-    title: string;
-    icon: ReactNode;
-    href: string;
-}) {
+function Avatar({ executive }: { executive: ExecutiveSummary }) {
     return (
-        <div className="mb-4 flex items-center justify-between gap-4 border-b pb-3">
-            <div className="flex items-center gap-2">
-                <span className="text-primary">{icon}</span>
-                <h2 className="text-base font-bold">{title}</h2>
-            </div>
-            <Link
-                href={href}
-                className="flex shrink-0 items-center gap-1 text-xs font-semibold text-primary hover:underline"
-            >
-                View all <ArrowRight className="size-3" />
-            </Link>
+        <div className="grid size-14 shrink-0 place-items-center overflow-hidden border border-[#1f2a24]/15 bg-[#efe3c6] dark:border-white/10 dark:bg-[#1b241d]">
+            {executive.avatar_url ? (
+                <img
+                    src={executive.avatar_url}
+                    alt=""
+                    className="size-full object-cover"
+                />
+            ) : (
+                <Users className="size-6 text-[#0f5b45] dark:text-[#d8a329]" />
+            )}
         </div>
     );
-}
-
-function formatDate(value: string | null) {
-    return value
-        ? new Date(value).toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-          })
-        : null;
 }
