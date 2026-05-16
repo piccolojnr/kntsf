@@ -12,6 +12,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Notifications\Payments\PaymentSuccessfulNotification;
 use App\Notifications\Permits\PermitIssuedNotification;
+use App\Support\ActiveAcademicPeriod;
 use App\Support\AuditEvents;
 use App\Support\PaymentReferenceGenerator;
 use App\Support\PermitCodeHasher;
@@ -31,6 +32,7 @@ class IssuePermitAction
         private readonly CreateAuditLogAction $createAuditLog,
         private readonly StudentNotifier $studentNotifier,
         private readonly PaymentReferenceGenerator $paymentReferenceGenerator,
+        private readonly ActiveAcademicPeriod $activeAcademicPeriod,
     ) {}
 
     /**
@@ -155,9 +157,7 @@ class IssuePermitAction
             return AcademicPeriod::query()->findOrFail($academicPeriodId);
         }
 
-        $academicPeriod = AcademicPeriod::query()
-            ->where('is_active', true)
-            ->first();
+        $academicPeriod = $this->activeAcademicPeriod->get();
 
         if (! $academicPeriod instanceof AcademicPeriod) {
             throw new RuntimeException('An active academic period is required before issuing permits.');

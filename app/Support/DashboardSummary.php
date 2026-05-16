@@ -25,12 +25,21 @@ class DashboardSummary
     public function __construct(
         private readonly PermitSettings $permitSettings,
         private readonly ContentSettings $contentSettings,
+        private readonly ApplicationCache $cache,
     ) {}
 
     /**
      * @return array<string, int>
      */
     public function counts(): array
+    {
+        return $this->cache->remember(ApplicationCache::DashboardCounts, 'default', 60, fn (): array => $this->uncachedCounts());
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function uncachedCounts(): array
     {
         return [
             'total_students' => Student::query()->count(),
@@ -75,6 +84,14 @@ class DashboardSummary
      * @return array<int, array{key: string, title: string, description: string, severity: string, count?: int}>
      */
     public function warnings(): array
+    {
+        return $this->cache->remember(ApplicationCache::DashboardWarnings, 'default', 60, fn (): array => $this->uncachedWarnings());
+    }
+
+    /**
+     * @return array<int, array{key: string, title: string, description: string, severity: string, count?: int}>
+     */
+    private function uncachedWarnings(): array
     {
         $warnings = [];
 
@@ -147,6 +164,14 @@ class DashboardSummary
      */
     public function contentReadiness(): array
     {
+        return $this->cache->remember(ApplicationCache::DashboardContentReadiness, 'default', 120, fn (): array => $this->uncachedContentReadiness());
+    }
+
+    /**
+     * @return array<int, array{key: string, title: string, description: string, ready: bool}>
+     */
+    private function uncachedContentReadiness(): array
+    {
         $settings = $this->contentSettings->all();
 
         return [
@@ -187,6 +212,14 @@ class DashboardSummary
      * @return array<string, array<string, int>>
      */
     public function reports(): array
+    {
+        return $this->cache->remember(ApplicationCache::DashboardReports, 'default', 60, fn (): array => $this->uncachedReports());
+    }
+
+    /**
+     * @return array<string, array<string, int>>
+     */
+    private function uncachedReports(): array
     {
         $counts = $this->counts();
 

@@ -8,16 +8,25 @@ class ContentSettings
 {
     public const SettingKey = 'content.settings';
 
+    public function __construct(private readonly ApplicationCache $cache) {}
+
     /**
      * @return array{allow_public_news: bool, allow_public_events: bool, allow_public_documents: bool, homepage_featured_limit: int, enable_comments: bool}
      */
     public function all(): array
     {
-        $stored = AppSetting::query()
-            ->where('key', self::SettingKey)
-            ->value('value');
+        return $this->cache->remember(
+            ApplicationCache::ContentSettings,
+            'default',
+            300,
+            function (): array {
+                $stored = AppSetting::query()
+                    ->where('key', self::SettingKey)
+                    ->value('value');
 
-        return $this->normalize(is_array($stored) ? $stored : []);
+                return $this->normalize(is_array($stored) ? $stored : []);
+            },
+        );
     }
 
     /**
@@ -33,6 +42,8 @@ class ContentSettings
         ], [
             'value' => $normalized,
         ]);
+
+        $this->cache->flushSettings();
 
         return $normalized;
     }

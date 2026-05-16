@@ -5,9 +5,9 @@ namespace App\Actions\Verification;
 use App\Enums\PermitStatus;
 use App\Enums\VerificationMethod;
 use App\Enums\VerificationResult;
-use App\Models\AcademicPeriod;
 use App\Models\Permit;
 use App\Models\Student;
+use App\Support\ActiveAcademicPeriod;
 use App\Support\VerificationIdentifierHasher;
 use Illuminate\Support\Carbon;
 
@@ -15,6 +15,7 @@ class VerifyStudentNumberAction
 {
     public function __construct(
         private readonly VerificationIdentifierHasher $verificationIdentifierHasher,
+        private readonly ActiveAcademicPeriod $activeAcademicPeriod,
     ) {}
 
     public function handle(string $studentNumber): VerificationAttempt
@@ -34,9 +35,7 @@ class VerifyStudentNumberAction
             );
         }
 
-        $activePeriod = AcademicPeriod::query()
-            ->where('is_active', true)
-            ->first();
+        $activePeriod = $this->activeAcademicPeriod->get();
 
         $permit = $student->permits()
             ->with('academicPeriod')

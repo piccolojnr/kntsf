@@ -44,7 +44,7 @@ function studentWithUser(): Student
     ]);
 }
 
-test('operational notifications are synchronous', function () {
+test('operational notifications are queued', function () {
     $notifications = [
         PermitIssuedNotification::class,
         PermitRevokedNotification::class,
@@ -58,7 +58,7 @@ test('operational notifications are synchronous', function () {
     ];
 
     foreach ($notifications as $notification) {
-        expect(is_subclass_of($notification, ShouldQueue::class))->toBeFalse();
+        expect(is_subclass_of($notification, ShouldQueue::class))->toBeTrue();
     }
 });
 

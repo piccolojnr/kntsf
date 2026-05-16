@@ -3,11 +3,15 @@
 namespace App\Notifications\NfcCards;
 
 use App\Models\NfcCard;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NfcCardRegisteredNotification extends Notification
+class NfcCardRegisteredNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(private readonly NfcCard $card) {}
 
     /**

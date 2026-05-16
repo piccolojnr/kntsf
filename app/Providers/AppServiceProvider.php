@@ -2,6 +2,22 @@
 
 namespace App\Providers;
 
+use App\Models\AcademicPeriod;
+use App\Models\Announcement;
+use App\Models\AppSetting;
+use App\Models\AuditLog;
+use App\Models\Document;
+use App\Models\Election;
+use App\Models\ElectionCandidate;
+use App\Models\ElectionVote;
+use App\Models\Event;
+use App\Models\ExecutiveProfile;
+use App\Models\NfcCard;
+use App\Models\Payment;
+use App\Models\Permit;
+use App\Models\Student;
+use App\Models\VerificationLog;
+use App\Support\ApplicationCache;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -28,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureRateLimiting();
+        $this->configureCacheInvalidation();
     }
 
     /**
@@ -84,5 +101,30 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('mobile-sensitive-actions', function (Request $request) {
             return Limit::perMinute(20)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
         });
+    }
+
+    /**
+     * Keep short-lived operational caches coherent after writes.
+     */
+    protected function configureCacheInvalidation(): void
+    {
+        $flushDashboard = fn (): mixed => app(ApplicationCache::class)->flushDashboard();
+        $flushPublicContent = fn (): mixed => app(ApplicationCache::class)->flushPublicContent();
+
+        foreach ([Student::class, Permit::class, NfcCard::class, Payment::class, VerificationLog::class, AuditLog::class, ElectionCandidate::class, ElectionVote::class] as $model) {
+            $model::saved($flushDashboard);
+            $model::deleted($flushDashboard);
+        }
+
+        AcademicPeriod::saved(fn () => app(ApplicationCache::class)->flushAcademicPeriods());
+        AcademicPeriod::deleted(fn () => app(ApplicationCache::class)->flushAcademicPeriods());
+
+        AppSetting::saved(fn () => app(ApplicationCache::class)->flushSettings());
+        AppSetting::deleted(fn () => app(ApplicationCache::class)->flushSettings());
+
+        foreach ([Announcement::class, Event::class, Document::class, ExecutiveProfile::class, Election::class] as $model) {
+            $model::saved($flushPublicContent);
+            $model::deleted($flushPublicContent);
+        }
     }
 }
