@@ -3,6 +3,7 @@
 namespace App\Notifications\NfcCards;
 
 use App\Models\NfcCard;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,11 +25,16 @@ class NfcCardRegisteredNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('NFC card registered')
-            ->greeting('NFC card registered')
-            ->line('An NFC card has been registered for your student profile.')
-            ->line('UID last four: '.($this->card->uid_last4 ?? '----'))
-            ->line('Keep your card safe and report loss immediately.');
+        return NotificationMail::make(
+            subject: 'NFC card registered',
+            eyebrow: 'NFC card',
+            title: 'Your NFC card has been registered',
+            intro: 'An NFC card has been registered for your student profile.',
+            details: [
+                ['label' => 'UID last four', 'value' => $this->card->uid_last4 ?? '----'],
+            ],
+            note: 'Keep your card safe and report loss immediately.',
+            tone: 'success',
+        );
     }
 }

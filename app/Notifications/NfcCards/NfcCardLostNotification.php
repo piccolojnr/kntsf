@@ -3,6 +3,7 @@
 namespace App\Notifications\NfcCards;
 
 use App\Models\NfcCard;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,11 +25,16 @@ class NfcCardLostNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('NFC card marked lost')
-            ->greeting('NFC card marked lost')
-            ->line('Your NFC card has been marked as lost.')
-            ->line('UID last four: '.($this->card->uid_last4 ?? '----'))
-            ->line('Contact the SRC office if this is incorrect.');
+        return NotificationMail::make(
+            subject: 'NFC card marked lost',
+            eyebrow: 'Card lost',
+            title: 'Your NFC card was marked lost',
+            intro: 'Your NFC card has been marked as lost.',
+            details: [
+                ['label' => 'UID last four', 'value' => $this->card->uid_last4 ?? '----'],
+            ],
+            note: 'Contact the SRC office if this is incorrect.',
+            tone: 'warning',
+        );
     }
 }

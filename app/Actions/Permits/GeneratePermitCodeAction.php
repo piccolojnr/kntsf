@@ -8,6 +8,6 @@ class GeneratePermitCodeAction
 {
     public function handle(): string
     {
-        return 'KNT-'.Str::upper(Str::random(4)).'-'.Str::upper(Str::random(4)).'-'.random_int(1000, 9999);
+        return 'KUC-' . Str::substr(now()->format('Y'), -2) . '-' . random_int(1000, 9999); // Example: KUC-24-1234
     }
 }

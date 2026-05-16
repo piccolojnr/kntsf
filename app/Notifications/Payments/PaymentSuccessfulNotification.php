@@ -3,6 +3,7 @@
 namespace App\Notifications\Payments;
 
 use App\Models\Payment;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,12 +25,17 @@ class PaymentSuccessfulNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Payment confirmed')
-            ->greeting('Payment confirmed')
-            ->line('Your payment has been confirmed successfully.')
-            ->line('Reference: '.$this->payment->reference)
-            ->line('Amount: '.$this->payment->currency.' '.$this->payment->amount)
-            ->lineIf($this->payment->permit_id !== null, 'A permit has been linked to this payment.');
+        return NotificationMail::make(
+            subject: 'Payment confirmed',
+            eyebrow: 'Payment confirmed',
+            title: 'Your payment has been confirmed',
+            intro: 'Your payment has been confirmed successfully.',
+            details: [
+                ['label' => 'Reference', 'value' => $this->payment->reference],
+                ['label' => 'Amount', 'value' => $this->payment->currency.' '.number_format((float) $this->payment->amount, 2)],
+                ['label' => 'Permit', 'value' => $this->payment->permit_id !== null ? 'Linked to this payment' : null],
+            ],
+            tone: 'success',
+        );
     }
 }

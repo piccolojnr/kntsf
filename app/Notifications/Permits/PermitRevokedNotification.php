@@ -3,6 +3,7 @@
 namespace App\Notifications\Permits;
 
 use App\Models\Permit;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,12 +25,17 @@ class PermitRevokedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Permit revoked')
-            ->greeting('Permit revoked')
-            ->line('Your permit has been revoked.')
-            ->line('Permit code last four: '.($this->permit->code_last4 ?? '----'))
-            ->lineIf(filled($this->permit->revocation_reason), 'Reason: '.$this->permit->revocation_reason)
-            ->line('Contact the SRC office if you need clarification.');
+        return NotificationMail::make(
+            subject: 'Permit revoked',
+            eyebrow: 'Permit revoked',
+            title: 'Your SRC permit was revoked',
+            intro: 'A permit linked to your student profile has been revoked.',
+            details: [
+                ['label' => 'Code last four', 'value' => $this->permit->code_last4 ?? '----'],
+                ['label' => 'Reason', 'value' => $this->permit->revocation_reason],
+            ],
+            note: 'Contact the SRC office if you need clarification.',
+            tone: 'danger',
+        );
     }
 }
