@@ -7,8 +7,11 @@ import { cn } from '@/lib/utils';
 
 export default function AppearanceToggleTab({
     className = '',
+    compact = false,
     ...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & {
+    compact?: boolean;
+}) {
     const { appearance, updateAppearance } = useAppearance();
 
     const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
@@ -20,7 +23,7 @@ export default function AppearanceToggleTab({
     return (
         <div
             className={cn(
-                'inline-flex gap-1 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800',
+                'inline-flex min-h-9 items-center gap-1 rounded-md border border-app-border bg-app-surface-muted p-1',
                 className,
             )}
             {...props}
@@ -29,15 +32,19 @@ export default function AppearanceToggleTab({
                 <button
                     key={value}
                     onClick={() => updateAppearance(value)}
+                    title={label}
                     className={cn(
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
+                        compact && 'h-7 w-7 justify-center px-0 py-0',
                         appearance === value
-                            ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                            ? 'bg-app-surface text-app-ink shadow-xs'
+                            : 'text-app-muted hover:bg-app-surface hover:text-app-ink',
                     )}
                 >
-                    <Icon className="-ml-1 h-4 w-4" />
-                    <span className="ml-1.5 text-sm">{label}</span>
+                    <Icon className={cn('size-4', !compact && '-ml-1')} />
+                    <span className={cn('ml-1.5 text-sm', compact && 'sr-only')}>
+                        {label}
+                    </span>
                 </button>
             ))}
         </div>

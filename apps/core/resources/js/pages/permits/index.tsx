@@ -1,7 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { BadgeCheck, CreditCard, Search, ShieldCheck } from 'lucide-react';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Heading from '@/components/shared/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,27 @@ export default function PermitsIndex({
     issuedPermitCode?: string | null;
     can: PermitPermissions;
 }) {
+    const { url } = usePage();
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
+    const shouldOpenIssueDialog = useMemo(
+        () => new URLSearchParams(url.split('?')[1] ?? '').has('issue'),
+        [url],
+    );
+
+    function cleanIssueQuery() {
+        const query = new URLSearchParams(url.split('?')[1] ?? '');
+        query.delete('issue');
+
+        router.get(
+            `${index.url()}${query.size > 0 ? `?${query.toString()}` : ''}`,
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            },
+        );
+    }
 
     function submitSearch(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -69,8 +89,17 @@ export default function PermitsIndex({
                         description="Issue and manage student permits for academic periods."
                     />
 
-                    {can.issue && <PermitIssueDialog options={options} />}
                 </div>
+
+                {can.issue && shouldOpenIssueDialog && (
+                    <PermitIssueDialog
+                        key={url}
+                        options={options}
+                        defaultOpen
+                        trigger={null}
+                        onClose={cleanIssueQuery}
+                    />
+                )}
 
                 {issuedPermitCode && (
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">

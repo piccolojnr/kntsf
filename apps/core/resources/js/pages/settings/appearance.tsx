@@ -14,9 +14,14 @@ export default function Appearance() {
                 <Heading
                     variant="small"
                     title="Appearance settings"
-                    description="Update your account's appearance settings"
+                    description="Choose how the dashboard should render on this device."
                 />
-                <AppearanceTabs />
+                <div className="app-panel-muted p-4">
+                    <p className="app-kicker">Theme mode</p>
+                    <div className="mt-3">
+                        <AppearanceTabs />
+                    </div>
+                </div>
             </div>
         </>
     );
