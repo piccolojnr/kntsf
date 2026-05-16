@@ -3,7 +3,6 @@ import { ArrowRight, Bell, CalendarDays, FileText, Users, Vote } from 'lucide-re
 import type { ReactNode } from 'react';
 import {
     PublicContentCard,
-    PublicContentCardSkeleton,
     PublicContentEmpty,
 } from '@/features/public/content-card';
 import { show as announcementShow } from '@/routes/public/announcements';

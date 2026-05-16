@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::middleware('guest')->group(function () {
+Route::middleware(['guest', 'throttle:setup-password'])->group(function () {
     Route::get('account/setup-password/{token}', [SetupPasswordController::class, 'show'])
         ->name('account.setup-password.show');
 

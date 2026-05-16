@@ -11,11 +11,15 @@ import { index as executivesIndex } from '@/routes/public/executives';
 import type { SharedPageProps } from '@/types';
 
 const navItems = [
-    { label: 'Announcements', href: announcementsIndex() },
-    { label: 'Events', href: eventsIndex() },
-    { label: 'Documents', href: documentsIndex() },
-    { label: 'Executives', href: executivesIndex() },
-    { label: 'Elections', href: electionsIndex() },
+    {
+        label: 'Announcements',
+        href: announcementsIndex(),
+        url: announcementsIndex.url(),
+    },
+    { label: 'Events', href: eventsIndex(), url: eventsIndex.url() },
+    { label: 'Documents', href: documentsIndex(), url: documentsIndex.url() },
+    { label: 'Executives', href: executivesIndex(), url: executivesIndex.url() },
+    { label: 'Elections', href: electionsIndex(), url: electionsIndex.url() },
 ];
 
 export default function PublicLayout({ children }: PropsWithChildren) {
@@ -79,13 +83,13 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 key={item.label}
                                 href={item.href}
                                 className={`relative px-3 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                                    isActive(item.href)
+                                    isActive(item.url)
                                         ? 'text-primary'
                                         : 'text-muted-foreground hover:text-foreground'
                                 }`}
                             >
                                 {item.label}
-                                {isActive(item.href) && (
+                                {isActive(item.url) && (
                                     <span className="absolute inset-x-3 bottom-0 h-0.5 bg-primary" />
                                 )}
                             </Link>
@@ -102,13 +106,13 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                     key={item.label}
                                     href={item.href}
                                     className={`flex items-center rounded px-3 py-3 text-sm font-medium transition-colors ${
-                                        isActive(item.href)
+                                        isActive(item.url)
                                             ? 'text-primary'
                                             : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                                     onClick={() => setOpen(false)}
                                 >
-                                    {isActive(item.href) && (
+                                    {isActive(item.url) && (
                                         <span className="mr-2.5 inline-block size-1.5 rounded-full bg-primary" />
                                     )}
                                     {item.label}

@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { Users } from 'lucide-react';
-import { PublicContentEmpty } from '@/features/public/content-card';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
+import { PublicContentEmpty } from '@/features/public/content-card';
 import type { ExecutiveSummary } from '../types';
 
 export default function PublicExecutivesIndex({
