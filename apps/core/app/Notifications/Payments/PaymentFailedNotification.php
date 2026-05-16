@@ -3,6 +3,7 @@
 namespace App\Notifications\Payments;
 
 use App\Models\Payment;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,12 +25,17 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Payment marked failed')
-            ->greeting('Payment marked failed')
-            ->line('A payment record linked to your student profile was marked failed.')
-            ->line('Reference: '.$this->payment->reference)
-            ->lineIf(filled($this->payment->failure_reason), 'Reason: '.$this->payment->failure_reason)
-            ->line('Contact the SRC office if you need help.');
+        return NotificationMail::make(
+            subject: 'Payment marked failed',
+            eyebrow: 'Payment failed',
+            title: 'A payment was marked failed',
+            intro: 'A payment record linked to your student profile was marked failed.',
+            details: [
+                ['label' => 'Reference', 'value' => $this->payment->reference],
+                ['label' => 'Reason', 'value' => $this->payment->failure_reason],
+            ],
+            note: 'Contact the SRC office if you need help.',
+            tone: 'danger',
+        );
     }
 }

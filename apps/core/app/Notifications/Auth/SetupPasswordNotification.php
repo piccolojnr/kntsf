@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Auth;
 
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -30,13 +31,15 @@ class SetupPasswordNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Set up your student account password')
-            ->greeting('Set up your student account')
-            ->line('A student account has been created for you.')
-            ->line('Use the link below to set your password. This link expires in 24 hours.')
-            ->action('Set password', route('account.setup-password.show', ['token' => $this->token]))
-            ->line('If you did not expect this email, you can ignore it.');
+        return NotificationMail::make(
+            subject: 'Set up your student account password',
+            eyebrow: 'Account setup',
+            title: 'Set up your student account',
+            intro: 'A student account has been created for you. Use the secure link below to set your password and finish account setup.',
+            actionLabel: 'Set password',
+            actionUrl: route('account.setup-password.show', ['token' => $this->token]),
+            note: 'This link expires in 24 hours. If you did not expect this email, you can ignore it.',
+        );
     }
 
     /**

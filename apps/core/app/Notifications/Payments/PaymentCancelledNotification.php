@@ -3,6 +3,7 @@
 namespace App\Notifications\Payments;
 
 use App\Models\Payment;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,11 +25,16 @@ class PaymentCancelledNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Payment cancelled')
-            ->greeting('Payment cancelled')
-            ->line('A payment record linked to your student profile was cancelled.')
-            ->line('Reference: '.$this->payment->reference)
-            ->line('Contact the SRC office if you need clarification.');
+        return NotificationMail::make(
+            subject: 'Payment cancelled',
+            eyebrow: 'Payment cancelled',
+            title: 'A payment was cancelled',
+            intro: 'A payment record linked to your student profile was cancelled.',
+            details: [
+                ['label' => 'Reference', 'value' => $this->payment->reference],
+            ],
+            note: 'Contact the SRC office if you need clarification.',
+            tone: 'warning',
+        );
     }
 }

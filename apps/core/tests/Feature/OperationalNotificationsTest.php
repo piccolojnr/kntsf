@@ -8,6 +8,7 @@ use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\Auth\SetupPasswordNotification;
 use App\Notifications\NfcCards\NfcCardLostNotification;
 use App\Notifications\NfcCards\NfcCardRegisteredNotification;
 use App\Notifications\NfcCards\NfcCardRevokedNotification;
@@ -60,6 +61,35 @@ test('operational notifications are queued', function () {
     foreach ($notifications as $notification) {
         expect(is_subclass_of($notification, ShouldQueue::class))->toBeTrue();
     }
+});
+
+test('operational notifications use the branded markdown template', function () {
+    $user = User::factory()->make();
+    $payment = Payment::factory()->make([
+        'reference' => 'PAY-2026-ABC123',
+        'amount' => '25.00',
+        'currency' => 'GHS',
+    ]);
+
+    $mail = (new PaymentSuccessfulNotification($payment))->toMail($user);
+
+    expect($mail->markdown)->toBe('mail.notifications.operational')
+        ->and($mail->viewData['eyebrow'])->toBe('Payment confirmed')
+        ->and($mail->viewData['details'])->toContain([
+            'label' => 'Reference',
+            'value' => 'PAY-2026-ABC123',
+        ])
+        ->and((string) $mail->render())->toContain('Your payment has been confirmed');
+});
+
+test('setup password notification uses the branded markdown template', function () {
+    $user = User::factory()->make();
+    $mail = (new SetupPasswordNotification('plain-token'))->toMail($user);
+
+    expect($mail->markdown)->toBe('mail.notifications.operational')
+        ->and($mail->viewData['eyebrow'])->toBe('Account setup')
+        ->and($mail->viewData['actionLabel'])->toBe('Set password')
+        ->and((string) $mail->render())->toContain('Set up your student account');
 });
 
 test('permit issue and revoke notifications are sent', function () {

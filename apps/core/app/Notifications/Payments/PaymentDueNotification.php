@@ -3,6 +3,7 @@
 namespace App\Notifications\Payments;
 
 use App\Models\Payment;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,12 +25,17 @@ class PaymentDueNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Payment pending')
-            ->greeting('Payment pending')
-            ->line('A payment record has been created and is pending confirmation.')
-            ->line('Reference: '.$this->payment->reference)
-            ->line('Amount: '.$this->payment->currency.' '.$this->payment->amount)
-            ->line('Please contact the SRC office if this is unexpected.');
+        return NotificationMail::make(
+            subject: 'Payment pending',
+            eyebrow: 'Payment pending',
+            title: 'A payment is waiting for confirmation',
+            intro: 'A payment record has been created and is pending confirmation.',
+            details: [
+                ['label' => 'Reference', 'value' => $this->payment->reference],
+                ['label' => 'Amount', 'value' => $this->payment->currency.' '.number_format((float) $this->payment->amount, 2)],
+            ],
+            note: 'Please contact the SRC office if this is unexpected.',
+            tone: 'warning',
+        );
     }
 }

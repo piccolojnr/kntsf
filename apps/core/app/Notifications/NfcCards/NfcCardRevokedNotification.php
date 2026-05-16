@@ -3,6 +3,7 @@
 namespace App\Notifications\NfcCards;
 
 use App\Models\NfcCard;
+use App\Support\NotificationMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -24,11 +25,16 @@ class NfcCardRevokedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('NFC card revoked')
-            ->greeting('NFC card revoked')
-            ->line('Your NFC card has been revoked.')
-            ->line('UID last four: '.($this->card->uid_last4 ?? '----'))
-            ->line('Contact the SRC office if you need clarification.');
+        return NotificationMail::make(
+            subject: 'NFC card revoked',
+            eyebrow: 'Card revoked',
+            title: 'Your NFC card was revoked',
+            intro: 'Your NFC card has been revoked.',
+            details: [
+                ['label' => 'UID last four', 'value' => $this->card->uid_last4 ?? '----'],
+            ],
+            note: 'Contact the SRC office if you need clarification.',
+            tone: 'danger',
+        );
     }
 }
