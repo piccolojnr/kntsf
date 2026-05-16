@@ -6,9 +6,9 @@ use App\Enums\NfcCardStatus;
 use App\Enums\PermitStatus;
 use App\Enums\VerificationMethod;
 use App\Enums\VerificationResult;
-use App\Models\AcademicPeriod;
 use App\Models\NfcCard;
 use App\Models\Permit;
+use App\Support\ActiveAcademicPeriod;
 use App\Support\NfcUidHasher;
 use Illuminate\Support\Carbon;
 
@@ -16,6 +16,7 @@ class VerifyNfcUidAction
 {
     public function __construct(
         private readonly NfcUidHasher $nfcUidHasher,
+        private readonly ActiveAcademicPeriod $activeAcademicPeriod,
     ) {}
 
     public function handle(string $uid): VerificationAttempt
@@ -50,9 +51,7 @@ class VerifyNfcUidAction
             );
         }
 
-        $activePeriod = AcademicPeriod::query()
-            ->where('is_active', true)
-            ->first();
+        $activePeriod = $this->activeAcademicPeriod->get();
 
         $permit = $card->student->permits()
             ->with('academicPeriod')

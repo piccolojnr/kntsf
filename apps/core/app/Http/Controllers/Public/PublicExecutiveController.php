@@ -4,21 +4,27 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExecutiveProfile;
+use App\Support\ApplicationCache;
 use App\Support\MediaCollections;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicExecutiveController extends Controller
 {
-    public function __invoke(): Response
+    public function __invoke(ApplicationCache $cache): Response
     {
         return Inertia::render('public/executives/index', [
-            'executives' => ExecutiveProfile::query()
-                ->published()
-                ->with(['user:id,name', 'media'])
-                ->orderBy('sort_order')
-                ->get()
-                ->map(fn (ExecutiveProfile $profile): array => self::payload($profile)),
+            'executives' => $cache->remember(
+                ApplicationCache::PublicExecutives,
+                'index',
+                300,
+                fn () => ExecutiveProfile::query()
+                    ->published()
+                    ->with(['user:id,name', 'media'])
+                    ->orderBy('sort_order')
+                    ->get()
+                    ->map(fn (ExecutiveProfile $profile): array => self::payload($profile)),
+            ),
         ]);
     }
 

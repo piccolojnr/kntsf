@@ -1,12 +1,21 @@
 <?php
 
 use App\Http\Controllers\Auth\SetupPasswordController;
+use App\Http\Controllers\HealthController;
 use App\Support\ActivityFeed;
 use App\Support\DashboardSummary;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 require __DIR__.'/public.php';
+
+Route::get('health/database', [HealthController::class, 'database'])
+    ->middleware('throttle:public-content')
+    ->name('health.database');
+
+Route::get('health/queue', [HealthController::class, 'queue'])
+    ->middleware('throttle:public-content')
+    ->name('health.queue');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function (ActivityFeed $activityFeed, DashboardSummary $dashboardSummary) {

@@ -8,16 +8,25 @@ class PermitSettings
 {
     public const SettingKey = 'permits.settings';
 
+    public function __construct(private readonly ApplicationCache $cache) {}
+
     /**
      * @return array{default_amount: float, currency: string, default_validity_days: int, permit_requests_enabled: bool}
      */
     public function all(): array
     {
-        $stored = AppSetting::query()
-            ->where('key', self::SettingKey)
-            ->value('value');
+        return $this->cache->remember(
+            ApplicationCache::PermitSettings,
+            'default',
+            300,
+            function (): array {
+                $stored = AppSetting::query()
+                    ->where('key', self::SettingKey)
+                    ->value('value');
 
-        return $this->normalize(is_array($stored) ? $stored : []);
+                return $this->normalize(is_array($stored) ? $stored : []);
+            },
+        );
     }
 
     /**
@@ -33,6 +42,8 @@ class PermitSettings
         ], [
             'value' => $normalized,
         ]);
+
+        $this->cache->flushSettings();
 
         return $normalized;
     }

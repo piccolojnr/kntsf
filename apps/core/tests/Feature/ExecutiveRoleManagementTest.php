@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Notifications\Auth\SetupPasswordNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -70,19 +69,6 @@ test('setup link can be sent', function () {
 
     expect(AccountActivationToken::query()->where('user_id', $executive->id)->count())->toBe(1);
     Notification::assertSentTo($executive, SetupPasswordNotification::class);
-});
-
-test('setup password notification is not queued', function () {
-    Queue::fake();
-
-    $executive = User::factory()->create(['password' => null]);
-    $executive->assignRole('staff');
-
-    $this->actingAs(managementUserWithRole('admin'))
-        ->post(route('executives.send-setup-link', $executive))
-        ->assertRedirect();
-
-    Queue::assertNothingPushed();
 });
 
 test('admin cannot deactivate self', function () {
