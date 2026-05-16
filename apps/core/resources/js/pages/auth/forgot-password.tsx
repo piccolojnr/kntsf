@@ -15,13 +15,13 @@ export default function ForgotPassword({ status }: { status?: string }) {
             <Head title="Forgot password" />
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-5 rounded-md border border-app-green/30 bg-app-green/10 px-3 py-2.5 text-center text-sm text-app-ink">
                     {status}
                 </div>
             )}
 
-            <div className="space-y-6">
-                <Form {...email.form()}>
+            <div className="space-y-5">
+                <Form {...email.form()} className="space-y-5">
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
@@ -33,14 +33,15 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     autoComplete="off"
                                     autoFocus
                                     placeholder="email@example.com"
+                                    className="h-10 bg-app-surface"
                                 />
 
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="my-6 flex items-center justify-start">
+                            <div className="flex items-center justify-start">
                                 <Button
-                                    className="w-full"
+                                    className="h-10 w-full"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
@@ -54,8 +55,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     )}
                 </Form>
 
-                <div className="space-x-1 text-center text-sm text-muted-foreground">
+                <div className="rounded-md border border-app-border bg-app-surface-muted px-3 py-2 text-center text-xs leading-5 text-app-muted">
                     <span>Or, return to</span>
+                    <span> </span>
                     <TextLink href={login()}>log in</TextLink>
                 </div>
             </div>

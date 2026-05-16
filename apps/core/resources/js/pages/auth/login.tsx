@@ -26,11 +26,17 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        {status && (
+                            <div className="rounded-md border border-app-green/30 bg-app-green/10 px-3 py-2.5 text-center text-sm text-app-ink">
+                                {status}
+                            </div>
+                        )}
+
+                        <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
@@ -42,6 +48,7 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    className="h-10 bg-app-surface"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -66,11 +73,12 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    className="h-10 bg-app-surface"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center gap-3 rounded-md border border-app-border bg-app-surface-muted px-3 py-2">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -81,7 +89,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 h-10 w-full"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -91,18 +99,12 @@ export default function Login({
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <div className="rounded-md border border-app-border bg-app-surface-muted px-3 py-2 text-center text-xs leading-5 text-app-muted">
                             Accounts are created by administrators.
                         </div>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
