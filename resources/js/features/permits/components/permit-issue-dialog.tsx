@@ -23,26 +23,36 @@ import type { PermitOptions } from '../types';
 export function PermitIssueDialog({
     options,
     trigger,
+    defaultOpen = false,
+    onClose,
 }: {
     options: PermitOptions;
-    trigger?: ReactNode;
+    trigger?: ReactNode | null;
+    defaultOpen?: boolean;
+    onClose?: () => void;
 }) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(defaultOpen);
 
     function closeDialog(nextOpen: boolean) {
         setOpen(nextOpen);
+
+        if (!nextOpen) {
+            onClose?.();
+        }
     }
 
     return (
         <Dialog open={open} onOpenChange={closeDialog}>
-            <DialogTrigger asChild>
-                {trigger ?? (
-                    <Button>
-                        <Plus />
-                        Issue permit
-                    </Button>
-                )}
-            </DialogTrigger>
+            {trigger !== null && (
+                <DialogTrigger asChild>
+                    {trigger ?? (
+                        <Button>
+                            <Plus />
+                            Issue permit
+                        </Button>
+                    )}
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-lg">
                 <DialogTitle>Issue permit</DialogTitle>
                 <DialogDescription>
@@ -53,7 +63,7 @@ export function PermitIssueDialog({
                 <Form
                     {...store.form()}
                     options={{ preserveScroll: true }}
-                    onSuccess={() => setOpen(false)}
+                    onSuccess={() => closeDialog(false)}
                     className="space-y-5"
                 >
                     {({ processing, errors, resetAndClearErrors }) => (
