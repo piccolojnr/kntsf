@@ -13,7 +13,7 @@ export function FormSection({
     className?: string;
 }) {
     return (
-        <section className={cn('rounded-lg border bg-card/70 p-4', className)}>
+        <section className={cn('rounded-md border bg-card/70 p-4', className)}>
             <div className="mb-4">
                 <h2 className="text-sm font-semibold">{title}</h2>
                 {description && (

@@ -16,7 +16,7 @@ export function PermitList({
 }) {
     if (permits.data.length === 0) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-10 text-center">
+            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
                 <p className="text-sm font-medium">No permits found</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                     Issue the first permit or adjust your search.
@@ -27,7 +27,7 @@ export function PermitList({
 
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-lg border bg-card">
+            <div className="overflow-hidden rounded-md border bg-card">
                 <div className="w-full overflow-x-auto">
                     <table className="w-full min-w-[920px] text-sm">
                         <thead className="border-b bg-muted/40 text-xs text-muted-foreground">

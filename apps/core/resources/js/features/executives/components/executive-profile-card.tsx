@@ -4,7 +4,7 @@ export function ExecutiveProfileCard({ executive }: { executive: Executive }) {
     const profile = executive.profile;
 
     return (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-md border bg-card p-4">
             <div className="flex items-start gap-4">
                 <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
                     {executive.name.slice(0, 2).toUpperCase()}

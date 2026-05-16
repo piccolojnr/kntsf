@@ -102,17 +102,17 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
         <>
             <Head title="Reports" />
 
-            <div className="min-h-full min-w-0 bg-[#f7f2e8] p-4 text-[#17211b] dark:bg-[#080d0a] dark:text-[#f6ead6] md:p-6">
-                <section className="grid min-w-0 gap-5 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
+            <div className="app-page p-4 md:p-6">
+                <section className="app-panel grid min-w-0 gap-5 overflow-hidden p-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
                     <div className="min-w-0">
-                        <p className="inline-flex items-center gap-2 rounded-md bg-[#17211b] px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#f6ead6] dark:bg-[#f6ead6] dark:text-[#17211b]">
+                        <p className="inline-flex items-center gap-2 rounded-md bg-app-ink px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-app-surface dark:bg-app-surface dark:text-app-ink">
                             <FileText className="size-4" />
                             Operational reporting
                         </p>
                         <h1 className="mt-5 max-w-3xl text-4xl font-black leading-none tracking-normal md:text-6xl">
                             Reports that stay close to the work.
                         </h1>
-                        <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5c655b] dark:text-[#bcc7bc]">
+                        <p className="mt-4 max-w-2xl text-sm leading-7 text-app-muted">
                             Lightweight counts across students, permits, NFC
                             cards, payments, and verification. These charts are
                             designed for quick operational review, not heavy
@@ -137,17 +137,17 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
                     </div>
                 </section>
 
-                <section className="mt-5 min-w-0 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
+                <section className="app-panel mt-5 min-w-0 overflow-hidden p-5">
                     <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#b45309]">
+                            <p className="text-xs font-black uppercase tracking-[0.18em] text-app-red">
                                 Cross-module totals
                             </p>
                             <h2 className="mt-1 text-2xl font-black tracking-normal">
                                 Overview distribution
                             </h2>
                         </div>
-                        <p className="max-w-md text-sm leading-6 text-[#5c655b] dark:text-[#bcc7bc]">
+                        <p className="max-w-md text-sm leading-6 text-app-muted">
                             Totals are grouped by module so operational spikes are
                             visible without opening each report.
                         </p>
@@ -241,8 +241,8 @@ function ReportPanel({
     };
 
     return (
-        <article className="min-w-0 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
-            <header className="flex flex-col gap-4 border-b border-[#17211b]/10 p-5 dark:border-white/10 sm:flex-row sm:items-start sm:justify-between">
+        <article className="app-panel min-w-0 overflow-hidden">
+            <header className="flex flex-col gap-4 border-b border-app-border p-5 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 gap-4">
                     <div
                         className="grid size-12 shrink-0 place-items-center rounded-md text-white"
@@ -254,13 +254,13 @@ function ReportPanel({
                         <h2 className="break-words text-xl font-black tracking-normal">
                             {group.title}
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[#5c655b] dark:text-[#bcc7bc]">
+                        <p className="mt-1 text-sm leading-6 text-app-muted">
                             {group.description}
                         </p>
                     </div>
                 </div>
                 <div className="shrink-0 text-left sm:text-right">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-[#8a9183]">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-app-muted">
                         Total
                     </p>
                     <p className="mt-1 text-3xl font-black tabular-nums">
@@ -322,17 +322,17 @@ function ReportPanel({
                     {group.entries.map(([label, value]) => (
                         <div
                             key={label}
-                            className="min-w-0 rounded-md border border-[#17211b]/10 bg-[#f7f2e8] p-3 dark:border-white/10 dark:bg-[#0a100d]"
+                            className="app-panel-muted min-w-0 p-3"
                         >
                             <div className="flex min-w-0 items-center justify-between gap-3">
-                                <p className="min-w-0 truncate text-xs font-black uppercase tracking-[0.14em] text-[#5c655b] dark:text-[#bcc7bc]">
+                                <p className="min-w-0 truncate text-xs font-black uppercase tracking-[0.14em] text-app-muted">
                                     {titleCase(label)}
                                 </p>
                                 <p className="font-black tabular-nums">
                                     {value}
                                 </p>
                             </div>
-                            <div className="mt-3 h-2 rounded-full bg-[#e5dcc9] dark:bg-[#1f2b22]">
+                            <div className="mt-3 h-2 rounded-full bg-app-border">
                                 <div
                                     className="h-full rounded-full"
                                     style={{
@@ -359,12 +359,12 @@ function OverviewStat({
     icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <div className="rounded-md border border-[#17211b]/10 bg-[#f7f2e8] p-4 dark:border-white/10 dark:bg-[#0a100d]">
+        <div className="app-panel-muted p-4">
             <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5c655b] dark:text-[#bcc7bc]">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-app-muted">
                     {label}
                 </p>
-                <Icon className="size-5 text-[#b45309]" />
+                <Icon className="size-5 text-app-red" />
             </div>
             <p className="mt-3 text-4xl font-black tabular-nums">{value}</p>
         </div>

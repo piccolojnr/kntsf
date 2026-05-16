@@ -85,7 +85,7 @@ export default function PermitSettingsPage({
                                 />
                             </div>
 
-                            <div className="flex items-center gap-3 rounded-lg border bg-muted/20 p-4">
+                            <div className="flex items-center gap-3 rounded-md border bg-muted/20 p-4">
                                 <input
                                     type="hidden"
                                     name="permit_requests_enabled"

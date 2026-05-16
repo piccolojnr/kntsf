@@ -156,7 +156,7 @@ export default function ShowStudent({
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 py-4">
-                            <div className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
+                            <div className="flex items-center justify-between rounded-md border bg-muted/20 p-4">
                                 <div>
                                     <p className="text-xs text-muted-foreground">
                                         Current state
@@ -222,7 +222,7 @@ function Detail({
     value: string | null;
 }) {
     return (
-        <div className="flex gap-3 rounded-lg border p-4">
+        <div className="flex gap-3 rounded-md border p-4">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                 <Icon className="size-4" />
             </div>

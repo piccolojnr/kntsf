@@ -17,7 +17,7 @@ export function ElectionVotePanel({
 }) {
     if (!canVote || !election.is_open) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground">
                 Voting is unavailable for this position.
             </div>
         );

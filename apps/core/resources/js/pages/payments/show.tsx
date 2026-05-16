@@ -149,7 +149,7 @@ export default function PaymentShow({
 
 function Detail({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-lg border bg-muted/20 p-3">
+        <div className="rounded-md border bg-muted/20 p-3">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 font-medium">{value}</p>
         </div>

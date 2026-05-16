@@ -5,7 +5,7 @@ import type { DocumentFile } from '../types';
 export function DocumentFileList({ files }: { files: DocumentFile[] }) {
     if (files.length === 0) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-center">
+            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-center">
                 <p className="text-sm font-medium">No files attached</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                     Attach at least one file before publishing.
@@ -15,7 +15,7 @@ export function DocumentFileList({ files }: { files: DocumentFile[] }) {
     }
 
     return (
-        <div className="divide-y rounded-lg border bg-card">
+        <div className="divide-y rounded-md border bg-card">
             {files.map((file) => (
                 <div
                     key={file.id}

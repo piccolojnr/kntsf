@@ -102,7 +102,7 @@ export default function PermitsIndex({
                 )}
 
                 {issuedPermitCode && (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+                    <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
                         <p className="font-medium">Permit code generated</p>
                         <p className="mt-1">
                             Code: <span className="font-mono">{issuedPermitCode}</span>
@@ -210,7 +210,7 @@ function OverviewTile({
     value: string;
 }) {
     return (
-        <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+        <div className="flex items-center gap-3 rounded-md border bg-card p-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
                 <Icon className="size-5" />
             </div>

@@ -75,7 +75,7 @@ export default function ShowPermit({
                 </div>
 
                 {issuedPermitCode && (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+                    <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
                         <p className="font-medium">One-time permit code</p>
                         <p className="mt-1">
                             Code:{' '}
@@ -239,7 +239,7 @@ function Detail({
     children?: React.ReactNode;
 }) {
     return (
-        <div className="rounded-lg border p-4">
+        <div className="rounded-md border p-4">
             <p className="text-xs text-muted-foreground">{label}</p>
             <div className="mt-1 text-sm font-medium">
                 {children ?? value ?? 'Not provided'}

@@ -41,7 +41,7 @@ export default function ErrorPage({ status }: { status: number }) {
         <>
             <Head title={`${status} ${details.title}`} />
             <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12 text-foreground">
-                <section className="w-full max-w-lg rounded-lg border bg-card p-8 shadow-sm">
+                <section className="w-full max-w-lg rounded-md border bg-card p-8 shadow-sm">
                     <div className="flex size-12 items-center justify-center rounded-md border bg-muted">
                         <AlertTriangle className="size-6 text-muted-foreground" />
                     </div>

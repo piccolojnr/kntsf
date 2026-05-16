@@ -25,7 +25,7 @@ export function ElectionVotingWorkspace({
 
     if (!canVote || !election.is_open) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                 Voting is unavailable for this election.
             </div>
         );
@@ -33,7 +33,7 @@ export function ElectionVotingWorkspace({
 
     if (!activePosition) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                 No approved candidates are available yet.
             </div>
         );
@@ -41,7 +41,7 @@ export function ElectionVotingWorkspace({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 rounded-lg border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm font-medium">
                         Step {activeIndex + 1} of {votablePositions.length}
@@ -65,7 +65,7 @@ export function ElectionVotingWorkspace({
                 </div>
             </div>
 
-            <div className="rounded-lg border bg-card p-4">
+            <div className="rounded-md border bg-card p-4">
                 <div className="mb-4">
                     <p className="font-medium">{activePosition.title}</p>
                     <p className="text-sm text-muted-foreground">
