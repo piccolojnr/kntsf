@@ -113,18 +113,14 @@ img {
 }
 
 .brand-mark {
-    background-color: #17211b;
+    background-color: #fffaf0;
     border-radius: 6px;
     box-shadow: 5px 5px 0 #d8a329;
-    color: #fffaf0;
     display: inline-block;
-    font-size: 13px;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    line-height: 42px;
     margin-bottom: 16px;
-    text-align: center;
+    object-fit: cover;
     width: 42px;
+    height: 42px;
 }
 
 .brand-name {

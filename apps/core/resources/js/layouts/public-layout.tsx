@@ -2,7 +2,6 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     ChevronRight,
-    Landmark,
     LogIn,
     Menu,
     ShieldCheck,
@@ -10,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
+import AppLogoIcon from '@/components/app/app-logo-icon';
 import { dashboard, home, login } from '@/routes';
 import { index as announcementsIndex } from '@/routes/public/announcements';
 import { index as documentsIndex } from '@/routes/public/documents';
@@ -48,8 +48,8 @@ export default function PublicLayout({ children }: PropsWithChildren) {
             <header className="sticky top-0 z-40 border-b border-app-border bg-app-page/92 backdrop-blur-xl">
                 <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 md:px-8">
                     <Link href={home()} className="group flex items-center gap-3">
-                        <div className="grid size-11 place-items-center rounded-md border border-app-ink bg-app-ink text-app-surface shadow-[5px_5px_0_var(--app-brass)] transition group-hover:-translate-y-0.5 dark:border-app-surface dark:bg-app-surface dark:text-app-ink">
-                            <Landmark className="size-5" />
+                        <div className="grid size-11 place-items-center overflow-hidden rounded-md border border-app-ink bg-app-ink text-app-surface shadow-[5px_5px_0_var(--app-brass)] transition group-hover:-translate-y-0.5 dark:border-app-surface dark:bg-app-surface dark:text-app-ink">
+                            <AppLogoIcon className="size-full object-cover" />
                         </div>
                         <div className="leading-tight">
                             <span className="block text-base font-black tracking-normal">
