@@ -43,19 +43,19 @@ export default function PublicLayout({ children }: PropsWithChildren) {
     const ctaLabel = auth.user ? 'Dashboard' : 'Staff Login';
 
     return (
-        <div className="min-h-screen bg-[#f7f0df] text-[#17211b] selection:bg-[#d8a329] selection:text-[#17211b] dark:bg-[#0b100d] dark:text-[#f5ead2]">
+        <div className="public-page">
             <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.035] [background-image:radial-gradient(#17211b_1px,transparent_1px)] [background-size:14px_14px] dark:opacity-[0.08] dark:[background-image:radial-gradient(#f5ead2_1px,transparent_1px)]" />
-            <header className="sticky top-0 z-40 border-b border-[#1f2a24]/10 bg-[#f7f0df]/92 backdrop-blur-xl dark:border-white/10 dark:bg-[#0b100d]/92">
+            <header className="sticky top-0 z-40 border-b border-app-border bg-app-page/92 backdrop-blur-xl">
                 <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 md:px-8">
                     <Link href={home()} className="group flex items-center gap-3">
-                        <div className="grid size-11 place-items-center border border-[#17211b] bg-[#17211b] text-[#f5ead2] shadow-[5px_5px_0_#d8a329] transition group-hover:-translate-y-0.5 dark:border-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
+                        <div className="grid size-11 place-items-center rounded-md border border-app-ink bg-app-ink text-app-surface shadow-[5px_5px_0_var(--app-brass)] transition group-hover:-translate-y-0.5 dark:border-app-surface dark:bg-app-surface dark:text-app-ink">
                             <Landmark className="size-5" />
                         </div>
                         <div className="leading-tight">
                             <span className="block text-base font-black tracking-normal">
                                 Knutsford SRC
                             </span>
-                            <span className="block text-[10px] font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                            <span className="block text-[10px] font-black uppercase tracking-[0.24em] text-app-red">
                                 Public portal
                             </span>
                         </div>
@@ -68,26 +68,26 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 href={item.href}
                                 className={`relative px-3 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${
                                     isActive(item.url)
-                                        ? 'text-[#b7352d]'
-                                        : 'text-[#566157] hover:text-[#17211b] dark:text-[#b8c3b8] dark:hover:text-[#f5ead2]'
+                                        ? 'text-app-red'
+                                        : 'text-app-muted hover:text-app-ink'
                                 }`}
                             >
                                 {item.label}
                                 {isActive(item.url) && (
-                                    <span className="absolute inset-x-3 -bottom-1 h-1 bg-[#d8a329]" />
+                                    <span className="absolute inset-x-3 -bottom-1 h-1 rounded-full bg-app-brass" />
                                 )}
                             </Link>
                         ))}
                     </nav>
 
                     <div className="hidden items-center gap-3 md:flex">
-                        <div className="hidden items-center gap-2 border border-[#1f2a24]/10 bg-[#fffaf0] px-3 py-2 text-xs font-bold text-[#566157] xl:flex dark:border-white/10 dark:bg-[#111712] dark:text-[#b8c3b8]">
-                            <ShieldCheck className="size-4 text-[#0f5b45] dark:text-[#d8a329]" />
+                        <div className="hidden items-center gap-2 rounded-md border border-app-border bg-app-surface px-3 py-2 text-xs font-bold text-app-muted xl:flex">
+                            <ShieldCheck className="size-4 text-app-teal dark:text-app-brass" />
                             Official SRC information
                         </div>
                         <Link
                             href={ctaHref}
-                            className="inline-flex items-center gap-2 bg-[#17211b] px-4 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-[#f5ead2] transition hover:bg-[#b7352d] dark:bg-[#f5ead2] dark:text-[#17211b] dark:hover:bg-[#d8a329]"
+                            className="public-action"
                         >
                             <LogIn className="size-4" />
                             {ctaLabel}
@@ -96,7 +96,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
 
                     <button
                         type="button"
-                        className="grid size-11 place-items-center border border-[#17211b]/20 bg-[#fffaf0] text-[#17211b] md:hidden dark:border-white/10 dark:bg-[#111712] dark:text-[#f5ead2]"
+                        className="grid size-11 place-items-center rounded-md border border-app-border bg-app-surface text-app-ink md:hidden"
                         onClick={() => setOpen((value) => !value)}
                         aria-label="Toggle menu"
                     >
@@ -105,16 +105,16 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                 </div>
 
                 {open && (
-                    <div className="border-t border-[#1f2a24]/10 bg-[#f7f0df] px-5 py-4 md:hidden dark:border-white/10 dark:bg-[#0b100d]">
+                    <div className="border-t border-app-border bg-app-page px-5 py-4 md:hidden">
                         <nav className="grid gap-2">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className={`flex items-center justify-between border px-4 py-3 text-sm font-black uppercase tracking-[0.14em] ${
+                                    className={`flex items-center justify-between rounded-md border px-4 py-3 text-sm font-black uppercase tracking-[0.14em] ${
                                         isActive(item.url)
-                                            ? 'border-[#b7352d] bg-[#b7352d] text-white'
-                                            : 'border-[#1f2a24]/10 bg-[#fffaf0] text-[#17211b] dark:border-white/10 dark:bg-[#111712] dark:text-[#f5ead2]'
+                                            ? 'border-app-red bg-app-red text-white'
+                                            : 'border-app-border bg-app-surface text-app-ink'
                                     }`}
                                     onClick={() => setOpen(false)}
                                 >
@@ -124,7 +124,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                             ))}
                             <Link
                                 href={ctaHref}
-                                className="mt-2 flex items-center justify-between bg-[#17211b] px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#f5ead2]"
+                                className="mt-2 flex items-center justify-between rounded-md bg-app-ink px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-app-surface"
                                 onClick={() => setOpen(false)}
                             >
                                 {ctaLabel}
@@ -137,21 +137,21 @@ export default function PublicLayout({ children }: PropsWithChildren) {
 
             <main className="relative z-10">{children}</main>
 
-            <footer className="relative z-10 mt-20 border-t border-[#1f2a24]/10 bg-[#17211b] text-[#f5ead2] dark:border-white/10">
+            <footer className="relative z-10 mt-20 border-t border-app-border bg-app-ink text-app-surface">
                 <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:grid-cols-[1fr_auto_auto] md:px-8">
                     <div className="max-w-md">
                         <div className="flex items-center gap-3">
-                            <div className="grid size-10 place-items-center border border-[#f5ead2]/30">
-                                <BookOpen className="size-5 text-[#d8a329]" />
+                            <div className="grid size-10 place-items-center rounded-md border border-app-surface/30">
+                                <BookOpen className="size-5 text-app-brass" />
                             </div>
                             <div>
                                 <p className="font-black">Knutsford SRC</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-app-brass">
                                     Student voice, public record
                                 </p>
                             </div>
                         </div>
-                        <p className="mt-5 text-sm leading-6 text-[#c9c0aa]">
+                        <p className="mt-5 text-sm leading-6 text-app-surface/75">
                             Official announcements, events, documents, leadership
                             profiles, and election information from the Student
                             Representative Council.
@@ -159,7 +159,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                     </div>
 
                     <div>
-                        <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                        <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-app-brass">
                             Portal
                         </p>
                         <ul className="grid gap-2">
@@ -167,7 +167,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 <li key={item.label}>
                                     <Link
                                         href={item.href}
-                                        className="text-sm font-semibold text-[#c9c0aa] transition hover:text-[#f5ead2]"
+                                        className="text-sm font-semibold text-app-surface/75 transition hover:text-app-surface"
                                     >
                                         {item.label}
                                     </Link>
@@ -177,19 +177,19 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                     </div>
 
                     <div>
-                        <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                        <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-app-brass">
                             Access
                         </p>
                         <Link
                             href={ctaHref}
-                            className="inline-flex items-center gap-2 border border-[#f5ead2]/20 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-[#f5ead2] transition hover:bg-[#f5ead2] hover:text-[#17211b]"
+                            className="inline-flex items-center gap-2 rounded-md border border-app-surface/20 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-app-surface transition hover:bg-app-surface hover:text-app-ink"
                         >
                             {ctaLabel}
                             <ChevronRight className="size-4" />
                         </Link>
                     </div>
                 </div>
-                <div className="border-t border-[#f5ead2]/10 px-5 py-5 text-center text-xs font-semibold text-[#9f967f]">
+                <div className="border-t border-app-surface/10 px-5 py-5 text-center text-xs font-semibold text-app-surface/55">
                     © {new Date().getFullYear()} Knutsford University SRC.
                 </div>
             </footer>

@@ -56,18 +56,18 @@ export default function PublicHome({
                 />
             </Head>
 
-            <section className="relative overflow-hidden border-b border-[#1f2a24]/10 bg-[#efe3c6] dark:border-white/10 dark:bg-[#111712]">
+            <section className="relative overflow-hidden border-b border-app-border bg-app-surface-muted">
                 <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,#17211b_1px,transparent_1px),linear-gradient(#17211b_1px,transparent_1px)] [background-size:44px_44px]" />
                 <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-end gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="pb-6">
-                        <p className="inline-flex items-center gap-2 border border-[#17211b]/15 bg-[#fffaf0] px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-[#b7352d] dark:border-white/10 dark:bg-[#0b100d]">
+                        <p className="inline-flex items-center gap-2 rounded-md border border-app-border bg-app-surface px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-app-red">
                             <Landmark className="size-4" />
                             Knutsford University
                         </p>
-                        <h1 className="mt-7 max-w-4xl text-6xl font-black leading-[0.88] tracking-normal text-[#17211b] dark:text-[#f5ead2] md:text-8xl">
+                        <h1 className="mt-7 max-w-4xl text-6xl font-black leading-[0.88] tracking-normal text-app-ink md:text-8xl">
                             SRC public record.
                         </h1>
-                        <p className="mt-7 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                        <p className="mt-7 max-w-2xl text-lg leading-8 text-app-muted">
                             Official notices, campus programmes, public documents,
                             leadership profiles, and election information in one
                             civic portal built for students.
@@ -79,18 +79,18 @@ export default function PublicHome({
                     </div>
 
                     <div className="pb-6">
-                        <div className="border border-[#17211b] bg-[#17211b] p-5 text-[#f5ead2] shadow-[14px_14px_0_#d8a329]">
-                            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                        <div className="rounded-md border border-app-ink bg-app-ink p-5 text-app-surface shadow-[14px_14px_0_var(--app-brass)]">
+                            <p className="text-xs font-black uppercase tracking-[0.24em] text-app-brass">
                                 Portal count
                             </p>
-                            <div className="mt-6 grid grid-cols-2 gap-px bg-[#f5ead2]/15">
+                            <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-md bg-app-surface/15">
                                 <Metric icon={<Bell />} label="Announcements" value={announcementItems.length} />
                                 <Metric icon={<CalendarDays />} label="Events" value={eventItems.length} />
                                 <Metric icon={<FileText />} label="Documents" value={documentItems.length} />
                                 <Metric icon={<Vote />} label="Elections" value={electionItems.length} />
                             </div>
-                            <div className="mt-6 border-t border-[#f5ead2]/15 pt-5">
-                                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#d8a329]">
+                            <div className="mt-6 border-t border-app-surface/15 pt-5">
+                                <p className="text-xs font-black uppercase tracking-[0.24em] text-app-brass">
                                     Featured notice
                                 </p>
                                 <p className="mt-3 text-2xl font-black leading-tight">
@@ -150,10 +150,10 @@ export default function PublicHome({
                 </PublicSection>
 
                 {executiveItems.length > 0 && (
-                    <section className="border-y border-[#1f2a24]/10 py-12 dark:border-white/10">
+                    <section className="border-y border-app-border py-12">
                         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                             <div>
-                                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                                <p className="public-kicker">
                                     Leadership
                                 </p>
                                 <h2 className="mt-2 text-4xl font-black tracking-normal">
@@ -162,7 +162,7 @@ export default function PublicHome({
                             </div>
                             <Link
                                 href="/executives/public"
-                                className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                                className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-app-teal dark:text-app-brass"
                             >
                                 View all
                                 <ArrowRight className="size-4" />
@@ -172,7 +172,7 @@ export default function PublicHome({
                             {executiveItems.map((executive) => (
                                 <article
                                     key={executive.id}
-                                    className="border border-[#1f2a24]/10 bg-[#fffaf0] p-4 dark:border-white/10 dark:bg-[#111712]"
+                                    className="public-panel p-4"
                                 >
                                     <div className="flex items-center gap-4">
                                         <Avatar executive={executive} />
@@ -180,7 +180,7 @@ export default function PublicHome({
                                             <p className="truncate font-black">
                                                 {executive.name}
                                             </p>
-                                            <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-[#b7352d]">
+                                            <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-app-red">
                                                 {executive.position}
                                             </p>
                                         </div>
@@ -262,10 +262,10 @@ function PortalLink({
     return (
         <Link
             href={href}
-            className={`inline-flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
+            className={`inline-flex items-center gap-2 rounded-md px-5 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
                 variant === 'dark'
-                    ? 'bg-[#17211b] text-[#f5ead2] hover:bg-[#b7352d]'
-                    : 'border border-[#17211b]/20 bg-[#fffaf0] text-[#17211b] hover:border-[#b7352d] dark:border-white/10 dark:bg-[#111712] dark:text-[#f5ead2]'
+                    ? 'bg-app-ink text-app-surface hover:bg-app-red'
+                    : 'border border-app-border bg-app-surface text-app-ink hover:border-app-red'
             }`}
         >
             {label}
@@ -284,10 +284,10 @@ function Metric({
     value: number;
 }) {
     return (
-        <div className="bg-[#17211b] p-4">
-            <div className="mb-4 text-[#d8a329] [&_svg]:size-5">{icon}</div>
+        <div className="bg-app-ink p-4">
+            <div className="mb-4 text-app-brass [&_svg]:size-5">{icon}</div>
             <p className="text-4xl font-black">{value}</p>
-            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#c9c0aa]">
+            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-app-surface/75">
                 {label}
             </p>
         </div>
@@ -315,7 +315,7 @@ function PublicSection({
         <section>
             <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                    <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                    <p className="public-kicker">
                         {kicker}
                     </p>
                     <h2 className="mt-2 text-4xl font-black leading-none tracking-normal md:text-5xl">
@@ -324,7 +324,7 @@ function PublicSection({
                 </div>
                 <Link
                     href={href}
-                    className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                    className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-app-teal dark:text-app-brass"
                 >
                     View all
                     <ArrowRight className="size-4" />
@@ -343,7 +343,7 @@ function PublicSection({
 
 function Avatar({ executive }: { executive: ExecutiveSummary }) {
     return (
-        <div className="grid size-14 shrink-0 place-items-center overflow-hidden border border-[#1f2a24]/15 bg-[#efe3c6] dark:border-white/10 dark:bg-[#1b241d]">
+        <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-md border border-app-border bg-app-surface-muted">
             {executive.avatar_url ? (
                 <img
                     src={executive.avatar_url}
@@ -351,7 +351,7 @@ function Avatar({ executive }: { executive: ExecutiveSummary }) {
                     className="size-full object-cover"
                 />
             ) : (
-                <Users className="size-6 text-[#0f5b45] dark:text-[#d8a329]" />
+                <Users className="size-6 text-app-teal dark:text-app-brass" />
             )}
         </div>
     );

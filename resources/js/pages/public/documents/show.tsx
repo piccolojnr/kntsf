@@ -24,7 +24,7 @@ export default function PublicDocumentShow({
             <article className="mx-auto w-full max-w-7xl px-5 py-12 md:px-8">
                 <Link
                     href={index()}
-                    className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                    className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-app-teal dark:text-app-brass"
                 >
                     <ArrowLeft className="size-4" />
                     All documents
@@ -34,12 +34,12 @@ export default function PublicDocumentShow({
                     <div>
                         <div className="mb-5 flex flex-wrap items-center gap-3">
                             {document.category && (
-                                <span className="bg-[#17211b] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
+                                <span className="rounded-md bg-app-ink px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-app-surface dark:bg-app-surface dark:text-app-ink">
                                     {document.category}
                                 </span>
                             )}
                             {document.published_at && (
-                                <span className="text-xs font-black uppercase tracking-[0.22em] text-[#596257] dark:text-[#b8c3b8]">
+                                <span className="text-xs font-black uppercase tracking-[0.22em] text-app-muted">
                                     {formatPublicDate(document.published_at, true)}
                                 </span>
                             )}
@@ -48,12 +48,12 @@ export default function PublicDocumentShow({
                             {document.title}
                         </h1>
                         {document.excerpt && (
-                            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                            <p className="mt-6 max-w-2xl text-lg leading-8 text-app-muted">
                                 {document.excerpt}
                             </p>
                         )}
                         {document.description && (
-                            <div className="mt-10 max-w-3xl border-t border-[#1f2a24]/10 pt-8 dark:border-white/10">
+                            <div className="mt-10 max-w-3xl border-t border-app-border pt-8">
                                 <RichTextViewer
                                     value={document.description}
                                     emptyText="No description provided."
@@ -63,14 +63,14 @@ export default function PublicDocumentShow({
                     </div>
 
                     <aside className="lg:pt-10">
-                        <div className="border border-[#17211b] bg-[#fffaf0] p-5 shadow-[10px_10px_0_#d8a329] dark:border-white/10 dark:bg-[#111712]">
+                        <div className="public-panel p-5 shadow-[10px_10px_0_var(--app-brass)]">
                             <div className="mb-5 flex items-center gap-3">
-                                <div className="grid size-12 place-items-center bg-[#17211b] text-[#f5ead2]">
+                                <div className="grid size-12 place-items-center rounded-md bg-app-ink text-app-surface">
                                     <FileText className="size-6" />
                                 </div>
                                 <div>
                                     <p className="font-black">Attachments</p>
-                                    <p className="text-xs font-semibold text-[#596257] dark:text-[#b8c3b8]">
+                                    <p className="text-xs font-semibold text-app-muted">
                                         {document.files.length} public file
                                         {document.files.length === 1 ? '' : 's'}
                                     </p>
@@ -81,18 +81,18 @@ export default function PublicDocumentShow({
                                 {document.files.map((file) => (
                                     <div
                                         key={file.id}
-                                        className="border border-[#1f2a24]/10 bg-[#f7f0df] p-3 dark:border-white/10 dark:bg-[#0b100d]"
+                                        className="rounded-md border border-app-border bg-app-surface-muted p-3"
                                     >
                                         <p className="break-words text-sm font-black">
                                             {file.file_name}
                                         </p>
-                                        <p className="mt-1 text-xs font-semibold text-[#596257] dark:text-[#b8c3b8]">
+                                        <p className="mt-1 text-xs font-semibold text-app-muted">
                                             {file.human_size}
                                         </p>
                                         <Button
                                             asChild
                                             size="sm"
-                                            className="mt-3 w-full rounded-none bg-[#b7352d] text-white hover:bg-[#17211b]"
+                                            className="mt-3 w-full rounded-md bg-app-red text-white hover:bg-app-ink"
                                         >
                                             <a
                                                 href={file.url}
