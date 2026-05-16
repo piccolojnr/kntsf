@@ -103,9 +103,9 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
             <Head title="Reports" />
 
             <div className="min-h-full min-w-0 bg-[#f7f2e8] p-4 text-[#17211b] dark:bg-[#080d0a] dark:text-[#f6ead6] md:p-6">
-                <section className="grid min-w-0 gap-5 overflow-hidden border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
+                <section className="grid min-w-0 gap-5 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
                     <div className="min-w-0">
-                        <p className="inline-flex items-center gap-2 bg-[#17211b] px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#f6ead6] dark:bg-[#f6ead6] dark:text-[#17211b]">
+                        <p className="inline-flex items-center gap-2 rounded-md bg-[#17211b] px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#f6ead6] dark:bg-[#f6ead6] dark:text-[#17211b]">
                             <FileText className="size-4" />
                             Operational reporting
                         </p>
@@ -137,7 +137,7 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
                     </div>
                 </section>
 
-                <section className="mt-5 min-w-0 overflow-hidden border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
+                <section className="mt-5 min-w-0 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
                     <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
                             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#b45309]">
@@ -241,11 +241,11 @@ function ReportPanel({
     };
 
     return (
-        <article className="min-w-0 overflow-hidden border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
+        <article className="min-w-0 overflow-hidden rounded-md border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
             <header className="flex flex-col gap-4 border-b border-[#17211b]/10 p-5 dark:border-white/10 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 gap-4">
                     <div
-                        className="grid size-12 shrink-0 place-items-center text-white"
+                        className="grid size-12 shrink-0 place-items-center rounded-md text-white"
                         style={{ backgroundColor: group.color }}
                     >
                         <Icon className="size-5" />
@@ -322,7 +322,7 @@ function ReportPanel({
                     {group.entries.map(([label, value]) => (
                         <div
                             key={label}
-                            className="min-w-0 border border-[#17211b]/10 bg-[#f7f2e8] p-3 dark:border-white/10 dark:bg-[#0a100d]"
+                            className="min-w-0 rounded-md border border-[#17211b]/10 bg-[#f7f2e8] p-3 dark:border-white/10 dark:bg-[#0a100d]"
                         >
                             <div className="flex min-w-0 items-center justify-between gap-3">
                                 <p className="min-w-0 truncate text-xs font-black uppercase tracking-[0.14em] text-[#5c655b] dark:text-[#bcc7bc]">
@@ -332,9 +332,9 @@ function ReportPanel({
                                     {value}
                                 </p>
                             </div>
-                            <div className="mt-3 h-2 bg-[#e5dcc9] dark:bg-[#1f2b22]">
+                            <div className="mt-3 h-2 rounded-full bg-[#e5dcc9] dark:bg-[#1f2b22]">
                                 <div
-                                    className="h-full"
+                                    className="h-full rounded-full"
                                     style={{
                                         width: `${percent(value, Math.max(group.total, highestTotal))}%`,
                                         backgroundColor: group.color,
@@ -359,7 +359,7 @@ function OverviewStat({
     icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <div className="border border-[#17211b]/10 bg-[#f7f2e8] p-4 dark:border-white/10 dark:bg-[#0a100d]">
+        <div className="rounded-md border border-[#17211b]/10 bg-[#f7f2e8] p-4 dark:border-white/10 dark:bg-[#0a100d]">
             <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#5c655b] dark:text-[#bcc7bc]">
                     {label}

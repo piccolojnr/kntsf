@@ -2,8 +2,6 @@
 
 @import 'tw-animate-css';
 
-@import "tw-animate-css";
-
 @import "shadcn/tailwind.css";
 
 @import "@fontsource-variable/montserrat";
@@ -65,108 +63,127 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-app-page: var(--app-page);
+    --color-app-surface: var(--app-surface);
+    --color-app-surface-muted: var(--app-surface-muted);
+    --color-app-ink: var(--app-ink);
+    --color-app-muted: var(--app-muted);
+    --color-app-brass: var(--app-brass);
+    --color-app-teal: var(--app-teal);
+    --color-app-red: var(--app-red);
+    --color-app-border: var(--app-border);
 }
 
 :root {
     --background:
-        oklch(1 0 0);
+        #f7f2e8;
     --foreground:
-        oklch(0.147 0.004 49.3);
+        #17211b;
     --card:
-        oklch(1 0 0);
+        #fffaf0;
     --card-foreground:
-        oklch(0.147 0.004 49.3);
+        #17211b;
     --popover:
-        oklch(1 0 0);
+        #fffaf0;
     --popover-foreground:
-        oklch(0.147 0.004 49.3);
+        #17211b;
     --primary:
-        oklch(0.511 0.096 186.391);
+        #0f766e;
     --primary-foreground:
-        oklch(0.984 0.014 180.72);
+        #f6ead6;
     --secondary:
-        oklch(0.967 0.001 286.375);
+        #eee4d2;
     --secondary-foreground:
-        oklch(0.21 0.006 285.885);
+        #17211b;
     --muted:
-        oklch(0.96 0.002 17.2);
+        #efe6d6;
     --muted-foreground:
-        oklch(0.547 0.021 43.1);
+        #5c655b;
     --accent:
-        oklch(0.511 0.096 186.391);
+        #d8a329;
     --accent-foreground:
-        oklch(0.984 0.014 180.72);
+        #17211b;
     --destructive:
-        oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
+        #b7352d;
+    --destructive-foreground: #fffaf0;
     --border:
-        oklch(0.922 0.005 34.3);
+        rgb(23 33 27 / 10%);
     --input:
-        oklch(0.922 0.005 34.3);
+        rgb(23 33 27 / 14%);
     --ring:
-        oklch(0.714 0.014 41.2);
+        #d8a329;
     --chart-1:
-        oklch(0.808 0.114 19.571);
+        #0f766e;
     --chart-2:
-        oklch(0.637 0.237 25.331);
+        #b45309;
     --chart-3:
-        oklch(0.577 0.245 27.325);
+        #0369a1;
     --chart-4:
-        oklch(0.505 0.213 27.518);
+        #15803d;
     --chart-5:
-        oklch(0.444 0.177 26.899);
+        #b91c1c;
     --radius:
-        0.625rem;
+        0.5rem;
     --sidebar:
-        oklch(0.986 0.002 67.8);
+        #17211b;
     --sidebar-foreground:
-        oklch(0.147 0.004 49.3);
+        #f6ead6;
     --sidebar-primary:
-        oklch(0.6 0.118 184.704);
+        #d8a329;
     --sidebar-primary-foreground:
-        oklch(0.984 0.014 180.72);
+        #17211b;
     --sidebar-accent:
-        oklch(0.96 0.002 17.2);
+        rgb(246 234 214 / 10%);
     --sidebar-accent-foreground:
-        oklch(0.214 0.009 43.1);
+        #fffaf0;
     --sidebar-border:
-        oklch(0.922 0.005 34.3);
+        rgb(246 234 214 / 12%);
     --sidebar-ring:
-        oklch(0.714 0.014 41.2);
+        #d8a329;
+    --app-page: #f7f2e8;
+    --app-surface: #fffaf0;
+    --app-surface-muted: #efe6d6;
+    --app-ink: #17211b;
+    --app-muted: #5c655b;
+    --app-brass: #d8a329;
+    --app-teal: #0f766e;
+    --app-red: #b7352d;
+    --app-border: rgb(23 33 27 / 10%);
 }
 
 .dark {
     --background:
-        oklch(0.147 0.004 49.3);
+        #080d0a;
     --foreground:
-        oklch(0.986 0.002 67.8);
+        #f6ead6;
     --card:
-        oklch(0.214 0.009 43.1);
+        #111712;
     --card-foreground:
-        oklch(0.986 0.002 67.8);
+        #f6ead6;
     --popover:
-        oklch(0.214 0.009 43.1);
+        #111712;
     --popover-foreground:
-        oklch(0.986 0.002 67.8);
+        #f6ead6;
     --primary:
-        oklch(0.437 0.078 188.216);
+        #7fb99f;
     --primary-foreground:
-        oklch(0.984 0.014 180.72);
+        #08100c;
     --secondary:
-        oklch(0.274 0.006 286.033);
+        #1f2b22;
     --secondary-foreground:
-        oklch(0.985 0 0);
+        #f6ead6;
     --muted:
-        oklch(0.268 0.011 36.5);
+        #1f2b22;
     --muted-foreground:
-        oklch(0.714 0.014 41.2);
+        #bcc7bc;
     --accent:
-        oklch(0.437 0.078 188.216);
+        #d8a329;
     --accent-foreground:
-        oklch(0.984 0.014 180.72);
+        #17211b;
     --destructive:
-        oklch(0.704 0.191 22.216);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
+        #e0584f;
+    --destructive-foreground: #fffaf0;
     --border:
         oklch(1 0 0 / 10%);
     --input:
@@ -184,21 +201,30 @@
     --chart-5:
         oklch(0.444 0.177 26.899);
     --sidebar:
-        oklch(0.214 0.009 43.1);
+        #0a100d;
     --sidebar-foreground:
-        oklch(0.986 0.002 67.8);
+        #f6ead6;
     --sidebar-primary:
-        oklch(0.704 0.14 182.503);
+        #d8a329;
     --sidebar-primary-foreground:
-        oklch(0.277 0.046 192.524);
+        #17211b;
     --sidebar-accent:
-        oklch(0.268 0.011 36.5);
+        rgb(246 234 214 / 10%);
     --sidebar-accent-foreground:
-        oklch(0.986 0.002 67.8);
+        #fffaf0;
     --sidebar-border:
         oklch(1 0 0 / 10%);
     --sidebar-ring:
         oklch(0.547 0.021 43.1);
+    --app-page: #080d0a;
+    --app-surface: #111712;
+    --app-surface-muted: #0a100d;
+    --app-ink: #f6ead6;
+    --app-muted: #bcc7bc;
+    --app-brass: #d8a329;
+    --app-teal: #7fb99f;
+    --app-red: #e0584f;
+    --app-border: rgb(255 255 255 / 10%);
 }
 
 @layer base {
@@ -207,41 +233,68 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-app-page text-app-ink;
     }
-  button:not(:disabled), [role="button"]:not(:disabled) {
-    cursor:
-        pointer;
+
+    button:not(:disabled), [role="button"]:not(:disabled) {
+        cursor: pointer;
     }
-  html {
-    @apply font-sans;
+
+    html {
+        @apply font-sans;
     }
 
 
   /* For WebKit browsers (Chrome, Safari) */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
 
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
 
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--foreground) / 0.3);
-    border-radius: 9999px;
-  }
+    ::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--app-ink) 28%, transparent);
+        border-radius: 9999px;
+    }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--foreground) / 0.5);
-  }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: color-mix(in srgb, var(--app-ink) 42%, transparent);
+    }
 
-  /* For Firefox */
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--foreground) / 0.3) transparent;
-  }
+    /* For Firefox */
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in srgb, var(--app-ink) 30%, transparent) transparent;
+    }
+}
+
+@layer components {
+    .app-page {
+        @apply min-h-full min-w-0 bg-app-page text-app-ink;
+    }
+
+    .app-shell-surface {
+        @apply bg-app-page text-app-ink;
+    }
+
+    .app-panel {
+        @apply rounded-md border border-app-border bg-app-surface shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:shadow-none;
+    }
+
+    .app-panel-muted {
+        @apply rounded-md border border-app-border bg-app-surface-muted;
+    }
+
+    .app-kicker {
+        @apply text-xs font-black uppercase tracking-[0.18em] text-app-red;
+    }
+
+    .app-muted {
+        @apply text-app-muted;
+    }
 }
 
 @theme inline {

@@ -42,7 +42,7 @@ type Props = {
 };
 
 const activeItemStyles =
-    'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
+    'bg-app-surface-muted text-app-ink dark:bg-app-surface-muted dark:text-app-ink';
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedPageProps>();
@@ -57,7 +57,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
     return (
         <>
-            <div className="border-b border-sidebar-border/80">
+            <div className="border-b border-app-border bg-app-page/90 backdrop-blur">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
@@ -73,7 +73,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </SheetTrigger>
                             <SheetContent
                                 side="left"
-                                className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar"
+                            className="flex h-full w-72 flex-col items-stretch justify-between bg-sidebar text-sidebar-foreground"
                             >
                                 <SheetTitle className="sr-only">
                                     Navigation menu
@@ -88,7 +88,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
-                                                    className="flex items-center space-x-2 font-medium"
+                                                    className="flex items-center space-x-2 rounded-md px-3 py-2 font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                                 >
                                                     {item.icon && (
                                                         <item.icon className="h-5 w-5" />
@@ -106,7 +106,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                         href={toUrl(item.href)}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center space-x-2 font-medium"
+                                                        className="flex items-center space-x-2 rounded-md px-3 py-2 font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                                     >
                                                         {item.icon && (
                                                             <item.icon className="h-5 w-5" />
@@ -149,7 +149,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     item.href,
                                                     activeItemStyles,
                                                 ),
-                                                'h-9 cursor-pointer px-3',
+                                                'h-9 cursor-pointer rounded-md px-3',
                                             )}
                                         >
                                             {item.icon && (
@@ -158,7 +158,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             {item.title}
                                         </Link>
                                         {isCurrentUrl(item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-app-brass"></div>
                                         )}
                                     </NavigationMenuItem>
                                 ))}
@@ -227,7 +227,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 </div>
             </div>
             {breadcrumbs.length > 1 && (
-                <div className="flex w-full border-b border-sidebar-border/70">
+                <div className="flex w-full border-b border-app-border bg-app-page/80">
                     <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
