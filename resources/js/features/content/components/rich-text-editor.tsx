@@ -27,7 +27,7 @@ export function RichTextEditor({
     }, [value]);
 
     return (
-        <div className="overflow-hidden rounded-lg border bg-background">
+        <div className="overflow-hidden rounded-md border bg-background">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-3 py-2">
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <AlignLeft className="size-4" />

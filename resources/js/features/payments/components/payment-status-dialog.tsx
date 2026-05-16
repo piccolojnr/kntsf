@@ -111,7 +111,7 @@ export function PaymentStatusDialog({
                                         <InputError message={errors.academic_period_id} />
                                     </div>
 
-                                    <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-3">
+                                    <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
                                         <input
                                             type="hidden"
                                             name="issue_permit"

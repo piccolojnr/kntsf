@@ -8,7 +8,7 @@ export function VerificationLogList({
 }) {
     if (logs.data.length === 0) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-10 text-center">
+            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
                 <p className="text-sm font-medium">No verification logs yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                     Attempts will appear here after manual verification starts.
@@ -18,7 +18,7 @@ export function VerificationLogList({
     }
 
     return (
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="overflow-hidden rounded-md border bg-card">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[920px] text-sm">
                     <thead className="border-b bg-muted/40 text-xs text-muted-foreground">

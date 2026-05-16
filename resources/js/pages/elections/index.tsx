@@ -46,7 +46,7 @@ export default function ElectionsIndex({
                 </div>
                 <Card>
                     <CardContent className="p-4">
-                        <div className="divide-y rounded-lg border">
+                        <div className="divide-y rounded-md border">
                             {elections.data.map((election) => (
                                 <Link
                                     key={election.id}
@@ -77,7 +77,7 @@ export default function ElectionsIndex({
 
 function Tile({ label, value }: { label: string; value: number }) {
     return (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-md border bg-card p-4">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 text-2xl font-semibold">{value}</p>
         </div>

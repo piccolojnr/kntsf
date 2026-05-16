@@ -28,7 +28,7 @@ export function MultipleFileUploadField({
     return (
         <div className="grid gap-2">
             <Label htmlFor={id}>{label}</Label>
-            <div className="rounded-lg border border-dashed bg-muted/20 p-3">
+            <div className="rounded-md border border-dashed bg-muted/20 p-3">
                 <div className="flex items-start gap-3 rounded-md bg-background p-3">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
                         <Icon className="size-5 text-muted-foreground" />

@@ -35,7 +35,7 @@ export function ImageUploadField({
     return (
         <div className="grid gap-2">
             <Label htmlFor={id}>{label}</Label>
-            <div className="rounded-lg border border-dashed bg-muted/20 p-3">
+            <div className="rounded-md border border-dashed bg-muted/20 p-3">
                 {previewUrl ? (
                     <div className="space-y-3">
                         <img

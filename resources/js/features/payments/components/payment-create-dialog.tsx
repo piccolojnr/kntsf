@@ -99,7 +99,7 @@ export function PaymentCreateDialog({ options }: { options: PaymentOptions }) {
                                 errors={errors}
                             />
 
-                            <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-3">
+                            <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
                                 <input type="hidden" name="issue_permit" value="0" />
                                 <Checkbox
                                     id="issue_permit"

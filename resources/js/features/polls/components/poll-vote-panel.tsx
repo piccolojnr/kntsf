@@ -10,7 +10,7 @@ import type { Poll } from '../types';
 export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean }) {
     if (!canVote) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                 Voting is available only to linked student accounts.
             </div>
         );
@@ -18,7 +18,7 @@ export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean 
 
     if (!poll.is_open) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                 This poll is not currently open for voting.
             </div>
         );

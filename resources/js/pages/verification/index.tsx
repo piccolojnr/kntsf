@@ -50,7 +50,7 @@ export default function VerificationIndex({
 
                 <VerificationResultCard result={result} />
 
-                <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
+                <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground">
                     <div className="flex gap-3">
                         <ShieldCheck className="mt-0.5 size-4 shrink-0" />
                         <p>

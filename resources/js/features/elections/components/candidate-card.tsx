@@ -3,7 +3,7 @@ import type { ElectionCandidate } from '../types';
 
 export function CandidateCard({ candidate }: { candidate: ElectionCandidate }) {
     return (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-md border bg-card p-4">
             <div className="flex items-start gap-3">
                 {candidate.poster_url ? (
                     <img

@@ -23,7 +23,7 @@ export function ElectionPositionList({
 }) {
     if (election.positions.length === 0) {
         return (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <div className="rounded-md border border-dashed bg-muted/20 p-8 text-center">
                 <p className="text-sm font-medium">No positions yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                     Add the first position before adding candidates or publishing
@@ -47,7 +47,7 @@ export function ElectionPositionList({
     return (
         <div className="space-y-4">
             {election.positions.map((position) => (
-                <div key={position.id} className="rounded-lg border bg-card p-4">
+                <div key={position.id} className="rounded-md border bg-card p-4">
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <p className="font-medium">{position.title}</p>
@@ -128,7 +128,7 @@ export function ElectionPositionList({
                         ))}
                     </div>
                     {position.candidates.length === 0 && (
-                        <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+                        <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                             No candidates added to this position yet.
                         </div>
                     )}

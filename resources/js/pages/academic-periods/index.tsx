@@ -72,7 +72,7 @@ export default function AcademicPeriodsIndex({
                     </CardHeader>
                     <CardContent className="border-t py-4">
                         {periods.length === 0 ? (
-                            <div className="rounded-lg border border-dashed bg-muted/20 p-10 text-center">
+                            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
                                 <CalendarDays className="mx-auto size-8 text-muted-foreground" />
                                 <p className="mt-3 text-sm font-medium">
                                     No academic periods yet
@@ -83,7 +83,7 @@ export default function AcademicPeriodsIndex({
                                 </p>
                             </div>
                         ) : (
-                            <div className="overflow-hidden rounded-lg border">
+                            <div className="overflow-hidden rounded-md border">
                                 <div className="w-full overflow-x-auto">
                                     <table className="w-full min-w-[760px] text-sm">
                                         <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
@@ -211,7 +211,7 @@ export default function AcademicPeriodsIndex({
 
 function OverviewTile({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-md border bg-card p-4">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 text-sm font-medium">{value}</p>
         </div>

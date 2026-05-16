@@ -113,19 +113,19 @@ export default function Dashboard({
     return (
         <>
             <Head title="Dashboard" />
-            <div className="min-h-full bg-[#f5f1e8] p-4 text-[#17211b] dark:bg-[#090e0b] dark:text-[#f5ead2] md:p-6">
-                <section className="relative overflow-hidden rounded-md border border-[#17211b]/10 bg-[#17211b] text-[#f5ead2] shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:border-white/10">
+            <div className="app-page p-4 md:p-6">
+                <section className="relative overflow-hidden rounded-md border border-app-border bg-app-ink text-app-surface shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:shadow-none">
                     <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,#f5ead2_1px,transparent_1px),linear-gradient(#f5ead2_1px,transparent_1px)] [background-size:36px_36px]" />
                     <div className="relative grid gap-8 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
                         <div>
-                            <p className="inline-flex items-center gap-2 bg-[#d8a329] px-3 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-[#17211b]">
+                            <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-app-ink">
                                 <Landmark className="size-4" />
                                 SRC control room
                             </p>
                             <h1 className="mt-6 max-w-4xl text-5xl font-black leading-[0.92] tracking-normal md:text-7xl">
                                 Operations overview
                             </h1>
-                            <p className="mt-5 max-w-2xl text-sm leading-7 text-[#cfc7b4]">
+                            <p className="mt-5 max-w-2xl text-sm leading-7 text-app-surface/75">
                                 Live working summary for student records, permits,
                                 NFC cards, payments, verification, content, and
                                 elections.
@@ -252,28 +252,28 @@ function CommandCard({
     meter: number;
 }) {
     const tones = {
-        emerald: 'bg-[#0f5b45]',
-        amber: 'bg-[#d8a329]',
-        cyan: 'bg-[#1f6b83]',
-        rose: 'bg-[#b7352d]',
+        emerald: 'bg-app-teal text-white',
+        amber: 'bg-app-brass text-app-ink',
+        cyan: 'bg-app-ink text-app-surface',
+        rose: 'bg-app-red text-white',
     };
 
     return (
-        <article className="group rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_50px_rgba(23,33,27,0.08)] transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#111712]">
+        <article className="app-panel group p-5 transition hover:-translate-y-1">
             <div className="flex items-start justify-between gap-4">
-                <div className={`grid size-12 place-items-center rounded-md ${tones[tone]} text-white`}>
+                <div className={`grid size-12 place-items-center rounded-md ${tones[tone]}`}>
                     <Icon className="size-5" />
                 </div>
-                <ArrowUpRight className="size-5 text-[#909684] transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpRight className="size-5 text-app-muted transition group-hover:translate-x-1 group-hover:-translate-y-1" />
             </div>
-            <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-[#596257] dark:text-[#b8c3b8]">
+            <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-app-muted">
                 {label}
             </p>
             <p className="mt-2 text-4xl font-black tabular-nums">{value}</p>
-            <p className="mt-2 text-sm font-semibold text-[#596257] dark:text-[#b8c3b8]">
+            <p className="mt-2 text-sm font-semibold text-app-muted">
                 {detail}
             </p>
-            <div className="mt-5 h-2 rounded-full bg-[#e2dac8] dark:bg-[#1e2a22]">
+            <div className="mt-5 h-2 rounded-full bg-app-surface-muted">
                 <div className={`h-full rounded-full ${tones[tone]}`} style={{ width: `${meter}%` }} />
             </div>
         </article>
@@ -292,12 +292,12 @@ function StatusPlate({
     alert?: boolean;
 }) {
     return (
-        <div className="rounded-md border border-[#f5ead2]/15 bg-[#0e1511]/80 p-4">
+        <div className="rounded-md border border-app-surface/15 bg-black/20 p-4">
             <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#cfc7b4]">
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-app-surface/75">
                     {label}
                 </p>
-                <Icon className={alert ? 'size-5 text-[#d8a329]' : 'size-5 text-[#7fb99f]'} />
+                <Icon className={alert ? 'size-5 text-app-brass' : 'size-5 text-app-teal'} />
             </div>
             <p className="mt-3 text-4xl font-black">{value}</p>
         </div>
@@ -316,13 +316,13 @@ function SignalCard({
     icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <article className="rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 dark:border-white/10 dark:bg-[#111712]">
-            <Icon className="size-5 text-[#b7352d]" />
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[#596257] dark:text-[#b8c3b8]">
+        <article className="app-panel p-5">
+            <Icon className="size-5 text-app-red" />
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-app-muted">
                 {label}
             </p>
             <p className="mt-2 text-3xl font-black tabular-nums">{value}</p>
-            <p className="mt-1 text-sm font-semibold text-[#596257] dark:text-[#b8c3b8]">
+            <p className="mt-1 text-sm font-semibold text-app-muted">
                 {detail}
             </p>
         </article>
@@ -341,15 +341,15 @@ function Panel({
     children: ReactNode;
 }) {
     return (
-        <section className="rounded-md border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_50px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
-            <header className="flex items-center justify-between border-b border-[#17211b]/10 p-5 dark:border-white/10">
+        <section className="app-panel">
+            <header className="flex items-center justify-between border-b border-app-border p-5">
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-app-red">
                         {eyebrow}
                     </p>
                     <h2 className="mt-1 text-xl font-black tracking-normal">{title}</h2>
                 </div>
-                <div className="grid size-10 place-items-center rounded-md bg-[#17211b] text-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
+                <div className="grid size-10 place-items-center rounded-md bg-app-ink text-app-surface dark:bg-app-surface dark:text-app-ink">
                     <Icon className="size-5" />
                 </div>
             </header>
@@ -359,14 +359,19 @@ function Panel({
 }
 
 function WarningRow({ item }: { item: DashboardWarning }) {
-    const severity = item.severity === 'high' ? 'bg-[#b7352d]' : item.severity === 'medium' ? 'bg-[#d8a329]' : 'bg-[#0f5b45]';
+    const severity =
+        item.severity === 'high'
+            ? 'bg-app-red'
+            : item.severity === 'medium'
+              ? 'bg-app-brass text-app-ink'
+              : 'bg-app-teal';
 
     return (
-        <div className="rounded-md border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
+        <div className="app-panel-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <p className="font-black leading-tight">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-[#596257] dark:text-[#b8c3b8]">
+                    <p className="mt-2 text-sm leading-6 text-app-muted">
                         {item.description}
                     </p>
                 </div>
@@ -380,12 +385,12 @@ function WarningRow({ item }: { item: DashboardWarning }) {
 
 function ContentRow({ item }: { item: ContentReadinessItem }) {
     return (
-        <div className="rounded-md border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
+        <div className="app-panel-muted p-4">
             <div className="flex items-center gap-2">
-                <span className={item.ready ? 'size-2 rounded-full bg-[#0f5b45]' : 'size-2 rounded-full bg-[#d8a329]'} />
+                <span className={item.ready ? 'size-2 rounded-full bg-app-teal' : 'size-2 rounded-full bg-app-brass'} />
                 <p className="font-black">{item.title}</p>
             </div>
-            <p className="mt-2 text-sm leading-6 text-[#596257] dark:text-[#b8c3b8]">
+            <p className="mt-2 text-sm leading-6 text-app-muted">
                 {item.description}
             </p>
         </div>
@@ -394,19 +399,19 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
 
 function ActivityRow({ item }: { item: ActivityItem }) {
     return (
-        <div className="rounded-md border-l-4 border-[#0f5b45] bg-[#f5f1e8] p-4 dark:bg-[#0b100d]">
+        <div className="rounded-md border-l-4 border-app-teal bg-app-surface-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <p className="font-black leading-tight">{item.label}</p>
-                    <p className="mt-1 text-sm leading-6 text-[#596257] dark:text-[#b8c3b8]">
+                    <p className="mt-1 text-sm leading-6 text-app-muted">
                         {item.description ?? 'System activity'}
                     </p>
                 </div>
-                <span className="shrink-0 text-xs font-black uppercase tracking-[0.14em] text-[#909684]">
+                <span className="shrink-0 text-xs font-black uppercase tracking-[0.14em] text-app-muted">
                     {formatActivityDate(item.created_at)}
                 </span>
             </div>
-            <p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-[#b7352d]">
+            <p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-app-red">
                 {item.actor?.name ?? 'System'}
                 {item.subject ? ` / ${item.subject.label}` : ''}
             </p>
@@ -424,11 +429,11 @@ function EmptyState({
     description: string;
 }) {
     return (
-        <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-[#17211b]/20 text-center dark:border-white/15">
+        <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-app-border text-center">
             <div>
-                <Icon className="mx-auto mb-4 size-8 text-[#0f5b45] dark:text-[#d8a329]" />
+                <Icon className="mx-auto mb-4 size-8 text-app-teal dark:text-app-brass" />
                 <p className="font-black">{title}</p>
-                <p className="mt-2 max-w-sm text-sm text-[#596257] dark:text-[#b8c3b8]">
+                <p className="mt-2 max-w-sm text-sm text-app-muted">
                     {description}
                 </p>
             </div>

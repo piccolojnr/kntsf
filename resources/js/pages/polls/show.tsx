@@ -143,7 +143,7 @@ export default function ShowPoll({
                                 {can.view_results ? (
                                     <PollResults poll={poll} />
                                 ) : (
-                                    <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+                                    <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
                                         Results are hidden.
                                     </div>
                                 )}

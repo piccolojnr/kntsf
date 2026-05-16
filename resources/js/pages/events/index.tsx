@@ -154,7 +154,7 @@ export default function EventsIndex({
 
 function OverviewTile({ label, value }: { label: string; value: number }) {
     return (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-md border bg-card p-4">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 text-2xl font-semibold">{value}</p>
         </div>

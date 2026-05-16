@@ -16,7 +16,7 @@ export function RoleList({
     canManage: boolean;
 }) {
     return (
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="overflow-hidden rounded-md border bg-card">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[760px] text-sm">
                     <thead className="border-b bg-muted/40 text-xs text-muted-foreground">

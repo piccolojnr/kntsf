@@ -4,7 +4,7 @@ export function ElectionResults({ election }: { election: Election }) {
     return (
         <div className="space-y-4">
             {election.positions.map((position) => (
-                <div key={position.id} className="rounded-lg border p-4">
+                <div key={position.id} className="rounded-md border p-4">
                     <p className="font-medium">{position.title}</p>
                     <div className="mt-3 space-y-2">
                         {position.candidates.map((candidate) => (
