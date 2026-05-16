@@ -18,24 +18,25 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     );
 
     return (
-        <div className="px-4 py-6 lg:px-6">
-            <div className="mb-8">
+        <div className="app-page px-4 py-6 lg:px-6">
+            <div className="app-panel mb-6 p-5">
                 <Heading
                     title="Settings"
                     description="Manage your profile, security, appearance, and platform configuration."
                 />
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+            <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
                 <aside className="w-full">
-                    <div className="mb-3 hidden rounded-lg border bg-card p-4 shadow-xs lg:block">
-                        <p className="text-sm font-medium">Settings menu</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                    <div className="app-panel mb-3 hidden p-4 lg:block">
+                        <p className="app-kicker">Settings menu</p>
+                        <p className="mt-2 text-sm font-black">Account controls</p>
+                        <p className="app-muted mt-1 text-xs">
                             Links are shown based on your permissions.
                         </p>
                     </div>
                     <nav
-                        className="grid gap-1 rounded-lg border bg-card p-2 shadow-xs sm:grid-cols-2 lg:grid-cols-1"
+                        className="app-panel grid gap-1 p-2 sm:grid-cols-2 lg:grid-cols-1"
                         aria-label="Settings"
                     >
                         {visibleSettingsNavItems.map((item, index) => (
@@ -47,7 +48,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 className={cn(
                                     'h-10 w-full justify-start gap-2 rounded-md px-3 text-sm font-medium',
                                     {
-                                        'bg-muted text-foreground shadow-xs':
+                                        'bg-app-surface-muted text-app-ink shadow-[inset_3px_0_0_var(--app-brass)]':
                                             isCurrentOrParentUrl(item.href),
                                     },
                                 )}
@@ -66,7 +67,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 <Separator className="my-6 lg:hidden" />
 
                 <div className="min-w-0 flex-1">
-                    <section className="max-w-3xl rounded-lg border bg-card p-5 shadow-xs sm:p-6">
+                    <section className="app-panel max-w-3xl p-5 sm:p-6">
                         <div className="max-w-xl space-y-12">{children}</div>
                     </section>
                 </div>

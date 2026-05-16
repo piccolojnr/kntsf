@@ -38,13 +38,13 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
         <>
             {navGroups.map((group) => (
                 <SidebarGroup key={group.title} className="px-2 py-0">
-                    <SidebarGroupLabel className="px-3 text-[0.68rem] font-semibold tracking-wide text-muted-foreground uppercase">
+                    <SidebarGroupLabel className="h-7 px-3 text-[0.62rem] font-black tracking-[0.22em] text-sidebar-foreground/45 uppercase">
                         {group.title}
                     </SidebarGroupLabel>
                     <SidebarGroupContent
-                        className={state === 'expanded' ? 'pl-4' : undefined}
+                        className={state === 'expanded' ? 'pl-2' : undefined}
                     >
-                        <SidebarMenu className="gap-1">
+                        <SidebarMenu className="gap-1.5">
                             {group.items.map((item) => {
                                 const hasChildren =
                                     item.children !== undefined &&
@@ -62,9 +62,10 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                             isActive={isActive}
                                             tooltip={{ children: item.title }}
                                             className={cn(
-                                                'h-9 rounded-lg px-2.5 text-sidebar-foreground/80',
-                                                'data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-xs',
-                                                '[&_svg]:text-sidebar-foreground/60 data-active:[&_svg]:text-sidebar-accent-foreground',
+                                                'h-10 rounded-md border border-transparent px-2.5 text-sidebar-foreground/72',
+                                                'hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                                                'data-active:border-sidebar-primary/45 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-[inset_3px_0_0_var(--sidebar-primary)]',
+                                                '[&_svg]:text-sidebar-foreground/52 data-active:[&_svg]:text-sidebar-primary',
                                             )}
                                         >
                                             <Link href={item.href} prefetch>
@@ -74,7 +75,7 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                         </SidebarMenuButton>
 
                                         {hasChildren && (
-                                            <SidebarMenuSub>
+                                            <SidebarMenuSub className="my-1 border-sidebar-border/60">
                                                 {item.children?.map((child) => (
                                                     <SidebarMenuSubItem
                                                         key={child.title}
@@ -84,6 +85,7 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                                             isActive={isCurrentUrl(
                                                                 child.href,
                                                             )}
+                                                            className="rounded-md text-sidebar-foreground/65 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
                                                         >
                                                             <Link
                                                                 href={

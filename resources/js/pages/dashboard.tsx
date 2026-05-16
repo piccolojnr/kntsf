@@ -114,7 +114,7 @@ export default function Dashboard({
         <>
             <Head title="Dashboard" />
             <div className="min-h-full bg-[#f5f1e8] p-4 text-[#17211b] dark:bg-[#090e0b] dark:text-[#f5ead2] md:p-6">
-                <section className="relative overflow-hidden border border-[#17211b]/10 bg-[#17211b] text-[#f5ead2] shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:border-white/10">
+                <section className="relative overflow-hidden rounded-md border border-[#17211b]/10 bg-[#17211b] text-[#f5ead2] shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:border-white/10">
                     <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,#f5ead2_1px,transparent_1px),linear-gradient(#f5ead2_1px,transparent_1px)] [background-size:36px_36px]" />
                     <div className="relative grid gap-8 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
                         <div>
@@ -259,9 +259,9 @@ function CommandCard({
     };
 
     return (
-        <article className="group border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_50px_rgba(23,33,27,0.08)] transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#111712]">
+        <article className="group rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 shadow-[0_18px_50px_rgba(23,33,27,0.08)] transition hover:-translate-y-1 dark:border-white/10 dark:bg-[#111712]">
             <div className="flex items-start justify-between gap-4">
-                <div className={`grid size-12 place-items-center ${tones[tone]} text-white`}>
+                <div className={`grid size-12 place-items-center rounded-md ${tones[tone]} text-white`}>
                     <Icon className="size-5" />
                 </div>
                 <ArrowUpRight className="size-5 text-[#909684] transition group-hover:translate-x-1 group-hover:-translate-y-1" />
@@ -273,8 +273,8 @@ function CommandCard({
             <p className="mt-2 text-sm font-semibold text-[#596257] dark:text-[#b8c3b8]">
                 {detail}
             </p>
-            <div className="mt-5 h-2 bg-[#e2dac8] dark:bg-[#1e2a22]">
-                <div className={`h-full ${tones[tone]}`} style={{ width: `${meter}%` }} />
+            <div className="mt-5 h-2 rounded-full bg-[#e2dac8] dark:bg-[#1e2a22]">
+                <div className={`h-full rounded-full ${tones[tone]}`} style={{ width: `${meter}%` }} />
             </div>
         </article>
     );
@@ -292,7 +292,7 @@ function StatusPlate({
     alert?: boolean;
 }) {
     return (
-        <div className="border border-[#f5ead2]/15 bg-[#0e1511]/80 p-4">
+        <div className="rounded-md border border-[#f5ead2]/15 bg-[#0e1511]/80 p-4">
             <div className="flex items-center justify-between">
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#cfc7b4]">
                     {label}
@@ -316,7 +316,7 @@ function SignalCard({
     icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <article className="border border-[#17211b]/10 bg-[#fffaf0] p-5 dark:border-white/10 dark:bg-[#111712]">
+        <article className="rounded-md border border-[#17211b]/10 bg-[#fffaf0] p-5 dark:border-white/10 dark:bg-[#111712]">
             <Icon className="size-5 text-[#b7352d]" />
             <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[#596257] dark:text-[#b8c3b8]">
                 {label}
@@ -341,7 +341,7 @@ function Panel({
     children: ReactNode;
 }) {
     return (
-        <section className="border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_50px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
+        <section className="rounded-md border border-[#17211b]/10 bg-[#fffaf0] shadow-[0_18px_50px_rgba(23,33,27,0.08)] dark:border-white/10 dark:bg-[#111712]">
             <header className="flex items-center justify-between border-b border-[#17211b]/10 p-5 dark:border-white/10">
                 <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#b7352d]">
@@ -349,7 +349,7 @@ function Panel({
                     </p>
                     <h2 className="mt-1 text-xl font-black tracking-normal">{title}</h2>
                 </div>
-                <div className="grid size-10 place-items-center bg-[#17211b] text-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
+                <div className="grid size-10 place-items-center rounded-md bg-[#17211b] text-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
                     <Icon className="size-5" />
                 </div>
             </header>
@@ -362,7 +362,7 @@ function WarningRow({ item }: { item: DashboardWarning }) {
     const severity = item.severity === 'high' ? 'bg-[#b7352d]' : item.severity === 'medium' ? 'bg-[#d8a329]' : 'bg-[#0f5b45]';
 
     return (
-        <div className="border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
+        <div className="rounded-md border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <p className="font-black leading-tight">{item.title}</p>
@@ -380,9 +380,9 @@ function WarningRow({ item }: { item: DashboardWarning }) {
 
 function ContentRow({ item }: { item: ContentReadinessItem }) {
     return (
-        <div className="border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
+        <div className="rounded-md border border-[#17211b]/10 bg-[#f5f1e8] p-4 dark:border-white/10 dark:bg-[#0b100d]">
             <div className="flex items-center gap-2">
-                <span className={item.ready ? 'size-2 bg-[#0f5b45]' : 'size-2 bg-[#d8a329]'} />
+                <span className={item.ready ? 'size-2 rounded-full bg-[#0f5b45]' : 'size-2 rounded-full bg-[#d8a329]'} />
                 <p className="font-black">{item.title}</p>
             </div>
             <p className="mt-2 text-sm leading-6 text-[#596257] dark:text-[#b8c3b8]">
@@ -394,7 +394,7 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
 
 function ActivityRow({ item }: { item: ActivityItem }) {
     return (
-        <div className="border-l-4 border-[#0f5b45] bg-[#f5f1e8] p-4 dark:bg-[#0b100d]">
+        <div className="rounded-md border-l-4 border-[#0f5b45] bg-[#f5f1e8] p-4 dark:bg-[#0b100d]">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <p className="font-black leading-tight">{item.label}</p>
@@ -424,7 +424,7 @@ function EmptyState({
     description: string;
 }) {
     return (
-        <div className="grid min-h-52 place-items-center border border-dashed border-[#17211b]/20 text-center dark:border-white/15">
+        <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-[#17211b]/20 text-center dark:border-white/15">
             <div>
                 <Icon className="mx-auto mb-4 size-8 text-[#0f5b45] dark:text-[#d8a329]" />
                 <p className="font-black">{title}</p>

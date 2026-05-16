@@ -42,7 +42,7 @@ export function AppSidebar() {
                         <SidebarMenuButton
                             size="lg"
                             asChild
-                            className="h-14 rounded-xl px-3"
+                            className="h-14 rounded-md px-3 text-sidebar-foreground hover:bg-sidebar-accent data-active:bg-sidebar-accent"
                         >
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />
@@ -52,7 +52,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="gap-3 px-1 py-3">
+            <SidebarContent className="gap-4 px-1 py-4">
                 <NavMain groups={visibleNavGroups} />
             </SidebarContent>
 

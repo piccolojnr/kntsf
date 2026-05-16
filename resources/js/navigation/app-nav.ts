@@ -183,11 +183,11 @@ export const headerExternalNavItems: NavItem[] = [];
 
 export const sidebarNavGroups: NavGroup[] = [
     {
-        title: 'Overview',
+        title: 'Command',
         items: [dashboardNavItem, reportsNavItem],
     },
     {
-        title: 'Records',
+        title: 'People & Content',
         items: [
             studentsNavItem,
             executivesNavItem,
@@ -200,7 +200,7 @@ export const sidebarNavGroups: NavGroup[] = [
         ],
     },
     {
-        title: 'Operations',
+        title: 'Permit Operations',
         items: [permitsNavItem, nfcCardsNavItem, paymentsNavItem],
     },
     {
