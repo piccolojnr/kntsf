@@ -72,5 +72,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('public-content', function (Request $request) {
             return Limit::perMinute(120)->by($request->ip());
         });
+
+        RateLimiter::for('mobile-login', function (Request $request) {
+            return Limit::perMinute(5)->by(mb_strtolower((string) $request->input('email')).'|'.$request->ip());
+        });
+
+        RateLimiter::for('mobile-verification', function (Request $request) {
+            return Limit::perMinute(30)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
+        });
+
+        RateLimiter::for('mobile-sensitive-actions', function (Request $request) {
+            return Limit::perMinute(20)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
+        });
     }
 }
