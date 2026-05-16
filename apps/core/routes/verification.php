@@ -9,12 +9,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('verification.index');
 
     Route::post('verification/student-number', [VerificationController::class, 'verifyStudentNumber'])
+        ->middleware('throttle:verification')
         ->name('verification.student-number');
 
     Route::post('verification/permit-code', [VerificationController::class, 'verifyPermitCode'])
+        ->middleware('throttle:verification')
         ->name('verification.permit-code');
 
     Route::post('verification/nfc', [VerificationController::class, 'verifyNfcUid'])
+        ->middleware('throttle:verification')
         ->name('verification.nfc');
 
     Route::get('verification/logs', [VerificationLogController::class, 'index'])

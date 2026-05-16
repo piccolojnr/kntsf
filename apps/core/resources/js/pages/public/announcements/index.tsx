@@ -1,6 +1,9 @@
 import { Head } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
-import { PublicContentCard, PublicContentCardSkeleton, PublicContentEmpty } from '@/features/public/content-card';
+import {
+    PublicContentCard,
+    PublicContentEmpty,
+} from '@/features/public/content-card';
 import { show } from '@/routes/public/announcements';
 import type { AnnouncementSummary, Paginated } from '../types';
 
