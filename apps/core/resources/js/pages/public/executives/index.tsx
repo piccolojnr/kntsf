@@ -35,11 +35,11 @@ export default function PublicExecutivesIndex({
                         {executives.map((executive, index) => (
                             <article
                                 key={executive.id}
-                                className={`overflow-hidden border border-[#1f2a24]/10 bg-[#fffaf0] dark:border-white/10 dark:bg-[#111712] ${
+                                className={`public-panel overflow-hidden ${
                                     index === 0 ? 'md:col-span-2 xl:col-span-1' : ''
                                 }`}
                             >
-                                <div className="relative aspect-[5/4] bg-[#efe3c6] dark:bg-[#1b241d]">
+                                <div className="relative aspect-[5/4] bg-app-surface-muted">
                                     {executive.avatar_url ? (
                                         <img
                                             src={executive.avatar_url}
@@ -48,11 +48,11 @@ export default function PublicExecutivesIndex({
                                         />
                                     ) : (
                                         <div className="grid size-full place-items-center">
-                                            <Users className="size-16 text-[#0f5b45]/30 dark:text-[#d8a329]/30" />
+                                            <Users className="size-16 text-app-teal/30 dark:text-app-brass/30" />
                                         </div>
                                     )}
                                     {executive.category && (
-                                        <span className="absolute left-5 top-5 bg-[#b7352d] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
+                                        <span className="absolute left-5 top-5 rounded-md bg-app-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
                                             {executive.category}
                                         </span>
                                     )}
@@ -61,16 +61,16 @@ export default function PublicExecutivesIndex({
                                     <h2 className="text-3xl font-black leading-tight">
                                         {executive.name}
                                     </h2>
-                                    <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-[#0f5b45] dark:text-[#d8a329]">
+                                    <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-app-teal dark:text-app-brass">
                                         {executive.position}
                                     </p>
                                     {executive.position_description && (
-                                        <p className="mt-4 text-sm font-semibold leading-6 text-[#596257] dark:text-[#b8c3b8]">
+                                        <p className="mt-4 text-sm font-semibold leading-6 text-app-muted">
                                             {executive.position_description}
                                         </p>
                                     )}
                                     {executive.biography && (
-                                        <div className="mt-5 border-t border-[#1f2a24]/10 pt-5 text-sm text-[#596257] dark:border-white/10 dark:text-[#b8c3b8]">
+                                        <div className="mt-5 border-t border-app-border pt-5 text-sm text-app-muted">
                                             <RichTextViewer value={executive.biography} />
                                         </div>
                                     )}

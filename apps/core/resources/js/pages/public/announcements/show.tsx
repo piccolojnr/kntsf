@@ -21,23 +21,23 @@ export default function PublicAnnouncementShow({
             </Head>
 
             <article>
-                <section className="relative overflow-hidden border-b border-[#1f2a24]/10 bg-[#efe3c6] dark:border-white/10 dark:bg-[#111712]">
+                <section className="relative overflow-hidden border-b border-app-border bg-app-surface-muted">
                     <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1fr_24rem] lg:py-16">
                         <div>
                             <Link
                                 href={index()}
-                                className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
+                                className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-app-teal dark:text-app-brass"
                             >
                                 <ArrowLeft className="size-4" />
                                 All announcements
                             </Link>
                             <div className="flex flex-wrap items-center gap-3">
                                 {announcement.category && (
-                                    <span className="bg-[#b7352d] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
+                                    <span className="rounded-md bg-app-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
                                         {announcement.category}
                                     </span>
                                 )}
-                                <span className="text-xs font-black uppercase tracking-[0.22em] text-[#596257] dark:text-[#b8c3b8]">
+                                <span className="text-xs font-black uppercase tracking-[0.22em] text-app-muted">
                                     {formatPublicDate(announcement.published_at, true) ?? 'Published'}
                                 </span>
                             </div>
@@ -45,7 +45,7 @@ export default function PublicAnnouncementShow({
                                 {announcement.title}
                             </h1>
                             {announcement.excerpt && (
-                                <p className="mt-6 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                                <p className="mt-6 max-w-2xl text-lg leading-8 text-app-muted">
                                     {announcement.excerpt}
                                 </p>
                             )}
@@ -55,11 +55,11 @@ export default function PublicAnnouncementShow({
                                 <img
                                     src={announcement.image_url}
                                     alt=""
-                                    className="aspect-[4/5] w-full object-cover shadow-[12px_12px_0_#d8a329]"
+                                    className="aspect-[4/5] w-full rounded-md object-cover shadow-[12px_12px_0_var(--app-brass)]"
                                 />
                             ) : (
-                                <div className="grid aspect-[4/5] w-full place-items-center border border-[#17211b] bg-[#17211b] text-[#f5ead2] shadow-[12px_12px_0_#d8a329]">
-                                    <Newspaper className="size-16 text-[#d8a329]" />
+                                <div className="grid aspect-[4/5] w-full place-items-center rounded-md border border-app-ink bg-app-ink text-app-surface shadow-[12px_12px_0_var(--app-brass)]">
+                                    <Newspaper className="size-16 text-app-brass" />
                                 </div>
                             )}
                         </div>
@@ -68,8 +68,8 @@ export default function PublicAnnouncementShow({
 
                 <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_1fr]">
                     <aside className="hidden lg:block">
-                        <div className="sticky top-28 border-l-4 border-[#b7352d] pl-5">
-                            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#b7352d]">
+                        <div className="sticky top-28 rounded-md border-l-4 border-app-red bg-app-surface/60 p-5">
+                            <p className="text-xs font-black uppercase tracking-[0.24em] text-app-red">
                                 Author
                             </p>
                             <p className="mt-2 font-black">
@@ -77,7 +77,7 @@ export default function PublicAnnouncementShow({
                             </p>
                         </div>
                     </aside>
-                    <div className="max-w-3xl border-t border-[#1f2a24]/10 pt-10 dark:border-white/10">
+                    <div className="max-w-3xl border-t border-app-border pt-10">
                         <RichTextViewer value={announcement.content} />
                     </div>
                 </section>

@@ -295,6 +295,30 @@
     .app-muted {
         @apply text-app-muted;
     }
+
+    .public-page {
+        @apply min-h-screen bg-app-page text-app-ink selection:bg-app-brass selection:text-app-ink;
+    }
+
+    .public-panel {
+        @apply rounded-md border border-app-border bg-app-surface shadow-[0_18px_50px_rgba(23,33,27,0.08)] dark:shadow-none;
+    }
+
+    .public-panel-muted {
+        @apply rounded-md border border-app-border bg-app-surface-muted;
+    }
+
+    .public-kicker {
+        @apply text-xs font-black uppercase tracking-[0.2em] text-app-red;
+    }
+
+    .public-muted {
+        @apply text-app-muted;
+    }
+
+    .public-action {
+        @apply inline-flex items-center justify-center gap-2 rounded-md bg-app-ink px-4 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-app-surface transition hover:bg-app-red;
+    }
 }
 
 @theme inline {
