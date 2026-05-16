@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
+import { formatPublicDate } from '@/features/public/content-card';
 import { index } from '@/routes/public/documents';
 import type { DocumentDetail } from '../types';
 
@@ -20,103 +21,95 @@ export default function PublicDocumentShow({
                 />
             </Head>
 
-            <article className="mx-auto w-full max-w-3xl px-4 py-10 md:px-6">
-                {/* Back link */}
+            <article className="mx-auto w-full max-w-7xl px-5 py-12 md:px-8">
                 <Link
                     href={index()}
-                    className="mb-6 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-[#0f5b45] dark:text-[#d8a329]"
                 >
-                    <ArrowLeft className="size-3.5" />
+                    <ArrowLeft className="size-4" />
                     All documents
                 </Link>
 
-                {/* Featured image */}
-                {document.image_url && (
-                    <img
-                        src={document.image_url}
-                        alt=""
-                        className="mb-8 aspect-video w-full rounded-lg object-cover"
-                    />
-                )}
-
-                {/* Meta */}
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                    {document.category && (
-                        <span className="inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
-                            {document.category}
-                        </span>
-                    )}
-                    {document.published_at && (
-                        <span className="text-xs text-muted-foreground">
-                            {formatDate(document.published_at)}
-                        </span>
-                    )}
-                    {document.author && (
-                        <span className="text-xs text-muted-foreground">
-                            · {document.author.name}
-                        </span>
-                    )}
-                </div>
-
-                {/* Title */}
-                <h1 className="text-2xl font-bold leading-snug tracking-tight md:text-3xl">
-                    {document.title}
-                </h1>
-
-                {/* Excerpt */}
-                {document.excerpt && (
-                    <p className="mt-4 text-base leading-7 text-muted-foreground">
-                        {document.excerpt}
-                    </p>
-                )}
-
-                {/* Description */}
-                {document.description && (
-                    <>
-                        <hr className="my-8" />
-                        <RichTextViewer value={document.description} emptyText="No description provided." />
-                    </>
-                )}
-
-                {/* File attachments */}
-                {document.files.length > 0 && (
-                    <div className="mt-10">
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Attachments ({document.files.length})
-                        </p>
-                        <div className="space-y-3">
-                            {document.files.map((file) => (
-                                <div
-                                    key={file.id}
-                                    className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                                            <FileText className="size-4 text-muted-foreground" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium">{file.file_name}</p>
-                                            <p className="text-xs text-muted-foreground">{file.human_size}</p>
-                                        </div>
-                                    </div>
-                                    <Button asChild variant="outline" size="sm" className="shrink-0">
-                                        <a href={file.url} target="_blank" rel="noreferrer">
-                                            <Download className="size-3.5" />
-                                            Download
-                                        </a>
-                                    </Button>
-                                </div>
-                            ))}
+                <div className="grid gap-10 lg:grid-cols-[1fr_24rem]">
+                    <div>
+                        <div className="mb-5 flex flex-wrap items-center gap-3">
+                            {document.category && (
+                                <span className="bg-[#17211b] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#f5ead2] dark:bg-[#f5ead2] dark:text-[#17211b]">
+                                    {document.category}
+                                </span>
+                            )}
+                            {document.published_at && (
+                                <span className="text-xs font-black uppercase tracking-[0.22em] text-[#596257] dark:text-[#b8c3b8]">
+                                    {formatPublicDate(document.published_at, true)}
+                                </span>
+                            )}
                         </div>
+                        <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-normal md:text-7xl">
+                            {document.title}
+                        </h1>
+                        {document.excerpt && (
+                            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#596257] dark:text-[#b8c3b8]">
+                                {document.excerpt}
+                            </p>
+                        )}
+                        {document.description && (
+                            <div className="mt-10 max-w-3xl border-t border-[#1f2a24]/10 pt-8 dark:border-white/10">
+                                <RichTextViewer
+                                    value={document.description}
+                                    emptyText="No description provided."
+                                />
+                            </div>
+                        )}
                     </div>
-                )}
+
+                    <aside className="lg:pt-10">
+                        <div className="border border-[#17211b] bg-[#fffaf0] p-5 shadow-[10px_10px_0_#d8a329] dark:border-white/10 dark:bg-[#111712]">
+                            <div className="mb-5 flex items-center gap-3">
+                                <div className="grid size-12 place-items-center bg-[#17211b] text-[#f5ead2]">
+                                    <FileText className="size-6" />
+                                </div>
+                                <div>
+                                    <p className="font-black">Attachments</p>
+                                    <p className="text-xs font-semibold text-[#596257] dark:text-[#b8c3b8]">
+                                        {document.files.length} public file
+                                        {document.files.length === 1 ? '' : 's'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid gap-3">
+                                {document.files.map((file) => (
+                                    <div
+                                        key={file.id}
+                                        className="border border-[#1f2a24]/10 bg-[#f7f0df] p-3 dark:border-white/10 dark:bg-[#0b100d]"
+                                    >
+                                        <p className="break-words text-sm font-black">
+                                            {file.file_name}
+                                        </p>
+                                        <p className="mt-1 text-xs font-semibold text-[#596257] dark:text-[#b8c3b8]">
+                                            {file.human_size}
+                                        </p>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className="mt-3 w-full rounded-none bg-[#b7352d] text-white hover:bg-[#17211b]"
+                                        >
+                                            <a
+                                                href={file.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                <Download className="size-4" />
+                                                Download
+                                            </a>
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+                </div>
             </article>
         </>
     );
-}
-
-function formatDate(value: string | null) {
-    return value
-        ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-        : null;
 }

@@ -36,6 +36,8 @@ class HomeController extends Controller
                             ->limit($limit)
                             ->get()
                             ->map(fn (Announcement $announcement): array => PublicAnnouncementController::payload($announcement))
+                            ->values()
+                            ->all()
                         : [],
                     'events' => $settings['allow_public_events']
                         ? Event::query()
@@ -47,6 +49,8 @@ class HomeController extends Controller
                             ->limit($limit)
                             ->get()
                             ->map(fn (Event $event): array => PublicEventController::payload($event))
+                            ->values()
+                            ->all()
                         : [],
                     'documents' => $settings['allow_public_documents']
                         ? Document::query()
@@ -58,6 +62,8 @@ class HomeController extends Controller
                             ->limit($limit)
                             ->get()
                             ->map(fn (Document $document): array => PublicDocumentController::payload($document))
+                            ->values()
+                            ->all()
                         : [],
                     'executives' => ExecutiveProfile::query()
                         ->published()
@@ -65,7 +71,9 @@ class HomeController extends Controller
                         ->orderBy('sort_order')
                         ->limit(4)
                         ->get()
-                        ->map(fn (ExecutiveProfile $profile): array => PublicExecutiveController::payload($profile)),
+                        ->map(fn (ExecutiveProfile $profile): array => PublicExecutiveController::payload($profile))
+                        ->values()
+                        ->all(),
                     'elections' => Election::query()
                         ->publicVisible()
                         ->with(['academicPeriod:id,name,academic_year,semester'])
@@ -73,7 +81,9 @@ class HomeController extends Controller
                         ->latest('starts_at')
                         ->limit(3)
                         ->get()
-                        ->map(fn (Election $election): array => PublicElectionController::payload($election)),
+                        ->map(fn (Election $election): array => PublicElectionController::payload($election))
+                        ->values()
+                        ->all(),
                 ];
             },
         ));
