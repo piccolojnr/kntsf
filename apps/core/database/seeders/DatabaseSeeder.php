@@ -26,5 +26,15 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'password' => 'password',
         ]);
+
+        if ($this->shouldSeedDevelopmentData()) {
+            $this->call(DevelopmentSeeder::class);
+        }
+    }
+
+    private function shouldSeedDevelopmentData(): bool
+    {
+        return app()->environment(['local', 'development'])
+            && (bool) env('SEED_DEVELOPMENT_DATA', false);
     }
 }
