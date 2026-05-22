@@ -22,6 +22,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
+import { isAdmin } from "@/features/auth/auth-permissions";
 import { useOperationsSummary } from "@/features/operations/use-operations-summary";
 import { useAuth } from "@/hooks/use-auth";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -66,10 +67,13 @@ const adminTools: {
 
 export default function OperationsProfileScreen() {
   const { user, logout } = useAuth();
-  const summaryQuery = useOperationsSummary();
+  const canViewSummary = isAdmin(user);
+  const summaryQuery = useOperationsSummary({ enabled: canViewSummary });
 
   const refreshControl = usePullToRefresh(async () => {
-    await summaryQuery.refetch();
+    if (canViewSummary) {
+      await summaryQuery.refetch();
+    }
   });
 
   const summary = summaryQuery.data;
@@ -88,9 +92,9 @@ export default function OperationsProfileScreen() {
           subtitle="Review your workspace identity, access level, and live record counts."
           title="Profile"
         />
-        {summaryQuery.isLoading ? (
+        {canViewSummary && summaryQuery.isLoading ? (
           <LoadingState message="Loading workspace profile..." />
-        ) : summaryQuery.isError || !summary ? (
+        ) : canViewSummary && (summaryQuery.isError || !summary) ? (
           <EmptyState
             description="Workspace profile data could not be loaded right now."
             icon={ShieldAlert}
@@ -106,26 +110,28 @@ export default function OperationsProfileScreen() {
               workspaceLabel="Operations"
             />
 
-            <View style={styles.statusGrid}>
-              <StatusCard
-                title="Students Indexed"
-                value={String(summary.totalStudents)}
-                description="Student records currently available in the operations workspace."
-                tone="primary"
-              />
-              <StatusCard
-                title="Active Permits"
-                value={String(summary.activePermits)}
-                description="Permits that are currently valid for verification."
-                tone="success"
-              />
-              <StatusCard
-                title="Active Cards"
-                value={String(summary.activeNfcCards)}
-                description="Student cards currently usable for card-based verification."
-                tone="warning"
-              />
-            </View>
+            {summary ? (
+              <View style={styles.statusGrid}>
+                <StatusCard
+                  title="Students Indexed"
+                  value={String(summary.totalStudents)}
+                  description="Student records currently available in the operations workspace."
+                  tone="primary"
+                />
+                <StatusCard
+                  title="Active Permits"
+                  value={String(summary.activePermits)}
+                  description="Permits that are currently valid for verification."
+                  tone="success"
+                />
+                <StatusCard
+                  title="Active Cards"
+                  value={String(summary.activeNfcCards)}
+                  description="Student cards currently usable for card-based verification."
+                  tone="warning"
+                />
+              </View>
+            ) : null}
 
             <SectionCard title="Operations Access">
               <DetailRow

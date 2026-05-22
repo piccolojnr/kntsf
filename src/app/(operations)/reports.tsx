@@ -6,13 +6,19 @@ import { AdminToolScreen } from "@/components/layout/admin-tool-screen";
 import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
+import { isAdmin } from "@/features/auth/auth-permissions";
 import { useOperationsSummary } from "@/features/operations/use-operations-summary";
+import { useAuth } from "@/hooks/use-auth";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 export default function OperationsReportsScreen() {
-  const summaryQuery = useOperationsSummary();
+  const { user } = useAuth();
+  const canViewSummary = isAdmin(user);
+  const summaryQuery = useOperationsSummary({ enabled: canViewSummary });
   const refreshControl = usePullToRefresh(async () => {
-    await summaryQuery.refetch();
+    if (canViewSummary) {
+      await summaryQuery.refetch();
+    }
   });
 
   const summary = summaryQuery.data;
@@ -24,7 +30,13 @@ export default function OperationsReportsScreen() {
         onRefresh={refreshControl.onRefresh}
         refreshing={refreshControl.refreshing}
     >
-      {summaryQuery.isLoading ? (
+      {!canViewSummary ? (
+        <EmptyState
+          description="You do not have permission to view operations reports."
+          icon={ShieldAlert}
+          title="Admin access required"
+        />
+      ) : summaryQuery.isLoading ? (
         <LoadingState message="Loading reports..." />
       ) : summaryQuery.isError || !summary ? (
         <EmptyState

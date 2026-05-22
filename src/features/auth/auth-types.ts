@@ -29,8 +29,8 @@ export type AuthUserDto = {
   id: string | number;
   name: string;
   email: string;
-  role?: UserRole;
-  roles?: string[];
+  role?: UserRole | string | { name?: string; slug?: string };
+  roles?: (string | { name?: string; slug?: string })[];
   permissions?: string[];
   studentId?: string;
   student_id?: string;

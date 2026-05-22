@@ -27,22 +27,66 @@ type BackendMeData = {
 
 const VALID_ROLES = ["student", "staff", "admin"] as const;
 
-function isUserRole(value: string | undefined): value is (typeof VALID_ROLES)[number] {
-  return Boolean(value && VALID_ROLES.includes(value as (typeof VALID_ROLES)[number]));
+function normalizeRoleValue(value: unknown) {
+  if (typeof value === "string") {
+    return value.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  }
+
+  if (value && typeof value === "object") {
+    const roleObject = value as { name?: unknown; slug?: unknown };
+
+    return normalizeRoleValue(roleObject.slug ?? roleObject.name);
+  }
+
+  return "";
+}
+
+function toUserRole(value: unknown): UserRole | null {
+  const normalizedValue = normalizeRoleValue(value);
+
+  if (normalizedValue === "administrator" || normalizedValue === "super-admin") {
+    return "admin";
+  }
+
+  if (
+    normalizedValue === "staff-member" ||
+    normalizedValue === "operator" ||
+    normalizedValue === "operations"
+  ) {
+    return "staff";
+  }
+
+  if (VALID_ROLES.includes(normalizedValue as (typeof VALID_ROLES)[number])) {
+    return normalizedValue as UserRole;
+  }
+
+  return null;
 }
 
 function normalizeRoles(dto: AuthUserDto): UserRole[] {
-  const roles = (dto.roles ?? []).filter(isUserRole);
+  const roles = (dto.roles ?? [])
+    .map(toUserRole)
+    .filter((role): role is UserRole => Boolean(role));
 
   if (roles.length > 0) {
     return roles;
   }
 
-  if (isUserRole(dto.role)) {
-    return [dto.role];
+  const singleRole = toUserRole(dto.role);
+
+  if (singleRole) {
+    return [singleRole];
   }
 
-  return ["student"];
+  if (dto.type === "staff") {
+    return ["staff"];
+  }
+
+  if (dto.type === "student" || dto.studentId || dto.student_id || dto.student_number) {
+    return ["student"];
+  }
+
+  return ["staff"];
 }
 
 function getPrimaryRole(roles: UserRole[]): UserRole {

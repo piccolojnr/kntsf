@@ -2,6 +2,8 @@ import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
+import { normalizeStudent } from "@/features/students/student-api";
+import { StudentDto } from "@/features/students/student-types";
 
 import {
   Permit,
@@ -52,7 +54,7 @@ export function normalizePermit(dto: PermitDto): Permit {
     codeLast4,
     academicPeriod: dto.academicPeriod ?? dto.academic_period ?? null,
     qrCode: dto.qrCode,
-    student: dto.student ?? null,
+    student: dto.student ? normalizeStudent(dto.student as StudentDto) : null,
   };
 }
 
