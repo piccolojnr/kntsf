@@ -2,7 +2,7 @@
 
 ## Current Migration Phase
 
-Phase 3 is in progress: mobile permit request and Paystack flow. The API/auth foundation and student core screens are migrated, and students can now create permit requests, launch Paystack checkout, return to the app, verify payment server-side, and inspect request status.
+Phase 4 is in progress: student mobile content screens. The student app can now read published announcements, events, documents, executives, and the mobile content home payload from the Laravel API.
 
 ## Laravel API Response Strategy
 
@@ -87,6 +87,35 @@ Voting handling:
 - The UI does not support vote editing and does not duplicate backend eligibility rules.
 - Results are shown only when the backend returns them.
 
+## Content Screens
+
+Implemented endpoints:
+
+- `GET /api/mobile/content/home`
+- `GET /api/mobile/content/announcements`
+- `GET /api/mobile/content/announcements/{slug}`
+- `GET /api/mobile/content/events`
+- `GET /api/mobile/content/events/{slug}`
+- `GET /api/mobile/content/documents`
+- `GET /api/mobile/content/documents/{slug}`
+- `GET /api/mobile/content/executives`
+
+Implemented routes:
+
+- `/(student)/announcements`
+- `/(student)/announcements/[slug]`
+- `/(student)/events`
+- `/(student)/events/[slug]`
+- `/(student)/documents`
+- `/(student)/documents/[slug]`
+- `/(student)/executives`
+
+Content handling:
+
+- Content is read-only in the mobile app.
+- Student home shows compact sections for announcements, events, and documents.
+- Document file URLs are opened with `expo-web-browser`; files are not stored locally.
+
 ## Old Endpoint Mappings Still In Code
 
 These are still used outside the migrated student core screens and should be migrated in later phases:
@@ -127,6 +156,14 @@ Already aligned or prepared:
 - `GET /api/mobile/elections/{election}`
 - `POST /api/mobile/elections/{election}/positions/{position}/vote`
 - `GET /api/mobile/elections/{election}/results`
+- `GET /api/mobile/content/home`
+- `GET /api/mobile/content/announcements`
+- `GET /api/mobile/content/announcements/{slug}`
+- `GET /api/mobile/content/events`
+- `GET /api/mobile/content/events/{slug}`
+- `GET /api/mobile/content/documents`
+- `GET /api/mobile/content/documents/{slug}`
+- `GET /api/mobile/content/executives`
 - Laravel resource and pagination response helpers
 - Laravel validation error normalization
 - Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
@@ -149,7 +186,6 @@ No new UI was built in this phase. These screens still need endpoint/data migrat
 
 Missing future workflows remain out of scope for this phase:
 
-- Content screens for announcements, events, documents, and executives
 - Staff permit request review
 
 ## Next Steps
