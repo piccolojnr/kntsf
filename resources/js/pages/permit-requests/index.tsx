@@ -13,6 +13,7 @@ type PermitRequestRow = {
     requires_review: boolean;
     review_status: string | null;
     created_at: string | null;
+    recovery_state: string | null;
     student: {
         student_number: string;
         name: string | null;
@@ -36,21 +37,60 @@ export default function PermitRequestsIndex({
     permitRequests,
     filters,
     overview,
+    recovery,
+    academicPeriods,
 }: {
     permitRequests: Paginated<PermitRequestRow>;
-    filters: { search: string; status: string };
+    filters: {
+        search: string;
+        status: string;
+        review_status: string;
+        requires_review: string;
+        academic_period: string;
+        date_from: string | null;
+        date_to: string | null;
+    };
     overview: {
         total: number;
         review_required: number;
         failed: number;
         paid: number;
+        awaiting_payment: number;
+        issued: number;
+        expired: number;
+        stuck: number;
     };
+    recovery: {
+        paid_not_issued: number;
+        awaiting_payment_expired: number;
+        payment_success_request_failed: number;
+        payment_without_permit: number;
+    };
+    academicPeriods: Array<{ id: number; label: string }>;
 }) {
     const [search, setSearch] = useState(filters.search);
+    const [status, setStatus] = useState(filters.status);
+    const [reviewStatus, setReviewStatus] = useState(filters.review_status);
+    const [requiresReview, setRequiresReview] = useState(filters.requires_review);
+    const [academicPeriod, setAcademicPeriod] = useState(filters.academic_period);
+    const [dateFrom, setDateFrom] = useState(filters.date_from ?? '');
+    const [dateTo, setDateTo] = useState(filters.date_to ?? '');
 
     function submit(event: React.FormEvent) {
         event.preventDefault();
-        router.get(index.url(), { search }, { preserveState: true, replace: true });
+        router.get(
+            index.url(),
+            {
+                search,
+                status,
+                review_status: reviewStatus,
+                requires_review: requiresReview,
+                academic_period: academicPeriod,
+                date_from: dateFrom,
+                date_to: dateTo,
+            },
+            { preserveState: true, replace: true },
+        );
     }
 
     return (
@@ -71,14 +111,18 @@ export default function PermitRequestsIndex({
 
                 <div className="grid gap-3 md:grid-cols-4">
                     <Summary label="Total" value={overview.total} />
+                    <Summary label="Pending payment" value={overview.awaiting_payment} />
+                    <Summary label="Paid not issued" value={recovery.paid_not_issued} />
                     <Summary label="Needs review" value={overview.review_required} />
-                    <Summary label="Paid" value={overview.paid} />
+                    <Summary label="Issued" value={overview.issued} />
                     <Summary label="Failed" value={overview.failed} />
+                    <Summary label="Expired" value={overview.expired} />
+                    <Summary label="Needs recovery" value={overview.stuck} />
                 </div>
 
                 <section className="app-panel">
                     <div className="border-b border-app-border p-4">
-                        <form onSubmit={submit} className="flex gap-2">
+                        <form onSubmit={submit} className="grid gap-3">
                             <div className="relative flex-1">
                                 <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-app-muted" />
                                 <input
@@ -88,9 +132,54 @@ export default function PermitRequestsIndex({
                                     className="h-9 w-full rounded-md border border-app-border bg-app-surface pl-9 text-sm"
                                 />
                             </div>
-                            <button className="rounded-md bg-app-ink px-4 text-xs font-black uppercase tracking-[0.14em] text-app-surface">
-                                Search
-                            </button>
+                            <div className="grid gap-2 md:grid-cols-6">
+                                <Select value={status} onChange={setStatus}>
+                                    <option value="">All statuses</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="awaiting_payment">Pending payment</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="issued">Issued</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="expired">Expired</option>
+                                </Select>
+                                <Select value={reviewStatus} onChange={setReviewStatus}>
+                                    <option value="">All review states</option>
+                                    <option value="pending_review">Pending review</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </Select>
+                                <Select value={requiresReview} onChange={setRequiresReview}>
+                                    <option value="">Review optional</option>
+                                    <option value="1">Requires review</option>
+                                    <option value="0">No review required</option>
+                                </Select>
+                                <Select value={academicPeriod} onChange={setAcademicPeriod}>
+                                    <option value="">All periods</option>
+                                    {academicPeriods.map((period) => (
+                                        <option key={period.id} value={period.id}>
+                                            {period.label}
+                                        </option>
+                                    ))}
+                                </Select>
+                                <input
+                                    type="date"
+                                    value={dateFrom}
+                                    onChange={(event) => setDateFrom(event.target.value)}
+                                    className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+                                />
+                                <input
+                                    type="date"
+                                    value={dateTo}
+                                    onChange={(event) => setDateTo(event.target.value)}
+                                    className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+                                />
+                            </div>
+                            <div className="flex justify-end">
+                                <button className="rounded-md bg-app-ink px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-app-surface">
+                                    Apply filters
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -102,6 +191,7 @@ export default function PermitRequestsIndex({
                                     <th className="px-4 py-3">Student</th>
                                     <th className="px-4 py-3">Payment</th>
                                     <th className="px-4 py-3">Review</th>
+                                    <th className="px-4 py-3">State</th>
                                     <th className="px-4 py-3 text-right">Amount</th>
                                 </tr>
                             </thead>
@@ -142,6 +232,9 @@ export default function PermitRequestsIndex({
                                                 ? permitRequest.review_status
                                                 : 'Not required'}
                                         </td>
+                                        <td className="px-4 py-3 text-xs text-app-muted">
+                                            {permitRequest.recovery_state ?? 'Normal'}
+                                        </td>
                                         <td className="px-4 py-3 text-right font-semibold">
                                             {permitRequest.currency}{' '}
                                             {Number(permitRequest.amount).toFixed(2)}
@@ -154,6 +247,26 @@ export default function PermitRequestsIndex({
                 </section>
             </div>
         </>
+    );
+}
+
+function Select({
+    value,
+    onChange,
+    children,
+}: {
+    value: string;
+    onChange: (value: string) => void;
+    children: React.ReactNode;
+}) {
+    return (
+        <select
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+        >
+            {children}
+        </select>
     );
 }
 

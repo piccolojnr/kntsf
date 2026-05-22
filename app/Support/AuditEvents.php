@@ -32,6 +32,14 @@ final class AuditEvents
 
     public const PermitRequestReviewRejected = 'permit_request.review_rejected';
 
+    public const PermitRequestVerificationRetried = 'permit_request.verification_retried';
+
+    public const PermitRequestIssuanceRetried = 'permit_request.issuance_retried';
+
+    public const PermitRequestCancelled = 'permit_request.cancelled';
+
+    public const PermitRequestExpired = 'permit_request.expired';
+
     public const PaymentCreated = 'payment.created';
 
     public const PaymentSuccessful = 'payment.successful';
@@ -164,6 +172,10 @@ final class AuditEvents
             self::PermitRequestFailed,
             self::PermitRequestReviewApproved,
             self::PermitRequestReviewRejected,
+            self::PermitRequestVerificationRetried,
+            self::PermitRequestIssuanceRetried,
+            self::PermitRequestCancelled,
+            self::PermitRequestExpired,
             self::PaymentCreated,
             self::PaymentSuccessful,
             self::PaymentFailed,

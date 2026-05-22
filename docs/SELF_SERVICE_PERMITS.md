@@ -62,6 +62,29 @@ The workflow locks payment and permit request rows during verification/completio
 
 Duplicate active permits for the same student and academic period are still blocked by `IssuePermitAction`.
 
+## Recovery and Admin Oversight
+
+Admins use `/permit-requests` to investigate self-service requests by status, review status, academic period, date range, and student search.
+
+Important recovery states:
+
+- pending payment: request exists but payment is not verified
+- paid but not issued: payment succeeded but permit issuance is still pending
+- failed payment/request: request failed during payment or issuance
+- expired: unpaid request passed its payment window
+- requires review: provisional student record needs admin approval
+
+Admin recovery actions:
+
+- retry payment verification: calls Paystack server-side again
+- retry permit issuance: reuses `CompletePermitRequestAction` and requires a verified payment
+- cancel request: closes a non-issued request
+- mark expired: closes an unpaid pending request
+
+Every admin recovery action writes an audit log. Duplicate active permits remain blocked by the existing permit issuance action.
+
+The scheduled command `permit-requests:expire` marks old `awaiting_payment` requests as expired. It does not expire paid or issued requests.
+
 ## Mobile API Reuse
 
 Authenticated mobile students use the same `PermitRequest`, `Payment`, Paystack, and permit issuance actions.
