@@ -1,8 +1,9 @@
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { unwrapData } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
-import { Student, StudentDto } from "./student-types";
+import { MobileHomeContent, Student, StudentDto } from "./student-types";
 
 type MobileApiResponse<T> = {
   success: boolean;
@@ -22,12 +23,13 @@ export type StudentsListResult = ApiListResponse<Student>;
 function normalizeStudent(dto: StudentDto): Student {
   return {
     id: String(dto.id),
-    studentId: dto.studentId ?? dto.student_id ?? "",
+    studentId: dto.studentId ?? dto.student_number ?? dto.student_id ?? "",
     name: dto.name ?? "",
     email: dto.email ?? "",
     course: dto.course ?? dto.programme ?? dto.program ?? "",
     level: dto.level ?? "",
     phone: dto.phone ?? dto.number ?? "",
+    accountStatus: dto.accountStatus ?? dto.account_status,
   };
 }
 
@@ -108,18 +110,30 @@ export async function getStudentByStudentId(studentId: string) {
 export async function getStudentProfile() {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<StudentDto | { student: StudentDto }>
+      StudentDto | { student: StudentDto } | MobileApiResponse<StudentDto | { student: StudentDto }>
     >("/api/mobile/student/profile");
-    const data = getMobileData(response.data);
+    const data = unwrapData<StudentDto | { student: StudentDto }>(response.data);
 
     return normalizeStudent("student" in data ? data.student : data);
   } catch (error) {
     const normalizedError = normalizeApiError(error);
 
-    if (normalizedError.statusCode === 404) {
+    if (normalizedError.status === 404) {
       return null;
     }
 
+    throw toUserFacingError(error);
+  }
+}
+
+export async function getMobileHomeContent() {
+  try {
+    const response = await apiClient.get<MobileHomeContent | { data: MobileHomeContent }>(
+      "/api/mobile/content/home",
+    );
+
+    return unwrapData<MobileHomeContent>(response.data);
+  } catch (error) {
     throw toUserFacingError(error);
   }
 }

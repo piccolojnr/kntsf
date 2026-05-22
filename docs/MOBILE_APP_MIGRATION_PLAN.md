@@ -2,7 +2,7 @@
 
 ## Current Migration Phase
 
-Phase 1 is in progress: API/auth foundation migration for the Laravel mobile API. This phase prepares shared request, response, error, auth, and query-key infrastructure without building new screens or migrating feature workflows.
+Phase 2 is in progress: student core screen migration. The API/auth foundation is in place, and the existing student home, profile, permits, NFC card, and report-lost flows now target Laravel student endpoints without adding permit request, payment, elections, or content-detail UI.
 
 ## Laravel API Response Strategy
 
@@ -29,14 +29,24 @@ Shared helpers:
 - Logout still calls `/api/mobile/auth/logout` and clears the local token even if the network request fails.
 - Auth bootstrap no longer treats network/server timeout during `/me` as logout. It preserves the token and surfaces a recoverable startup state.
 
+## Student Core Migration
+
+Migrated student endpoints:
+
+- `GET /api/mobile/student/profile`
+- `GET /api/mobile/student/permits`
+- `GET /api/mobile/student/nfc-card`
+- `POST /api/mobile/student/nfc-card/report-lost`
+- `GET /api/mobile/content/home` helper added for later lightweight home content use
+
+Student response mapping now uses Laravel resource fields such as `student_number`, `starts_at`, `expires_at`, `amount_paid`, `code_last4`, and `uid_last4`. The UI compatibility fields remain normalized inside feature APIs so existing screens do not need a redesign. Raw NFC UIDs and full permit codes are not expected by the student screens.
+
 ## Old Endpoint Mappings Still In Code
 
-These are still used by current screens and should be migrated in later phases:
+These are still used outside the migrated student core screens and should be migrated in later phases:
 
 | Current app endpoint | Target Laravel endpoint |
 | --- | --- |
-| `GET /api/mobile/student/card` | `GET /api/mobile/student/nfc-card` |
-| `POST /api/mobile/student/card/report-lost` | `POST /api/mobile/student/nfc-card/report-lost` |
 | `GET /api/mobile/operations/students` | `GET /api/mobile/operations/students/search` plus detail endpoint |
 | `GET /api/mobile/operations/cards` | New operations NFC-card list endpoint if exposed |
 | `GET /api/mobile/operations/permits` | New operations permit list endpoint if exposed |
@@ -57,6 +67,10 @@ Already aligned or prepared:
 - `POST /api/mobile/auth/login`
 - `POST /api/mobile/auth/logout`
 - `GET /api/mobile/me`
+- `GET /api/mobile/student/profile`
+- `GET /api/mobile/student/permits`
+- `GET /api/mobile/student/nfc-card`
+- `POST /api/mobile/student/nfc-card/report-lost`
 - Laravel resource and pagination response helpers
 - Laravel validation error normalization
 - Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
@@ -65,10 +79,6 @@ Already aligned or prepared:
 
 No new UI was built in this phase. These screens still need endpoint/data migration:
 
-- Student home
-- Student permits
-- Student NFC card
-- Student profile
 - Staff verification scan
 - Staff/admin permit list
 - Staff/admin student list
@@ -90,8 +100,8 @@ Missing future workflows remain out of scope for this phase:
 
 ## Next Steps
 
-1. Migrate student profile, permits, and NFC-card APIs to Laravel response shapes.
-2. Migrate staff verification endpoints to `/api/mobile/verification/*`.
-3. Migrate card registration/replacement/revocation to operations NFC-card endpoints.
+1. Migrate staff verification endpoints to `/api/mobile/verification/*`.
+2. Migrate card registration/replacement/revocation to operations NFC-card endpoints.
+3. Add permit request and Paystack flow after the student core remains stable.
 4. Add feature-level response schemas with Zod once endpoint payloads are stable.
 5. Decompose oversized screens while migrating each feature, not before.

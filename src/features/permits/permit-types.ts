@@ -10,6 +10,9 @@ export type Permit = {
   startDate: string;
   expiryDate: string;
   amountPaid: number;
+  currency: string;
+  codeLast4?: string | null;
+  academicPeriod?: Record<string, unknown> | null;
   qrCode?: string;
   student?: Student | null;
 };
@@ -27,13 +30,18 @@ export type PermitDto = Partial<Permit> & {
   id: string | number;
   student_id?: string;
   permit_code?: string;
+  code_last4?: string | null;
   originalCode?: string;
   code?: string;
+  starts_at?: string;
+  expires_at?: string;
   start_date?: string;
   expiry_date?: string;
   expiresAt?: string;
-  amount_paid?: number;
-  amount?: number;
+  amount_paid?: string | number;
+  amount?: string | number;
+  currency?: string;
+  academic_period?: Record<string, unknown> | null;
   student?: Student | StudentDto | null;
 };
 export type PermitIssuanceConfigDto = Partial<PermitIssuanceConfig> & {

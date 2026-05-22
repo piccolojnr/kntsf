@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreditCard, Nfc, ShieldAlert, UserRound } from "lucide-react-native";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
@@ -10,9 +9,11 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { reportLostCardForStudent } from "@/features/cards/card-api";
 import { CardStatus, StudentCard } from "@/features/cards/card-types";
-import { useStudentCard } from "@/features/cards/use-student-card";
+import {
+  useReportLostNfcCard,
+  useStudentNfcCard,
+} from "@/features/cards/use-student-card";
 import { useCurrentStudent } from "@/features/students/use-current-student";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
@@ -236,31 +237,12 @@ const panelStyles = StyleSheet.create({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StudentCardScreen() {
-  const queryClient = useQueryClient();
   const studentQuery = useCurrentStudent();
   const student = studentQuery.student;
-  const cardQuery = useStudentCard(student?.id);
+  const cardQuery = useStudentNfcCard(student?.id);
   const latestCard = cardQuery.data ?? null;
 
-  const reportLostMutation = useMutation({
-    mutationFn: async () => {
-      if (!student)
-        throw new Error("No student record linked to this account.");
-      return reportLostCardForStudent(student.studentId);
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["student-card"] });
-      Alert.alert("Card Reported", "Your active card has been marked as lost.");
-    },
-    onError: (error) => {
-      Alert.alert(
-        "Unable to report card",
-        error instanceof Error
-          ? error.message
-          : "Your card could not be reported as lost right now.",
-      );
-    },
-  });
+  const reportLostMutation = useReportLostNfcCard(student?.studentId);
 
   const isLoading = studentQuery.isLoading || cardQuery.isLoading;
   const hasError = studentQuery.isError || cardQuery.isError;
@@ -279,7 +261,23 @@ export default function StudentCardScreen() {
         {
           style: "destructive",
           text: "Report Lost",
-          onPress: () => reportLostMutation.mutate(),
+          onPress: () =>
+            reportLostMutation.mutate(undefined, {
+              onSuccess: () => {
+                Alert.alert(
+                  "Card Reported",
+                  "Your active card has been marked as lost.",
+                );
+              },
+              onError: (error) => {
+                Alert.alert(
+                  "Unable to report card",
+                  error instanceof Error
+                    ? error.message
+                    : "Your card could not be reported as lost right now.",
+                );
+              },
+            }),
         },
       ],
     );
