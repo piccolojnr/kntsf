@@ -65,6 +65,28 @@ Payment handling:
 - Payment is never trusted from redirect alone; the app calls backend verification.
 - A manual "I Have Paid, Verify Payment" fallback is available on the request detail screen.
 
+## Elections UI
+
+Implemented endpoints:
+
+- `GET /api/mobile/elections`
+- `GET /api/mobile/elections/{election}`
+- `POST /api/mobile/elections/{election}/positions/{position}/vote`
+- `GET /api/mobile/elections/{election}/results`
+
+Implemented routes:
+
+- `/(student)/elections`
+- `/(student)/elections/[id]`
+- `/(student)/elections/[id]/results`
+
+Voting handling:
+
+- Authenticated students can view elections, positions, approved candidates, eligibility, and voting status.
+- Vote submission goes through the backend endpoint and is confirmed before mutation.
+- The UI does not support vote editing and does not duplicate backend eligibility rules.
+- Results are shown only when the backend returns them.
+
 ## Old Endpoint Mappings Still In Code
 
 These are still used outside the migrated student core screens and should be migrated in later phases:
@@ -101,6 +123,10 @@ Already aligned or prepared:
 - `GET /api/mobile/permit-requests/{reference}`
 - `POST /api/mobile/permit-requests/{reference}/initialize-payment`
 - `POST /api/mobile/permit-requests/{reference}/verify-payment`
+- `GET /api/mobile/elections`
+- `GET /api/mobile/elections/{election}`
+- `POST /api/mobile/elections/{election}/positions/{position}/vote`
+- `GET /api/mobile/elections/{election}/results`
 - Laravel resource and pagination response helpers
 - Laravel validation error normalization
 - Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
@@ -123,7 +149,6 @@ No new UI was built in this phase. These screens still need endpoint/data migrat
 
 Missing future workflows remain out of scope for this phase:
 
-- Elections voting
 - Content screens for announcements, events, documents, and executives
 - Staff permit request review
 

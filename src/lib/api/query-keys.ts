@@ -24,6 +24,7 @@ export const queryKeys = {
     all: ["elections"] as const,
     lists: () => [...queryKeys.elections.all, "list"] as const,
     detail: (id: string | number) => [...queryKeys.elections.all, "detail", id] as const,
+    results: (id: string | number) => [...queryKeys.elections.all, "results", id] as const,
   },
   content: {
     all: ["content"] as const,
