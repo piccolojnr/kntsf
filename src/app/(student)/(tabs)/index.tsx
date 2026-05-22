@@ -45,6 +45,14 @@ type QuickAction = {
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
+    label: "Request",
+    sublabel: "Pay permit",
+    icon: CalendarClock,
+    href: "/(student)/permit-request" as Href,
+    accent: colors.success,
+    accentSoft: colors.successSoft,
+  },
+  {
     label: "Permits",
     sublabel: "View history",
     icon: FileText,

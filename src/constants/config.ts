@@ -7,7 +7,7 @@ type EnvironmentConfig = {
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
     // apiBaseUrl: "http://192.168.100.249:3001",
-    apiBaseUrl: "https://admin.knutsfordsrc.com",
+    apiBaseUrl: "https://a487-154-161-184-123.ngrok-free.app",
   },
   preview: {
     apiBaseUrl: "https://admin.knutsfordsrc.com",

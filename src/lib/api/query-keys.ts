@@ -17,6 +17,8 @@ export const queryKeys = {
     all: ["permit-requests"] as const,
     lists: () => [...queryKeys.permitRequests.all, "list"] as const,
     options: () => [...queryKeys.permitRequests.all, "options"] as const,
+    detail: (reference?: string | null) =>
+      [...queryKeys.permitRequests.all, "detail", reference ?? ""] as const,
   },
   elections: {
     all: ["elections"] as const,
