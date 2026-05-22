@@ -49,6 +49,19 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 | POST | `/api/mobile/elections/{election}/positions/{position}/vote` | Sanctum student account, throttled | Cast immutable vote for one position |
 | GET | `/api/mobile/elections/{election}/results` | Sanctum student account | View results when visible or permitted |
 
+### Content
+
+| Method | Endpoint | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/mobile/content/home` | Sanctum, throttled | Featured announcements, upcoming events, featured documents, and executives |
+| GET | `/api/mobile/content/announcements` | Sanctum, throttled | Paginated published public announcements |
+| GET | `/api/mobile/content/announcements/{slug}` | Sanctum, throttled | Published public announcement detail |
+| GET | `/api/mobile/content/events` | Sanctum, throttled | Paginated published public events |
+| GET | `/api/mobile/content/events/{slug}` | Sanctum, throttled | Published public event detail |
+| GET | `/api/mobile/content/documents` | Sanctum, throttled | Paginated published public documents |
+| GET | `/api/mobile/content/documents/{slug}` | Sanctum, throttled | Published public document detail and public files |
+| GET | `/api/mobile/content/executives` | Sanctum, throttled | Published executive profiles |
+
 ### Operations
 
 | Method | Endpoint | Auth | Purpose |
@@ -148,6 +161,28 @@ Election voting rules:
 - votes cannot be edited after submission
 - results are hidden until `results_visible` is true unless the user has `elections.view_results`
 
+## Mobile Content Flow
+
+Expected Expo sections:
+
+```txt
+Home
+Announcements
+Events
+Documents
+Executives
+```
+
+Content endpoints reuse the public portal visibility rules:
+
+- `published` status only
+- `public` visibility only
+- `published_at` must be set and not in the future
+- executive profiles must be published
+- draft, archived, internal, and unpublished records return `404` on detail routes
+
+List endpoints support lightweight `search`, `category`, and `featured` filters. Events also support `upcoming=true`. Responses are paginated and use mobile resources so dashboard metadata, token hashes, payment metadata, and internal model payloads are not exposed.
+
 ## Expo Integration Notes
 
 - Store the bearer token in the platform secure storage layer, not plain async storage.
@@ -159,5 +194,4 @@ Election voting rules:
 ## Not Built Yet
 
 - Mobile password reset.
-- Mobile public content browsing.
 - Push notifications.

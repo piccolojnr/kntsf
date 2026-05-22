@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Mobile\AuthController;
+use App\Http\Controllers\Api\Mobile\ContentController;
 use App\Http\Controllers\Api\Mobile\ElectionController;
 use App\Http\Controllers\Api\Mobile\OperationsController;
 use App\Http\Controllers\Api\Mobile\OperationsPermitRequestController;
@@ -22,6 +23,17 @@ Route::prefix('mobile')->name('mobile.')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
+
+        Route::prefix('content')->name('content.')->middleware('throttle:public-content')->group(function () {
+            Route::get('home', [ContentController::class, 'home'])->name('home');
+            Route::get('announcements', [ContentController::class, 'announcements'])->name('announcements.index');
+            Route::get('announcements/{announcement:slug}', [ContentController::class, 'announcementShow'])->name('announcements.show');
+            Route::get('events', [ContentController::class, 'events'])->name('events.index');
+            Route::get('events/{event:slug}', [ContentController::class, 'eventShow'])->name('events.show');
+            Route::get('documents', [ContentController::class, 'documents'])->name('documents.index');
+            Route::get('documents/{document:slug}', [ContentController::class, 'documentShow'])->name('documents.show');
+            Route::get('executives', [ContentController::class, 'executives'])->name('executives.index');
+        });
 
         Route::prefix('elections')->name('elections.')->group(function () {
             Route::get('/', [ElectionController::class, 'index'])->name('index');

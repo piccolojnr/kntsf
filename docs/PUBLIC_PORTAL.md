@@ -60,4 +60,8 @@ Future SEO improvements could include SSR, Open Graph images, canonical tags, an
 
 ## Future API Reuse
 
-The same visibility rules should be reused by future mobile/public APIs. Do not expose dashboard payloads directly to public clients.
+The same visibility rules are reused by the mobile content API under `/api/mobile/content`.
+
+Mobile clients receive JSON resources instead of Inertia dashboard payloads. These resources expose only safe public fields, public media URLs, and public document file URLs for published public documents.
+
+Do not expose dashboard payloads directly to public or mobile clients.
