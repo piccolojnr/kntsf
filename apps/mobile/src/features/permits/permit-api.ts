@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
-import { unwrapData } from "@/lib/api/api-response";
+import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
@@ -19,8 +19,11 @@ type MobileApiResponse<T> = {
 export type OperationsPermitListParams = {
   search?: string;
   status?: Permit["status"] | "all";
+  academicPeriodId?: string | number;
+  academic_period_id?: string | number;
   page?: number;
   limit?: number;
+  per_page?: number;
 };
 
 export type PermitsListResult = ApiListResponse<Permit>;
@@ -95,17 +98,28 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
 export async function getPermits(params?: OperationsPermitListParams) {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<PermitDto>>
+      | MobileApiResponse<ApiListResponse<PermitDto>>
+      | { data: PermitDto[]; links?: Record<string, string | null>; meta?: Record<string, unknown> }
+      | PermitDto[]
     >("/api/mobile/operations/permits", {
       params: {
         search: params?.search,
         status: params?.status === "all" ? undefined : params?.status,
+        academic_period_id: params?.academic_period_id ?? params?.academicPeriodId,
         page: params?.page,
-        limit: params?.limit,
+        per_page: params?.per_page ?? params?.limit,
       },
     });
 
-    const data = getMobileData(response.data);
+    if (Array.isArray(response.data)) {
+      return response.data.map(normalizePermit);
+    }
+
+    if ("meta" in response.data && Array.isArray(response.data.data)) {
+      return unwrapPaginated<PermitDto>(response.data).items.map(normalizePermit);
+    }
+
+    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<PermitDto>>);
 
     return data.items.map(normalizePermit);
   } catch (error) {
@@ -118,16 +132,41 @@ export async function getPermitsPage(
 ): Promise<PermitsListResult> {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<PermitDto>>
+      | MobileApiResponse<ApiListResponse<PermitDto>>
+      | { data: PermitDto[]; links?: Record<string, string | null>; meta?: Record<string, unknown> }
+      | PermitDto[]
     >("/api/mobile/operations/permits", {
       params: {
         search: params?.search,
         status: params?.status === "all" ? undefined : params?.status,
+        academic_period_id: params?.academic_period_id ?? params?.academicPeriodId,
         page: params?.page,
-        limit: params?.limit,
+        per_page: params?.per_page ?? params?.limit,
       },
     });
-    const data = getMobileData(response.data);
+
+    if (Array.isArray(response.data)) {
+      return {
+        items: response.data.map(normalizePermit),
+        pagination: {
+          page: 1,
+          limit: response.data.length,
+          total: response.data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
+    if ("meta" in response.data && Array.isArray(response.data.data)) {
+      const data = unwrapPaginated<PermitDto>(response.data);
+
+      return {
+        items: data.items.map(normalizePermit),
+        pagination: data.pagination,
+      };
+    }
+
+    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<PermitDto>>);
 
     return {
       items: data.items.map(normalizePermit),
