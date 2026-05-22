@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   User,
   UserRound,
+  Vote,
 } from "lucide-react-native";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -67,6 +68,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     href: "/(student)/(tabs)/card" as Href,
     accent: "#7c3aed",
     accentSoft: "#ede9fe",
+  },
+  {
+    label: "Elections",
+    sublabel: "Vote",
+    icon: Vote,
+    href: "/(student)/elections" as Href,
+    accent: colors.warning,
+    accentSoft: colors.warningSoft,
   },
   {
     label: "Profile",
@@ -501,6 +510,7 @@ const styles = StyleSheet.create({
   // ── Quick actions ────────────────────────────────────────────────────────────
   actionsRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   actionTile: {
@@ -510,6 +520,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     flex: 1,
+    minWidth: "30%",
     gap: spacing.xs,
     paddingHorizontal: spacing.sm + 4,
     paddingVertical: spacing.md,
