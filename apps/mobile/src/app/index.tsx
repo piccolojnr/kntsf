@@ -28,7 +28,7 @@ function getRoleRoute(role?: string | null): Href {
 
 // ─── Branded loading screen ───────────────────────────────────────────────────
 
-function LoadingScreen() {
+function LoadingScreen({ message }: { message?: string }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const dotScale1 = useRef(new Animated.Value(0.5)).current;
   const dotScale2 = useRef(new Animated.Value(0.5)).current;
@@ -94,6 +94,7 @@ function LoadingScreen() {
             />
           ))}
         </View>
+        {message ? <Text style={styles.message}>{message}</Text> : null}
       </Animated.View>
     </SafeAreaView>
   );
@@ -102,10 +103,14 @@ function LoadingScreen() {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function Index() {
-  const { isLoading, isAuthenticated, user } = useAuth();
+  const { authError, isLoading, isAuthenticated, token, user } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (token && authError) {
+    return <LoadingScreen message={authError} />;
   }
 
   if (!isAuthenticated) {
@@ -163,5 +168,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 8,
     width: 8,
+  },
+  message: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+    maxWidth: 280,
+    textAlign: "center",
   },
 });

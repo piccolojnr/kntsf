@@ -17,12 +17,14 @@ import {
   LoginPayload,
   LoginResponse,
 } from "@/features/auth/auth-types";
+import { normalizeApiError } from "@/lib/api/api-errors";
 import { getStoredToken } from "@/lib/storage/secure-storage";
 
 type AuthContextValue = {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  authError: string | null;
   isAuthenticated: boolean;
   login: (payload: LoginPayload) => Promise<LoginResponse>;
   logout: () => Promise<void>;
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const refreshUser = useCallback(async () => {
     const storedToken = await getStoredToken();
@@ -44,25 +47,33 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (!storedToken) {
       setToken(null);
       setUser(null);
+      setAuthError(null);
       return null;
     }
 
-    let currentUser: AuthUser | null = null;
-
     try {
-      currentUser = await getCurrentAuthUser();
-    } catch {
-      currentUser = null;
+      const currentUser = await getCurrentAuthUser();
+
+      setToken(currentUser ? storedToken : null);
+      setUser(currentUser);
+      setAuthError(null);
+
+      return currentUser;
+    } catch (error) {
+      const normalizedError = normalizeApiError(error);
+
+      if (normalizedError.status === 401) {
+        setToken(null);
+        setUser(null);
+        setAuthError(null);
+        return null;
+      }
+
+      setToken(storedToken);
+      setUser(null);
+      setAuthError(normalizedError.message);
+      throw error;
     }
-
-    setToken(storedToken);
-    setUser(currentUser);
-
-    if (!currentUser) {
-      setToken(null);
-    }
-
-    return currentUser;
   }, []);
 
   const login = useCallback(async (payload: LoginPayload) => {
@@ -70,6 +81,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     setToken(response.token);
     setUser(response.user);
+    setAuthError(null);
 
     return response;
   }, []);
@@ -78,6 +90,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await logoutRequest();
     setToken(null);
     setUser(null);
+    setAuthError(null);
   }, []);
 
   useEffect(() => {
@@ -86,20 +99,28 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async function bootstrapAuth() {
       try {
         const storedToken = await getStoredToken();
-        let currentUser: AuthUser | null = null;
 
         try {
-          currentUser = await getCurrentAuthUser();
+          const currentUser = await getCurrentAuthUser();
+
+          if (!isMounted) {
+            return;
+          }
+
+          setToken(currentUser ? storedToken : null);
+          setUser(currentUser);
+          setAuthError(null);
         } catch {
-          currentUser = null;
-        }
+          if (!isMounted) {
+            return;
+          }
 
-        if (!isMounted) {
-          return;
+          setToken(storedToken);
+          setUser(null);
+          setAuthError(
+            "Unable to restore your session. Check your connection and try again.",
+          );
         }
-
-        setToken(currentUser ? storedToken : null);
-        setUser(currentUser);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -119,12 +140,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
       user,
       token,
       isLoading,
+      authError,
       isAuthenticated: Boolean(user && token),
       login,
       logout,
       refreshUser,
     }),
-    [isLoading, login, refreshUser, token, user, logout],
+    [authError, isLoading, login, refreshUser, token, user, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

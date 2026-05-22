@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/api-client";
-import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { normalizeApiError, toUserFacingError } from "@/lib/api/api-errors";
+import { unwrapData } from "@/lib/api/api-response";
 import {
   getStoredToken,
   removeStoredToken,
@@ -11,6 +12,7 @@ import {
   LoginPayload,
   LoginResponse,
   LoginResponseDto,
+  UserRole,
 } from "./auth-types";
 
 type MobileAuthResponse<T> = {
@@ -23,18 +25,59 @@ type BackendMeData = {
   user?: AuthUserDto;
 } & Partial<AuthUserDto>;
 
+const VALID_ROLES = ["student", "staff", "admin"] as const;
+
+function isUserRole(value: string | undefined): value is (typeof VALID_ROLES)[number] {
+  return Boolean(value && VALID_ROLES.includes(value as (typeof VALID_ROLES)[number]));
+}
+
+function normalizeRoles(dto: AuthUserDto): UserRole[] {
+  const roles = (dto.roles ?? []).filter(isUserRole);
+
+  if (roles.length > 0) {
+    return roles;
+  }
+
+  if (isUserRole(dto.role)) {
+    return [dto.role];
+  }
+
+  return ["student"];
+}
+
+function getPrimaryRole(roles: UserRole[]): UserRole {
+  if (roles.includes("admin")) {
+    return "admin";
+  }
+
+  if (roles.includes("staff")) {
+    return "staff";
+  }
+
+  return "student";
+}
+
+function getDeviceName(payload: LoginPayload) {
+  return payload.device_name ?? "Expo Mobile App";
+}
+
 function normalizeAuthUser(dto: AuthUserDto | null | undefined) {
   if (!dto) {
     return null;
   }
 
+  const roles = normalizeRoles(dto);
+  const role = getPrimaryRole(roles);
+
   return {
     id: String(dto.id),
     name: dto.name,
     email: dto.email,
-    role: dto.role,
-    studentId: dto.studentId,
-    type: dto.type ?? (dto.role === "student" ? "student" : "staff"),
+    roles,
+    permissions: dto.permissions ?? [],
+    role,
+    studentId: dto.studentId ?? dto.student_id ?? dto.student_number,
+    type: dto.type ?? (role === "student" ? "student" : "staff"),
   };
 }
 
@@ -47,6 +90,7 @@ function normalizeLoginResponse(dto: LoginResponseDto): LoginResponse {
 
   return {
     token: dto.token,
+    tokenType: dto.token_type ?? "Bearer",
     user,
     role: user.role,
   };
@@ -59,12 +103,18 @@ function normalizeMeResponse(data: BackendMeData) {
 export async function login(payload: LoginPayload) {
   try {
     const response = normalizeLoginResponse(
-      (
-        await apiClient.post<MobileAuthResponse<LoginResponseDto>>(
-          "/api/mobile/auth/login",
-          payload,
-        )
-      ).data.data,
+      unwrapData<LoginResponseDto>(
+        (
+          await apiClient.post<LoginResponseDto | MobileAuthResponse<LoginResponseDto>>(
+            "/api/mobile/auth/login",
+            {
+              email: payload.email,
+              password: payload.password,
+              device_name: getDeviceName(payload),
+            },
+          )
+        ).data,
+      ),
     );
 
     await setStoredToken(response.token);
@@ -93,17 +143,19 @@ export async function getCurrentUser() {
 
   try {
     const response =
-      await apiClient.get<MobileAuthResponse<BackendMeData>>("/api/mobile/me");
+      await apiClient.get<BackendMeData | MobileAuthResponse<BackendMeData>>(
+        "/api/mobile/me",
+      );
 
-    return normalizeMeResponse(response.data.data);
+    return normalizeMeResponse(unwrapData<BackendMeData>(response.data));
   } catch (error) {
     const normalizedError = normalizeApiError(error);
 
-    if (normalizedError.statusCode === 401) {
+    if (normalizedError.status === 401) {
       await removeStoredToken();
       return null;
     }
 
-    throw new Error(normalizedError.message);
+    throw toUserFacingError(error);
   }
 }
