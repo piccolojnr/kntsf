@@ -64,7 +64,7 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                             className={cn(
                                                 'h-10 rounded-md border border-transparent px-2.5 text-sidebar-foreground/72',
                                                 'hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                                                'data-active:border-sidebar-primary/45 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground data-active:shadow-[inset_3px_0_0_var(--sidebar-primary)]',
+                                                'data-active:border-sidebar-primary/45 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground',
                                                 '[&_svg]:text-sidebar-foreground/52 data-active:[&_svg]:text-sidebar-primary',
                                             )}
                                         >

@@ -65,12 +65,16 @@ export default function Dashboard({
         summary.activated_student_accounts,
         summary.total_students,
     );
-    const verificationSuccessRate = 100 - percent(
-        summary.failed_verification_attempts_today,
-        summary.verification_attempts_today,
-    );
+    const verificationSuccessRate =
+        100 -
+        percent(
+            summary.failed_verification_attempts_today,
+            summary.verification_attempts_today,
+        );
     const permitPressure =
-        summary.active_permits + summary.expired_permits + summary.revoked_permits;
+        summary.active_permits +
+        summary.expired_permits +
+        summary.revoked_permits;
 
     const commandCards = [
         {
@@ -115,20 +119,20 @@ export default function Dashboard({
             <Head title="Dashboard" />
             <div className="app-page p-4 md:p-6">
                 <section className="relative overflow-hidden rounded-md border border-app-border bg-app-ink text-app-surface shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:shadow-none">
-                    <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,#f5ead2_1px,transparent_1px),linear-gradient(#f5ead2_1px,transparent_1px)] [background-size:36px_36px]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,#f5ead2_1px,transparent_1px),linear-gradient(#f5ead2_1px,transparent_1px)] bg-size-[36px_36px] opacity-[0.08]" />
                     <div className="relative grid gap-8 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
                         <div>
-                            <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-app-ink">
+                            <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black tracking-[0.22em] text-app-ink uppercase">
                                 <Landmark className="size-4" />
                                 SRC control room
                             </p>
-                            <h1 className="mt-6 max-w-4xl text-5xl font-black leading-[0.92] tracking-normal md:text-7xl">
+                            <h1 className="mt-6 max-w-4xl text-5xl leading-[0.92] font-black tracking-normal md:text-7xl">
                                 Operations overview
                             </h1>
                             <p className="mt-5 max-w-2xl text-sm leading-7 text-app-surface/75">
-                                Live working summary for student records, permits,
-                                NFC cards, payments, verification, content, and
-                                elections.
+                                Live working summary for student records,
+                                permits, NFC cards, payments, verification,
+                                content, and elections.
                             </p>
                         </div>
                         <div className="grid content-end gap-3">
@@ -190,7 +194,10 @@ export default function Dashboard({
                             ) : (
                                 <div className="grid gap-3 md:grid-cols-2">
                                     {warnings.map((item) => (
-                                        <WarningRow key={item.key} item={item} />
+                                        <WarningRow
+                                            key={item.key}
+                                            item={item}
+                                        />
                                     ))}
                                 </div>
                             )}
@@ -204,7 +211,10 @@ export default function Dashboard({
                             >
                                 <div className="grid gap-3 md:grid-cols-2">
                                     {contentReadiness.map((item) => (
-                                        <ContentRow key={item.key} item={item} />
+                                        <ContentRow
+                                            key={item.key}
+                                            item={item}
+                                        />
                                     ))}
                                 </div>
                             </Panel>
@@ -261,12 +271,14 @@ function CommandCard({
     return (
         <article className="app-panel group p-5 transition hover:-translate-y-1">
             <div className="flex items-start justify-between gap-4">
-                <div className={`grid size-12 place-items-center rounded-md ${tones[tone]}`}>
+                <div
+                    className={`grid size-12 place-items-center rounded-md ${tones[tone]}`}
+                >
                     <Icon className="size-5" />
                 </div>
                 <ArrowUpRight className="size-5 text-app-muted transition group-hover:translate-x-1 group-hover:-translate-y-1" />
             </div>
-            <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-app-muted">
+            <p className="mt-6 text-xs font-black tracking-[0.18em] text-app-muted uppercase">
                 {label}
             </p>
             <p className="mt-2 text-4xl font-black tabular-nums">{value}</p>
@@ -274,7 +286,10 @@ function CommandCard({
                 {detail}
             </p>
             <div className="mt-5 h-2 rounded-full bg-app-surface-muted">
-                <div className={`h-full rounded-full ${tones[tone]}`} style={{ width: `${meter}%` }} />
+                <div
+                    className={`h-full rounded-full ${tones[tone]}`}
+                    style={{ width: `${meter}%` }}
+                />
             </div>
         </article>
     );
@@ -294,10 +309,14 @@ function StatusPlate({
     return (
         <div className="rounded-md border border-app-surface/15 bg-black/20 p-4">
             <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-app-surface/75">
+                <p className="text-xs font-black tracking-[0.22em] text-app-surface/75 uppercase">
                     {label}
                 </p>
-                <Icon className={alert ? 'size-5 text-app-brass' : 'size-5 text-app-teal'} />
+                <Icon
+                    className={
+                        alert ? 'size-5 text-app-brass' : 'size-5 text-app-teal'
+                    }
+                />
             </div>
             <p className="mt-3 text-4xl font-black">{value}</p>
         </div>
@@ -318,7 +337,7 @@ function SignalCard({
     return (
         <article className="app-panel p-5">
             <Icon className="size-5 text-app-red" />
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-app-muted">
+            <p className="mt-5 text-xs font-black tracking-[0.18em] text-app-muted uppercase">
                 {label}
             </p>
             <p className="mt-2 text-3xl font-black tabular-nums">{value}</p>
@@ -344,10 +363,12 @@ function Panel({
         <section className="app-panel">
             <header className="flex items-center justify-between border-b border-app-border p-5">
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-app-red">
+                    <p className="text-[10px] font-black tracking-[0.24em] text-app-red uppercase">
                         {eyebrow}
                     </p>
-                    <h2 className="mt-1 text-xl font-black tracking-normal">{title}</h2>
+                    <h2 className="mt-1 text-xl font-black tracking-normal">
+                        {title}
+                    </h2>
                 </div>
                 <div className="grid size-10 place-items-center rounded-md bg-app-ink text-app-surface dark:bg-app-surface dark:text-app-ink">
                     <Icon className="size-5" />
@@ -370,12 +391,14 @@ function WarningRow({ item }: { item: DashboardWarning }) {
         <div className="app-panel-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="font-black leading-tight">{item.title}</p>
+                    <p className="leading-tight font-black">{item.title}</p>
                     <p className="mt-2 text-sm leading-6 text-app-muted">
                         {item.description}
                     </p>
                 </div>
-                <span className={`${severity} px-2 py-1 text-xs font-black text-white`}>
+                <span
+                    className={`${severity} px-2 py-1 text-xs font-black text-white`}
+                >
                     {item.count ?? '!'}
                 </span>
             </div>
@@ -387,7 +410,13 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
     return (
         <div className="app-panel-muted p-4">
             <div className="flex items-center gap-2">
-                <span className={item.ready ? 'size-2 rounded-full bg-app-teal' : 'size-2 rounded-full bg-app-brass'} />
+                <span
+                    className={
+                        item.ready
+                            ? 'size-2 rounded-full bg-app-teal'
+                            : 'size-2 rounded-full bg-app-brass'
+                    }
+                />
                 <p className="font-black">{item.title}</p>
             </div>
             <p className="mt-2 text-sm leading-6 text-app-muted">
@@ -399,19 +428,19 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
 
 function ActivityRow({ item }: { item: ActivityItem }) {
     return (
-        <div className="rounded-md border-l-4 border-app-teal bg-app-surface-muted p-4">
+        <div className="rounded-md border-app-teal bg-app-surface-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="font-black leading-tight">{item.label}</p>
+                    <p className="leading-tight font-black">{item.label}</p>
                     <p className="mt-1 text-sm leading-6 text-app-muted">
                         {item.description ?? 'System activity'}
                     </p>
                 </div>
-                <span className="shrink-0 text-xs font-black uppercase tracking-[0.14em] text-app-muted">
+                <span className="shrink-0 text-xs font-black tracking-[0.14em] text-app-muted uppercase">
                     {formatActivityDate(item.created_at)}
                 </span>
             </div>
-            <p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-app-red">
+            <p className="mt-3 text-xs font-black tracking-[0.14em] text-app-red uppercase">
                 {item.actor?.name ?? 'System'}
                 {item.subject ? ` / ${item.subject.label}` : ''}
             </p>
