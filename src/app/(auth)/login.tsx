@@ -167,7 +167,7 @@ export default function LoginScreen() {
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      const payload: LoginPayload = { username: email.trim(), password };
+      const payload: LoginPayload = { email: email.trim(), password };
       const response = await login(payload);
       router.replace(getRoleRoute(response.user.role));
     } catch (error) {
@@ -226,10 +226,10 @@ export default function LoginScreen() {
           {/* Form */}
           <View style={styles.form}>
             <InputField
-              label="Username or email"
+              label="Email"
               value={email}
               onChangeText={setEmail}
-              placeholder="Enter username or email"
+              placeholder="Enter email address"
               autoCapitalize="none"
               keyboardType="email-address"
               onFocus={handleInputFocus}

@@ -1,13 +1,14 @@
 import { create } from "axios";
 
 import { API_BASE_URL } from "@/constants/config";
-import { toUserFacingError } from "@/lib/api/api-error";
+import { toUserFacingError } from "@/lib/api/api-errors";
 import { getStoredToken, removeStoredToken } from "@/lib/storage/secure-storage";
 
 export const apiClient = create({
   baseURL: API_BASE_URL || undefined,
   timeout: 10000,
   headers: {
+    Accept: "application/json",
     "Content-Type": "application/json",
   },
 });

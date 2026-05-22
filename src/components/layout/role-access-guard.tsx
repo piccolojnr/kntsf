@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { Screen } from "@/components/ui/screen";
 import { colors } from "@/constants/theme";
+import { hasAnyRole } from "@/features/auth/auth-permissions";
 import { UserRole } from "@/features/auth/auth-types";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -46,7 +47,7 @@ export function RoleAccessGuard({
     return <Redirect href={unauthenticatedHref} />;
   }
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (!hasAnyRole(user, allowedRoles)) {
     return <Redirect href={getForbiddenHref(user?.role)} />;
   }
 
