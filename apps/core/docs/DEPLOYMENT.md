@@ -40,6 +40,9 @@ Set strong secrets:
 APP_KEY=
 PERMIT_CODE_HASH_KEY=
 NFC_UID_HASH_KEY=
+PAYSTACK_PUBLIC_KEY=
+PAYSTACK_SECRET_KEY=
+PAYSTACK_WEBHOOK_SECRET=
 ```
 
 ## Deployment Commands
@@ -76,7 +79,7 @@ Run every minute:
 * * * * * php /path/to/app/artisan schedule:run >> /dev/null 2>&1
 ```
 
-The scheduler prunes expired Sanctum tokens, prunes old queue records, and expires permits.
+The scheduler prunes expired Sanctum tokens, prunes old queue records, expires permits, and expires unpaid permit requests.
 
 ## Storage
 
@@ -103,6 +106,18 @@ Requirements:
 - Never log bearer tokens
 - Revoke tokens on logout
 - Prune expired tokens through the scheduler
+- Use `/api/mobile/permit-requests/*` for authenticated mobile self-service permit requests
+
+## Paystack
+
+Public and mobile permit payment flows use Paystack. Production requirements:
+
+- configure live Paystack keys
+- configure webhook URL: `/payments/paystack/webhook`
+- enforce HTTPS
+- verify webhook signatures
+- keep callback/webhook verification server-side
+- monitor stuck permit requests from the dashboard recovery view
 
 ## Health Checks
 

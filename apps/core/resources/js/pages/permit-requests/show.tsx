@@ -1,13 +1,18 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCcw, RotateCw, TimerOff, XCircle } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { PermitRequestStatusBadge } from '@/features/public-permit-request/components/permit-request-status-badge';
 import {
     approveReview,
+    cancel,
     index,
+    markExpired,
     rejectReview,
+    retryIssuance,
+    retryVerification,
 } from '@/routes/permit-requests';
 
 type PermitRequestDetail = {
@@ -42,6 +47,7 @@ type PermitRequestDetail = {
         permit_id: number | null;
         permit_code_last4: string | null;
     } | null;
+    recovery_state: string | null;
 };
 
 export default function PermitRequestShow({
@@ -49,7 +55,7 @@ export default function PermitRequestShow({
     can,
 }: {
     permitRequest: PermitRequestDetail;
-    can: { review: boolean };
+    can: { review: boolean; recover: boolean };
 }) {
     return (
         <>
@@ -85,8 +91,71 @@ export default function PermitRequestShow({
                         <Detail label="Email" value={permitRequest.contact_email ?? 'Missing'} />
                         <Detail label="Phone" value={permitRequest.contact_phone ?? 'Missing'} />
                         <Detail label="Amount" value={`${permitRequest.currency} ${Number(permitRequest.amount).toFixed(2)}`} />
+                        <Detail label="Recovery state" value={permitRequest.recovery_state ?? 'Normal'} />
                     </div>
                 </section>
+
+                {can.recover && (
+                    <section className="app-panel p-6">
+                        <h2 className="text-lg font-black">Recovery actions</h2>
+                        <p className="mt-2 text-sm text-app-muted">
+                            Use these only when Paystack callbacks arrive late,
+                            issuance fails after a verified payment, or an
+                            unpaid request needs closure.
+                        </p>
+
+                        <div className="mt-5 flex flex-wrap gap-2">
+                            <ConfirmActionDialog
+                                form={retryVerification.form(permitRequest.id)}
+                                title="Retry payment verification?"
+                                description="This will call Paystack server-side and update the payment/request if Paystack confirms success."
+                                confirmLabel="Retry verification"
+                                trigger={
+                                    <Button variant="outline">
+                                        <RefreshCcw />
+                                        Retry verification
+                                    </Button>
+                                }
+                            />
+                            <ConfirmActionDialog
+                                form={retryIssuance.form(permitRequest.id)}
+                                title="Retry permit issuance?"
+                                description="This will only issue a permit when the linked payment is verified. Duplicate active permits remain blocked."
+                                confirmLabel="Retry issuance"
+                                trigger={
+                                    <Button variant="outline">
+                                        <RotateCw />
+                                        Retry issuance
+                                    </Button>
+                                }
+                            />
+                            <ConfirmActionDialog
+                                form={markExpired.form(permitRequest.id)}
+                                title="Mark request expired?"
+                                description="Only unpaid pending requests should be marked expired."
+                                confirmLabel="Mark expired"
+                                trigger={
+                                    <Button variant="outline">
+                                        <TimerOff />
+                                        Mark expired
+                                    </Button>
+                                }
+                            />
+                            <ConfirmActionDialog
+                                form={cancel.form(permitRequest.id)}
+                                title="Cancel permit request?"
+                                description="This closes the request without issuing a permit. This is a destructive recovery action."
+                                confirmLabel="Cancel request"
+                                trigger={
+                                    <Button variant="destructive">
+                                        <XCircle />
+                                        Cancel request
+                                    </Button>
+                                }
+                            />
+                        </div>
+                    </section>
+                )}
 
                 {permitRequest.requires_review && can.review && permitRequest.review_status === 'pending_review' && (
                     <section className="app-panel p-6">

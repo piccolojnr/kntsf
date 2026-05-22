@@ -29,6 +29,17 @@ Create permit request
 
 The callback never trusts query parameters as proof of payment. It only uses the reference to perform server-side verification.
 
+## Late Callback and Recovery Handling
+
+Paystack callbacks and webhooks can arrive late, repeat, or race each other. The app handles this by treating verification and permit completion as idempotent operations:
+
+- callbacks/webhooks verify the payment directly with Paystack
+- successful payments are locked before status changes
+- permit completion reuses `CompletePermitRequestAction`
+- duplicate active permits for the same student and academic period are blocked
+
+If a request gets stuck, admins can retry verification from the permit request dashboard. This calls the same server-side Paystack verification action used by callbacks and mobile verification.
+
 ## Webhook
 
 Endpoint:
@@ -43,6 +54,8 @@ Supported events:
 - `charge.failed`
 
 The webhook verifies `x-paystack-signature` using HMAC SHA-512 over the raw request body. CSRF protection is disabled only for this webhook path.
+
+If webhook delivery fails or arrives after the student leaves checkout, admin retry verification or the mobile/public callback can still reconcile the local payment.
 
 ## Security Rules
 

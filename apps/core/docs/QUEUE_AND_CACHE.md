@@ -57,6 +57,7 @@ Scheduled tasks currently include:
 - `queue:prune-failed --hours=168`
 - `queue:prune-batches --hours=168 --unfinished=336 --cancelled=336`
 - `permits:expire`
+- `permit-requests:expire`
 
 ## Cache Strategy
 
@@ -75,6 +76,8 @@ Cached areas:
 - Active academic period lookup
 - Permit settings
 - Content settings
+
+The active academic period cache stores only a scalar ID and re-queries the model to avoid unsafe PHP object cache serialization.
 
 The cache uses short TTLs and versioned keys instead of tags so it works with the database cache store. Relevant model changes flush dashboard caches or bump public content versions.
 

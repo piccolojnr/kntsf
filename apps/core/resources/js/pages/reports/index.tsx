@@ -60,6 +60,12 @@ const reportMeta: Record<string, ReportMeta> = {
         icon: CreditCard,
         color: '#15803d',
     },
+    permit_requests: {
+        title: 'Permit Requests',
+        description: 'Self-service recovery and stuck request totals.',
+        icon: FileText,
+        color: '#7c3aed',
+    },
     verification: {
         title: 'Verification',
         description: 'Manual verification attempts and outcomes.',

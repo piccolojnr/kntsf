@@ -23,3 +23,7 @@ Schedule::command('queue:prune-batches --hours=168 --unfinished=336 --cancelled=
 Schedule::command('permits:expire')
     ->hourly()
     ->withoutOverlapping();
+
+Schedule::command('permit-requests:expire')
+    ->hourly()
+    ->withoutOverlapping();

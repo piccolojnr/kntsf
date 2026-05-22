@@ -12,4 +12,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('permit-requests/{permit_request}/reject-review', [PermitRequestController::class, 'rejectReview'])
         ->middleware('throttle:sensitive-actions')
         ->name('permit-requests.reject-review');
+    Route::post('permit-requests/{permit_request}/retry-verification', [PermitRequestController::class, 'retryVerification'])
+        ->middleware('throttle:sensitive-actions')
+        ->name('permit-requests.retry-verification');
+    Route::post('permit-requests/{permit_request}/retry-issuance', [PermitRequestController::class, 'retryIssuance'])
+        ->middleware('throttle:sensitive-actions')
+        ->name('permit-requests.retry-issuance');
+    Route::post('permit-requests/{permit_request}/cancel', [PermitRequestController::class, 'cancel'])
+        ->middleware('throttle:sensitive-actions')
+        ->name('permit-requests.cancel');
+    Route::post('permit-requests/{permit_request}/mark-expired', [PermitRequestController::class, 'markExpired'])
+        ->middleware('throttle:sensitive-actions')
+        ->name('permit-requests.mark-expired');
 });

@@ -16,6 +16,8 @@ The dashboard uses `App\Support\DashboardSummary` for:
 - pending and successful payments
 - verification attempts today
 - failed verification attempts today
+- stuck self-service permit requests
+- paid but unissued permit requests
 
 The same service also returns operational warnings, including:
 
@@ -24,6 +26,7 @@ The same service also returns operational warnings, including:
 - students without activated accounts
 - students without active NFC cards
 - permits expiring within 14 days
+- self-service permit requests that need recovery
 
 ## Reports Page
 
@@ -45,7 +48,15 @@ The page groups counts by:
 - Permits
 - NFC Cards
 - Payments
+- Permit Requests
 - Verification
+
+Permit request reports include:
+
+- paid but not issued
+- awaiting payment but expired
+- payment success but request failed
+- successful payment without a linked permit
 
 ## Design Notes
 

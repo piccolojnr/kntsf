@@ -26,6 +26,7 @@ class DashboardSummary
         private readonly PermitSettings $permitSettings,
         private readonly ContentSettings $contentSettings,
         private readonly ApplicationCache $cache,
+        private readonly PermitRequestRecovery $permitRequestRecovery,
     ) {}
 
     /**
@@ -77,6 +78,8 @@ class DashboardSummary
             'active_elections' => Election::query()->where('status', 'active')->count(),
             'pending_candidates' => ElectionCandidate::query()->where('status', 'pending')->count(),
             'election_votes_today' => ElectionVote::query()->whereDate('cast_at', today())->count(),
+            'stuck_permit_requests' => array_sum($this->permitRequestRecovery->counts()),
+            'paid_unissued_permit_requests' => $this->permitRequestRecovery->paidNotIssued()->count(),
         ];
     }
 
@@ -153,6 +156,18 @@ class DashboardSummary
                 'description' => 'Active permits will expire within the next 14 days.',
                 'severity' => 'low',
                 'count' => $permitsExpiringSoon,
+            ];
+        }
+
+        $stuckPermitRequests = array_sum($this->permitRequestRecovery->counts());
+
+        if ($stuckPermitRequests > 0) {
+            $warnings[] = [
+                'key' => 'stuck_permit_requests',
+                'title' => 'Permit requests need recovery',
+                'description' => 'Some self-service permit requests are paid, expired, or failed and need admin review.',
+                'severity' => 'high',
+                'count' => $stuckPermitRequests,
             ];
         }
 
@@ -253,6 +268,7 @@ class DashboardSummary
                 'failed' => Payment::query()->where('status', PaymentStatus::Failed)->count(),
                 'cancelled' => Payment::query()->where('status', PaymentStatus::Cancelled)->count(),
             ],
+            'permit_requests' => $this->permitRequestRecovery->counts(),
             'verification' => [
                 'attempts_today' => $counts['verification_attempts_today'],
                 'failed_today' => $counts['failed_verification_attempts_today'],

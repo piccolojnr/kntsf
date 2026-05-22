@@ -7,6 +7,7 @@ This document summarizes the production-readiness pass for the Laravel/Inertia S
 | Area | Access boundary | Notes |
 | --- | --- | --- |
 | Public portal | Public, throttled | Only published/public announcements, events, documents, executives, and public election info are exposed. |
+| Self-service permits | Public or Sanctum mobile | Public flow can create provisional students; mobile flow requires linked student accounts. Payment is verified server-side. |
 | Dashboard | `auth`, `verified` | Operational dashboard data is never public. |
 | Students, permits, payments, NFC cards | `auth`, `verified`, policies/Form Requests | Destructive and sensitive actions require permissions and confirmation in the UI. |
 | Verification | `auth`, `verified`, `verification.perform`, throttled | Raw identifiers are accepted only as request input and are hashed before logging. |
@@ -26,6 +27,10 @@ Named application limiters are configured in `App\Providers\AppServiceProvider`:
 | `verification` | Student number, permit code, NFC verification | 30 per minute per user/IP |
 | `sensitive-actions` | Payment, permit, and NFC status actions | 20 per minute per user/IP |
 | `public-content` | Public portal pages | 120 per minute per IP |
+| `mobile-login` | Mobile API login | 5 per minute per email/IP |
+| `mobile-verification` | Mobile verification endpoints | 30 per minute per user/IP |
+| `mobile-sensitive-actions` | Mobile staff operations | 20 per minute per user/IP |
+| `mobile-permit-requests` | Mobile permit request create/init/verify | 12 per minute per user/IP |
 
 ## Sensitive Data Rules
 
@@ -34,6 +39,7 @@ Named application limiters are configured in `App\Providers\AppServiceProvider`:
 - Never store raw verification identifiers in logs.
 - Never expose password hashes, token hashes, raw UIDs, full permit codes, or internal metadata in Inertia props.
 - Public controllers must return explicit payload arrays instead of raw models.
+- Paystack metadata and access codes are not returned from permit request resources.
 
 ## Token Security
 
@@ -53,7 +59,7 @@ Dashboard uploads are validated by Form Requests before Media Library attachment
 - Featured images and gallery uploads must be images.
 - File sizes are capped in the relevant request classes.
 - Public document download links are returned only through public document routes after `published` and `public` checks.
-- Private/internal media rules should be revisited before cloud storage or mobile APIs are added.
+- Private/internal media rules should be revisited before cloud storage or public mobile media downloads are added.
 
 ## Authorization Rules
 
@@ -103,6 +109,7 @@ Audit logging is expected for:
 - Role and permission changes
 - Permit issue/revoke/card delivery
 - Payment create/success/failure/cancel
+- Permit request create/payment verify/issue/review/recovery/cancel/expire
 - NFC register/replace/lost/revoke
 - Verification attempts
 - Content publish/archive/delete
