@@ -2,7 +2,7 @@
 
 ## Current Migration Phase
 
-Phase 2 is in progress: student core screen migration. The API/auth foundation is in place, and the existing student home, profile, permits, NFC card, and report-lost flows now target Laravel student endpoints without adding permit request, payment, elections, or content-detail UI.
+Phase 3 is in progress: mobile permit request and Paystack flow. The API/auth foundation and student core screens are migrated, and students can now create permit requests, launch Paystack checkout, return to the app, verify payment server-side, and inspect request status.
 
 ## Laravel API Response Strategy
 
@@ -41,6 +41,30 @@ Migrated student endpoints:
 
 Student response mapping now uses Laravel resource fields such as `student_number`, `starts_at`, `expires_at`, `amount_paid`, `code_last4`, and `uid_last4`. The UI compatibility fields remain normalized inside feature APIs so existing screens do not need a redesign. Raw NFC UIDs and full permit codes are not expected by the student screens.
 
+## Permit Request And Payment Flow
+
+Implemented endpoints:
+
+- `GET /api/mobile/permit-requests/options`
+- `GET /api/mobile/permit-requests`
+- `POST /api/mobile/permit-requests`
+- `GET /api/mobile/permit-requests/{reference}`
+- `POST /api/mobile/permit-requests/{reference}/initialize-payment`
+- `POST /api/mobile/permit-requests/{reference}/verify-payment`
+
+Implemented routes:
+
+- `/(student)/permit-request`
+- `/(student)/permit-request/[reference]`
+- `/(student)/permit-request/payment-return`
+
+Payment handling:
+
+- Paystack checkout opens through `expo-web-browser`.
+- Redirect return is handled by the payment return route when available.
+- Payment is never trusted from redirect alone; the app calls backend verification.
+- A manual "I Have Paid, Verify Payment" fallback is available on the request detail screen.
+
 ## Old Endpoint Mappings Still In Code
 
 These are still used outside the migrated student core screens and should be migrated in later phases:
@@ -71,6 +95,12 @@ Already aligned or prepared:
 - `GET /api/mobile/student/permits`
 - `GET /api/mobile/student/nfc-card`
 - `POST /api/mobile/student/nfc-card/report-lost`
+- `GET /api/mobile/permit-requests/options`
+- `GET /api/mobile/permit-requests`
+- `POST /api/mobile/permit-requests`
+- `GET /api/mobile/permit-requests/{reference}`
+- `POST /api/mobile/permit-requests/{reference}/initialize-payment`
+- `POST /api/mobile/permit-requests/{reference}/verify-payment`
 - Laravel resource and pagination response helpers
 - Laravel validation error normalization
 - Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
@@ -93,15 +123,14 @@ No new UI was built in this phase. These screens still need endpoint/data migrat
 
 Missing future workflows remain out of scope for this phase:
 
-- Permit request and Paystack payment flow
 - Elections voting
 - Content screens for announcements, events, documents, and executives
 - Staff permit request review
 
 ## Next Steps
 
-1. Migrate staff verification endpoints to `/api/mobile/verification/*`.
-2. Migrate card registration/replacement/revocation to operations NFC-card endpoints.
-3. Add permit request and Paystack flow after the student core remains stable.
+1. Confirm the Paystack callback/redirect URL configured by the backend matches the Expo deep-link route.
+2. Migrate staff verification endpoints to `/api/mobile/verification/*`.
+3. Migrate card registration/replacement/revocation to operations NFC-card endpoints.
 4. Add feature-level response schemas with Zod once endpoint payloads are stable.
 5. Decompose oversized screens while migrating each feature, not before.

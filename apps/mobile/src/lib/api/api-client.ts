@@ -26,6 +26,7 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.error("API Error:", error);
     if (error?.response?.status === 401) {
       await removeStoredToken();
     }

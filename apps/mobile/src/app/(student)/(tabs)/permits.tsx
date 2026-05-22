@@ -12,9 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Href, router } from "expo-router";
 
 import StudentPermitCard from "@/components/cards/student-permit-card";
 import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -631,6 +633,13 @@ export default function StudentPermitsScreen() {
           />
         ) : (
           <>
+            <Button
+              icon={FileText}
+              label="Request Permit"
+              onPress={() => router.push("/(student)/permit-request" as Href)}
+              variant="secondary"
+            />
+
             {/* ── Permit Card hero ── */}
             {activePermit ? (
               <StudentPermitCard
