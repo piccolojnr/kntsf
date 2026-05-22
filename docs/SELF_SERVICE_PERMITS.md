@@ -61,3 +61,17 @@ Rejection:
 The workflow locks payment and permit request rows during verification/completion. Duplicate callbacks or webhooks safely return without issuing duplicate permits.
 
 Duplicate active permits for the same student and academic period are still blocked by `IssuePermitAction`.
+
+## Mobile API Reuse
+
+Authenticated mobile students use the same `PermitRequest`, `Payment`, Paystack, and permit issuance actions.
+
+Mobile differences:
+
+- only linked student accounts can create requests
+- the mobile API never creates unknown/provisional students
+- students cannot change student number, name, course, or level from mobile
+- missing email or phone can be supplied if the student record does not already have it
+- active permits and open requests are reported by `/api/mobile/permit-requests/options` before checkout
+
+Unknown students or students without linked accounts should use the public website flow for now.
