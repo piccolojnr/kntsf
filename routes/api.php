@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Mobile\AuthController;
+use App\Http\Controllers\Api\Mobile\ElectionController;
 use App\Http\Controllers\Api\Mobile\OperationsController;
 use App\Http\Controllers\Api\Mobile\OperationsPermitRequestController;
 use App\Http\Controllers\Api\Mobile\PermitRequestController;
@@ -21,6 +22,15 @@ Route::prefix('mobile')->name('mobile.')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
+
+        Route::prefix('elections')->name('elections.')->group(function () {
+            Route::get('/', [ElectionController::class, 'index'])->name('index');
+            Route::get('{election}', [ElectionController::class, 'show'])->name('show');
+            Route::get('{election}/results', [ElectionController::class, 'results'])->name('results');
+            Route::post('{election}/positions/{position}/vote', [ElectionController::class, 'vote'])
+                ->middleware('throttle:mobile-sensitive-actions')
+                ->name('vote');
+        });
 
         Route::prefix('permit-requests')->name('permit-requests.')->group(function () {
             Route::get('options', [PermitRequestController::class, 'options'])->name('options');
