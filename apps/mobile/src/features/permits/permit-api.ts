@@ -25,7 +25,7 @@ export type OperationsPermitListParams = {
 
 export type PermitsListResult = ApiListResponse<Permit>;
 
-function normalizePermit(dto: PermitDto): Permit {
+export function normalizePermit(dto: PermitDto): Permit {
   const expiryDate =
     dto.expiryDate ?? dto.expires_at ?? dto.expiry_date ?? dto.expiresAt ?? "";
   const codeLast4 = dto.codeLast4 ?? dto.code_last4 ?? null;
@@ -163,11 +163,42 @@ export async function getLatestPermitByStudentId(studentId: string) {
 export async function getPermitIssuanceConfig() {
   try {
     const response =
-      await apiClient.get<MobileApiResponse<PermitIssuanceConfigDto>>(
-        "/api/mobile/operations/permit-config",
+      await apiClient.get<
+        | PermitIssuanceConfigDto
+        | {
+            data: PermitIssuanceConfigDto;
+          }
+        | {
+            permit_requests_enabled?: boolean;
+            default_amount?: string | number;
+            currency?: string;
+            active_academic_period?: {
+              academic_year?: string | null;
+              semester?: string | null;
+            } | null;
+          }
+      >(
+        "/api/mobile/permit-requests/options",
       );
+    const data = unwrapData<
+      PermitIssuanceConfigDto & {
+        permit_requests_enabled?: boolean;
+        default_amount?: string | number;
+        active_academic_period?: {
+          academic_year?: string | null;
+          semester?: string | null;
+        } | null;
+      }
+    >(response.data);
 
-    return normalizePermitIssuanceConfig(getMobileData(response.data));
+    return normalizePermitIssuanceConfig({
+      ...data,
+      enabled: data.enabled ?? data.permit_requests_enabled,
+      defaultAmount: Number(data.defaultAmount ?? data.default_amount ?? 0),
+      academicYear:
+        data.academicYear ?? data.active_academic_period?.academic_year ?? null,
+      semester: data.semester ?? data.active_academic_period?.semester ?? null,
+    });
   } catch (error) {
     throw toUserFacingError(error);
   }
@@ -176,9 +207,15 @@ export async function getPermitIssuanceConfig() {
 export async function issuePermitForStudent(studentId: string) {
   try {
     const response = await apiClient.post<
-      MobileApiResponse<PermitDto | { permit: PermitDto }>
-    >("/api/mobile/permits/issue", { studentId });
-    const data = getMobileData(response.data);
+      | PermitDto
+      | { permit: PermitDto }
+      | { data: PermitDto | { permit: PermitDto } }
+      | MobileApiResponse<PermitDto | { permit: PermitDto }>
+    >("/api/mobile/operations/permits/issue", {
+      student_number: studentId,
+      student_id: studentId,
+    });
+    const data = unwrapData<PermitDto | { permit: PermitDto }>(response.data);
 
     return normalizePermit("permit" in data ? data.permit : data);
   } catch (error) {

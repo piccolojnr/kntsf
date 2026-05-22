@@ -7,6 +7,15 @@ export type Student = {
   level: string;
   phone: string;
   accountStatus?: string;
+  activeNfcCard?: {
+    id: string;
+    status: string;
+    uidLast4?: string | null;
+    uid?: string;
+    registeredAt?: string;
+    issuedAt?: string | null;
+    activatedAt?: string | null;
+  } | null;
 };
 
 export type StudentDto = Partial<Student> & {
@@ -22,6 +31,20 @@ export type StudentDto = Partial<Student> & {
   phone?: string | null;
   course?: string | null;
   level?: string | null;
+  active_nfc_card?: {
+    id: string | number;
+    status?: string;
+    uid_last4?: string | null;
+    issued_at?: string | null;
+    activated_at?: string | null;
+  } | null;
+  nfc_card?: {
+    id: string | number;
+    status?: string;
+    uid_last4?: string | null;
+    issued_at?: string | null;
+    activated_at?: string | null;
+  } | null;
 };
 
 export type MobileHomeContentItem = {

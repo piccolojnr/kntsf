@@ -1,7 +1,12 @@
-import { getPermitIssuanceConfig } from "@/features/permits/permit-api";
-import { Permit } from "@/features/permits/permit-types";
+import { getPermitIssuanceConfig, normalizePermit } from "@/features/permits/permit-api";
+import { Permit, PermitDto } from "@/features/permits/permit-types";
+import { normalizeCard } from "@/features/cards/card-api";
+import { StudentCardDto } from "@/features/cards/card-types";
+import { normalizeStudent } from "@/features/students/student-api";
+import { StudentDto } from "@/features/students/student-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { unwrapData } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
@@ -22,9 +27,21 @@ type MobileApiResponse<T> = {
 };
 
 type IssuePermitResponseDto = {
-  permit: Permit;
+  permit: Permit | PermitDto;
   verificationResult?: VerificationResultDto | null;
   verification?: VerificationResultDto;
+};
+
+type LaravelVerificationResultDto = Partial<VerificationResultDto> & {
+  method?: string;
+  result?: string;
+  reason?: string | null;
+  student?: StudentDto | null;
+  permit?: PermitDto | null;
+  card?: StudentCardDto | null;
+  checked_at?: string;
+  checkedAt?: string;
+  message?: string;
 };
 
 function getMobileData<T>(response: MobileApiResponse<T>) {
@@ -65,15 +82,21 @@ function normalizeVerificationLog(dto: VerificationLogDto): VerificationLog {
 }
 
 function normalizeVerificationResult(
-  dto: VerificationResultDto,
+  dto: VerificationResultDto | LaravelVerificationResultDto,
 ): VerificationResult {
-  const checkedAt = dto.checkedAt ?? new Date().toISOString();
-  const reason = dto.reason ?? "unknown_error";
+  const checkedAt =
+    dto.checkedAt ??
+    ("checked_at" in dto ? dto.checked_at : undefined) ??
+    new Date().toISOString();
+  const reason = normalizeVerificationReason(dto.reason ?? dto.result);
   const decision = dto.decision ?? getDecisionFromReason(reason);
   const outcome = dto.outcome ?? getOutcomeFromReason(reason);
-  const method = dto.method ?? "student_id";
+  const method = normalizeVerificationMethod(dto.method);
   const value = dto.value ?? "";
   const message = dto.message ?? "Verification completed.";
+  const student = dto.student ? normalizeStudent(dto.student as StudentDto) : null;
+  const permit = dto.permit ? normalizePermit(dto.permit as PermitDto) : null;
+  const card = dto.card ? normalizeCard(dto.card as StudentCardDto) : null;
   const log = dto.log
     ? normalizeVerificationLog(dto.log)
     : {
@@ -86,9 +109,9 @@ function normalizeVerificationResult(
         reason,
         decision,
         message,
-        cardId: dto.card?.id,
-        permitId: dto.permit?.id,
-        studentId: dto.student?.id,
+        cardId: card?.id,
+        permitId: permit?.id,
+        studentId: student?.id,
       };
 
   return {
@@ -101,15 +124,60 @@ function normalizeVerificationResult(
     message,
     method,
     value,
-    card: dto.card ? { ...dto.card } : null,
-    permit: dto.permit ? { ...dto.permit } : null,
-    student: dto.student ? { ...dto.student } : null,
+    card,
+    permit,
+    student,
     canIssuePermit:
       dto.canIssuePermit ??
       (outcome === "warning" && reason !== "permit_issuance_disabled"),
     issuanceConfig: dto.issuanceConfig ?? null,
     log,
   };
+}
+
+function normalizeVerificationMethod(method: unknown): VerificationMethod {
+  if (method === "nfc" || method === "card_uid") {
+    return "card_uid";
+  }
+
+  if (method === "permit_code") {
+    return "permit_code";
+  }
+
+  return "student_id";
+}
+
+function normalizeVerificationReason(reason: unknown): VerificationReason {
+  switch (reason) {
+    case "valid":
+    case "active_permit":
+      return "active_permit";
+    case "expired":
+    case "expired_permit":
+      return "expired_permit";
+    case "revoked":
+    case "revoked_permit":
+      return "revoked_permit";
+    case "not_found":
+    case "permit_not_found":
+      return "permit_not_found";
+    case "card_inactive":
+      return "card_inactive";
+    case "card_not_registered":
+      return "card_not_registered";
+    case "student_not_found":
+      return "student_not_found";
+    case "no_active_permit":
+      return "no_active_permit";
+    case "invalid":
+    case "mismatch":
+    case "invalid_input":
+      return "invalid_input";
+    case "permit_issuance_disabled":
+      return "permit_issuance_disabled";
+    default:
+      return "unknown_error";
+  }
 }
 
 function getOutcomeFromReason(reason: VerificationReason): VerificationOutcome {
@@ -160,7 +228,11 @@ async function postVerification<TBody>(
       body,
     );
 
-    const result = normalizeVerificationResult(getMobileData(response.data));
+    const result = normalizeVerificationResult(
+      unwrapData<VerificationResultDto | LaravelVerificationResultDto>(
+        response.data,
+      ),
+    );
 
     if (result.canIssuePermit && !result.issuanceConfig) {
       result.issuanceConfig = await getPermitIssuanceConfig();
@@ -174,12 +246,14 @@ async function postVerification<TBody>(
 
 async function postIssuePermit(studentId: string) {
   try {
-    const response = await apiClient.post<MobileApiResponse<IssuePermitResponseDto>>(
-      "/api/mobile/permits/issue",
-      { studentId },
+    const response = await apiClient.post<
+      IssuePermitResponseDto | { data: IssuePermitResponseDto } | MobileApiResponse<IssuePermitResponseDto>
+    >(
+      "/api/mobile/operations/permits/issue",
+      { student_number: studentId, student_id: studentId },
     );
 
-    const data = getMobileData(response.data);
+    const data = unwrapData<IssuePermitResponseDto>(response.data);
 
     const verification = (data.verificationResult ?? data.verification)
       ? normalizeVerificationResult(data.verificationResult ?? data.verification!)
@@ -190,17 +264,17 @@ async function postIssuePermit(studentId: string) {
     }
 
     return {
-      permit: data.permit,
+      permit: normalizePermit(data.permit as PermitDto),
       verification,
     };
   } catch (error) {
     const normalizedError = normalizeApiError(error);
 
-    if (normalizedError.statusCode === 401) {
+    if (normalizedError.status === 401) {
       throw new Error("Your session has expired. Please log in again.");
     }
 
-    if (normalizedError.statusCode === 403) {
+    if (normalizedError.status === 403) {
       throw new Error("You do not have permission to issue permits.");
     }
 
@@ -223,13 +297,16 @@ export async function getVerificationLogs() {
 }
 
 export async function scanCardByUid(uid: string): Promise<VerificationResult> {
-  return postVerification("/api/mobile/verify/card", { uid });
+  return postVerification("/api/mobile/verification/nfc", { uid });
 }
 
 export async function verifyPermitByStudentId(
   studentId: string,
 ): Promise<VerificationResult> {
-  return postVerification("/api/mobile/verify/student", { studentId });
+  return postVerification("/api/mobile/verification/student-number", {
+    student_number: studentId,
+    studentId,
+  });
 }
 
 export async function verifyPermitByCardUid(uid: string) {
@@ -237,7 +314,7 @@ export async function verifyPermitByCardUid(uid: string) {
 }
 
 export async function verifyPermitByPermitCode(code: string) {
-  return postVerification("/api/mobile/verify/permit-code", { code });
+  return postVerification("/api/mobile/verification/permit-code", { code });
 }
 
 export async function verifyPermit(input: {
