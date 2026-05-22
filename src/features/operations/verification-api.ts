@@ -6,7 +6,7 @@ import { normalizeStudent } from "@/features/students/student-api";
 import { StudentDto } from "@/features/students/student-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
-import { unwrapData } from "@/lib/api/api-response";
+import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
@@ -42,6 +42,15 @@ type LaravelVerificationResultDto = Partial<VerificationResultDto> & {
   checked_at?: string;
   checkedAt?: string;
   message?: string;
+};
+
+export type VerificationLogListParams = {
+  method?: VerificationMethod | "all";
+  result?: VerificationOutcome | VerificationDecision | "all";
+  search?: string;
+  page?: number;
+  limit?: number;
+  per_page?: number;
 };
 
 function getMobileData<T>(response: MobileApiResponse<T>) {
@@ -282,12 +291,37 @@ async function postIssuePermit(studentId: string) {
   }
 }
 
-export async function getVerificationLogs() {
+export async function getVerificationLogs(params?: VerificationLogListParams) {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<VerificationLogDto> | VerificationLogDto[]>
-    >("/api/mobile/operations/verifications");
-    const data = getMobileData(response.data);
+      | MobileApiResponse<ApiListResponse<VerificationLogDto> | VerificationLogDto[]>
+      | { data: VerificationLogDto[]; links?: Record<string, string | null>; meta?: Record<string, unknown> }
+      | VerificationLogDto[]
+    >("/api/mobile/operations/verification-logs", {
+      params: {
+        method: params?.method === "all" ? undefined : params?.method,
+        result: params?.result === "all" ? undefined : params?.result,
+        search: params?.search,
+        page: params?.page,
+        per_page: params?.per_page ?? params?.limit,
+      },
+    });
+
+    if (Array.isArray(response.data)) {
+      return response.data.map(normalizeVerificationLog);
+    }
+
+    if ("meta" in response.data && Array.isArray(response.data.data)) {
+      return unwrapPaginated<VerificationLogDto>(response.data).items.map(
+        normalizeVerificationLog,
+      );
+    }
+
+    const data = getMobileData(
+      response.data as MobileApiResponse<
+        ApiListResponse<VerificationLogDto> | VerificationLogDto[]
+      >,
+    );
     const logs = Array.isArray(data) ? data : data.items;
 
     return logs.map(normalizeVerificationLog);

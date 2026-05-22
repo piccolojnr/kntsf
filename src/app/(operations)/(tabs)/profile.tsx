@@ -22,9 +22,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Screen } from "@/components/ui/screen";
 import { spacing } from "@/constants/theme";
-import { useCards } from "@/features/cards/use-cards";
-import { usePermits } from "@/features/permits/use-permits";
-import { useStudents } from "@/features/students/use-students";
+import { useOperationsSummary } from "@/features/operations/use-operations-summary";
 import { useAuth } from "@/hooks/use-auth";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
@@ -68,29 +66,13 @@ const adminTools: {
 
 export default function OperationsProfileScreen() {
   const { user, logout } = useAuth();
-  const studentsQuery = useStudents();
-  const cardsQuery = useCards();
-  const permitsQuery = usePermits();
+  const summaryQuery = useOperationsSummary();
 
-  const isLoading =
-    studentsQuery.isLoading || cardsQuery.isLoading || permitsQuery.isLoading;
-  const hasError =
-    studentsQuery.isError || cardsQuery.isError || permitsQuery.isError;
   const refreshControl = usePullToRefresh(async () => {
-    await Promise.all([
-      studentsQuery.refetch(),
-      cardsQuery.refetch(),
-      permitsQuery.refetch(),
-    ]);
+    await summaryQuery.refetch();
   });
 
-  const studentCount = (studentsQuery.data ?? []).length;
-  const activePermitCount = (permitsQuery.data ?? []).filter(
-    (permit) => permit.status === "active",
-  ).length;
-  const activeCardCount = (cardsQuery.data ?? []).filter(
-    (card) => card.status === "active",
-  ).length;
+  const summary = summaryQuery.data;
 
   return (
     <Screen scrolled>
@@ -106,9 +88,9 @@ export default function OperationsProfileScreen() {
           subtitle="Review your workspace identity, access level, and live record counts."
           title="Profile"
         />
-        {isLoading ? (
+        {summaryQuery.isLoading ? (
           <LoadingState message="Loading workspace profile..." />
-        ) : hasError ? (
+        ) : summaryQuery.isError || !summary ? (
           <EmptyState
             description="Workspace profile data could not be loaded right now."
             icon={ShieldAlert}
@@ -127,19 +109,19 @@ export default function OperationsProfileScreen() {
             <View style={styles.statusGrid}>
               <StatusCard
                 title="Students Indexed"
-                value={String(studentCount)}
+                value={String(summary.totalStudents)}
                 description="Student records currently available in the operations workspace."
                 tone="primary"
               />
               <StatusCard
                 title="Active Permits"
-                value={String(activePermitCount)}
+                value={String(summary.activePermits)}
                 description="Permits that are currently valid for verification."
                 tone="success"
               />
               <StatusCard
                 title="Active Cards"
-                value={String(activeCardCount)}
+                value={String(summary.activeNfcCards)}
                 description="Student cards currently usable for card-based verification."
                 tone="warning"
               />

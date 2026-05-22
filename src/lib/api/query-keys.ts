@@ -37,11 +37,16 @@ export const queryKeys = {
   verification: {
     all: ["verification"] as const,
     logs: () => [...queryKeys.verification.all, "logs"] as const,
+    logsList: (params?: object) =>
+      [...queryKeys.verification.all, "logs", params ?? {}] as const,
   },
   operations: {
     all: ["operations"] as const,
+    summary: () => [...queryKeys.operations.all, "summary"] as const,
     students: () => [...queryKeys.operations.all, "students"] as const,
-    cards: () => [...queryKeys.operations.all, "cards"] as const,
-    permits: () => [...queryKeys.operations.all, "permits"] as const,
+    cards: (params?: object) =>
+      [...queryKeys.operations.all, "nfc-cards", params ?? {}] as const,
+    permits: (params?: object) =>
+      [...queryKeys.operations.all, "permits", params ?? {}] as const,
   },
 } as const;

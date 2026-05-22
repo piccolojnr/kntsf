@@ -2,7 +2,7 @@
 
 ## Current Migration Phase
 
-Phase 5 is in progress: staff verification and NFC operations migration. Staff/admin verification, student search/detail, NFC card mutations, and staff permit issuance now point at Laravel mobile operations endpoints.
+Phase 5 is in progress: staff verification and NFC operations migration. Staff/admin verification, student search/detail, NFC card mutations, staff permit issuance, and aggregate operations list/dashboard endpoints now point at Laravel mobile operations endpoints.
 
 ## Laravel API Response Strategy
 
@@ -137,15 +137,35 @@ Migration notes:
 - Card mutation responses expose masked UID data only through `uid_last4` normalization.
 - Student detail/search now uses Laravel operations student endpoints.
 
+## Operations Aggregate Endpoint Alignment
+
+Implemented endpoint replacements:
+
+- `GET /api/mobile/operations/nfc-cards`
+- `GET /api/mobile/operations/permits`
+- `GET /api/mobile/operations/verification-logs`
+- `GET /api/mobile/operations/summary`
+
+Migration notes:
+
+- NFC-card list calls now use `per_page` pagination and Laravel paginated `{ data, links, meta }` responses.
+- Permit list calls now use Laravel pagination and support `academic_period_id`.
+- Verification log calls now use `/verification-logs` and avoid depending on raw identifier values.
+- Admin dashboard, reports, and operations profile now use `/operations/summary` for counts instead of deriving dashboard metrics from full list endpoints.
+- Backend implementation could not be changed in this workspace because no Laravel `artisan` project is present under `C:\Users\USER\projects\kntsf`.
+
 ## Old Endpoint Mappings Still In Code
 
-These are still used outside the migrated student core screens and should be migrated in later phases:
+No known legacy mobile operations endpoint usage remains in `src`.
 
-| Current app endpoint | Target Laravel endpoint |
+Backend contracts that must exist for the migrated operations screens:
+
+| Laravel endpoint | Mobile usage |
 | --- | --- |
-| `GET /api/mobile/operations/cards` | New operations NFC-card list endpoint if exposed |
-| `GET /api/mobile/operations/permits` | New operations permit list endpoint if exposed |
-| `GET /api/mobile/operations/verifications` | Verification/audit endpoint if exposed |
+| `GET /api/mobile/operations/nfc-cards` | Operations cards list, card lookup helpers |
+| `GET /api/mobile/operations/permits` | Operations permits list and permit lookup helpers |
+| `GET /api/mobile/operations/verification-logs` | Verification log/report consumers |
+| `GET /api/mobile/operations/summary` | Admin dashboard, reports, operations profile counts |
 
 ## New Endpoint Foundation
 
@@ -181,6 +201,10 @@ Already aligned or prepared:
 - `POST /api/mobile/verification/permit-code`
 - `GET /api/mobile/operations/students/search`
 - `GET /api/mobile/operations/students/{student}`
+- `GET /api/mobile/operations/nfc-cards`
+- `GET /api/mobile/operations/permits`
+- `GET /api/mobile/operations/verification-logs`
+- `GET /api/mobile/operations/summary`
 - `POST /api/mobile/operations/nfc-cards/register`
 - `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace`
 - `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke`
@@ -191,16 +215,10 @@ Already aligned or prepared:
 
 ## Screens Not Yet Migrated
 
-No new UI was built in this phase. These screens still need endpoint/data migration:
+No new UI was built in this phase. These screens still need endpoint/data migration or backend confirmation:
 
-- Staff/admin permit list
-- Staff/admin student list
-- Staff/admin profile dashboard
-- Admin dashboard
-- Cards
 - Settings
 - Audit logs
-- Reports
 
 Missing future workflows remain out of scope for this phase:
 
@@ -209,7 +227,7 @@ Missing future workflows remain out of scope for this phase:
 ## Next Steps
 
 1. Confirm the Paystack callback/redirect URL configured by the backend matches the Expo deep-link route.
-2. Migrate remaining staff/admin aggregate list screens when Laravel list endpoints are finalized.
+2. Confirm the Laravel backend exposes the operations aggregate endpoints and safe resources documented above.
 3. Add staff permit request review.
 4. Add feature-level response schemas with Zod once endpoint payloads are stable.
 5. Decompose oversized screens while migrating each feature, not before.

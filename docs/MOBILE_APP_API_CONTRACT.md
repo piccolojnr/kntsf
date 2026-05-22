@@ -125,6 +125,10 @@ List filters:
 | POST | `/api/mobile/verification/nfc` | Verify by NFC UID |
 | GET | `/api/mobile/operations/students/search` | Staff student search |
 | GET | `/api/mobile/operations/students/{student}` | Staff student detail |
+| GET | `/api/mobile/operations/nfc-cards` | Staff NFC card list |
+| GET | `/api/mobile/operations/permits` | Staff permit list |
+| GET | `/api/mobile/operations/verification-logs` | Staff verification log list |
+| GET | `/api/mobile/operations/summary` | Staff operations dashboard counts |
 | POST | `/api/mobile/operations/permits/issue` | Staff permit issue |
 | POST | `/api/mobile/operations/nfc-cards/register` | Staff NFC registration |
 | POST | `/api/mobile/operations/nfc-cards/{nfcCard}/replace` | Staff NFC replacement |
@@ -158,6 +162,9 @@ Staff endpoints require server-side permissions. The mobile UI may hide links, b
 | Report Lost Card | `POST /api/mobile/student/nfc-card/report-lost` |
 | Staff Verify | `POST /api/mobile/verification/student-number`, `POST /api/mobile/verification/permit-code`, `POST /api/mobile/verification/nfc` |
 | Staff Register Card | `GET /api/mobile/operations/students/search`, `POST /api/mobile/operations/nfc-cards/register` |
+| Operations Cards | `GET /api/mobile/operations/nfc-cards` |
+| Operations Permits | `GET /api/mobile/operations/permits` |
+| Operations Reports | `GET /api/mobile/operations/summary`, `GET /api/mobile/operations/verification-logs` |
 
 ## Common Error Response Shape
 

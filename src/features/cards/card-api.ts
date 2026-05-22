@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
-import { unwrapData } from "@/lib/api/api-response";
+import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import { CardStatus, StudentCard, StudentCardDto } from "./card-types";
@@ -18,6 +18,7 @@ export type OperationsCardListParams = {
   status?: CardStatus | "all";
   page?: number;
   limit?: number;
+  per_page?: number;
 };
 
 export type CardsListResult = ApiListResponse<StudentCard>;
@@ -75,17 +76,27 @@ function sortCardsByRegisteredAt(left: StudentCard, right: StudentCard) {
 export async function getCards(params?: OperationsCardListParams) {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<StudentCardDto>>
-    >("/api/mobile/operations/cards", {
+      | MobileApiResponse<ApiListResponse<StudentCardDto>>
+      | { data: StudentCardDto[]; links?: Record<string, string | null>; meta?: Record<string, unknown> }
+      | StudentCardDto[]
+    >("/api/mobile/operations/nfc-cards", {
       params: {
         search: params?.search,
         status: params?.status === "all" ? undefined : params?.status,
         page: params?.page,
-        limit: params?.limit,
+        per_page: params?.per_page ?? params?.limit,
       },
     });
 
-    const data = getMobileData(response.data);
+    if (Array.isArray(response.data)) {
+      return response.data.map(normalizeCard);
+    }
+
+    if ("meta" in response.data && Array.isArray(response.data.data)) {
+      return unwrapPaginated<StudentCardDto>(response.data).items.map(normalizeCard);
+    }
+
+    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<StudentCardDto>>);
 
     return data.items.map(normalizeCard);
   } catch (error) {
@@ -98,16 +109,40 @@ export async function getCardsPage(
 ): Promise<CardsListResult> {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<StudentCardDto>>
-    >("/api/mobile/operations/cards", {
+      | MobileApiResponse<ApiListResponse<StudentCardDto>>
+      | { data: StudentCardDto[]; links?: Record<string, string | null>; meta?: Record<string, unknown> }
+      | StudentCardDto[]
+    >("/api/mobile/operations/nfc-cards", {
       params: {
         search: params?.search,
         status: params?.status === "all" ? undefined : params?.status,
         page: params?.page,
-        limit: params?.limit,
+        per_page: params?.per_page ?? params?.limit,
       },
     });
-    const data = getMobileData(response.data);
+
+    if (Array.isArray(response.data)) {
+      return {
+        items: response.data.map(normalizeCard),
+        pagination: {
+          page: 1,
+          limit: response.data.length,
+          total: response.data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
+    if ("meta" in response.data && Array.isArray(response.data.data)) {
+      const data = unwrapPaginated<StudentCardDto>(response.data);
+
+      return {
+        items: data.items.map(normalizeCard),
+        pagination: data.pagination,
+      };
+    }
+
+    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<StudentCardDto>>);
 
     return {
       items: data.items.map(normalizeCard),
