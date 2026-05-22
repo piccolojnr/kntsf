@@ -20,7 +20,7 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { CardStatus } from "@/features/cards/card-types";
-import { useStudentCard } from "@/features/cards/use-student-card";
+import { useStudentNfcCard } from "@/features/cards/use-student-card";
 import { Permit } from "@/features/permits/permit-types";
 import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
@@ -313,7 +313,7 @@ export default function StudentHomeScreen() {
   const studentQuery = useCurrentStudent();
   const student = studentQuery.student;
   const permitsQuery = useStudentPermits(student?.id);
-  const cardQuery = useStudentCard(student?.id);
+  const cardQuery = useStudentNfcCard(student?.id);
 
   const isLoading =
     studentQuery.isLoading || permitsQuery.isLoading || cardQuery.isLoading;

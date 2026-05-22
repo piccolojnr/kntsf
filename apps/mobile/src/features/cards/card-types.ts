@@ -19,6 +19,8 @@ export type StudentCard = {
   type: CardType;
   status: CardStatus;
   registeredAt: string;
+  issuedAt?: string | null;
+  activatedAt?: string | null;
   uidLast4?: string;
   student?: Student | null;
 };
@@ -27,6 +29,8 @@ export type StudentCardDto = Partial<StudentCard> & {
   id: string | number;
   student_id?: string;
   registered_at?: string;
+  issued_at?: string | null;
+  activated_at?: string | null;
   issuedAt?: string;
   activatedAt?: string;
   deactivatedAt?: string;
@@ -35,5 +39,6 @@ export type StudentCardDto = Partial<StudentCard> & {
   createdAt?: string;
   uidLast4?: string;
   uid_last4?: string;
+  status?: CardStatus;
   student?: Student | null;
 };

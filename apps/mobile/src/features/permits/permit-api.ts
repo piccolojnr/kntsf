@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { unwrapData } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
@@ -25,22 +26,28 @@ export type OperationsPermitListParams = {
 export type PermitsListResult = ApiListResponse<Permit>;
 
 function normalizePermit(dto: PermitDto): Permit {
-  const expiryDate = dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "";
+  const expiryDate =
+    dto.expiryDate ?? dto.expires_at ?? dto.expiry_date ?? dto.expiresAt ?? "";
+  const codeLast4 = dto.codeLast4 ?? dto.code_last4 ?? null;
 
   return {
     id: String(dto.id),
     studentId:
       dto.studentId ?? dto.student_id ?? dto.student?.id?.toString() ?? "",
     permitCode:
+      (codeLast4 ? `.... ${codeLast4}` : undefined) ??
       dto.permitCode ??
       dto.permit_code ??
       dto.originalCode ??
       dto.code ??
       "",
     status: normalizePermitStatus(dto.status, expiryDate),
-    startDate: dto.startDate ?? dto.start_date ?? "",
+    startDate: dto.startDate ?? dto.starts_at ?? dto.start_date ?? "",
     expiryDate,
-    amountPaid: dto.amountPaid ?? dto.amount_paid ?? dto.amount ?? 0,
+    amountPaid: Number(dto.amountPaid ?? dto.amount_paid ?? dto.amount ?? 0),
+    currency: dto.currency ?? "GHS",
+    codeLast4,
+    academicPeriod: dto.academicPeriod ?? dto.academic_period ?? null,
     qrCode: dto.qrCode,
     student: dto.student ?? null,
   };
@@ -182,16 +189,18 @@ export async function issuePermitForStudent(studentId: string) {
 export async function getStudentPermits() {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<PermitDto[] | { permits: PermitDto[] }>
+      PermitDto[] | { permits: PermitDto[] } | MobileApiResponse<PermitDto[] | { permits: PermitDto[] }>
     >("/api/mobile/student/permits");
-    const data = getMobileData(response.data);
+    const data = unwrapData<PermitDto[] | { permits: PermitDto[] }>(
+      response.data,
+    );
     const permits = Array.isArray(data) ? data : data.permits;
 
     return permits.map(normalizePermit);
   } catch (error) {
     const normalizedError = normalizeApiError(error);
 
-    if (normalizedError.statusCode === 404) {
+    if (normalizedError.status === 404) {
       return [];
     }
 

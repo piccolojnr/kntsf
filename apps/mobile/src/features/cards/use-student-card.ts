@@ -1,11 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getStudentCard } from "./card-api";
+import { queryKeys } from "@/lib/api/query-keys";
 
-export function useStudentCard(studentId?: string | null) {
+import { getStudentNfcCard, reportLostNfcCardForStudent } from "./card-api";
+
+export function useStudentNfcCard(studentId?: string | null) {
   return useQuery({
     enabled: Boolean(studentId),
-    queryKey: ["student-card", studentId],
-    queryFn: () => getStudentCard(studentId ?? undefined),
+    queryKey: queryKeys.student.card(),
+    queryFn: () => getStudentNfcCard(studentId ?? undefined),
+  });
+}
+
+export const useStudentCard = useStudentNfcCard;
+
+export function useReportLostNfcCard(studentId?: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!studentId) {
+        throw new Error("No student record linked to this account.");
+      }
+
+      return reportLostNfcCardForStudent(studentId);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.student.card() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.student.profile() }),
+      ]);
+    },
   });
 }

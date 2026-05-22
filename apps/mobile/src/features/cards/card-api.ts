@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
+import { unwrapData } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import { CardStatus, StudentCard, StudentCardDto } from "./card-types";
@@ -30,20 +31,24 @@ type CardMutationResponse =
 
 function normalizeCard(dto: StudentCardDto): StudentCard {
   const uidLast4 = dto.uidLast4 ?? dto.uid_last4;
+  const issuedAt = dto.issuedAt ?? dto.issued_at ?? null;
+  const activatedAt = dto.activatedAt ?? dto.activated_at ?? null;
 
   return {
     id: String(dto.id),
     studentId: String(dto.studentId ?? dto.student_id ?? dto.student?.studentId ?? ""),
-    uid: dto.uid ?? (uidLast4 ? `.... ${uidLast4}` : ""),
+    uid: uidLast4 ? `.... ${uidLast4}` : "",
     type: dto.type ?? "unknown",
     status: dto.status ?? "inactive",
     registeredAt:
       dto.registeredAt ??
       dto.registered_at ??
-      dto.activatedAt ??
-      dto.issuedAt ??
+      activatedAt ??
+      issuedAt ??
       dto.createdAt ??
       "",
+    issuedAt,
+    activatedAt,
     uidLast4,
     student: dto.student ?? null,
   };
@@ -209,12 +214,16 @@ export async function revokeCardForStudent(cardId: string) {
   }
 }
 
-export async function reportLostCardForStudent(_studentId: string) {
+export async function reportLostNfcCardForStudent(_studentId: string) {
   try {
     const response = await apiClient.post<
-      MobileApiResponse<CardMutationResponse | { card: StudentCardDto | null }>
-    >("/api/mobile/student/card/report-lost");
-    const data = getMobileData(response.data);
+      | StudentCardDto
+      | { card: StudentCardDto | null }
+      | MobileApiResponse<CardMutationResponse | { card: StudentCardDto | null }>
+    >("/api/mobile/student/nfc-card/report-lost");
+    const data = unwrapData<
+      StudentCardDto | CardMutationResponse | { card: StudentCardDto | null }
+    >(response.data);
 
     if (!data || ("card" in data && !data.card)) {
       return null;
@@ -226,22 +235,30 @@ export async function reportLostCardForStudent(_studentId: string) {
   }
 }
 
-export async function getStudentCard(_studentId?: string) {
+export async function getStudentNfcCard(_studentId?: string) {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<StudentCardDto | { card: StudentCardDto | null } | null>
-    >("/api/mobile/student/card");
-    const data = getMobileData(response.data);
+      | StudentCardDto
+      | { card: StudentCardDto | null }
+      | null
+      | MobileApiResponse<StudentCardDto | { card: StudentCardDto | null } | null>
+    >("/api/mobile/student/nfc-card");
+    const data = unwrapData<StudentCardDto | { card: StudentCardDto | null } | null>(
+      response.data,
+    );
     const card = data && "card" in data ? data.card : data;
 
     return card ? normalizeCard(card) : null;
   } catch (error) {
     const normalizedError = normalizeApiError(error);
 
-    if (normalizedError.statusCode === 404) {
+    if (normalizedError.status === 404) {
       return null;
     }
 
     throw toUserFacingError(error);
   }
 }
+
+export const reportLostCardForStudent = reportLostNfcCardForStudent;
+export const getStudentCard = getStudentNfcCard;
