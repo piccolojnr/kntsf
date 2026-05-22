@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Controllers\Payments\PaymentController;
+use App\Http\Controllers\Payments\PaystackWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('payments/paystack/webhook', PaystackWebhookController::class)
+    ->middleware('throttle:sensitive-actions')
+    ->name('payments.paystack.webhook');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('payments/{payment}/mark-successful', [PaymentController::class, 'markSuccessful'])

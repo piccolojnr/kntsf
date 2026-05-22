@@ -10,13 +10,19 @@ class ActiveAcademicPeriod
 
     public function get(): ?AcademicPeriod
     {
-        return $this->cache->remember(
+        $activeAcademicPeriodId = $this->cache->remember(
             ApplicationCache::ActiveAcademicPeriod,
-            'default',
+            'id',
             300,
-            fn (): ?AcademicPeriod => AcademicPeriod::query()
+            fn (): ?int => AcademicPeriod::query()
                 ->where('is_active', true)
-                ->first(),
+                ->value('id'),
         );
+
+        if (! is_int($activeAcademicPeriodId)) {
+            return null;
+        }
+
+        return AcademicPeriod::query()->find($activeAcademicPeriodId);
     }
 }

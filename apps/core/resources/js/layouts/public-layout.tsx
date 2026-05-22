@@ -16,6 +16,7 @@ import { index as documentsIndex } from '@/routes/public/documents';
 import { index as electionsIndex } from '@/routes/public/elections';
 import { index as eventsIndex } from '@/routes/public/events';
 import { index as executivesIndex } from '@/routes/public/executives';
+import { index as permitRequestIndex } from '@/routes/public/permit-request';
 import type { SharedPageProps } from '@/types';
 
 const navItems = [
@@ -28,6 +29,11 @@ const navItems = [
     { label: 'Documents', href: documentsIndex(), url: documentsIndex.url() },
     { label: 'Executives', href: executivesIndex(), url: executivesIndex.url() },
     { label: 'Elections', href: electionsIndex(), url: electionsIndex.url() },
+    {
+        label: 'Permit Request',
+        href: permitRequestIndex(),
+        url: permitRequestIndex.url(),
+    },
 ];
 
 export default function PublicLayout({ children }: PropsWithChildren) {

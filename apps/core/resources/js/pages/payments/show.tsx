@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Ban, CheckCircle2, Trash2, XCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import { PaymentStatusBadge } from '@/features/payments/components/payment-statu
 import { PaymentStatusDialog } from '@/features/payments/components/payment-status-dialog';
 import type { Payment, PaymentOptions } from '@/features/payments/types';
 import { destroy, index } from '@/routes/payments';
+import { show as showPermitRequest } from '@/routes/permit-requests';
 
 export default function PaymentShow({
     payment,
@@ -66,7 +68,9 @@ export default function PaymentShow({
                             value={
                                 payment.permit
                                     ? `Last 4: ${payment.permit.code_last4 ?? '----'}`
-                                    : 'Not linked'
+                                    : payment.permit_request
+                                      ? 'Pending permit issuance'
+                                      : 'Not linked'
                             }
                         />
                         {payment.failure_reason && (
@@ -77,6 +81,67 @@ export default function PaymentShow({
                         )}
                     </CardContent>
                 </Card>
+
+                {payment.permit_request && (
+                    <Card className="gap-0 py-0">
+                        <CardHeader className="py-4">
+                            <CardTitle>Permit request</CardTitle>
+                            <CardDescription>
+                                This payment was collected through the self-service permit request flow.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid gap-3 border-t py-4 md:grid-cols-2">
+                            <Detail
+                                label="Request reference"
+                                value={
+                                    <Button
+                                        asChild
+                                        variant="link"
+                                        className="h-auto p-0"
+                                    >
+                                        <Link
+                                            href={showPermitRequest(
+                                                payment.permit_request.id,
+                                            )}
+                                        >
+                                            {payment.permit_request.reference}
+                                        </Link>
+                                    </Button>
+                                }
+                            />
+                            <Detail
+                                label="Request status"
+                                value={payment.permit_request.status.replaceAll(
+                                    '_',
+                                    ' ',
+                                )}
+                            />
+                            <Detail
+                                label="Review status"
+                                value={
+                                    payment.permit_request.review_status
+                                        ? payment.permit_request.review_status.replaceAll(
+                                              '_',
+                                              ' ',
+                                          )
+                                        : 'Not required'
+                                }
+                            />
+                            <Detail
+                                label="Issuance state"
+                                value={
+                                    payment.permit
+                                        ? 'Permit issued'
+                                        : payment.permit_request.requires_review &&
+                                            payment.permit_request.review_status ===
+                                                'pending_review'
+                                          ? 'Waiting for student review approval'
+                                          : 'Waiting for permit issuance'
+                                }
+                            />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {can.manage && (
                     <Card className="gap-0 py-0">
@@ -147,7 +212,7 @@ export default function PaymentShow({
     );
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({ label, value }: { label: string; value: ReactNode }) {
     return (
         <div className="rounded-md border bg-muted/20 p-3">
             <p className="text-xs text-muted-foreground">{label}</p>

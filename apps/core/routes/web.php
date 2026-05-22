@@ -43,6 +43,7 @@ require __DIR__.'/permits.php';
 require __DIR__.'/verification.php';
 require __DIR__.'/nfc-cards.php';
 require __DIR__.'/payments.php';
+require __DIR__.'/permit-requests.php';
 require __DIR__.'/audit-logs.php';
 require __DIR__.'/reports.php';
 require __DIR__.'/executives.php';

@@ -67,6 +67,7 @@ class ApplicationCache
     public function flushAcademicPeriods(): void
     {
         $this->forget(self::ActiveAcademicPeriod);
+        $this->forget(self::ActiveAcademicPeriod, 'id');
         $this->flushDashboard();
     }
 

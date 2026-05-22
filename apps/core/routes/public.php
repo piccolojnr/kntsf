@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\PermitRequestController;
 use App\Http\Controllers\Public\PublicAnnouncementController;
 use App\Http\Controllers\Public\PublicDocumentController;
 use App\Http\Controllers\Public\PublicElectionController;
@@ -25,3 +26,15 @@ Route::middleware('throttle:public-content')->group(function () {
     Route::get('elections/public', [PublicElectionController::class, 'index'])->name('public.elections.index');
     Route::get('elections/public/{election:slug}', [PublicElectionController::class, 'show'])->name('public.elections.show');
 });
+
+Route::prefix('permit-request')
+    ->name('public.permit-request.')
+    ->middleware('throttle:public-content')
+    ->group(function () {
+        Route::get('/', [PermitRequestController::class, 'index'])->name('index');
+        Route::post('/', [PermitRequestController::class, 'store'])->middleware('throttle:sensitive-actions')->name('store');
+        Route::get('preview', [PermitRequestController::class, 'preview'])->name('preview');
+        Route::get('payment/callback', [PermitRequestController::class, 'callback'])->middleware('throttle:sensitive-actions')->name('callback');
+        Route::get('success/{reference}', [PermitRequestController::class, 'success'])->name('success');
+        Route::get('{reference}', [PermitRequestController::class, 'show'])->name('show');
+    });

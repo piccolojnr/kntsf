@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\PermitStatus;
+use App\Models\AcademicPeriod;
 use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
@@ -10,6 +11,8 @@ use App\Notifications\Auth\SetupPasswordNotification;
 use App\Notifications\NfcCards\NfcCardRegisteredNotification;
 use App\Notifications\Payments\PaymentSuccessfulNotification;
 use App\Notifications\Permits\PermitIssuedNotification;
+use App\Support\ActiveAcademicPeriod;
+use App\Support\ApplicationCache;
 use App\Support\DashboardSummary;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -22,6 +25,15 @@ test('cached dashboard summary is invalidated when students change', function ()
     Student::factory()->create();
 
     expect($summary->counts()['total_students'])->toBe(1);
+});
+
+test('active academic period cache stores only scalar id', function () {
+    $period = AcademicPeriod::factory()->active()->create();
+
+    $activePeriod = app(ActiveAcademicPeriod::class)->get();
+
+    expect($activePeriod?->id)->toBe($period->id)
+        ->and(cache()->get(ApplicationCache::ActiveAcademicPeriod.':v1:id'))->toBe($period->id);
 });
 
 test('health endpoints respond with lightweight status data', function () {

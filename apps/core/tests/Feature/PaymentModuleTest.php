@@ -1,9 +1,12 @@
 <?php
 
 use App\Enums\PaymentStatus;
+use App\Enums\PermitRequestReviewStatus;
+use App\Enums\PermitRequestStatus;
 use App\Models\AcademicPeriod;
 use App\Models\Payment;
 use App\Models\Permit;
+use App\Models\PermitRequest;
 use App\Models\Student;
 use App\Models\User;
 use App\Support\PaymentReferenceGenerator;
@@ -207,4 +210,56 @@ test('soft deleted payments are excluded from normal index', function () {
             ->where('payments.data', fn ($payments) => collect($payments)
                 ->pluck('id')
                 ->all() === [$visiblePayment->id]));
+});
+
+test('self service payment index shows linked permit request while awaiting review', function () {
+    $student = Student::factory()->create();
+    $payment = Payment::factory()->successful()->create([
+        'student_id' => $student->id,
+        'permit_id' => null,
+    ]);
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $student->id,
+        'payment_id' => $payment->id,
+        'status' => PermitRequestStatus::Paid,
+        'requires_review' => true,
+        'review_status' => PermitRequestReviewStatus::PendingReview,
+    ]);
+
+    $this->actingAs(paymentUserWithRole('admin'))
+        ->get(route('payments.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('payments/index')
+            ->where('payments.data.0.id', $payment->id)
+            ->where('payments.data.0.permit', null)
+            ->where('payments.data.0.permit_request.id', $permitRequest->id)
+            ->where('payments.data.0.permit_request.reference', $permitRequest->request_reference)
+            ->where('payments.data.0.permit_request.review_status', 'pending_review'));
+});
+
+test('self service payment show explains linked permit request without permit yet', function () {
+    $student = Student::factory()->create();
+    $payment = Payment::factory()->successful()->create([
+        'student_id' => $student->id,
+        'permit_id' => null,
+    ]);
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $student->id,
+        'payment_id' => $payment->id,
+        'status' => PermitRequestStatus::Paid,
+        'requires_review' => true,
+        'review_status' => PermitRequestReviewStatus::PendingReview,
+    ]);
+
+    $this->actingAs(paymentUserWithRole('admin'))
+        ->get(route('payments.show', $payment))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('payments/show')
+            ->where('payment.id', $payment->id)
+            ->where('payment.permit', null)
+            ->where('payment.permit_request.id', $permitRequest->id)
+            ->where('payment.permit_request.reference', $permitRequest->request_reference)
+            ->where('payment.permit_request.requires_review', true));
 });

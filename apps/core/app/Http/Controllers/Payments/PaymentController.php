@@ -34,6 +34,7 @@ class PaymentController extends Controller
                 'student:id,student_number,name,email,course,level',
                 'permit:id,code_last4,status,academic_period_id',
                 'permit.academicPeriod:id,name,academic_year,semester',
+                'permitRequest:id,payment_id,request_reference,status,requires_review,review_status',
                 'createdBy:id,name,email',
             ])
             ->when($search !== '', function (Builder $query) use ($search) {
@@ -93,6 +94,7 @@ class PaymentController extends Controller
                 'student:id,student_number,name,email,course,level',
                 'permit:id,code_last4,status,academic_period_id,starts_at,expires_at',
                 'permit.academicPeriod:id,name,academic_year,semester',
+                'permitRequest:id,payment_id,request_reference,status,requires_review,review_status',
                 'createdBy:id,name,email',
             ])),
             'options' => $this->formOptions(),
@@ -185,6 +187,13 @@ class PaymentController extends Controller
                     'academic_year' => $payment->permit->academicPeriod->academic_year,
                     'semester' => $payment->permit->academicPeriod->semester,
                 ] : null,
+            ] : null,
+            'permit_request' => $payment->permitRequest ? [
+                'id' => $payment->permitRequest->id,
+                'reference' => $payment->permitRequest->request_reference,
+                'status' => $payment->permitRequest->status->value,
+                'requires_review' => $payment->permitRequest->requires_review,
+                'review_status' => $payment->permitRequest->review_status?->value,
             ] : null,
             'created_by' => $payment->createdBy ? [
                 'id' => $payment->createdBy->id,

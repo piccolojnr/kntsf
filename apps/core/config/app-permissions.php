@@ -47,6 +47,11 @@ return [
             'permits.revoke',
         ],
 
+        'permit_requests' => [
+            'permit_requests.view',
+            'permit_requests.manage',
+        ],
+
         'permit_settings' => [
             'permit_settings.view',
             'permit_settings.update',
@@ -154,6 +159,8 @@ return [
             'permits.view',
             'permits.issue',
             'permits.revoke',
+            'permit_requests.view',
+            'permit_requests.manage',
             'permit_settings.view',
             'permit_settings.update',
             'nfc_cards.view',
@@ -206,6 +213,7 @@ return [
             'permits.view',
             'permits.issue',
             'permits.revoke',
+            'permit_requests.view',
             'nfc_cards.view',
             'verification.perform',
             'verification.view_logs',

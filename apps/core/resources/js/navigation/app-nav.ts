@@ -27,6 +27,7 @@ import { index as eventsIndex } from '@/routes/events';
 import { index as executivesIndex } from '@/routes/executives';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
+import { index as permitRequestsIndex } from '@/routes/permit-requests';
 import { index as permitsIndex } from '@/routes/permits';
 import { index as pollsIndex } from '@/routes/polls';
 import { index as reportsIndex } from '@/routes/reports';
@@ -85,6 +86,13 @@ const paymentsNavItem: NavItem = {
     href: paymentsIndex(),
     icon: CircleDollarSign,
     permission: 'payments.view',
+};
+
+const permitRequestsNavItem: NavItem = {
+    title: 'Permit Requests',
+    href: permitRequestsIndex(),
+    icon: History,
+    permission: 'permit_requests.view',
 };
 
 const reportsNavItem: NavItem = {
@@ -163,6 +171,7 @@ export const mainNavItems: NavItem[] = [
     executivesNavItem,
     academicPeriodsNavItem,
     permitsNavItem,
+    permitRequestsNavItem,
     nfcCardsNavItem,
     paymentsNavItem,
     announcementsNavItem,
@@ -201,7 +210,7 @@ export const sidebarNavGroups: NavGroup[] = [
     },
     {
         title: 'Permit Operations',
-        items: [permitsNavItem, nfcCardsNavItem, paymentsNavItem],
+        items: [permitsNavItem, permitRequestsNavItem, nfcCardsNavItem, paymentsNavItem],
     },
     {
         title: 'Verification',

@@ -3,6 +3,7 @@ import { Ban, CheckCircle2, Eye, Trash2, XCircle } from 'lucide-react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import { Button } from '@/components/ui/button';
 import { destroy, show } from '@/routes/payments';
+import { show as showPermitRequest } from '@/routes/permit-requests';
 import type { Paginated, Payment, PaymentOptions } from '../types';
 import { PaymentStatusBadge } from './payment-status-badge';
 import { PaymentStatusDialog } from './payment-status-dialog';
@@ -80,9 +81,7 @@ export function PaymentList({
                                     <PaymentStatusBadge payment={payment} />
                                 </td>
                                 <td className="px-4 py-3">
-                                    {payment.permit
-                                        ? `Last 4: ${payment.permit.code_last4 ?? '----'}`
-                                        : 'Not linked'}
+                                    <PaymentPermitLink payment={payment} />
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex justify-end gap-2">
@@ -160,4 +159,39 @@ export function PaymentList({
             </div>
         </div>
     );
+}
+
+function PaymentPermitLink({ payment }: { payment: Payment }) {
+    if (payment.permit) {
+        return (
+            <div>
+                <p className="font-medium">
+                    Last 4: {payment.permit.code_last4 ?? '----'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    {payment.permit.status}
+                </p>
+            </div>
+        );
+    }
+
+    if (payment.permit_request) {
+        return (
+            <div>
+                <Button asChild variant="link" className="h-auto p-0 text-sm">
+                    <Link href={showPermitRequest(payment.permit_request.id)}>
+                        {payment.permit_request.reference}
+                    </Link>
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                    {payment.permit_request.requires_review &&
+                    payment.permit_request.review_status === 'pending_review'
+                        ? 'Awaiting student review'
+                        : payment.permit_request.status.replaceAll('_', ' ')}
+                </p>
+            </div>
+        );
+    }
+
+    return <span className="text-muted-foreground">Not linked</span>;
 }

@@ -22,7 +22,8 @@ class ContentSettings
             function (): array {
                 $stored = AppSetting::query()
                     ->where('key', self::SettingKey)
-                    ->value('value');
+                    ->first()
+                    ?->value;
 
                 return $this->normalize(is_array($stored) ? $stored : []);
             },
