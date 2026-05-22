@@ -29,7 +29,7 @@ type CardMutationResponse =
       reason?: string;
     };
 
-function normalizeCard(dto: StudentCardDto): StudentCard {
+export function normalizeCard(dto: StudentCardDto): StudentCard {
   const uidLast4 = dto.uidLast4 ?? dto.uid_last4;
   const issuedAt = dto.issuedAt ?? dto.issued_at ?? null;
   const activatedAt = dto.activatedAt ?? dto.activated_at ?? null;
@@ -153,20 +153,52 @@ export async function getCardsByStudentId(studentId: string) {
 
 export async function getCurrentCardByStudentId(studentId: string) {
   const cards = await getCardsByStudentId(studentId);
+  const cardFromList =
+    cards.find((card) => card.status === "active") ?? cards[0] ?? null;
 
-  return (
-    cards.find((card) => card.status === "active") ?? cards[0] ?? null
-  );
+  if (cardFromList) {
+    return cardFromList;
+  }
+
+  try {
+    const response = await apiClient.get<
+      | {
+          active_nfc_card?: StudentCardDto | null;
+          nfc_card?: StudentCardDto | null;
+        }
+      | {
+          data?: {
+            active_nfc_card?: StudentCardDto | null;
+            nfc_card?: StudentCardDto | null;
+          };
+        }
+    >(`/api/mobile/operations/students/${encodeURIComponent(studentId)}`);
+    const studentDetail =
+      response.data && "data" in response.data && response.data.data
+        ? response.data.data
+        : (response.data as {
+            active_nfc_card?: StudentCardDto | null;
+            nfc_card?: StudentCardDto | null;
+          });
+    const card = studentDetail?.active_nfc_card ?? studentDetail?.nfc_card ?? null;
+
+    return card ? normalizeCard(card) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function registerCardForStudent(studentId: string, uid: string) {
   try {
-    const response = await apiClient.post<MobileApiResponse<CardMutationResponse>>(
-      "/api/mobile/cards/register",
-      { studentId, uid },
+    const response = await apiClient.post<
+      CardMutationResponse | { data: CardMutationResponse } | MobileApiResponse<CardMutationResponse>
+    >(
+      "/api/mobile/operations/nfc-cards/register",
+      { student_number: studentId, student_id: studentId, uid },
     );
+    const data = unwrapData<CardMutationResponse>(response.data);
 
-    return normalizeCard(unwrapCardMutationResponse(getMobileData(response.data)));
+    return normalizeCard(unwrapCardMutationResponse(data));
   } catch (error) {
     throw toUserFacingError(error);
   }
@@ -174,12 +206,21 @@ export async function registerCardForStudent(studentId: string, uid: string) {
 
 export async function replaceCardForStudent(studentId: string, uid: string) {
   try {
-    const response = await apiClient.post<MobileApiResponse<CardMutationResponse>>(
-      "/api/mobile/cards/replace",
-      { studentId, uid },
-    );
+    const currentCard = await getCurrentCardByStudentId(studentId);
 
-    return normalizeCard(unwrapCardMutationResponse(getMobileData(response.data)));
+    if (!currentCard) {
+      throw new Error("No active NFC card was found for replacement.");
+    }
+
+    const response = await apiClient.post<
+      CardMutationResponse | { data: CardMutationResponse } | MobileApiResponse<CardMutationResponse>
+    >(
+      `/api/mobile/operations/nfc-cards/${encodeURIComponent(currentCard.id)}/replace`,
+      { uid },
+    );
+    const data = unwrapData<CardMutationResponse>(response.data);
+
+    return normalizeCard(unwrapCardMutationResponse(data));
   } catch (error) {
     throw toUserFacingError(error);
   }
@@ -203,12 +244,14 @@ export async function assignCardToStudent(input: {
 
 export async function revokeCardForStudent(cardId: string) {
   try {
-    const response = await apiClient.post<MobileApiResponse<CardMutationResponse>>(
-      "/api/mobile/cards/revoke",
-      { cardId: Number(cardId) },
+    const response = await apiClient.post<
+      CardMutationResponse | { data: CardMutationResponse } | MobileApiResponse<CardMutationResponse>
+    >(
+      `/api/mobile/operations/nfc-cards/${encodeURIComponent(cardId)}/revoke`,
     );
+    const data = unwrapData<CardMutationResponse>(response.data);
 
-    return normalizeCard(unwrapCardMutationResponse(getMobileData(response.data)));
+    return normalizeCard(unwrapCardMutationResponse(data));
   } catch (error) {
     throw toUserFacingError(error);
   }

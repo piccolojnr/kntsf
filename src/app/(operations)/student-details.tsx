@@ -130,7 +130,7 @@ export default function OperationsStudentDetailsScreen() {
 
   const currentCard = useMemo(() => {
     if (!student) return null;
-    return (
+    const cardFromList =
       (cardsQuery.data ?? [])
         .filter(
           (card) =>
@@ -143,7 +143,25 @@ export default function OperationsStudentDetailsScreen() {
             new Date(r.registeredAt).getTime() -
             new Date(l.registeredAt).getTime(),
         )[0] ?? null
-    );
+
+    if (cardFromList) {
+      return cardFromList;
+    }
+
+    return student.activeNfcCard
+      ? {
+          id: student.activeNfcCard.id,
+          studentId: student.studentId,
+          uid: student.activeNfcCard.uid ?? "",
+          type: "unknown" as const,
+          status: resolveCardStatus(student.activeNfcCard.status),
+          registeredAt: student.activeNfcCard.registeredAt ?? "",
+          uidLast4: student.activeNfcCard.uidLast4 ?? undefined,
+          issuedAt: student.activeNfcCard.issuedAt,
+          activatedAt: student.activeNfcCard.activatedAt,
+          student,
+        }
+      : null;
   }, [cardsQuery.data, student]);
 
   async function refreshCards() {

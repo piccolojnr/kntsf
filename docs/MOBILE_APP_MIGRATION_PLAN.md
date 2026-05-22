@@ -2,7 +2,7 @@
 
 ## Current Migration Phase
 
-Phase 4 is in progress: student mobile content screens. The student app can now read published announcements, events, documents, executives, and the mobile content home payload from the Laravel API.
+Phase 5 is in progress: staff verification and NFC operations migration. Staff/admin verification, student search/detail, NFC card mutations, and staff permit issuance now point at Laravel mobile operations endpoints.
 
 ## Laravel API Response Strategy
 
@@ -116,24 +116,36 @@ Content handling:
 - Student home shows compact sections for announcements, events, and documents.
 - Document file URLs are opened with `expo-web-browser`; files are not stored locally.
 
+## Staff Verification And NFC Operations
+
+Implemented endpoint replacements:
+
+- `POST /api/mobile/verification/nfc`
+- `POST /api/mobile/verification/student-number`
+- `POST /api/mobile/verification/permit-code`
+- `GET /api/mobile/operations/students/search`
+- `GET /api/mobile/operations/students/{student}`
+- `POST /api/mobile/operations/nfc-cards/register`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke`
+- `POST /api/mobile/operations/permits/issue`
+
+Migration notes:
+
+- The NFC UID reader remains unchanged and only sends the UID to the backend.
+- Verification results are normalized from Laravel `method`, `result`, `reason`, `student`, and `permit` fields into existing UI-compatible result objects.
+- Card mutation responses expose masked UID data only through `uid_last4` normalization.
+- Student detail/search now uses Laravel operations student endpoints.
+
 ## Old Endpoint Mappings Still In Code
 
 These are still used outside the migrated student core screens and should be migrated in later phases:
 
 | Current app endpoint | Target Laravel endpoint |
 | --- | --- |
-| `GET /api/mobile/operations/students` | `GET /api/mobile/operations/students/search` plus detail endpoint |
 | `GET /api/mobile/operations/cards` | New operations NFC-card list endpoint if exposed |
 | `GET /api/mobile/operations/permits` | New operations permit list endpoint if exposed |
-| `GET /api/mobile/operations/permit-config` | `GET /api/mobile/permit-requests/options` or staff config endpoint if exposed |
 | `GET /api/mobile/operations/verifications` | Verification/audit endpoint if exposed |
-| `POST /api/mobile/cards/register` | `POST /api/mobile/operations/nfc-cards/register` |
-| `POST /api/mobile/cards/replace` | `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace` |
-| `POST /api/mobile/cards/revoke` | `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke` |
-| `POST /api/mobile/permits/issue` | `POST /api/mobile/operations/permits/issue` |
-| `POST /api/mobile/verify/card` | `POST /api/mobile/verification/nfc` |
-| `POST /api/mobile/verify/student` | `POST /api/mobile/verification/student-number` |
-| `POST /api/mobile/verify/permit-code` | `POST /api/mobile/verification/permit-code` |
 
 ## New Endpoint Foundation
 
@@ -164,6 +176,15 @@ Already aligned or prepared:
 - `GET /api/mobile/content/documents`
 - `GET /api/mobile/content/documents/{slug}`
 - `GET /api/mobile/content/executives`
+- `POST /api/mobile/verification/nfc`
+- `POST /api/mobile/verification/student-number`
+- `POST /api/mobile/verification/permit-code`
+- `GET /api/mobile/operations/students/search`
+- `GET /api/mobile/operations/students/{student}`
+- `POST /api/mobile/operations/nfc-cards/register`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke`
+- `POST /api/mobile/operations/permits/issue`
 - Laravel resource and pagination response helpers
 - Laravel validation error normalization
 - Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
@@ -172,12 +193,9 @@ Already aligned or prepared:
 
 No new UI was built in this phase. These screens still need endpoint/data migration:
 
-- Staff verification scan
 - Staff/admin permit list
 - Staff/admin student list
 - Staff/admin profile dashboard
-- Student details
-- Card assignment
 - Admin dashboard
 - Cards
 - Settings
@@ -191,7 +209,7 @@ Missing future workflows remain out of scope for this phase:
 ## Next Steps
 
 1. Confirm the Paystack callback/redirect URL configured by the backend matches the Expo deep-link route.
-2. Migrate staff verification endpoints to `/api/mobile/verification/*`.
-3. Migrate card registration/replacement/revocation to operations NFC-card endpoints.
+2. Migrate remaining staff/admin aggregate list screens when Laravel list endpoints are finalized.
+3. Add staff permit request review.
 4. Add feature-level response schemas with Zod once endpoint payloads are stable.
 5. Decompose oversized screens while migrating each feature, not before.
