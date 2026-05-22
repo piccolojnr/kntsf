@@ -29,7 +29,8 @@ export const queryKeys = {
   content: {
     all: ["content"] as const,
     home: () => [...queryKeys.content.all, "home"] as const,
-    lists: (type: string) => [...queryKeys.content.all, type, "list"] as const,
+    lists: (type: string, params?: object) =>
+      [...queryKeys.content.all, type, "list", params ?? {}] as const,
     detail: (type: string, slug: string) =>
       [...queryKeys.content.all, type, "detail", slug] as const,
   },

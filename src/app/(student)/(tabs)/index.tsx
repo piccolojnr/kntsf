@@ -22,6 +22,8 @@ import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { CardStatus } from "@/features/cards/card-types";
 import { useStudentNfcCard } from "@/features/cards/use-student-card";
+import { useContentHome } from "@/features/content/content-hooks";
+import { ContentItem } from "@/features/content/content-types";
 import { Permit } from "@/features/permits/permit-types";
 import { useStudentPermits } from "@/features/permits/use-student-permits";
 import { useCurrentStudent } from "@/features/students/use-current-student";
@@ -324,6 +326,61 @@ function PermitHistorySection({ permits }: { permits: Permit[] }) {
   );
 }
 
+function ContentPreviewSection({
+  href,
+  items,
+  title,
+}: {
+  href: Href;
+  items: ContentItem[];
+  title: string;
+}) {
+  const previewItems = items.slice(0, 2);
+
+  if (previewItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionLabel}>{title}</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.seeAllBtn,
+            pressed && { opacity: 0.6 },
+          ]}
+          onPress={() => router.push(href)}
+        >
+          <Text style={styles.seeAllText}>View all</Text>
+          <ArrowRight size={13} color={colors.primary} strokeWidth={2.5} />
+        </Pressable>
+      </View>
+      <View style={styles.contentPreviewList}>
+        {previewItems.map((item) => (
+          <Pressable
+            key={String(item.id)}
+            style={({ pressed }) => [
+              styles.contentPreviewItem,
+              pressed && { opacity: 0.75 },
+            ]}
+            onPress={() => router.push(`${href}/${item.slug}` as Href)}
+          >
+            <Text style={styles.contentPreviewTitle} numberOfLines={1}>
+              {item.title}
+            </Text>
+            {item.excerpt ?? item.description ? (
+              <Text style={styles.contentPreviewExcerpt} numberOfLines={2}>
+                {item.excerpt ?? item.description}
+              </Text>
+            ) : null}
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function StudentHomeScreen() {
@@ -331,6 +388,7 @@ export default function StudentHomeScreen() {
   const student = studentQuery.student;
   const permitsQuery = useStudentPermits(student?.id);
   const cardQuery = useStudentNfcCard(student?.id);
+  const contentHomeQuery = useContentHome();
 
   const isLoading =
     studentQuery.isLoading || permitsQuery.isLoading || cardQuery.isLoading;
@@ -346,6 +404,7 @@ export default function StudentHomeScreen() {
       studentQuery.refetch(),
       permitsQuery.refetch(),
       cardQuery.refetch(),
+      contentHomeQuery.refetch(),
     ]);
   });
 
@@ -406,6 +465,24 @@ export default function StudentHomeScreen() {
 
             {/* Quick actions */}
             <QuickActionsGrid />
+
+            <ContentPreviewSection
+              href={"/(student)/announcements" as Href}
+              items={contentHomeQuery.data?.announcements ?? []}
+              title="Latest Announcements"
+            />
+
+            <ContentPreviewSection
+              href={"/(student)/events" as Href}
+              items={contentHomeQuery.data?.events ?? []}
+              title="Upcoming Events"
+            />
+
+            <ContentPreviewSection
+              href={"/(student)/documents" as Href}
+              items={contentHomeQuery.data?.documents ?? []}
+              title="Featured Documents"
+            />
 
             {/* Permit history */}
             <PermitHistorySection permits={sortedPermits} />
@@ -659,5 +736,26 @@ const styles = StyleSheet.create({
   // ── History ──────────────────────────────────────────────────────────────────
   historyList: {
     gap: spacing.sm,
+  },
+  contentPreviewList: {
+    gap: spacing.sm,
+  },
+  contentPreviewItem: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  contentPreviewTitle: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "900",
+  },
+  contentPreviewExcerpt: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    lineHeight: 18,
   },
 });
