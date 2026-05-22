@@ -29,6 +29,17 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 | GET | `/api/mobile/student/nfc-card` | Sanctum student account | Own active NFC card |
 | POST | `/api/mobile/student/nfc-card/report-lost` | Sanctum student account, throttled | Mark own active NFC card lost |
 
+### Student Permit Requests
+
+| Method | Endpoint | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/mobile/permit-requests/options` | Sanctum student account | Current settings, active period, and blocking state |
+| GET | `/api/mobile/permit-requests` | Sanctum student account | Own permit requests |
+| POST | `/api/mobile/permit-requests` | Sanctum student account, throttled | Create own permit request |
+| GET | `/api/mobile/permit-requests/{reference}` | Sanctum student account | Own permit request detail |
+| POST | `/api/mobile/permit-requests/{reference}/initialize-payment` | Sanctum student account, throttled | Initialize Paystack checkout |
+| POST | `/api/mobile/permit-requests/{reference}/verify-payment` | Sanctum student account, throttled | Server-side Paystack verification |
+
 ### Operations
 
 | Method | Endpoint | Auth | Purpose |
@@ -39,6 +50,10 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 | POST | `/api/mobile/operations/nfc-cards/register` | `nfc_cards.manage` | Register NFC card |
 | POST | `/api/mobile/operations/nfc-cards/{nfcCard}/replace` | `nfc_cards.manage` | Replace NFC card |
 | POST | `/api/mobile/operations/nfc-cards/{nfcCard}/revoke` | `nfc_cards.manage` | Revoke NFC card |
+| GET | `/api/mobile/operations/permit-requests` | `permit_requests.view` | Review self-service requests |
+| GET | `/api/mobile/operations/permit-requests/{reference}` | `permit_requests.view` | View request detail |
+| POST | `/api/mobile/operations/permit-requests/{reference}/approve-review` | `permit_requests.manage` | Approve review-required request |
+| POST | `/api/mobile/operations/permit-requests/{reference}/reject-review` | `permit_requests.manage` | Reject review-required request |
 
 ### Verification
 
@@ -86,6 +101,19 @@ Verification responses return normalized result data and never return raw submit
   - `mobile-login`
   - `mobile-verification`
   - `mobile-sensitive-actions`
+  - `mobile-permit-requests`
+
+## Mobile Permit Request Flow
+
+1. The Expo app calls `GET /api/mobile/permit-requests/options`.
+2. If `has_active_permit` or `has_pending_request` is true, the app should block checkout.
+3. The student calls `POST /api/mobile/permit-requests` with only missing `contact_email` or `contact_phone`.
+4. The app calls `POST /api/mobile/permit-requests/{reference}/initialize-payment`.
+5. Expo opens `authorization_url` in a browser tab or secure web view.
+6. After Paystack returns, the app calls `POST /api/mobile/permit-requests/{reference}/verify-payment` with the local payment `reference`.
+7. The app polls or refreshes the permit request detail until it is `issued`, `paid`, or `failed`.
+
+Unknown or unlinked students are intentionally not supported in the mobile API. They should use the public website self-service flow so provisional records can be reviewed safely.
 
 ## Expo Integration Notes
 
@@ -100,5 +128,4 @@ Verification responses return normalized result data and never return raw submit
 - Mobile password reset.
 - Mobile public content browsing.
 - Push notifications.
-- Gateway payment checkout.
 - Mobile election voting flow.

@@ -54,11 +54,18 @@ The webhook verifies `x-paystack-signature` using HMAC SHA-512 over the raw requ
 
 ## Mobile Reuse
 
-The future Expo app can reuse the same orchestration actions:
+The Expo app reuses the same orchestration actions:
 
 - create permit request
 - initialize Paystack payment
 - verify callback/webhook
 - complete permit request
 
-The mobile layer should call API endpoints around these actions rather than duplicating payment or permit issuing logic.
+Mobile endpoints:
+
+```txt
+POST /api/mobile/permit-requests/{reference}/initialize-payment
+POST /api/mobile/permit-requests/{reference}/verify-payment
+```
+
+The app should open the returned `authorization_url` in a browser/web view. After the Paystack return, it should call the verify endpoint with the local payment reference and then refresh the permit request. Verification remains server-side and idempotent.

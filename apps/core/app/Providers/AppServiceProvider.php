@@ -102,6 +102,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('mobile-sensitive-actions', function (Request $request) {
             return Limit::perMinute(20)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
         });
+
+        RateLimiter::for('mobile-permit-requests', function (Request $request) {
+            return Limit::perMinute(12)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
+        });
     }
 
     /**
