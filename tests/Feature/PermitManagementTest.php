@@ -95,6 +95,28 @@ test('issue form receives settings defaults and student emails', function () {
             ->where('options.issue_defaults.currency', 'GHS'));
 });
 
+test('issue defaults use active academic period dates when available', function () {
+    app(PermitSettings::class)->update([
+        'default_amount' => 25,
+        'currency' => 'GHS',
+        'default_validity_days' => 60,
+        'permit_requests_enabled' => true,
+    ]);
+
+    AcademicPeriod::factory()->active()->create([
+        'starts_at' => now()->addDays(10)->toDateString(),
+        'ends_at' => now()->addDays(120)->toDateString(),
+    ]);
+
+    $this->actingAs(permitUserWithRole('admin'))
+        ->get(route('permits.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('options.issue_defaults.amount_paid', 25)
+            ->where('options.issue_defaults.starts_at', now()->addDays(10)->startOfDay()->format('Y-m-d\TH:i'))
+            ->where('options.issue_defaults.expires_at', now()->addDays(120)->endOfDay()->format('Y-m-d\TH:i')));
+});
+
 test('issuing permit can update selected student email', function () {
     $student = Student::factory()->create([
         'email' => 'old@example.com',

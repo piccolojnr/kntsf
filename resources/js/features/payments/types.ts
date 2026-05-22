@@ -31,6 +31,13 @@ export type Payment = {
             semester: string | null;
         } | null;
     } | null;
+    permit_request: {
+        id: number;
+        reference: string;
+        status: string;
+        requires_review: boolean;
+        review_status: string | null;
+    } | null;
     created_by: {
         id: number;
         name: string;

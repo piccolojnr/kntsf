@@ -32,7 +32,6 @@ export function PermitIssueDialog({
     onClose?: () => void;
 }) {
     const [open, setOpen] = useState(defaultOpen);
-
     function closeDialog(nextOpen: boolean) {
         setOpen(nextOpen);
 
@@ -99,7 +98,9 @@ export function PermitIssueDialog({
                                     <InputError message={errors.starts_at} />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="expires_at">Expires at</Label>
+                                    <Label htmlFor="expires_at">
+                                        Expires at
+                                    </Label>
                                     <Input
                                         id="expires_at"
                                         name="expires_at"
@@ -142,7 +143,9 @@ export function PermitIssueDialog({
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button disabled={processing}>Issue permit</Button>
+                                <Button disabled={processing}>
+                                    Issue permit
+                                </Button>
                             </DialogFooter>
                         </>
                     )}

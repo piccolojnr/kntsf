@@ -66,7 +66,8 @@ class StudentOptions
         $defaults = config('student-options', []);
         $stored = AppSetting::query()
             ->where('key', self::SettingKey)
-            ->value('value');
+            ->first()
+            ?->value;
 
         if (! is_array($stored)) {
             return $defaults;

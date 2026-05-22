@@ -38,6 +38,7 @@ export default function PermitsIndex({
     issuedPermitCode?: string | null;
     can: PermitPermissions;
 }) {
+    console.log('options', options);
     const { url } = usePage();
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
     const shouldOpenIssueDialog = useMemo(
@@ -65,7 +66,10 @@ export default function PermitsIndex({
 
         router.get(
             index.url(),
-            { search: searchTerm || undefined, status: filters.status || undefined },
+            {
+                search: searchTerm || undefined,
+                status: filters.status || undefined,
+            },
             { preserveState: true, preserveScroll: true },
         );
     }
@@ -88,7 +92,6 @@ export default function PermitsIndex({
                         title="Permits"
                         description="Issue and manage student permits for academic periods."
                     />
-
                 </div>
 
                 {can.issue && shouldOpenIssueDialog && (
@@ -105,10 +108,14 @@ export default function PermitsIndex({
                     <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
                         <p className="font-medium">Permit code generated</p>
                         <p className="mt-1">
-                            Code: <span className="font-mono">{issuedPermitCode}</span>
+                            Code:{' '}
+                            <span className="font-mono">
+                                {issuedPermitCode}
+                            </span>
                         </p>
                         <p className="mt-1 text-xs">
-                            This code is shown once and is not stored in plaintext.
+                            This code is shown once and is not stored in
+                            plaintext.
                         </p>
                     </div>
                 )}
@@ -170,25 +177,31 @@ export default function PermitsIndex({
                             <div className="flex gap-2">
                                 <Button
                                     size="sm"
-                                    variant={filters.status === '' ? 'default' : 'outline'}
+                                    variant={
+                                        filters.status === ''
+                                            ? 'default'
+                                            : 'outline'
+                                    }
                                     onClick={() => filterStatus(undefined)}
                                 >
                                     All
                                 </Button>
-                                {['active', 'revoked', 'expired'].map((status) => (
-                                    <Button
-                                        key={status}
-                                        size="sm"
-                                        variant={
-                                            filters.status === status
-                                                ? 'default'
-                                                : 'outline'
-                                        }
-                                        onClick={() => filterStatus(status)}
-                                    >
-                                        {status}
-                                    </Button>
-                                ))}
+                                {['active', 'revoked', 'expired'].map(
+                                    (status) => (
+                                        <Button
+                                            key={status}
+                                            size="sm"
+                                            variant={
+                                                filters.status === status
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            onClick={() => filterStatus(status)}
+                                        >
+                                            {status}
+                                        </Button>
+                                    ),
+                                )}
                             </div>
                         </div>
 

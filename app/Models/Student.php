@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\StudentSource;
+use App\Enums\StudentVerificationStatus;
 use Database\Factories\StudentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'phone',
     'course',
     'level',
+    'source',
+    'verification_status',
+    'verified_at',
+    'verified_by_id',
+    'review_notes',
     'metadata',
     'created_by_id',
     'updated_by_id',
@@ -43,6 +50,11 @@ class Student extends Model
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by_id');
+    }
+
     public function permits(): HasMany
     {
         return $this->hasMany(Permit::class);
@@ -51,6 +63,11 @@ class Student extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function permitRequests(): HasMany
+    {
+        return $this->hasMany(PermitRequest::class);
     }
 
     public function nfcCards(): HasMany
@@ -81,6 +98,9 @@ class Student extends Model
     protected function casts(): array
     {
         return [
+            'source' => StudentSource::class,
+            'verification_status' => StudentVerificationStatus::class,
+            'verified_at' => 'datetime',
             'metadata' => 'array',
         ];
     }

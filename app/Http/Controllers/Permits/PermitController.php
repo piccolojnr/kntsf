@@ -192,8 +192,9 @@ class PermitController extends Controller
     private function formOptions(): array
     {
         $settings = app(PermitSettings::class)->all();
-        $startsAt = now();
-        $expiresAt = $startsAt->copy()->addDays($settings['default_validity_days']);
+        $activeAcademicPeriod = AcademicPeriod::query()->where('is_active', true)->first();
+        $startsAt = $this->defaultStartsAt($activeAcademicPeriod);
+        $expiresAt = $this->defaultExpiresAt($activeAcademicPeriod, $startsAt, $settings['default_validity_days']);
 
         return [
             'students' => Student::query()
@@ -231,5 +232,23 @@ class PermitController extends Controller
     private function datetimeLocalValue(CarbonInterface $date): string
     {
         return $date->format('Y-m-d\TH:i');
+    }
+
+    private function defaultStartsAt(?AcademicPeriod $academicPeriod): CarbonInterface
+    {
+        if ($academicPeriod?->starts_at instanceof CarbonInterface && $academicPeriod->starts_at->isFuture()) {
+            return $academicPeriod->starts_at->startOfDay();
+        }
+
+        return now();
+    }
+
+    private function defaultExpiresAt(?AcademicPeriod $academicPeriod, CarbonInterface $startsAt, int $defaultValidityDays): CarbonInterface
+    {
+        if ($academicPeriod?->ends_at instanceof CarbonInterface) {
+            return $academicPeriod->ends_at->endOfDay();
+        }
+
+        return $startsAt->copy()->addDays($defaultValidityDays);
     }
 }

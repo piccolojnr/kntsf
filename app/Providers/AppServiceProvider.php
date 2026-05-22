@@ -15,6 +15,7 @@ use App\Models\ExecutiveProfile;
 use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
+use App\Models\PermitRequest;
 use App\Models\Student;
 use App\Models\VerificationLog;
 use App\Support\ApplicationCache;
@@ -111,7 +112,7 @@ class AppServiceProvider extends ServiceProvider
         $flushDashboard = fn (): mixed => app(ApplicationCache::class)->flushDashboard();
         $flushPublicContent = fn (): mixed => app(ApplicationCache::class)->flushPublicContent();
 
-        foreach ([Student::class, Permit::class, NfcCard::class, Payment::class, VerificationLog::class, AuditLog::class, ElectionCandidate::class, ElectionVote::class] as $model) {
+        foreach ([Student::class, Permit::class, PermitRequest::class, NfcCard::class, Payment::class, VerificationLog::class, AuditLog::class, ElectionCandidate::class, ElectionVote::class] as $model) {
             $model::saved($flushDashboard);
             $model::deleted($flushDashboard);
         }

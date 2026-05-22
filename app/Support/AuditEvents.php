@@ -18,6 +18,20 @@ final class AuditEvents
 
     public const PermitCardDelivered = 'permit.card_delivered';
 
+    public const PermitRequestCreated = 'permit_request.created';
+
+    public const PermitRequestPaymentInitialized = 'permit_request.payment_initialized';
+
+    public const PermitRequestPaymentVerified = 'permit_request.payment_verified';
+
+    public const PermitRequestIssued = 'permit_request.issued';
+
+    public const PermitRequestFailed = 'permit_request.failed';
+
+    public const PermitRequestReviewApproved = 'permit_request.review_approved';
+
+    public const PermitRequestReviewRejected = 'permit_request.review_rejected';
+
     public const PaymentCreated = 'payment.created';
 
     public const PaymentSuccessful = 'payment.successful';
@@ -143,6 +157,13 @@ final class AuditEvents
             self::PermitIssued,
             self::PermitRevoked,
             self::PermitCardDelivered,
+            self::PermitRequestCreated,
+            self::PermitRequestPaymentInitialized,
+            self::PermitRequestPaymentVerified,
+            self::PermitRequestIssued,
+            self::PermitRequestFailed,
+            self::PermitRequestReviewApproved,
+            self::PermitRequestReviewRejected,
             self::PaymentCreated,
             self::PaymentSuccessful,
             self::PaymentFailed,
