@@ -45,6 +45,10 @@ const statConfig = {
 
 const PAGE_SIZE = 10;
 
+function searchable(value: string | null | undefined) {
+  return (value ?? "").toLowerCase();
+}
+
 export default function OperationsPermitsScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
@@ -71,9 +75,9 @@ export default function OperationsPermitsScreen() {
       return {
         permit,
         student,
-        permitCodeSearch: permit.permitCode.toLowerCase(),
-        studentIdSearch: student?.studentId.toLowerCase() ?? "",
-        studentNameSearch: student?.name.toLowerCase() ?? "",
+        permitCodeSearch: searchable(permit.permitCode),
+        studentIdSearch: searchable(student?.studentId),
+        studentNameSearch: searchable(student?.name),
       };
     });
   }, [permitsQuery.data?.items]);

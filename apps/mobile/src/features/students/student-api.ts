@@ -20,6 +20,15 @@ export type OperationsListParams = {
 
 export type StudentsListResult = ApiListResponse<Student>;
 
+type StudentListEnvelope = {
+  students?: StudentDto[];
+  items?: StudentDto[];
+  data?: StudentDto[];
+  pagination?: ApiListResponse<StudentDto>["pagination"];
+  links?: Record<string, string | null>;
+  meta?: Record<string, unknown>;
+};
+
 export function normalizeStudent(dto: StudentDto): Student {
   const activeNfcCard = dto.active_nfc_card ?? dto.nfc_card ?? null;
 
@@ -34,15 +43,15 @@ export function normalizeStudent(dto: StudentDto): Student {
     accountStatus: dto.accountStatus ?? dto.account_status,
     activeNfcCard: activeNfcCard
       ? {
-          id: String(activeNfcCard.id),
-          status: activeNfcCard.status ?? "inactive",
-          uidLast4: activeNfcCard.uid_last4,
-          uid: activeNfcCard.uid_last4 ? `.... ${activeNfcCard.uid_last4}` : "",
-          registeredAt:
-            activeNfcCard.activated_at ?? activeNfcCard.issued_at ?? "",
-          issuedAt: activeNfcCard.issued_at,
-          activatedAt: activeNfcCard.activated_at,
-        }
+        id: String(activeNfcCard.id),
+        status: activeNfcCard.status ?? "inactive",
+        uidLast4: activeNfcCard.uid_last4,
+        uid: activeNfcCard.uid_last4 ? `.... ${activeNfcCard.uid_last4}` : "",
+        registeredAt:
+          activeNfcCard.activated_at ?? activeNfcCard.issued_at ?? "",
+        issuedAt: activeNfcCard.issued_at,
+        activatedAt: activeNfcCard.activated_at,
+      }
       : null,
   };
 }
@@ -53,6 +62,117 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
   }
 
   return response.data;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function getStudentDtosFromEnvelope(envelope: StudentListEnvelope) {
+  return envelope.students ?? envelope.items ?? envelope.data ?? [];
+}
+
+function normalizeStudentListResponse(
+  response: unknown,
+): StudentsListResult {
+  if (Array.isArray(response)) {
+    return {
+      items: response.map(normalizeStudent),
+      pagination: {
+        page: 1,
+        limit: response.length,
+        total: response.length,
+        totalPages: 1,
+      },
+    };
+  }
+
+  if (!isObject(response)) {
+    return {
+      items: [],
+      pagination: {
+        page: 1,
+        limit: 0,
+        total: 0,
+        totalPages: 1,
+      },
+    };
+  }
+
+  if ("success" in response) {
+    const data = getMobileData(response as MobileApiResponse<StudentListEnvelope>);
+    const students = getStudentDtosFromEnvelope(data);
+
+    return {
+      items: students.map(normalizeStudent),
+      pagination:
+        data.pagination ?? {
+          page: 1,
+          limit: students.length,
+          total: students.length,
+          totalPages: 1,
+        },
+    };
+  }
+
+  if ("meta" in response && Array.isArray(response.data)) {
+    const data = unwrapPaginated<StudentDto>(
+      response as {
+        data: StudentDto[];
+        links?: Record<string, string | null>;
+        meta?: Record<string, unknown>;
+      },
+    );
+
+    return {
+      items: data.items.map(normalizeStudent),
+      pagination: data.pagination,
+    };
+  }
+
+  if ("data" in response && Array.isArray(response.data)) {
+    const students = response.data as StudentDto[];
+
+    return {
+      items: students.map(normalizeStudent),
+      pagination: {
+        page: 1,
+        limit: students.length,
+        total: students.length,
+        totalPages: 1,
+      },
+    };
+  }
+
+  if ("data" in response && isObject(response.data)) {
+    const envelope = response.data as StudentListEnvelope;
+    const students = getStudentDtosFromEnvelope(envelope);
+
+    return {
+      items: students.map(normalizeStudent),
+      pagination:
+        envelope.pagination ?? {
+          page: 1,
+          limit: students.length,
+          total: students.length,
+          totalPages: 1,
+        },
+    };
+  }
+
+  const envelope = response as StudentListEnvelope;
+  const students = getStudentDtosFromEnvelope(envelope);
+
+  return {
+    items: students.map(normalizeStudent),
+    pagination:
+      envelope.pagination ?? {
+        page: 1,
+        limit: students.length,
+        total: students.length,
+        totalPages: 1,
+      },
+  };
 }
 
 export async function getStudents(params?: OperationsListParams) {
@@ -70,17 +190,8 @@ export async function getStudents(params?: OperationsListParams) {
       },
     });
 
-    if (Array.isArray(response.data)) {
-      return response.data.map(normalizeStudent);
-    }
 
-    if ("meta" in response.data && Array.isArray(response.data.data)) {
-      return unwrapPaginated<StudentDto>(response.data).items.map(normalizeStudent);
-    }
-
-    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<StudentDto>>);
-
-    return data.items.map(normalizeStudent);
+    return normalizeStudentListResponse(response.data).items;
   } catch (error) {
     throw toUserFacingError(error);
   }
@@ -103,33 +214,9 @@ export async function getStudentsPage(
       },
     });
 
-    if (Array.isArray(response.data)) {
-      return {
-        items: response.data.map(normalizeStudent),
-        pagination: {
-          page: 1,
-          limit: response.data.length,
-          total: response.data.length,
-          totalPages: 1,
-        },
-      };
-    }
 
-    if ("meta" in response.data && Array.isArray(response.data.data)) {
-      const data = unwrapPaginated<StudentDto>(response.data);
 
-      return {
-        items: data.items.map(normalizeStudent),
-        pagination: data.pagination,
-      };
-    }
-
-    const data = getMobileData(response.data as MobileApiResponse<ApiListResponse<StudentDto>>);
-
-    return {
-      items: data.items.map(normalizeStudent),
-      pagination: data.pagination,
-    };
+    return normalizeStudentListResponse(response.data);
   } catch (error) {
     throw toUserFacingError(error);
   }

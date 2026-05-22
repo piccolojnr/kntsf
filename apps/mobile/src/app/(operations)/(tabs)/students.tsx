@@ -16,6 +16,10 @@ import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const PAGE_SIZE = 10;
 
+function searchable(value: string | null | undefined) {
+  return (value ?? "").toLowerCase();
+}
+
 export default function OperationsStudentsScreen() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,8 +45,8 @@ export default function OperationsStudentsScreen() {
 
     return students.filter((student) => {
       return (
-        student.studentId.toLowerCase().includes(normalizedSearch) ||
-        student.name.toLowerCase().includes(normalizedSearch)
+        searchable(student.studentId).includes(normalizedSearch) ||
+        searchable(student.name).includes(normalizedSearch)
       );
     });
   }, [searchTerm, studentsQuery.data?.items]);
