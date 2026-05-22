@@ -40,6 +40,15 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 | POST | `/api/mobile/permit-requests/{reference}/initialize-payment` | Sanctum student account, throttled | Initialize Paystack checkout |
 | POST | `/api/mobile/permit-requests/{reference}/verify-payment` | Sanctum student account, throttled | Server-side Paystack verification |
 
+### Elections
+
+| Method | Endpoint | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/mobile/elections` | Sanctum student account | List active/scheduled elections and closed elections with visible results |
+| GET | `/api/mobile/elections/{election}` | Sanctum student account | Election detail with positions and approved candidates |
+| POST | `/api/mobile/elections/{election}/positions/{position}/vote` | Sanctum student account, throttled | Cast immutable vote for one position |
+| GET | `/api/mobile/elections/{election}/results` | Sanctum student account | View results when visible or permitted |
+
 ### Operations
 
 | Method | Endpoint | Auth | Purpose |
@@ -115,6 +124,30 @@ Verification responses return normalized result data and never return raw submit
 
 Unknown or unlinked students are intentionally not supported in the mobile API. They should use the public website self-service flow so provisional records can be reviewed safely.
 
+## Mobile Election Flow
+
+Expected Expo flow:
+
+```txt
+Login
+→ Elections tab
+→ Election detail
+→ Select candidate
+→ Confirm vote
+→ Success
+```
+
+Election voting rules:
+
+- requires a linked student profile
+- requires active user account
+- requires active permit for the election academic period
+- only active elections inside their voting window accept votes
+- only approved candidates are returned and can receive votes
+- one vote per student per position
+- votes cannot be edited after submission
+- results are hidden until `results_visible` is true unless the user has `elections.view_results`
+
 ## Expo Integration Notes
 
 - Store the bearer token in the platform secure storage layer, not plain async storage.
@@ -128,4 +161,3 @@ Unknown or unlinked students are intentionally not supported in the mobile API. 
 - Mobile password reset.
 - Mobile public content browsing.
 - Push notifications.
-- Mobile election voting flow.

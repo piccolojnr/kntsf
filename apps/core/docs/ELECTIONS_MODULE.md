@@ -52,9 +52,32 @@ A student can vote only when:
 - the user account is active and has a password
 - the student has an active permit for the election academic period
 
-## Future NFC/Mobile Hooks
+## Mobile Voting API
 
-The vote action centralizes eligibility checks in `CastElectionVoteAction`, so future NFC/mobile verification can be added before the vote insert without changing controllers or UI flow.
+Authenticated students can vote through the mobile API:
+
+```txt
+GET  /api/mobile/elections
+GET  /api/mobile/elections/{election}
+POST /api/mobile/elections/{election}/positions/{position}/vote
+GET  /api/mobile/elections/{election}/results
+```
+
+The mobile detail endpoint returns:
+
+- election summary
+- positions
+- approved candidates only
+- per-position `has_voted`
+- eligibility status and reasons
+
+The vote endpoint reuses `CastElectionVoteAction`. It accepts `election_candidate_id`, validates that the candidate belongs to the selected position, and returns the updated election detail after a successful vote.
+
+Results are returned only when `results_visible` is true or the user has `elections.view_results`.
+
+## Future NFC Hooks
+
+The vote action centralizes eligibility checks in `CastElectionVoteAction`, so future NFC verification can be added before the vote insert without changing controllers or UI flow.
 
 ## Audit Events
 
@@ -73,7 +96,6 @@ Ballot audit metadata intentionally stores the position but not unnecessary sens
 
 ## Not Built Yet
 
-- Public/mobile voting endpoints.
 - NFC verification gate.
 - Live counting or realtime dashboards.
 - Candidate self-nomination workflow.
