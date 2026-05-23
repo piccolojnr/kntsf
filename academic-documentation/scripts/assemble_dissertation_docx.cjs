@@ -400,7 +400,17 @@ return;
 }
 
 const appendixMarkdownFiles = {
+  A: "appendices/APPENDIX_A_DATABASE_SCHEMA.md",
+  B: "appendices/APPENDIX_B_API_ENDPOINTS.md",
+  C: "appendices/APPENDIX_C_LARAVEL_ROUTE_LISTS.md",
+  D: "appendices/APPENDIX_D_MOBILE_API_CONTRACT.md",
+  E: "appendices/APPENDIX_E_TESTING_RESULTS.md",
   G: "appendices/APPENDIX_G_SELECTED_CODE_SNIPPETS.md",
+  H: "appendices/APPENDIX_H_DEPLOYMENT_CONFIGURATION.md",
+  I: "appendices/APPENDIX_I_NFC_VERIFICATION_SAMPLES.md",
+  J: "appendices/APPENDIX_J_PAYMENT_VERIFICATION_SAMPLES.md",
+  K: "appendices/APPENDIX_K_PERMISSION_MATRIX.md",
+  L: "appendices/APPENDIX_L_QUEUE_AND_SCHEDULER.md",
 };
 
 function parseFrontMatterSections() {
@@ -518,7 +528,7 @@ function appendixHeadings() {
   const children = [heading("APPENDICES", 1, true)];
   children.push(
     paragraph(
-      "This section contains supplementary material that supports the main report. Appendix G includes selected implementation excerpts. Remaining appendices will be assembled in later passes using route exports, screenshots, schema summaries, and other evidence described in APPENDICES_MASTER.md.",
+      "This section contains supplementary material that supports the main report. Text appendices A–E, G–L are assembled from markdown sources. Appendix F remains for screenshot evidence. See APPENDICES_MASTER.md for the full assembly plan.",
     ),
   );
 
@@ -530,8 +540,10 @@ function appendixHeadings() {
     children.push(heading(`Appendix ${letter} — ${title}`, 2));
 
     if (appendixFile && fs.existsSync(path.join(root, appendixFile))) {
+      console.log(`Appendix ${letter}: loaded ${appendixFile}`);
       children.push(...markdownToDocx(readAppendixMarkdown(appendixFile)));
     } else {
+      console.warn(`Appendix ${letter}: missing markdown at ${appendixFile ?? "(not mapped)"}`);
       children.push(placeholder(`[INSERT APPENDIX ${letter} CONTENT — ${title}]`));
     }
   }
