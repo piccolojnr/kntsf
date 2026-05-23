@@ -1,4 +1,5 @@
 import { Href, router, useLocalSearchParams } from "expo-router";
+import { CheckCircle2, RefreshCcw, XCircle } from "lucide-react-native";
 import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -37,9 +38,11 @@ export default function PermitPaymentReturnScreen() {
       },
       {
         onSuccess: (request) => {
-          router.replace(
-            `/(student)/permit-request/${request.request_reference}` as Href,
-          );
+          setTimeout(() => {
+            router.replace(
+              `/(student)/permit-request/${request.request_reference}` as Href,
+            );
+          }, 650);
         },
       },
     );
@@ -54,12 +57,24 @@ export default function PermitPaymentReturnScreen() {
           title="Verifying Payment"
         />
 
-        {verifyMutation.isError || !requestReference ? (
-          <>
+        {verifyMutation.isSuccess ? (
+          <View style={styles.stateCard}>
+            <CheckCircle2 color={colors.success} size={28} strokeWidth={2.4} />
+            <Text style={styles.stateTitle}>Payment checked</Text>
             <Text style={styles.message}>
-              Payment verification could not complete automatically. Open your
-              request and use the verify payment button.
+              Returning to your permit request with the latest status.
             </Text>
+          </View>
+        ) : verifyMutation.isError || !requestReference ? (
+          <>
+            <View style={styles.stateCard}>
+              <XCircle color={colors.danger} size={28} strokeWidth={2.4} />
+              <Text style={styles.stateTitle}>Verification failed</Text>
+              <Text style={styles.message}>
+                Payment verification could not complete automatically. Open your
+                request and use the verify payment button.
+              </Text>
+            </View>
             <Button
               label="Back to Requests"
               onPress={() => router.replace("/(student)/permit-request" as Href)}
@@ -67,7 +82,13 @@ export default function PermitPaymentReturnScreen() {
             />
           </>
         ) : (
-          <LoadingState message="Verifying payment..." />
+          <View style={styles.stateCard}>
+            <RefreshCcw color={colors.primary} size={28} strokeWidth={2.4} />
+            <LoadingState message="Verifying payment..." />
+            <Text style={styles.message}>
+              Please wait while the backend checks Paystack.
+            </Text>
+          </View>
         )}
       </View>
     </Screen>
@@ -85,6 +106,21 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     lineHeight: 22,
+    textAlign: "center",
+  },
+  stateCard: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  stateTitle: {
+    color: colors.text,
+    fontSize: fontSizes.lg,
+    fontWeight: "800",
     textAlign: "center",
   },
 });

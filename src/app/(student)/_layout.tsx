@@ -10,12 +10,19 @@ export default function StudentLayout() {
     >
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="permit-request" options={{ headerShown: false }} />
-        <Stack.Screen name="elections" options={{ headerShown: false }} />
-        <Stack.Screen name="announcements" options={{ headerShown: false }} />
-        <Stack.Screen name="events" options={{ headerShown: false }} />
-        <Stack.Screen name="documents" options={{ headerShown: false }} />
-        <Stack.Screen name="executives" options={{ headerShown: false }} />
+        <Stack.Screen name="permit-request/index" options={{ headerShown: false }} />
+        <Stack.Screen name="permit-request/[reference]" options={{ headerShown: false }} />
+        <Stack.Screen name="permit-request/payment-return" options={{ headerShown: false }} />
+        <Stack.Screen name="elections/index" options={{ headerShown: false }} />
+        <Stack.Screen name="elections/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="elections/[id]/results" options={{ headerShown: false }} />
+        <Stack.Screen name="announcements/index" options={{ headerShown: false }} />
+        <Stack.Screen name="announcements/[slug]" options={{ headerShown: false }} />
+        <Stack.Screen name="events/index" options={{ headerShown: false }} />
+        <Stack.Screen name="events/[slug]" options={{ headerShown: false }} />
+        <Stack.Screen name="documents/index" options={{ headerShown: false }} />
+        <Stack.Screen name="documents/[slug]" options={{ headerShown: false }} />
+        <Stack.Screen name="executives/index" options={{ headerShown: false }} />
       </Stack>
     </RoleAccessGuard>
   );

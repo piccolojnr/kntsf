@@ -61,6 +61,7 @@ export type PermitRequestOptions = {
   student: PermitRequestStudent | null;
   has_active_permit: boolean;
   has_pending_request: boolean;
+  pending_request?: PermitRequest | null;
   missing_contact: {
     email: boolean;
     phone: boolean;
@@ -77,6 +78,18 @@ export type PaymentInitialization = {
   access_code?: string;
   reference: string;
   permit_request_reference: string;
+};
+
+export type PaymentInitializationDto = Partial<PaymentInitialization> & {
+  authorizationUrl?: string;
+  authorizationURL?: string;
+  payment?: Partial<PaymentInitialization> | null;
+  data?: Partial<PaymentInitialization> | null;
+  paystack?: Partial<PaymentInitialization> | null;
+  permit_request?: {
+    request_reference?: string;
+  } | null;
+  request_reference?: string;
 };
 
 export type VerifyPaymentPayload = {

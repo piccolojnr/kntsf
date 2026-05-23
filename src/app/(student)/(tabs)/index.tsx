@@ -48,14 +48,6 @@ type QuickAction = {
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
-    label: "Request",
-    sublabel: "Pay permit",
-    icon: CalendarClock,
-    href: "/(student)/permit-request" as Href,
-    accent: colors.success,
-    accentSoft: colors.successSoft,
-  },
-  {
     label: "Permits",
     sublabel: "View history",
     icon: FileText,
@@ -169,12 +161,26 @@ function GreetingHeader({
   );
 }
 
-function QuickActionsGrid() {
+function QuickActionsGrid({ hasActivePermit }: { hasActivePermit: boolean }) {
+  const actions = hasActivePermit
+    ? QUICK_ACTIONS
+    : [
+        {
+          label: "Request",
+          sublabel: "Pay permit",
+          icon: CalendarClock,
+          href: "/(student)/permit-request" as Href,
+          accent: colors.success,
+          accentSoft: colors.successSoft,
+        },
+        ...QUICK_ACTIONS,
+      ];
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionLabel}>Quick Actions</Text>
       <View style={styles.actionsRow}>
-        {QUICK_ACTIONS.map((action) => (
+        {actions.map((action) => (
           <Pressable
             key={action.label}
             style={({ pressed }) => [
@@ -464,7 +470,7 @@ export default function StudentHomeScreen() {
             </View>
 
             {/* Quick actions */}
-            <QuickActionsGrid />
+            <QuickActionsGrid hasActivePermit={latestPermit?.status === "active"} />
 
             <ContentPreviewSection
               href={"/(student)/announcements" as Href}

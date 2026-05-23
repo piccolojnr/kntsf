@@ -1,3 +1,4 @@
+import { Href, router } from "expo-router";
 import {
   ChevronLeft,
   ChevronRight,
@@ -6,13 +7,7 @@ import {
   UserRound,
 } from "lucide-react-native";
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Href, router } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import StudentPermitCard from "@/components/cards/student-permit-card";
 import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
@@ -633,13 +628,6 @@ export default function StudentPermitsScreen() {
           />
         ) : (
           <>
-            <Button
-              icon={FileText}
-              label="Request Permit"
-              onPress={() => router.push("/(student)/permit-request" as Href)}
-              variant="secondary"
-            />
-
             {/* ── Permit Card hero ── */}
             {activePermit ? (
               <StudentPermitCard
@@ -647,11 +635,21 @@ export default function StudentPermitsScreen() {
                 permit={activePermit}
               />
             ) : (
-              <EmptyState
-                description="No active permit is linked to your student record."
-                icon={FileText}
-                title="No active permit"
-              />
+              <>
+                <EmptyState
+                  description="No active permit is linked to your student record."
+                  icon={FileText}
+                  title="No active permit"
+                />
+                <Button
+                  icon={FileText}
+                  label="Request Permit"
+                  onPress={() =>
+                    router.push("/(student)/permit-request" as Href)
+                  }
+                  variant="secondary"
+                />
+              </>
             )}
 
             {/* ── SRC Permit Details ── */}
