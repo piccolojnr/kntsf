@@ -84,11 +84,26 @@ Before submission:
 
 ## Pending Appendices
 
-Only appendix structure placeholders were inserted. Full appendix content should be assembled later using:
+Text appendices A–E and G–L are assembled from markdown sources. Appendix F still needs screenshot figures. Appendices I and J include text samples; screenshot placeholders remain inside those appendices:
 
 ```txt
-academic-documentation/APPENDICES_MASTER.md
+academic-documentation/appendices/APPENDIX_A_DATABASE_SCHEMA.md
+academic-documentation/appendices/APPENDIX_B_API_ENDPOINTS.md
+academic-documentation/appendices/APPENDIX_C_LARAVEL_ROUTE_LISTS.md
+academic-documentation/appendices/APPENDIX_D_MOBILE_API_CONTRACT.md
+academic-documentation/appendices/APPENDIX_E_TESTING_RESULTS.md
 academic-documentation/appendices/APPENDIX_G_SELECTED_CODE_SNIPPETS.md
+academic-documentation/appendices/APPENDIX_H_DEPLOYMENT_CONFIGURATION.md
+academic-documentation/appendices/APPENDIX_K_PERMISSION_MATRIX.md
+academic-documentation/appendices/APPENDIX_I_NFC_VERIFICATION_SAMPLES.md
+academic-documentation/appendices/APPENDIX_J_PAYMENT_VERIFICATION_SAMPLES.md
+academic-documentation/appendices/APPENDIX_L_QUEUE_AND_SCHEDULER.md
+```
+
+Regenerate Appendix K after permission changes:
+
+```txt
+node academic-documentation/scripts/generate_permission_matrix.cjs
 ```
 
 ## Manual Word Tasks Still Required
