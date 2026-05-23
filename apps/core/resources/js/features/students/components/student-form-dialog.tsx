@@ -203,7 +203,7 @@ function StudentFields({
                         >
                             <SelectTrigger
                                 id={`student_course_${fieldId}`}
-                                className="h-9 w-full text-sm"
+                                className="w-full"
                             >
                                 <SelectValue placeholder="Select course" />
                             </SelectTrigger>
@@ -229,7 +229,7 @@ function StudentFields({
                         >
                             <SelectTrigger
                                 id={`student_level_${fieldId}`}
-                                className="h-9 w-full text-sm"
+                                className="w-full"
                             >
                                 <SelectValue placeholder="Select level" />
                             </SelectTrigger>

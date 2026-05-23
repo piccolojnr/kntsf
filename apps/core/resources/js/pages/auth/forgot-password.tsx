@@ -33,7 +33,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     autoComplete="off"
                                     autoFocus
                                     placeholder="email@example.com"
-                                    className="h-10 bg-app-surface"
+                                    className="bg-app-surface"
                                 />
 
                                 <InputError message={errors.email} />
@@ -41,7 +41,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="flex items-center justify-start">
                                 <Button
-                                    className="h-10 w-full"
+                                    className="w-full"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >

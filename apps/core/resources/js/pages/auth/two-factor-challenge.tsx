@@ -70,7 +70,7 @@ export default function TwoFactorChallenge() {
                                         placeholder="Enter recovery code"
                                         autoFocus={showRecoveryInput}
                                         required
-                                        className="h-10 bg-app-surface"
+                                        className="bg-app-surface"
                                     />
                                     <InputError
                                         message={errors.recovery_code}
@@ -107,7 +107,7 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                className="h-10 w-full"
+                                className="w-full"
                                 disabled={processing}
                             >
                                 Continue

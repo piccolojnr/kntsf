@@ -5,9 +5,9 @@ import {
     Search,
     ShieldCheck,
     UserRoundPlus
-    
+
 } from 'lucide-react';
-import type {LucideIcon} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import Heading from '@/components/shared/heading';
@@ -73,7 +73,9 @@ export default function StudentsIndex({
                             mode="create"
                             options={options}
                             trigger={
-                                <Button>
+                                <Button
+                                    className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                                >
                                     <Plus />
                                     New student
                                 </Button>

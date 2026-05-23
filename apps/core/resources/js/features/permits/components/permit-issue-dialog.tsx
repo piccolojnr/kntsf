@@ -45,7 +45,8 @@ export function PermitIssueDialog({
             {trigger !== null && (
                 <DialogTrigger asChild>
                     {trigger ?? (
-                        <Button>
+                        <Button
+                        >
                             <Plus />
                             Issue permit
                         </Button>
