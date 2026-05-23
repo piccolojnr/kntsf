@@ -51,8 +51,18 @@ function resolvePermitStatus(status?: string) {
   }
 }
 
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString(undefined, {
+function formatDate(dateString?: string | null) {
+  if (!dateString) {
+    return "Unavailable";
+  }
+
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Unavailable";
+  }
+
+  return date.toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
     year: "numeric",

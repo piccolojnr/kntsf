@@ -33,10 +33,11 @@ export type PermitsListResult = ApiListResponse<Permit>;
 export function normalizePermit(dto: PermitDto): Permit {
   const expiryDate =
     dto.expiryDate ?? dto.expires_at ?? dto.expiry_date ?? dto.expiresAt ?? "";
+  const startDate = dto.startDate ?? dto.starts_at ?? dto.start_date ?? "";
   const codeLast4 = dto.codeLast4 ?? dto.code_last4 ?? null;
 
   return {
-    id: String(dto.id),
+    id: String(dto.id ?? ""),
     studentId:
       dto.studentId ?? dto.student_id ?? dto.student?.id?.toString() ?? "",
     permitCode:
@@ -47,7 +48,7 @@ export function normalizePermit(dto: PermitDto): Permit {
       dto.code ??
       "",
     status: normalizePermitStatus(dto.status, expiryDate),
-    startDate: dto.startDate ?? dto.starts_at ?? dto.start_date ?? "",
+    startDate,
     expiryDate,
     amountPaid: Number(dto.amountPaid ?? dto.amount_paid ?? dto.amount ?? 0),
     currency: dto.currency ?? "GHS",
@@ -79,13 +80,83 @@ function normalizePermitStatus(
 function normalizePermitIssuanceConfig(
   dto: PermitIssuanceConfigDto,
 ): PermitIssuanceConfig {
+  const activeAcademicPeriod =
+    dto.activeAcademicPeriod ?? dto.active_academic_period ?? null;
+  const selectedStudent = dto.selectedStudent ?? dto.selected_student ?? dto.student ?? null;
+  const selectedStudentState = dto.selected_student_state;
+  const blockingReasons =
+    dto.blocking?.reasons ??
+    dto.blocking?.reason_keys ??
+    selectedStudentState?.blocking_reasons ??
+    selectedStudentState?.reason_keys ??
+    dto.blocking_reasons ??
+    dto.blocking_reason_keys ??
+    [];
+  const hasOpenPermitRequest = Boolean(
+      dto.blocking?.has_open_permit_request ??
+      dto.blocking?.has_pending_request ??
+      selectedStudentState?.has_open_permit_request ??
+      selectedStudentState?.has_pending_request ??
+      dto.has_open_permit_request ??
+      dto.has_pending_request ??
+      dto.open_permit_request_exists,
+  );
+
   return {
-    enabled: dto.enabled ?? dto.issuanceEnabled ?? false,
-    defaultAmount: dto.defaultAmount ?? dto.amount ?? 0,
+    enabled: dto.enabled ?? dto.issuanceEnabled ?? dto.permit_requests_enabled ?? false,
+    defaultAmount: Number(dto.defaultAmount ?? dto.default_amount ?? dto.amount ?? 0),
     currency: dto.currency,
-    expiryDate: dto.expiryDate ?? dto.expiry_date ?? dto.expiresAt ?? "",
-    academicYear: dto.academicYear ?? dto.academic_year ?? null,
-    semester: dto.semester ?? null,
+    startDate:
+      dto.startDate ??
+      dto.start_date ??
+      dto.starts_at ??
+      dto.default_start_date ??
+      dto.default_starts_at,
+    expiryDate:
+      dto.expiryDate ??
+      dto.expiry_date ??
+      dto.expiresAt ??
+      dto.expires_at ??
+      dto.default_end_date ??
+      dto.default_ends_at ??
+      dto.default_expires_at ??
+      "",
+    academicYear:
+      dto.academicYear ??
+      dto.academic_year ??
+      activeAcademicPeriod?.academic_year ??
+      null,
+    semester: dto.semester ?? activeAcademicPeriod?.semester ?? null,
+    validityDays: optionalNumber(
+      dto.validityDays ?? dto.validity_days ?? dto.default_validity_days,
+    ),
+    permitRequestsEnabled: dto.permitRequestsEnabled ?? dto.permit_requests_enabled,
+    activeAcademicPeriod,
+    courseOptions: dto.courseOptions ?? dto.course_options ?? dto.courses ?? [],
+    levelOptions: dto.levelOptions ?? dto.level_options ?? dto.levels ?? [],
+    studentNumberPrefix: dto.studentNumberPrefix ?? dto.student_number_prefix ?? null,
+    selectedStudent: selectedStudent ? normalizeStudent(selectedStudent as StudentDto) : null,
+    blocking: {
+      hasActivePermit: Boolean(
+        dto.blocking?.has_active_permit ??
+          selectedStudentState?.has_active_permit ??
+          dto.has_active_permit,
+      ),
+      hasOpenPermitRequest,
+      missingEmail: Boolean(
+        dto.blocking?.missing_email ??
+          dto.missing_email ??
+          selectedStudentState?.missing_email ??
+          dto.missing_contact?.email,
+      ),
+      missingPhone: Boolean(
+        dto.blocking?.missing_phone ??
+          dto.missing_phone ??
+          selectedStudentState?.missing_phone ??
+          dto.missing_contact?.phone,
+      ),
+      reasons: blockingReasons,
+    },
   };
 }
 
@@ -95,6 +166,16 @@ function getMobileData<T>(response: MobileApiResponse<T>) {
   }
 
   return response.data;
+}
+
+function optionalNumber(value: unknown) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const numericValue = Number(value);
+
+  return Number.isFinite(numericValue) ? numericValue : null;
 }
 
 export async function getPermits(params?: OperationsPermitListParams) {
@@ -245,7 +326,28 @@ export async function getPermitIssuanceConfig() {
   }
 }
 
-export async function issuePermitForStudent(studentId: string) {
+export async function getOperationsPermitIssuanceConfig(studentId?: string | number) {
+  try {
+    const response = await apiClient.get<
+      PermitIssuanceConfigDto | { data: PermitIssuanceConfigDto }
+    >("/api/mobile/operations/permits/options", {
+      params: {
+        student_id: studentId,
+      },
+    });
+    const data = unwrapData<PermitIssuanceConfigDto>(response.data);
+
+    return normalizePermitIssuanceConfig(data);
+  } catch (error) {
+    throw toUserFacingError(error);
+  }
+}
+
+export async function issuePermitForStudent(input: {
+  studentId: string;
+  studentEmail?: string | null;
+  academicPeriodId?: string | number | null;
+}) {
   try {
     const response = await apiClient.post<
       | PermitDto
@@ -253,8 +355,9 @@ export async function issuePermitForStudent(studentId: string) {
       | { data: PermitDto | { permit: PermitDto } }
       | MobileApiResponse<PermitDto | { permit: PermitDto }>
     >("/api/mobile/operations/permits/issue", {
-      student_number: studentId,
-      student_id: studentId,
+      student_id: input.studentId,
+      student_email: input.studentEmail || undefined,
+      academic_period_id: input.academicPeriodId ?? undefined,
     });
     const data = unwrapData<PermitDto | { permit: PermitDto }>(response.data);
 

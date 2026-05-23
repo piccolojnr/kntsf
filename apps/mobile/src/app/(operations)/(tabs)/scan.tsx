@@ -198,7 +198,7 @@ export default function OperationsScanScreen() {
     setIsIssuing(true);
 
     try {
-      await issuePermit(result.student.studentId);
+      await issuePermit();
       setSuccessMessage("Permit issued successfully.");
       setShowIssueConfirm(false);
     } catch {
@@ -327,7 +327,7 @@ export default function OperationsScanScreen() {
                 onViewStudent={canViewStudent ? handleViewStudent : undefined}
                 result={result}
               />
-              {result.decision === "denied" &&
+              {result.reason === "student_not_found" &&
               result.method === "student_id" ? (
                 <View style={styles.infoNotice}>
                   <FileText
