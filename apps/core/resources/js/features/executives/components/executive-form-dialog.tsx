@@ -36,7 +36,9 @@ export function ExecutiveFormDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger ?? (
-                    <Button>
+                    <Button
+                        className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                    >
                         <Plus />
                         Create Executive
                     </Button>
@@ -188,7 +190,9 @@ export function ExecutiveFormDialog({
                             </Field>
 
                             <div className="flex justify-end">
-                                <Button disabled={processing}>
+                                <Button disabled={processing}
+                                    className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                                >
                                     <Save />
                                     Save
                                 </Button>

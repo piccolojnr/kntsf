@@ -138,13 +138,15 @@ export function PermitIssueDialog({
                                 <DialogClose asChild>
                                     <Button
                                         type="button"
-                                        variant="outline"
+                                        className="h-[39.5px] w-[39.5px]  px-0 text-app-surface bg-app-red hover:bg-app-red/80 sm:w-auto sm:px-3"
                                         onClick={() => resetAndClearErrors()}
                                     >
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button disabled={processing}>
+                                <Button disabled={processing}
+                                    className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                                >
                                     Issue permit
                                 </Button>
                             </DialogFooter>
