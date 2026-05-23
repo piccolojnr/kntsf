@@ -24,9 +24,9 @@ In a student governance system, centralization has practical value. Permit recor
 
 The proposed system uses this architectural idea by treating the backend as the central coordination layer for the operations dashboard, public portal, and mobile application. The dashboard supports administrative work by authorized users. The public portal exposes approved public information and self-service permit request pages. The mobile application provides student and staff access to selected functions. Although these clients serve different user groups, they depend on the same backend rules for authentication, permit handling, payment verification, election voting, audit logging, and reporting.
 
-[INSERT FIGURE — Client-Server Architecture]
+![Figure 2.1: Client-Server Architecture](diagrams/png/figure-2-1-client-server-architecture.png)
 
-Figure 2.1 should illustrate the general relationship between the dashboard, mobile application, public portal, backend services, database, queue workers, cache, and payment gateway. The figure should not include database schema details, because those are more appropriate for Chapter Three.
+Figure 2.1 illustrates the general relationship between the dashboard, mobile application, public portal, backend services, database, queue workers, cache, and payment gateway. The figure does not include database schema details, because those are more appropriate for Chapter Three.
 
 Client-server architecture also supports maintainability. When the rules for permit issuance or election eligibility change, the update can be made in the backend rather than duplicated across several user interfaces. This is especially relevant in a governance system where institutional policies may change over time. A centralized backend can enforce the same rule whether the request comes from the dashboard, mobile application, or public portal.
 
@@ -47,6 +47,10 @@ The principle of least privilege is closely related to RBAC. It states that user
 RBAC also supports accountability. When actions are tied to authenticated users and permission checks, audit logs become more meaningful. It is not enough to know that a permit was issued. The system should be able to identify which authorized user issued it, under what role, and when. This is particularly relevant in student governance because disputes about permits, payments, elections, and published information may require review.
 
 In the proposed system, RBAC relates to administrative roles, staff roles, executive permissions, and student access. Administrators may configure roles and manage sensitive settings. Staff may perform operational tasks such as verification or permit handling. Executives may manage SRC-related content and review operational summaries depending on assigned permissions. Students use the system for personal workflows such as permit requests, permit status viewing, and election participation. These role boundaries help keep the system organized.
+
+![Figure 2.4: Role-Based Access Control Model](diagrams/png/figure-2-4-rbac-model.png)
+
+Figure 2.4 presents the role-based access control model used to separate administrative, staff, executive, and student responsibilities. The model shows that users do not receive unrestricted system access simply because they are authenticated; instead, their assigned roles determine the permissions available to them.
 
 RBAC is not a complete security solution by itself. Poorly designed roles can become too broad, giving users more authority than required. Too many roles can also make administration difficult. A system may pass a role check but still expose too much data if the underlying query or response is not properly scoped. Therefore, RBAC must be combined with validation, authentication, data filtering, audit logging, and secure defaults. [Reference to access control security research]
 
@@ -79,6 +83,10 @@ REST API architecture supports interoperability because different clients can co
 Stateless communication is an important REST principle. In a stateless API, each request contains the information needed for the server to understand and process it, commonly through authentication tokens, request parameters, and payload data. The server does not depend on hidden client state from previous requests. This can improve scalability because requests can be handled more consistently across server processes. It also makes API behavior easier to test and document.
 
 In the proposed system, REST API principles are most relevant to the mobile API. The mobile application requires endpoints for authentication, student profile access, permit information, permit request creation, payment verification, election voting, and staff operations. These endpoints must return predictable responses, handle validation errors clearly, and apply authorization rules consistently. A well-structured API reduces ambiguity between the mobile application and backend.
+
+![Figure 2.3: REST API Architecture](diagrams/png/figure-2-3-rest-api-architecture.png)
+
+Figure 2.3 illustrates the REST API communication model between the mobile application, authenticated API layer, backend processing logic, and database. It emphasizes that the mobile application submits requests, while the backend remains responsible for validation, authorization, and persistence.
 
 REST API design also supports separation between presentation and business logic. The mobile application can focus on displaying screens and collecting user input, while the backend validates the request and applies institutional rules. For example, when a student attempts to vote, the mobile application may submit the selected candidate, but the backend must confirm that the election is active, the candidate is approved, the student is eligible, and the student has not already voted for that position.
 
@@ -120,9 +128,9 @@ NFC systems also face hardware and platform limitations. Not all mobile devices 
 
 Institutional use cases for NFC include attendance tracking, library access, room access, identity checks, payment cards, and event admission. In each case, the value of NFC comes from connecting a quick physical interaction to a trusted backend decision. The backend decision remains essential. A card tap should initiate verification, not replace verification.
 
-[INSERT FIGURE — NFC Verification Workflow]
+![Figure 2.2: NFC Verification Workflow](diagrams/png/figure-2-2-nfc-verification-workflow.png)
 
-Figure 2.2 should show a high-level NFC verification workflow: card tap, identifier reading, backend lookup, card status check, student record lookup, permit status check, verification response, and audit log entry. Detailed database relationships should be reserved for Chapter Three.
+Figure 2.2 shows a high-level NFC verification workflow: card tap, identifier reading, backend lookup, card status check, student record lookup, permit status check, verification response, and audit log entry. Detailed database relationships are reserved for Chapter Three.
 
 For the proposed system, NFC is used to improve student permit verification. A registered NFC card can be linked to a student record. During verification, the card is scanned using a compatible device, and the system checks whether the card and related permit are valid. This approach is stronger than visual inspection because the verification response comes from current system records. It is also more practical than a purely manual lookup because the scan reduces the time needed to identify the student.
 
