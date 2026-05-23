@@ -40,7 +40,7 @@ const reportMeta: Record<string, ReportMeta> = {
         title: 'Students',
         description: 'Account, profile, and registry coverage.',
         icon: Users,
-        color: '#0f766e',
+        color: '#442e66',
     },
     permits: {
         title: 'Permits',
