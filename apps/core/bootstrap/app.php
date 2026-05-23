@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'dashboard_access' => EnsureDashboardAccess::class,
         ]);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);

@@ -3,7 +3,7 @@
 use App\Http\Controllers\Executives\ExecutiveController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
     Route::post('executives/{executive}/activate', [ExecutiveController::class, 'activate'])
         ->name('executives.activate');
 

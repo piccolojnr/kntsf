@@ -163,13 +163,14 @@ test('setup password page rejects invalid expired and used token', function () {
 
 test('student can set initial password with valid token', function () {
     $user = User::factory()->create(['password' => null]);
+    $user->assignRole('student');
     [$plainToken, $activationToken] = createSetupToken($user);
 
     $this->post(route('account.setup-password.store', $plainToken), [
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
     ])
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('account.mobile-app'));
 
     expect(Hash::check('Password123!', $user->fresh()->password))->toBeTrue()
         ->and($activationToken->fresh()->used_at)->not->toBeNull();
@@ -207,7 +208,7 @@ test('activated student can login after setting password', function () {
     $this->post('/login', [
         'email' => 'login-student@example.com',
         'password' => 'Password123!',
-    ])->assertRedirect(route('dashboard', absolute: false));
+    ])->assertRedirect(route('account.mobile-app', absolute: false));
 
     $this->assertAuthenticatedAs($user);
 });

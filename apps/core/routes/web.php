@@ -17,7 +17,10 @@ Route::get('health/queue', [HealthController::class, 'queue'])
     ->middleware('throttle:public-content')
     ->name('health.queue');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('account/mobile-app', fn () => Inertia::render('account/mobile-app'))
+    ->name('account.mobile-app');
+
+Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
     Route::get('dashboard', function (ActivityFeed $activityFeed, DashboardSummary $dashboardSummary) {
         return Inertia::render('dashboard', [
             'summary' => $dashboardSummary->counts(),
