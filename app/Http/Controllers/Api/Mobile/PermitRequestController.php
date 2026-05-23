@@ -8,6 +8,7 @@ use App\Actions\PermitRequests\VerifyPaystackPaymentAction;
 use App\Enums\PermitRequestStatus;
 use App\Enums\PermitStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Mobile\InitializeMobilePermitPaymentRequest;
 use App\Http\Requests\Api\Mobile\StoreMobilePermitRequestRequest;
 use App\Http\Requests\Api\Mobile\VerifyMobilePermitPaymentRequest;
 use App\Http\Resources\Mobile\PermitRequestResource;
@@ -108,7 +109,7 @@ class PermitRequestController extends Controller
     }
 
     public function initializePayment(
-        Request $request,
+        InitializeMobilePermitPaymentRequest $request,
         PermitRequest $permitRequest,
         InitializePaystackPaymentAction $initializePaystackPayment,
     ): JsonResponse {
@@ -121,7 +122,11 @@ class PermitRequestController extends Controller
         }
 
         try {
-            $payment = $initializePaystackPayment->handle($permitRequest);
+            $payment = $initializePaystackPayment->handle(
+                $permitRequest,
+                $request->validated('callback_url'),
+                $request->validated('redirect_url'),
+            );
         } catch (RuntimeException $exception) {
             return response()->json([
                 'message' => $exception->getMessage(),

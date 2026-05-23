@@ -164,6 +164,54 @@ test('student can initialize mobile permit payment', function () {
         ->and($permitRequest->status)->toBe(PermitRequestStatus::AwaitingPayment);
 });
 
+test('mobile payment initialization forwards deep link callback to paystack', function () {
+    mobilePermitFakePaystackInitialize();
+    $user = mobilePermitStudentUser();
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $user->student->id,
+        'academic_period_id' => AcademicPeriod::query()->where('is_active', true)->value('id'),
+        'status' => PermitRequestStatus::Pending,
+    ]);
+
+    $callbackUrl = 'kntsfapp://permit-request/payment-return?source=paystack';
+    $redirectUrl = 'kntsfapp://(student)/permit-request/payment-return?source=paystack';
+
+    $this->withToken(mobilePermitBearerToken($user))
+        ->postJson("/api/mobile/permit-requests/{$permitRequest->request_reference}/initialize-payment", [
+            'callback_url' => $callbackUrl,
+            'redirect_url' => $redirectUrl,
+        ])
+        ->assertOk()
+        ->assertJsonPath('authorization_url', 'https://checkout.paystack.test/pay');
+
+    Http::assertSent(fn ($request): bool => $request->url() === 'https://api.paystack.co/transaction/initialize'
+        && $request['callback_url'] === $callbackUrl
+        && $request['metadata']['callback_url'] === $callbackUrl
+        && $request['metadata']['redirect_url'] === $redirectUrl);
+
+    $payment = Payment::query()->firstOrFail();
+
+    expect($payment->metadata['paystack_callback_url'])->toBe($callbackUrl)
+        ->and($payment->metadata['mobile_redirect_url'])->toBe($redirectUrl);
+});
+
+test('mobile payment initialization rejects unsupported callback protocols', function () {
+    $user = mobilePermitStudentUser();
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $user->student->id,
+        'academic_period_id' => AcademicPeriod::query()->where('is_active', true)->value('id'),
+        'status' => PermitRequestStatus::Pending,
+    ]);
+
+    $this->withToken(mobilePermitBearerToken($user))
+        ->postJson("/api/mobile/permit-requests/{$permitRequest->request_reference}/initialize-payment", [
+            'callback_url' => 'javascript:alert(1)',
+            'redirect_url' => 'file:///tmp/payment-return',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['callback_url', 'redirect_url']);
+});
+
 test('verify payment uses server side verification and is idempotent', function () {
     mobilePermitFakePaystackInitialize();
     $user = mobilePermitStudentUser();

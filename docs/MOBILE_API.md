@@ -150,12 +150,16 @@ Verification responses return normalized result data and never return raw submit
 1. The Expo app calls `GET /api/mobile/permit-requests/options`.
 2. If `has_active_permit` or `has_pending_request` is true, the app should block checkout.
 3. The student calls `POST /api/mobile/permit-requests` with only missing `contact_email` or `contact_phone`.
-4. The app calls `POST /api/mobile/permit-requests/{reference}/initialize-payment`.
+4. The app calls `POST /api/mobile/permit-requests/{reference}/initialize-payment` with optional mobile return URLs:
+   - `callback_url`
+   - `redirect_url`
 5. Expo opens `authorization_url` in a browser tab or secure web view.
 6. After Paystack returns, the app calls `POST /api/mobile/permit-requests/{reference}/verify-payment` with the local payment `reference`.
 7. The app polls or refreshes the permit request detail until it is `issued`, `paid`, or `failed`.
 
 Unknown or unlinked students are intentionally not supported in the mobile API. They should use the public website self-service flow so provisional records can be reviewed safely.
+
+Mobile payment initialization accepts `http://`, `https://`, and `kntsfapp://` return URLs. When `callback_url` is supplied, it is forwarded to Paystack as the transaction callback URL. Both URLs are stored in local payment metadata for recovery and troubleshooting, but they are not exposed through mobile resources.
 
 ## Mobile Election Flow
 

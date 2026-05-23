@@ -81,4 +81,13 @@ POST /api/mobile/permit-requests/{reference}/initialize-payment
 POST /api/mobile/permit-requests/{reference}/verify-payment
 ```
 
-The app should open the returned `authorization_url` in a browser/web view. After the Paystack return, it should call the verify endpoint with the local payment reference and then refresh the permit request. Verification remains server-side and idempotent.
+The app should initialize payment with mobile return URLs when it needs Paystack to return to Expo:
+
+```json
+{
+  "callback_url": "kntsfapp://app/(student)/permit-request/payment-return",
+  "redirect_url": "kntsfapp://app/(student)/permit-request/payment-return"
+}
+```
+
+`callback_url` is sent to Paystack as the transaction callback URL. `redirect_url` is stored locally in payment metadata for recovery and troubleshooting. The app should open the returned `authorization_url` in a browser/web view. After the Paystack return, it should call the verify endpoint with the local payment reference and then refresh the permit request. Verification remains server-side and idempotent.

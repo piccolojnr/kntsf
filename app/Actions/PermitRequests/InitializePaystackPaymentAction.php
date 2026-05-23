@@ -24,9 +24,9 @@ class InitializePaystackPaymentAction
     /**
      * @return array{authorization_url: string, access_code: string, reference: string}
      */
-    public function handle(PermitRequest $permitRequest): array
+    public function handle(PermitRequest $permitRequest, ?string $callbackUrl = null, ?string $redirectUrl = null): array
     {
-        return DB::transaction(function () use ($permitRequest): array {
+        return DB::transaction(function () use ($permitRequest, $callbackUrl, $redirectUrl): array {
             $permitRequest = PermitRequest::query()
                 ->with(['student', 'academicPeriod', 'payment'])
                 ->lockForUpdate()
@@ -59,17 +59,21 @@ class InitializePaystackPaymentAction
                 ])->save();
             }
 
+            $paystackCallbackUrl = $callbackUrl ?: route('public.permit-request.callback');
+
             $response = $this->paystackClient->initializeTransaction([
                 'email' => $permitRequest->contact_email ?? $permitRequest->student?->email,
                 'amount' => (int) round(((float) $permitRequest->amount) * 100),
                 'currency' => $permitRequest->currency,
                 'reference' => $payment->reference,
-                'callback_url' => route('public.permit-request.callback'),
+                'callback_url' => $paystackCallbackUrl,
                 'metadata' => [
                     'permit_request_id' => $permitRequest->id,
                     'permit_request_reference' => $permitRequest->request_reference,
                     'student_id' => $permitRequest->student_id,
                     'academic_period_id' => $permitRequest->academic_period_id,
+                    'callback_url' => $paystackCallbackUrl,
+                    'redirect_url' => $redirectUrl,
                 ],
             ]);
 
@@ -84,6 +88,8 @@ class InitializePaystackPaymentAction
                 'metadata' => array_replace($payment->metadata ?? [], [
                     'paystack_access_code' => $data['access_code'] ?? null,
                     'paystack_authorization_url' => $data['authorization_url'],
+                    'paystack_callback_url' => $paystackCallbackUrl,
+                    'mobile_redirect_url' => $redirectUrl,
                     'initialized_at' => now()->toISOString(),
                 ]),
             ])->save();
