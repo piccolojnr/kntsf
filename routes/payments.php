@@ -8,7 +8,7 @@ Route::post('payments/paystack/webhook', PaystackWebhookController::class)
     ->middleware('throttle:sensitive-actions')
     ->name('payments.paystack.webhook');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
     Route::post('payments/{payment}/mark-successful', [PaymentController::class, 'markSuccessful'])
         ->middleware('throttle:sensitive-actions')
         ->name('payments.mark-successful');

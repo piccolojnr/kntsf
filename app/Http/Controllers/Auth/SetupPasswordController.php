@@ -31,7 +31,11 @@ class SetupPasswordController extends Controller
     ): RedirectResponse {
         Auth::logout();
 
-        $setInitialPassword->handle($token, $request->validated('password'));
+        $user = $setInitialPassword->handle($token, $request->validated('password'));
+
+        if ($user->hasOnlyStudentRole()) {
+            return to_route('account.mobile-app')->with('status', 'Password set. Continue in the Knutsford SRC mobile app.');
+        }
 
         return to_route('login')->with('status', 'Password set. You may now log in.');
     }

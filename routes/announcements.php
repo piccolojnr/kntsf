@@ -3,7 +3,7 @@
 use App\Http\Controllers\Announcements\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->prefix('dashboard')->group(function () {
     Route::post('announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])
         ->name('announcements.publish');
 

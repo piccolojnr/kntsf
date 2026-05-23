@@ -37,6 +37,12 @@ class User extends Authenticatable
         return $this->hasMany(AccountActivationToken::class);
     }
 
+    public function hasOnlyStudentRole(): bool
+    {
+        return $this->hasRole('student')
+            && ! $this->roles()->where('name', '!=', 'student')->exists();
+    }
+
     public function issuedPermits(): HasMany
     {
         return $this->hasMany(Permit::class, 'issued_by_id');

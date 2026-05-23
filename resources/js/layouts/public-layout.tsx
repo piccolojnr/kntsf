@@ -2,7 +2,6 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     ChevronRight,
-    LogIn,
     Menu,
     ShieldCheck,
     X,
@@ -10,14 +9,13 @@ import {
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
-import { dashboard, home, login } from '@/routes';
+import { home } from '@/routes';
 import { index as announcementsIndex } from '@/routes/public/announcements';
 import { index as documentsIndex } from '@/routes/public/documents';
 import { index as electionsIndex } from '@/routes/public/elections';
 import { index as eventsIndex } from '@/routes/public/events';
 import { index as executivesIndex } from '@/routes/public/executives';
 import { index as permitRequestIndex } from '@/routes/public/permit-request';
-import type { SharedPageProps } from '@/types';
 
 const navItems = [
     {
@@ -38,15 +36,11 @@ const navItems = [
 
 export default function PublicLayout({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
-    const { auth } = usePage<SharedPageProps>().props;
     const currentUrl = usePage().url;
 
     function isActive(href: string) {
         return currentUrl === href || currentUrl.startsWith(`${href}/`);
     }
-
-    const ctaHref = auth.user ? dashboard() : login();
-    const ctaLabel = auth.user ? 'Dashboard' : 'Staff Login';
 
     return (
         <div className="public-page">
@@ -91,13 +85,6 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                             <ShieldCheck className="size-4 text-app-teal dark:text-app-brass" />
                             Official SRC information
                         </div>
-                        <Link
-                            href={ctaHref}
-                            className="public-action"
-                        >
-                            <LogIn className="size-4" />
-                            {ctaLabel}
-                        </Link>
                     </div>
 
                     <button
@@ -128,14 +115,6 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                     <ChevronRight className="size-4" />
                                 </Link>
                             ))}
-                            <Link
-                                href={ctaHref}
-                                className="mt-2 flex items-center justify-between rounded-md bg-app-ink px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-app-surface"
-                                onClick={() => setOpen(false)}
-                            >
-                                {ctaLabel}
-                                <ChevronRight className="size-4" />
-                            </Link>
                         </nav>
                     </div>
                 )}
@@ -144,7 +123,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
             <main className="relative z-10">{children}</main>
 
             <footer className="relative z-10 mt-20 border-t border-app-border bg-app-ink text-app-surface">
-                <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:grid-cols-[1fr_auto_auto] md:px-8">
+                <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:grid-cols-[1fr_auto] md:px-8">
                     <div className="max-w-md">
                         <div className="flex items-center gap-3">
                             <div className="grid size-10 place-items-center rounded-md border border-app-surface/30">
@@ -180,19 +159,6 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 </li>
                             ))}
                         </ul>
-                    </div>
-
-                    <div>
-                        <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-app-brass">
-                            Access
-                        </p>
-                        <Link
-                            href={ctaHref}
-                            className="inline-flex items-center gap-2 rounded-md border border-app-surface/20 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-app-surface transition hover:bg-app-surface hover:text-app-ink"
-                        >
-                            {ctaLabel}
-                            <ChevronRight className="size-4" />
-                        </Link>
                     </div>
                 </div>
                 <div className="border-t border-app-surface/10 px-5 py-5 text-center text-xs font-semibold text-app-surface/55">

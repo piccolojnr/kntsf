@@ -3,7 +3,7 @@
 use App\Http\Controllers\Events\EventController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
     Route::post('events/{event}/publish', [EventController::class, 'publish'])
         ->name('events.publish');
 
