@@ -1,5 +1,10 @@
 import { Href, router } from "expo-router";
-import { AlertCircle, CreditCard, FileText, RefreshCcw } from "lucide-react-native";
+import {
+  AlertCircle,
+  CreditCard,
+  FileText,
+  RefreshCcw,
+} from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -20,6 +25,7 @@ import {
 } from "@/features/permit-requests/permit-request-hooks";
 import { PermitRequest } from "@/features/permit-requests/permit-request-types";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { normalizeApiError } from "@/lib/api/api-error";
 
 function formatMoney(amount?: string | number | null, currency = "GHS") {
   const value = Number(amount ?? 0);
@@ -66,8 +72,10 @@ export default function PermitRequestScreen() {
     () => getPendingRequest(requestsQuery.data ?? []),
     [requestsQuery.data],
   );
+  const existingRequest = pendingRequest ?? options?.pending_request ?? null;
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!options) {
@@ -94,7 +102,7 @@ export default function PermitRequestScreen() {
         ? "Permit requests are currently disabled."
         : null,
       options.has_active_permit ? "You already have an active permit." : null,
-      options.has_pending_request || pendingRequest
+      options.has_pending_request || existingRequest
         ? "You already have a pending permit request."
         : null,
       options.missing_contact.email && !contactEmail.trim()
@@ -104,17 +112,33 @@ export default function PermitRequestScreen() {
         ? "A contact phone number is required."
         : null,
     ].filter((item): item is string => Boolean(item));
-  }, [contactEmail, contactPhone, options, pendingRequest]);
+  }, [contactEmail, contactPhone, existingRequest, options]);
 
   async function handleCreateRequest() {
-    const request = await createMutation.mutateAsync({
-      contact_email: contactEmail.trim() || undefined,
-      contact_phone: contactPhone.trim() || undefined,
-    });
+    setSubmitError(null);
 
-    router.push(
-      `/(student)/permit-request/${request.request_reference}` as Href,
-    );
+    try {
+      const payload = {
+        contact_email:
+          contactEmail.trim() || options?.student?.email || undefined,
+        contact_phone:
+          contactPhone.trim() || options?.student?.phone || undefined,
+      };
+      const request = await createMutation.mutateAsync(payload);
+
+      router.push(
+        `/(student)/permit-request/${request.request_reference}?pay=1` as Href,
+      );
+    } catch (error) {
+      const normalizedError = normalizeApiError(error);
+      const fieldMessage =
+        normalizedError.fields?.contact_email?.[0] ??
+        normalizedError.fields?.email?.[0] ??
+        normalizedError.fields?.contact_phone?.[0] ??
+        normalizedError.message;
+
+      setSubmitError(fieldMessage);
+    }
   }
 
   return (
@@ -188,19 +212,19 @@ export default function PermitRequestScreen() {
               </SectionCard>
             ) : null}
 
-            {pendingRequest ? (
+            {existingRequest ? (
               <SectionCard title="Existing Request">
                 <DetailRow
                   label="Reference"
-                  value={pendingRequest.request_reference}
-                  helper={`Status: ${pendingRequest.status}`}
+                  value={existingRequest.request_reference}
+                  helper={`Status: ${existingRequest.status}`}
                 />
                 <Button
                   icon={FileText}
                   label="View Request"
                   onPress={() =>
                     router.push(
-                      `/(student)/permit-request/${pendingRequest.request_reference}` as Href,
+                      `/(student)/permit-request/${existingRequest.request_reference}` as Href,
                     )
                   }
                 />
@@ -217,6 +241,15 @@ export default function PermitRequestScreen() {
                     </Text>
                   ))}
                 </View>
+              </View>
+            ) : null}
+
+            {submitError ? (
+              <View style={styles.warning}>
+                <AlertCircle color={colors.danger} size={18} />
+                <Text style={[styles.warningText, { color: colors.danger }]}>
+                  {submitError}
+                </Text>
               </View>
             ) : null}
 

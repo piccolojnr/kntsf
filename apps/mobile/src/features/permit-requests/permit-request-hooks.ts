@@ -66,7 +66,8 @@ export function useInitializePermitPayment() {
   const invalidate = useInvalidatePermitRequestQueries();
 
   return useMutation({
-    mutationFn: (reference: string) => initializePermitPayment(reference),
+    mutationFn: (input: { callbackUrl?: string; reference: string }) =>
+      initializePermitPayment(input),
     onSuccess: async (payment) => {
       await invalidate(payment.permit_request_reference);
     },
