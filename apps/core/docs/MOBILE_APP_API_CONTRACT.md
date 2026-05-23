@@ -75,12 +75,23 @@ Mobile permit requests are for authenticated students with linked student profil
 1. Call `GET /api/mobile/permit-requests/options`.
 2. Block checkout if `has_active_permit` or `has_pending_request` is true.
 3. Create a request with `POST /api/mobile/permit-requests`.
-4. Initialize payment.
+4. Initialize payment with optional `callback_url` and `redirect_url`.
 5. Open `authorization_url` in the system browser or a secure web view.
 6. After Paystack redirects back, call `verify-payment` with the payment reference.
 7. Poll `GET /api/mobile/permit-requests/{reference}` until status is `issued`, `paid`, or `failed`.
 
 The app must not treat Paystack redirect alone as payment proof. The backend verifies directly with Paystack.
+
+Mobile initialization body:
+
+```json
+{
+  "callback_url": "kntsfapp://app/(student)/permit-request/payment-return",
+  "redirect_url": "kntsfapp://app/(student)/permit-request/payment-return"
+}
+```
+
+`callback_url` is forwarded to Paystack. `redirect_url` is stored with the payment metadata for recovery/debugging. The backend accepts `http://`, `https://`, and `kntsfapp://` return URLs.
 
 ## Elections Endpoints
 
