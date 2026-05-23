@@ -7,7 +7,9 @@ import {
     ShieldCheck,
     UsersRound
 } from 'lucide-react';
-import type {LucideIcon} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { dashboard, login } from '@/routes';
 import type { SharedPageProps } from '@/types';
 
@@ -41,7 +43,10 @@ export default function Welcome() {
                         {auth.user ? (
                             <Link
                                 href={dashboard()}
-                                className="inline-flex h-9 items-center gap-2 rounded-md border border-app-border px-3 font-medium hover:bg-app-surface-muted"
+                                className={cn(
+                                    buttonVariants({ variant: 'outline', size: 'default' }),
+                                    'gap-2'
+                                )}
                             >
                                 Dashboard
                                 <ArrowRight className="size-4" />
@@ -50,7 +55,7 @@ export default function Welcome() {
                             <>
                                 <Link
                                     href={login()}
-                                    className="inline-flex h-9 items-center rounded-md px-3 font-medium hover:bg-app-surface-muted"
+                                    className={buttonVariants({ variant: 'ghost', size: 'default' })}
                                 >
                                     Log in
                                 </Link>
@@ -78,7 +83,10 @@ export default function Welcome() {
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href={auth.user ? dashboard() : login()}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-app-ink px-4 text-sm font-medium text-app-surface hover:bg-app-red"
+                                className={cn(
+                                    buttonVariants({ variant: 'default', size: 'default' }),
+                                    'gap-2'
+                                )}
                             >
                                 {auth.user ? 'Open dashboard' : 'Log in'}
                                 <ArrowRight className="size-4" />

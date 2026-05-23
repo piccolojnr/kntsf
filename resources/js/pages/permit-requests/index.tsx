@@ -1,6 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { PermitRequestStatusBadge } from '@/features/public-permit-request/components/permit-request-status-badge';
 import { index, show } from '@/routes/permit-requests';
 
@@ -97,7 +99,7 @@ export default function PermitRequestsIndex({
         <>
             <Head title="Permit Requests" />
 
-            <div className="space-y-6">
+            <div className="space-y-6 p-4 md:p-6    ">
                 <div>
                     <p className="app-kicker">Self-service</p>
                     <h1 className="mt-2 text-3xl font-black tracking-tight">
@@ -125,11 +127,11 @@ export default function PermitRequestsIndex({
                         <form onSubmit={submit} className="grid gap-3">
                             <div className="relative flex-1">
                                 <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-app-muted" />
-                                <input
+                                <Input
                                     value={search}
                                     onChange={(event) => setSearch(event.target.value)}
                                     placeholder="Search request, student number, name, email"
-                                    className="h-9 w-full rounded-md border border-app-border bg-app-surface pl-9 text-sm"
+                                    className="pl-9"
                                 />
                             </div>
                             <div className="grid gap-2 md:grid-cols-6">
@@ -162,23 +164,23 @@ export default function PermitRequestsIndex({
                                         </option>
                                     ))}
                                 </Select>
-                                <input
+                                <Input
                                     type="date"
                                     value={dateFrom}
                                     onChange={(event) => setDateFrom(event.target.value)}
-                                    className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+                                    className="w-full"
                                 />
-                                <input
+                                <Input
                                     type="date"
                                     value={dateTo}
                                     onChange={(event) => setDateTo(event.target.value)}
-                                    className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+                                    className="w-full"
                                 />
                             </div>
                             <div className="flex justify-end">
-                                <button className="rounded-md bg-app-ink px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-app-surface">
+                                <Button type="submit">
                                     Apply filters
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>
@@ -263,7 +265,7 @@ function Select({
         <select
             value={value}
             onChange={(event) => onChange(event.target.value)}
-            className="h-9 rounded-md border border-app-border bg-app-surface px-3 text-sm"
+            className="h-7 rounded-md border border-input bg-input/20 px-2 py-0.5 text-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 dark:bg-input/30"
         >
             {children}
         </select>

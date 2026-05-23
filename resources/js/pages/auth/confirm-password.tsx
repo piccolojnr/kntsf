@@ -22,7 +22,7 @@ export default function ConfirmPassword() {
                                 placeholder="Password"
                                 autoComplete="current-password"
                                 autoFocus
-                                className="h-10 bg-app-surface"
+                                className="bg-app-surface"
                             />
 
                             <InputError message={errors.password} />
@@ -30,7 +30,7 @@ export default function ConfirmPassword() {
 
                         <div className="flex items-center">
                             <Button
-                                className="h-10 w-full"
+                                className="w-full"
                                 disabled={processing}
                                 data-test="confirm-password-button"
                             >
