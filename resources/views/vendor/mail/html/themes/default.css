@@ -9,8 +9,8 @@ body *:not(html):not(style):not(br):not(tr):not(code) {
 
 body {
     -webkit-text-size-adjust: none;
-    background-color: #f7f2e8;
-    color: #17211b;
+    background-color: #ffffff;
+    color: #1c1826;
     height: 100%;
     line-height: 1.5;
     margin: 0;
@@ -27,7 +27,7 @@ blockquote {
 }
 
 a {
-    color: #0f766e;
+    color: #442e66;
 }
 
 a img {
@@ -37,7 +37,7 @@ a img {
 /* Typography */
 
 h1 {
-    color: #17211b;
+    color: #1c1826;
     font-size: 26px;
     font-weight: 800;
     letter-spacing: -0.02em;
@@ -47,7 +47,7 @@ h1 {
 }
 
 h2 {
-    color: #17211b;
+    color: #1c1826;
     font-size: 18px;
     font-weight: 800;
     margin-top: 0;
@@ -55,7 +55,7 @@ h2 {
 }
 
 h3 {
-    color: #17211b;
+    color: #1c1826;
     font-size: 15px;
     font-weight: 800;
     margin-top: 0;
@@ -63,7 +63,7 @@ h3 {
 }
 
 p {
-    color: #5c655b;
+    color: #6b6378;
     font-size: 15px;
     line-height: 1.65;
     margin-top: 0;
@@ -84,7 +84,7 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #f7f2e8;
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -107,15 +107,15 @@ img {
 }
 
 .header a {
-    color: #17211b;
+    color: #1c1826;
     display: inline-block;
     text-decoration: none;
 }
 
 .brand-mark {
-    background-color: #fffaf0;
+    background-color: #ffffff;
     border-radius: 6px;
-    box-shadow: 5px 5px 0 #d8a329;
+    box-shadow: 5px 5px 0 #ffb606;
     display: inline-block;
     margin-bottom: 16px;
     object-fit: cover;
@@ -124,7 +124,7 @@ img {
 }
 
 .brand-name {
-    color: #17211b;
+    color: #1c1826;
     display: block;
     font-size: 18px;
     font-weight: 900;
@@ -132,7 +132,7 @@ img {
 }
 
 .brand-subtitle {
-    color: #b7352d;
+    color: #dc2626;
     display: block;
     font-size: 10px;
     font-weight: 900;
@@ -157,9 +157,9 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #f7f2e8;
-    border-bottom: 1px solid #f7f2e8;
-    border-top: 1px solid #f7f2e8;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -169,11 +169,11 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 570px;
-    background-color: #fffaf0;
-    border-color: rgba(23, 33, 27, 0.12);
+    background-color: #ffffff;
+    border-color: rgba(68, 46, 102, 0.12);
     border-radius: 6px;
     border-width: 1px;
-    box-shadow: 0 18px 55px rgba(23, 33, 27, 0.08);
+    box-shadow: 0 18px 55px rgba(68, 46, 102, 0.08);
     margin: 0 auto;
     padding: 0;
     width: 570px;
@@ -202,35 +202,34 @@ img {
 }
 
 .mail-eyebrow-default {
-    background-color: #17211b;
-    color: #fffaf0;
+    background-color: #1c1826;
+    color: #ffffff;
 }
 
 .mail-eyebrow-success {
-    background-color: #0f766e;
+    background-color: #442e66;
     color: #ffffff;
 }
 
 .mail-eyebrow-warning {
-    background-color: #d8a329;
-    color: #17211b;
+    background-color: #ffb606;
+    color: #1c1826;
 }
 
 .mail-eyebrow-danger {
-    background-color: #b7352d;
+    background-color: #dc2626;
     color: #ffffff;
 }
 
 .detail-table {
-    background-color: #efe6d6;
-    border: 1px solid rgba(23, 33, 27, 0.1);
-    border-radius: 6px;
+    background-color: #f5f3f8;
+    border: 1px solid rgba(68, 46, 102, 0.1);
     margin: 24px 0;
     width: 100%;
 }
 
 .detail-table td {
-    border-bottom: 1px solid rgba(23, 33, 27, 0.08);
+    border-bottom: 1px solid rgba(68, 46, 102, 0.08);
     padding: 12px 14px;
     vertical-align: top;
 }
@@ -240,7 +239,7 @@ img {
 }
 
 .detail-label {
-    color: #5c655b;
+    color: #6b6378;
     font-size: 11px;
     font-weight: 900;
     letter-spacing: 0.12em;
@@ -249,7 +248,7 @@ img {
 }
 
 .detail-value {
-    color: #17211b;
+    color: #1c1826;
     font-size: 14px;
     font-weight: 800;
     text-align: right;
@@ -258,7 +257,7 @@ img {
 /* Subcopy */
 
 .subcopy {
-    border-top: 1px solid rgba(23, 33, 27, 0.1);
+    border-top: 1px solid rgba(68, 46, 102, 0.1);
     margin-top: 25px;
     padding-top: 25px;
 }
@@ -296,8 +295,8 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #efe6d6;
-    border: 1px solid rgba(23, 33, 27, 0.1);
+    background-color: #f5f3f8;
+    border: 1px solid rgba(68, 46, 102, 0.1);
     border-radius: 6px;
     margin: 30px auto;
     overflow: hidden;
@@ -305,9 +304,9 @@ img {
 }
 
 .table th {
-    background-color: #17211b;
-    border-bottom: 1px solid rgba(23, 33, 27, 0.12);
-    color: #fffaf0;
+    background-color: #442e66;
+    border-bottom: 1px solid rgba(68, 46, 102, 0.12);
+    color: #ffffff;
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 0.14em;
@@ -317,8 +316,8 @@ img {
 }
 
 .table td {
-    border-bottom: 1px solid rgba(23, 33, 27, 0.08);
-    color: #17211b;
+    border-bottom: 1px solid rgba(68, 46, 102, 0.08);
+    color: #1c1826;
     font-size: 14px;
     font-weight: 700;
     line-height: 18px;
@@ -346,7 +345,7 @@ img {
 .button {
     -webkit-text-size-adjust: none;
     border-radius: 6px;
-    color: #fffaf0;
+    color: #ffffff;
     display: inline-block;
     font-size: 13px;
     font-weight: 900;
@@ -358,47 +357,47 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #17211b;
-    border-bottom: 10px solid #17211b;
-    border-left: 20px solid #17211b;
-    border-right: 20px solid #17211b;
-    border-top: 10px solid #17211b;
+    background-color: #442e66;
+    border-bottom: 10px solid #442e66;
+    border-left: 20px solid #442e66;
+    border-right: 20px solid #442e66;
+    border-top: 10px solid #442e66;
 }
 
 .button-green,
 .button-success {
-    background-color: #0f766e;
-    border-bottom: 10px solid #0f766e;
-    border-left: 20px solid #0f766e;
-    border-right: 20px solid #0f766e;
-    border-top: 10px solid #0f766e;
+    background-color: #442e66;
+    border-bottom: 10px solid #442e66;
+    border-left: 20px solid #442e66;
+    border-right: 20px solid #442e66;
+    border-top: 10px solid #442e66;
 }
 
 .button-red,
 .button-error {
-    background-color: #b7352d;
-    border-bottom: 10px solid #b7352d;
-    border-left: 20px solid #b7352d;
-    border-right: 20px solid #b7352d;
-    border-top: 10px solid #b7352d;
+    background-color: #dc2626;
+    border-bottom: 10px solid #dc2626;
+    border-left: 20px solid #dc2626;
+    border-right: 20px solid #dc2626;
+    border-top: 10px solid #dc2626;
 }
 
 /* Panels */
 
 .panel {
-    border-left: #d8a329 solid 4px;
+    border-left: #ffb606 solid 4px;
     margin: 24px 0;
 }
 
 .panel-content {
-    background-color: #efe6d6;
+    background-color: #f5f3f8;
     border-radius: 0 6px 6px 0;
-    color: #5c655b;
+    color: #6b6378;
     padding: 16px;
 }
 
 .panel-content p {
-    color: #5c655b;
+    color: #6b6378;
 }
 
 .panel-item {
