@@ -30,9 +30,9 @@ The second weakness is duplicate prevention. In a manual workflow, preventing a 
 
 The third weakness is traceability. A manual permit may show that it was issued, but it may not reliably show who issued it, what payment record was used, whether the student had an active permit already, or whether the permit was later revoked. These details matter when students raise disputes or when executives need to review permit operations.
 
-Figure 3.1 should represent the existing manual permit issuance workflow. It should show the student request, manual payment confirmation, officer review, permit recording, and physical permit delivery.
+Figure 3.1 represents the existing manual permit issuance workflow. It shows the student request, manual payment confirmation, officer review, permit recording, and physical permit delivery.
 
-[INSERT FIGURE — Existing Manual Permit Issuance Workflow]
+![Figure 3.1: Existing Manual Permit Issuance Workflow](diagrams/png/figure-3-1-existing-manual-permit-issuance-workflow.png)
 
 Figure 3.1: Existing Manual Permit Issuance Workflow
 
@@ -432,11 +432,11 @@ The system uses a Laravel backend with domain actions, policies, form requests, 
 
 The overall system architecture connects the operations dashboard, public portal, mobile application, Paystack payment gateway, PostgreSQL database, queue workers, cache, media storage, and audit logs through a centralized Laravel backend. This design is shown in Figure 3.2.
 
-[INSERT FIGURE — Overall System Architecture]
+![Figure 3.2: Overall System Architecture](diagrams/png/figure-3-2-overall-system-architecture.png)
 
 Figure 3.2: Overall System Architecture
 
-Figure 3.2 should show three main access surfaces feeding into the backend: dashboard UI, public portal, and mobile API. It should also show Paystack, database, queue workers, cache, media storage, audit logs, and notification processing.
+Figure 3.2 shows three main access surfaces feeding into the backend: dashboard UI, public portal, and mobile API. It also shows Paystack, database, queue workers, cache, media storage, audit logs, and notification processing.
 
 The Laravel backend is the main coordination layer. It receives requests from the dashboard, public portal, mobile API, and Paystack webhook endpoint. It validates input, checks authorization, applies domain rules, reads and writes database records, dispatches queued tasks, updates cache where appropriate, and records audit events. This design keeps workflow decisions in one place.
 
@@ -464,11 +464,11 @@ The dashboard is designed for internal administrative work. It needs rich pages,
 
 The mobile application requires an API because it is not rendered by Laravel. It sends requests with bearer tokens and receives JSON responses. This allows the mobile application to operate independently as a native mobile client while still relying on the backend for trusted decisions.
 
-[INSERT FIGURE — Dashboard and Mobile Architecture]
+![Figure 3.3: Dashboard and Mobile Interaction Architecture](diagrams/png/figure-3-3-dashboard-and-mobile-interaction-architecture.png)
 
 Figure 3.3: Dashboard and Mobile Interaction Architecture
 
-Figure 3.3 should show the difference between dashboard session access and mobile token access. It should also show that both access paths reach shared backend actions, policies, models, and database records.
+Figure 3.3 shows the difference between dashboard session access and mobile token access. It also shows that both access paths reach shared backend actions, policies, models, and database records.
 
 Role separation is central to this architecture. Dashboard users may include administrators, staff, and executives. Mobile users may include students and selected staff. Public users may be unauthenticated. Each access channel has different expectations, but backend authorization prevents cross-boundary misuse.
 
@@ -480,13 +480,13 @@ Public and private boundaries are also preserved. The public portal and mobile c
 
 The proposed system uses a relational database design because its records have structured relationships and integrity requirements. Students, users, permits, payments, NFC cards, elections, votes, documents, and audit logs are not independent pieces of text. They form a connected operational model.
 
-The Entity Relationship Diagram in Figure 3.4 should show the main entities and relationships in the system.
+The Entity Relationship Diagram in Figure 3.4 shows the main entities and relationships in the system.
 
-[INSERT FIGURE — Entity Relationship Diagram]
+![Figure 3.4: Entity Relationship Diagram of the Proposed System](diagrams/png/figure-3-4-entity-relationship-diagram.png)
 
 Figure 3.4: Entity Relationship Diagram of the Proposed System
 
-Figure 3.4 should include users, students, academic periods, permits, permit requests, payments, NFC cards, verification logs, audit logs, announcements, events, documents, polls, poll options, poll votes, elections, election positions, election candidates, and election votes.
+Figure 3.4 includes users, students, academic periods, permits, permit requests, payments, NFC cards, verification logs, audit logs, announcements, events, documents, polls, poll options, poll votes, elections, election positions, election candidates, and election votes.
 
 #### Relational structure and integrity
 
@@ -567,7 +567,7 @@ The permit request and payment workflow is one of the most important parts of th
 
 Figure 3.5 presents the overall permit request and payment workflow.
 
-[INSERT FIGURE — Permit Request and Payment Workflow]
+![Figure 3.5: Permit Request and Payment Workflow](diagrams/png/figure-3-5-permit-request-and-payment-workflow.png)
 
 Figure 3.5: Permit Request and Payment Workflow
 
@@ -581,7 +581,7 @@ After the request is created, a local pending payment record is created. The sys
 
 Figure 3.6 focuses on the Paystack verification flow.
 
-[INSERT FIGURE — Paystack Verification Flow]
+![Figure 3.6: Paystack Verification Flow](diagrams/png/figure-3-6-paystack-verification-flow.png)
 
 Figure 3.6: Paystack Verification Flow
 
@@ -601,7 +601,7 @@ The NFC verification workflow is designed to make student permit checks faster w
 
 Figure 3.7 presents the NFC verification workflow.
 
-[INSERT FIGURE — NFC Verification Workflow]
+![Figure 3.7: NFC Verification Workflow](diagrams/png/figure-3-7-nfc-verification-workflow.png)
 
 Figure 3.7: NFC Verification Workflow
 
@@ -623,7 +623,7 @@ The election workflow is designed to support student governance elections with s
 
 Figure 3.8 presents the election voting workflow.
 
-[INSERT FIGURE — Election Voting Workflow]
+![Figure 3.8: Election Voting Workflow](diagrams/png/figure-3-8-election-voting-workflow.png)
 
 Figure 3.8: Election Voting Workflow
 
@@ -647,7 +647,7 @@ The mobile API supports mobile application access to the backend. It uses REST-s
 
 Figure 3.9 presents the mobile API communication flow.
 
-[INSERT FIGURE — Mobile API Communication Flow]
+![Figure 3.9: Mobile API Communication Flow](diagrams/png/figure-3-9-mobile-api-communication-flow.png)
 
 Figure 3.9: Mobile API Communication Flow
 
@@ -691,7 +691,7 @@ The mobile API design supports synchronization by allowing the mobile applicatio
 
 Security design is a major part of the proposed system because the platform handles student records, payment references, permit codes, NFC UIDs, election votes, audit logs, and public content. The security design is shown in Figure 3.10.
 
-[INSERT FIGURE — Security and Verification Architecture]
+![Figure 3.10: Security and Verification Architecture](diagrams/png/figure-3-10-security-and-verification-architecture.png)
 
 Figure 3.10: Security and Verification Architecture
 
@@ -721,7 +721,7 @@ Queue and cache architecture supports responsiveness and operational growth. The
 
 Figure 3.11 presents the queue and cache architecture.
 
-[INSERT FIGURE — Queue and Cache Architecture]
+![Figure 3.11: Queue and Cache Architecture](diagrams/png/figure-3-11-queue-and-cache-architecture.png)
 
 Figure 3.11: Queue and Cache Architecture
 

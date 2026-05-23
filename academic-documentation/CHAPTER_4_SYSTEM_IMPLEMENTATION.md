@@ -178,9 +178,9 @@ The student module uses policy and form request authorization. Permissions inclu
 
 Student account states are exposed to the interface as `not_activated`, `pending_setup`, and `activated`. These states help administrators understand whether the student has no linked user account, has a linked user without a password, or has completed setup. The distinction is useful for mobile readiness because a student cannot use authenticated mobile endpoints until account setup is complete.
 
-Figure 4.3 should show the student account activation workflow from dashboard action to setup-password completion.
+Figure 4.3 shows the student account activation workflow from dashboard action to setup-password completion.
 
-[INSERT FIGURE — Student Account Activation Workflow]
+![Figure 4.3: Student Account Activation Workflow](diagrams/png/figure-4-3-student-account-activation-workflow.png)
 
 Figure 4.3: Student Account Activation Workflow
 
@@ -235,9 +235,9 @@ Permit revocation is handled through a separate action. A revoked permit cannot 
 
 Permit card delivery is tracked through a delivery action that records the delivery timestamp. This separates physical card delivery from permit issuance. A permit may be issued before the physical card is delivered, and delivery status may be useful in operations.
 
-Figure 4.5 should show the permit verification workflow connecting permit code/student number/NFC verification to the permit record.
+Figure 4.5 shows the permit verification workflow connecting permit code/student number/NFC verification to the permit record.
 
-[INSERT FIGURE — Permit Verification Workflow]
+![Figure 4.5: Permit Verification Workflow](diagrams/png/figure-4-5-permit-verification-workflow.png)
 
 Figure 4.5: Permit Verification Workflow
 
@@ -275,9 +275,9 @@ The mobile flow is stricter. A student can use the mobile permit request workflo
 
 Before payment, the system checks whether the student already has an active permit or a pending request. This prevents duplicate requests and reduces payment disputes. If checkout is allowed, the system creates a permit request and a local pending payment record, then initializes Paystack checkout.
 
-Figure 4.7 should show the Paystack payment flow from permit request to verified payment and permit issuance.
+Figure 4.7 shows the Paystack payment flow from permit request to verified payment and permit issuance.
 
-[INSERT FIGURE — Paystack Payment Flow]
+![Figure 4.7: Paystack Payment Flow](diagrams/png/figure-4-7-paystack-payment-flow.png)
 
 Figure 4.7: Paystack Payment Flow
 
@@ -635,9 +635,9 @@ Operations summaries give staff and executives lightweight counts such as permit
 
 The mobile API client is structured around endpoint groups and query keys. Authentication, student data, permits, permit requests, payments, elections, content, verification, and staff operations are treated as separate API areas. This makes invalidation and refetching easier after state-changing actions.
 
-Figure 4.24 should show the mobile API communication flow.
+Figure 4.24 shows the mobile API communication flow.
 
-[INSERT FIGURE — Mobile API Communication Flow]
+![Figure 4.24: Mobile API Communication Flow](diagrams/png/figure-4-24-mobile-api-communication-flow.png)
 
 Figure 4.24: Mobile API Communication Flow
 
@@ -711,9 +711,9 @@ Table 4.12: Security and Integrity Mechanisms
 
 Queues were implemented to move selected work away from the immediate request cycle. Setup-password notifications, operational notifications, media conversions, and future large tasks can be processed by queue workers. This improves responsiveness because the user's request can finish after the important record changes are committed.
 
-Figure 4.25 should show the queue workflow.
+Figure 4.25 shows the queue workflow.
 
-[INSERT FIGURE — Queue Workflow]
+![Figure 4.25: Queue Workflow](diagrams/png/figure-4-25-queue-workflow.png)
 
 Figure 4.25: Queue Workflow
 
@@ -792,9 +792,9 @@ Manual validation remains necessary for screenshots and final demonstration. Aut
 
 Deployment readiness was considered during implementation because the system depends on more than the Laravel request cycle. A production environment requires PHP, web server, PostgreSQL, queue worker, scheduler, writable storage, HTTPS, environment secrets, and build assets.
 
-Figure 4.27 should show the deployment architecture.
+Figure 4.27 shows the deployment architecture.
 
-[INSERT FIGURE — Deployment Architecture]
+![Figure 4.27: Deployment Architecture](diagrams/png/figure-4-27-deployment-architecture.png)
 
 Figure 4.27: Deployment Architecture
 
