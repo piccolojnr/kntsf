@@ -69,6 +69,11 @@ Route::prefix('mobile')->name('mobile.')->group(function () {
         });
 
         Route::prefix('operations')->name('operations.')->group(function () {
+            Route::get('summary', [OperationsController::class, 'summary'])->name('summary');
+            Route::get('nfc-cards', [OperationsController::class, 'nfcCards'])->name('nfc-cards.index');
+            Route::get('permits', [OperationsController::class, 'permits'])->name('permits.index');
+            Route::get('permits/options', [OperationsController::class, 'permitOptions'])->name('permits.options');
+            Route::get('verification-logs', [OperationsController::class, 'verificationLogs'])->name('verification-logs.index');
             Route::get('students/search', [OperationsController::class, 'searchStudents'])->name('students.search');
             Route::get('students/{student}', [OperationsController::class, 'showStudent'])->name('students.show');
             Route::post('permits/issue', [OperationsController::class, 'issuePermit'])

@@ -59,7 +59,7 @@ Student endpoints only return data for the authenticated user's linked `students
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| GET | `/api/mobile/permit-requests/options` | Request settings and blocking state |
+| GET | `/api/mobile/permit-requests/options` | Student self-service request settings and own blocking state |
 | GET | `/api/mobile/permit-requests` | Student's own permit requests |
 | POST | `/api/mobile/permit-requests` | Create permit request |
 | GET | `/api/mobile/permit-requests/{reference}` | Permit request detail |
@@ -67,6 +67,8 @@ Student endpoints only return data for the authenticated user's linked `students
 | POST | `/api/mobile/permit-requests/{reference}/verify-payment` | Server-side Paystack verification |
 
 Mobile permit requests are for authenticated students with linked student profiles. Unknown students should use the public website self-service flow.
+
+`GET /api/mobile/permit-requests/options` is only for the authenticated student's own self-service flow. Staff permit issuing must use `GET /api/mobile/operations/permits/options`.
 
 ### Paystack Flow
 
@@ -123,6 +125,11 @@ List filters:
 | POST | `/api/mobile/verification/student-number` | Verify by student number |
 | POST | `/api/mobile/verification/permit-code` | Verify by permit code |
 | POST | `/api/mobile/verification/nfc` | Verify by NFC UID |
+| GET | `/api/mobile/operations/summary` | Staff operations summary |
+| GET | `/api/mobile/operations/nfc-cards` | Staff paginated NFC card list |
+| GET | `/api/mobile/operations/permits` | Staff paginated permit list |
+| GET | `/api/mobile/operations/permits/options` | Staff permit issue defaults and optional selected-student state |
+| GET | `/api/mobile/operations/verification-logs` | Staff paginated verification logs |
 | GET | `/api/mobile/operations/students/search` | Staff student search |
 | GET | `/api/mobile/operations/students/{student}` | Staff student detail |
 | POST | `/api/mobile/operations/permits/issue` | Staff permit issue |
@@ -135,6 +142,17 @@ List filters:
 | POST | `/api/mobile/operations/permit-requests/{reference}/reject-review` | Staff reject review |
 
 Staff endpoints require server-side permissions. The mobile UI may hide links, but backend policies remain authoritative.
+
+Staff operations filters:
+
+| Endpoint | Filters |
+| --- | --- |
+| `/api/mobile/operations/nfc-cards` | `search`, `status`, `per_page` |
+| `/api/mobile/operations/permits` | `search`, `status`, `academic_period_id`, `per_page` |
+| `/api/mobile/operations/permits/options` | `student_id`, `academic_period_id` |
+| `/api/mobile/operations/verification-logs` | `method`, `result`, `search`, `per_page` |
+
+The staff permit options endpoint returns form defaults, selectable course/level options, and selected-student preflight state when `student_id` is supplied. It requires a staff/admin role plus permit issue permission.
 
 ## Mobile Screen -> API Endpoint
 
@@ -157,6 +175,7 @@ Staff endpoints require server-side permissions. The mobile UI may hide links, b
 | NFC Card | `GET /api/mobile/student/nfc-card` |
 | Report Lost Card | `POST /api/mobile/student/nfc-card/report-lost` |
 | Staff Verify | `POST /api/mobile/verification/student-number`, `POST /api/mobile/verification/permit-code`, `POST /api/mobile/verification/nfc` |
+| Staff Issue Permit | `GET /api/mobile/operations/permits/options`, `GET /api/mobile/operations/students/search`, `POST /api/mobile/operations/permits/issue` |
 | Staff Register Card | `GET /api/mobile/operations/students/search`, `POST /api/mobile/operations/nfc-cards/register` |
 
 ## Common Error Response Shape
@@ -275,31 +294,79 @@ Paginated resources follow Laravel API resource pagination:
 }
 ```
 
-### Permit Request Options
+### Student Permit Request Options
 
 ```json
 {
-  "active_academic_period": {
-    "id": 4,
-    "name": "2026 Semester 1",
-    "academic_year": "2025/2026",
-    "semester": "1"
-  },
-  "default_amount": "50.00",
-  "currency": "GHS",
-  "permit_requests_enabled": true,
-  "student": {
-    "id": 22,
-    "student_number": "26102859",
-    "name": "Ama Mensah",
-    "email": "ama@example.com",
-    "phone": "0240000000"
-  },
-  "has_active_permit": false,
-  "has_pending_request": false,
-  "missing_contact": {
-    "email": false,
-    "phone": false
+  "data": {
+    "permit_requests_enabled": true,
+    "default_amount": 50,
+    "currency": "GHS",
+    "active_academic_period": {
+      "id": 4,
+      "name": "2026 Semester 1",
+      "academic_year": "2025/2026",
+      "semester": "1"
+    },
+    "student": {
+      "id": 22,
+      "student_number": "26102859",
+      "name": "Ama Mensah",
+      "email": "ama@example.com",
+      "phone": "0240000000"
+    },
+    "has_active_permit": false,
+    "has_pending_request": false,
+    "missing_email": false,
+    "missing_phone": false
+  }
+}
+```
+
+### Staff Permit Issue Options
+
+Request:
+
+```txt
+GET /api/mobile/operations/permits/options?student_id=22
+```
+
+```json
+{
+  "data": {
+    "default_amount": 50,
+    "currency": "GHS",
+    "default_validity_days": 120,
+    "permit_requests_enabled": true,
+    "default_starts_at": "2026-05-23T10:00:00.000000Z",
+    "default_expires_at": "2026-09-20T23:59:59.000000Z",
+    "student_number_prefix": "2610",
+    "courses": ["Computer Science", "Information Technology"],
+    "levels": ["100", "200", "300", "400"],
+    "active_academic_period": {
+      "id": 4,
+      "name": "2026 Semester 1",
+      "academic_year": "2025/2026",
+      "semester": "1",
+      "starts_at": "2026-05-01",
+      "ends_at": "2026-09-20"
+    },
+    "student": {
+      "id": 22,
+      "student_number": "26102859",
+      "name": "Ama Mensah",
+      "email": null,
+      "phone": "0240000000",
+      "course": "Computer Science",
+      "level": "400"
+    },
+    "selected_student_state": {
+      "has_active_permit": false,
+      "has_pending_request": false,
+      "missing_email": true,
+      "missing_phone": false,
+      "blocking_reasons": []
+    }
   }
 }
 ```

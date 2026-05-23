@@ -66,6 +66,11 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 
 | Method | Endpoint | Auth | Purpose |
 | --- | --- | --- | --- |
+| GET | `/api/mobile/operations/summary` | `reports.view` or staff/admin role | Aggregate operations counts |
+| GET | `/api/mobile/operations/nfc-cards` | Staff/admin + `nfc_cards.view` | Paginated NFC cards list |
+| GET | `/api/mobile/operations/permits` | Staff/admin + `permits.view` | Paginated permits list |
+| GET | `/api/mobile/operations/permits/options` | Staff/admin + `permits.issue` | Permit issue defaults and optional student blocking state |
+| GET | `/api/mobile/operations/verification-logs` | Staff/admin + `verification.view_logs` | Paginated verification logs |
 | GET | `/api/mobile/operations/students/search` | Staff/admin permissions | Search students |
 | GET | `/api/mobile/operations/students/{student}` | Staff/admin permissions | View student details |
 | POST | `/api/mobile/operations/permits/issue` | `permits.issue` | Issue permit using existing action |
@@ -84,6 +89,19 @@ The mobile API is a Sanctum token-based layer for the future Expo app. It is sep
 | POST | `/api/mobile/verification/student-number` | `verification.perform`, throttled | Verify student number |
 | POST | `/api/mobile/verification/permit-code` | `verification.perform`, throttled | Verify permit code |
 | POST | `/api/mobile/verification/nfc` | `verification.perform`, throttled | Verify NFC UID |
+
+Operations aggregate filters:
+
+| Endpoint | Filters |
+| --- | --- |
+| `/api/mobile/operations/nfc-cards` | `search`, `status`, `per_page` |
+| `/api/mobile/operations/permits` | `search`, `status`, `academic_period_id`, `per_page` |
+| `/api/mobile/operations/permits/options` | `student_id`, `academic_period_id` |
+| `/api/mobile/operations/verification-logs` | `method`, `result`, `search`, `per_page` |
+
+Operations aggregate resources never expose `uid_hash`, `code_hash`, raw NFC UIDs, full permit codes, raw verification identifiers, or `identifier_hash`.
+
+`/api/mobile/permit-requests/options` remains the student self-service endpoint and uses the authenticated user's linked student profile. Staff permit issuance should use `/api/mobile/operations/permits/options` instead.
 
 ## Role Restrictions
 
