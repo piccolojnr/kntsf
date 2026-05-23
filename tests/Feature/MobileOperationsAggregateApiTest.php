@@ -180,6 +180,53 @@ test('students cannot fetch staff permit issue options', function () {
         ->assertForbidden();
 });
 
+test('staff permit issue api uses configured amount currency and academic period dates', function () {
+    app(PermitSettings::class)->update([
+        'default_amount' => 80,
+        'currency' => 'GHS',
+        'default_validity_days' => 120,
+        'permit_requests_enabled' => true,
+    ]);
+
+    $period = AcademicPeriod::factory()->active()->create([
+        'starts_at' => now()->subWeek(),
+        'ends_at' => now()->addDays(60)->startOfDay(),
+    ]);
+    $student = Student::factory()->create();
+
+    $this->withToken(aggregateMobileToken(aggregateMobileUser('staff')))
+        ->postJson('/api/mobile/operations/permits/issue', [
+            'student_id' => $student->id,
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.student.id', $student->id)
+        ->assertJsonPath('data.academic_period.id', $period->id)
+        ->assertJsonPath('data.amount_paid', '80.00')
+        ->assertJsonPath('data.currency', 'GHS');
+
+    $permit = Permit::query()->where('student_id', $student->id)->sole();
+
+    expect($permit->amount_paid)->toBe('80.00')
+        ->and($permit->currency)->toBe('GHS')
+        ->and($permit->expires_at?->toDateString())->toBe($period->ends_at?->toDateString());
+});
+
+test('staff permit issue api rejects direct date amount and currency overrides', function () {
+    AcademicPeriod::factory()->active()->create();
+    $student = Student::factory()->create();
+
+    $this->withToken(aggregateMobileToken(aggregateMobileUser('staff')))
+        ->postJson('/api/mobile/operations/permits/issue', [
+            'student_id' => $student->id,
+            'starts_at' => now()->addYear()->toDateString(),
+            'expires_at' => now()->addYears(2)->toDateString(),
+            'amount_paid' => 1,
+            'currency' => 'USD',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['starts_at', 'expires_at', 'amount_paid', 'currency']);
+});
+
 test('verification logs list hides identifier hash and filters method result and search', function () {
     $student = Student::factory()->create([
         'student_number' => '26107777',

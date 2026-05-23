@@ -178,6 +178,18 @@ The staff permit options endpoint returns form defaults, selectable course/level
 | Staff Issue Permit | `GET /api/mobile/operations/permits/options`, `GET /api/mobile/operations/students/search`, `POST /api/mobile/operations/permits/issue` |
 | Staff Register Card | `GET /api/mobile/operations/students/search`, `POST /api/mobile/operations/nfc-cards/register` |
 
+Staff permit issue body:
+
+```json
+{
+  "student_id": 22,
+  "student_email": "student@example.com",
+  "academic_period_id": 4
+}
+```
+
+`student_email` and `academic_period_id` are optional. Do not send `starts_at`, `expires_at`, `amount_paid`, or `currency`; the API rejects those fields. Amount and currency come from Permit Settings. Start and expiry dates come from the selected or active academic period, with configured validity days used only when the academic period has no end date.
+
 ## Common Error Response Shape
 
 Unauthenticated:

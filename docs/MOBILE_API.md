@@ -103,6 +103,8 @@ Operations aggregate resources never expose `uid_hash`, `code_hash`, raw NFC UID
 
 `/api/mobile/permit-requests/options` remains the student self-service endpoint and uses the authenticated user's linked student profile. Staff permit issuance should use `/api/mobile/operations/permits/options` instead.
 
+Staff permit issuing with `POST /api/mobile/operations/permits/issue` accepts only `student_id`, optional `student_email`, and optional `academic_period_id`. The API does not accept direct `starts_at`, `expires_at`, `amount_paid`, or `currency` overrides. Amount and currency come from Permit Settings; dates come from the selected/active academic period, falling back to configured validity days when the period has no end date.
+
 ## Role Restrictions
 
 - Students can only access their linked `students.user_id` profile, permits, and active NFC card.

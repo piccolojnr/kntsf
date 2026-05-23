@@ -27,10 +27,10 @@ class IssuePermitRequest extends FormRequest
             'student_id' => ['required', 'exists:students,id'],
             'student_email' => ['nullable', 'email', 'max:255'],
             'academic_period_id' => ['nullable', 'exists:academic_periods,id'],
-            'starts_at' => ['nullable', 'date'],
-            'expires_at' => ['nullable', 'date', 'after:starts_at'],
-            'amount_paid' => ['nullable', 'numeric', 'min:0'],
-            'currency' => ['nullable', 'string', 'size:3'],
+            'starts_at' => ['prohibited'],
+            'expires_at' => ['prohibited'],
+            'amount_paid' => ['prohibited'],
+            'currency' => ['prohibited'],
         ];
     }
 }
