@@ -29,6 +29,15 @@ const MARGIN = { top: 1440, right: 1440, bottom: 1440, left: 1440 };
 const CONTENT_WIDTH = A4.width - MARGIN.left - MARGIN.right;
 const FONT = "Times New Roman";
 
+const CANDIDATES = [
+  { name: "Rahim Daud", index: "26102859" },
+  { name: "Kwuatsenu Divine", index: "26102924" },
+  { name: "M'Bangot-Menard Naeem Latif", index: "26102931" },
+];
+
+const SUBMISSION_MONTH_YEAR = "[INSERT MONTH AND YEAR]";
+const SUPERVISOR_NAME = "[INSERT SUPERVISOR NAME]";
+
 const chapterFiles = [
   "CHAPTER_1_INTRODUCTION.md",
   "CHAPTER_2_LITERATURE_REVIEW.md",
@@ -37,17 +46,23 @@ const chapterFiles = [
   "CHAPTER_5_SUMMARY_CONCLUSION_AND_RECOMMENDATIONS.md",
 ];
 
-const majorDiagramFiles = new Set([
+const embeddedDiagramFiles = new Set([
+  "figure-2-1-client-server-architecture.png",
+  "figure-2-4-rbac-model.png",
   "figure-3-2-overall-system-architecture.png",
   "figure-3-4-entity-relationship-diagram.png",
   "figure-3-5-permit-request-and-payment-workflow.png",
-  "figure-3-6-paystack-verification-flow.png",
   "figure-3-7-nfc-verification-workflow.png",
-  "figure-3-8-election-voting-workflow.png",
-  "figure-3-10-security-and-verification-architecture.png",
-  "figure-4-7-paystack-payment-flow.png",
+  "figure-4-5-permit-verification-workflow.png",
   "figure-4-27-deployment-architecture.png",
 ]);
+
+const appendices = [
+  { number: 1, title: "Testing Results", file: "appendices/APPENDIX_1_TESTING_RESULTS.md" },
+  { number: 2, title: "Database Schema Summary", file: "appendices/APPENDIX_2_DATABASE_SCHEMA.md" },
+  { number: 3, title: "System Screenshots", file: "appendices/APPENDIX_3_SYSTEM_SCREENSHOTS.md" },
+  { number: 4, title: "Code Snippets", file: "appendices/APPENDIX_4_CODE_SNIPPETS.md" },
+];
 
 function read(name) {
   return fs.readFileSync(path.join(root, name), "utf8").replace(/\r\n/g, "\n");
@@ -73,8 +88,6 @@ function paragraph(text, options = {}) {
       line: options.line ?? 360,
     },
     indent: options.indent,
-    shading: options.shading,
-    border: options.border,
     children: [textRun(text, options.run ?? {})],
   });
 }
@@ -138,7 +151,7 @@ function parseInline(text) {
 }
 
 function imageDimensions(buffer) {
-  if (buffer.readUInt32BE(0) !== 0x89504e47) {
+  if (buffer.length < 24 || buffer.readUInt32BE(0) !== 0x89504e47) {
     return { width: 900, height: 600 };
   }
 
@@ -152,8 +165,8 @@ function imageParagraph(markdownLine) {
   const match = markdownLine.match(/^!\[(.+?)\]\((.+?)\)$/);
 
   if (!match) {
-return null;
-}
+    return null;
+  }
 
   const [, alt, rel] = match;
   const file = path.join(root, rel);
@@ -163,8 +176,8 @@ return null;
     return placeholder(`[MISSING FIGURE FILE — ${alt}]`);
   }
 
-  if (!majorDiagramFiles.has(basename) && basename.startsWith("figure-")) {
-    return placeholder(`[FIGURE FILE AVAILABLE — INSERT DURING FINAL LAYOUT: ${alt}]`);
+  if (!embeddedDiagramFiles.has(basename)) {
+    return placeholder(`[INSERT FIGURE — ${alt}]`);
   }
 
   const data = fs.readFileSync(file);
@@ -207,8 +220,8 @@ function markdownTable(lines) {
     );
 
   if (rows.length === 0) {
-return [];
-}
+    return [];
+  }
 
   const colCount = Math.max(...rows.map((row) => row.length));
   const colWidth = Math.floor(CONTENT_WIDTH / colCount);
@@ -258,17 +271,17 @@ function markdownToDocx(markdown, options = {}) {
 
   function flushParagraph() {
     if (paragraphBuffer.length === 0) {
-return;
-}
+      return;
+    }
 
     const text = paragraphBuffer.join(" ").trim();
     paragraphBuffer = [];
 
     if (!text) {
-return;
-}
+      return;
+    }
 
-    if (/^\[INSERT (FIGURE|SCREENSHOT|TABLE|TEST|CONFIG|SAMPLE)/.test(text)) {
+    if (/^\[INSERT (FIGURE|SCREENSHOT|TABLE|TEST|CONFIG|SAMPLE|ACKNOWLEDGEMENTS)/i.test(text)) {
       children.push(placeholder(text));
 
       return;
@@ -285,8 +298,8 @@ return;
 
   function flushTable() {
     if (tableBuffer.length === 0) {
-return;
-}
+      return;
+    }
 
     children.push(...markdownTable(tableBuffer), paragraph(""));
     tableBuffer = [];
@@ -294,14 +307,14 @@ return;
 
   function flushCode() {
     if (codeBuffer.length === 0) {
-return;
-}
+      return;
+    }
 
     children.push(
       new Paragraph({
         spacing: { before: 120, after: 160, line: 300 },
         shading: { fill: "F2F2F2", type: ShadingType.CLEAR },
-        children: [new TextRun({ text: codeBuffer.join("\n").slice(0, 2600), font: "Courier New", size: 18 })],
+        children: [new TextRun({ text: codeBuffer.join("\n").slice(0, 2000), font: "Courier New", size: 18 })],
       }),
     );
     codeBuffer = [];
@@ -399,27 +412,7 @@ return;
   return children;
 }
 
-const appendixMarkdownFiles = {
-  A: "appendices/APPENDIX_A_DATABASE_SCHEMA.md",
-  B: "appendices/APPENDIX_B_API_ENDPOINTS.md",
-  C: "appendices/APPENDIX_C_LARAVEL_ROUTE_LISTS.md",
-  D: "appendices/APPENDIX_D_MOBILE_API_CONTRACT.md",
-  E: "appendices/APPENDIX_E_TESTING_RESULTS.md",
-  G: "appendices/APPENDIX_G_SELECTED_CODE_SNIPPETS.md",
-  H: "appendices/APPENDIX_H_DEPLOYMENT_CONFIGURATION.md",
-  I: "appendices/APPENDIX_I_NFC_VERIFICATION_SAMPLES.md",
-  J: "appendices/APPENDIX_J_PAYMENT_VERIFICATION_SAMPLES.md",
-  K: "appendices/APPENDIX_K_PERMISSION_MATRIX.md",
-  L: "appendices/APPENDIX_L_QUEUE_AND_SCHEDULER.md",
-};
-
 function parseFrontMatterSections() {
-  const filePath = path.join(root, "FRONT_MATTER.md");
-
-  if (!fs.existsSync(filePath)) {
-    return {};
-  }
-
   const sections = {};
   let current = null;
   let buffer = [];
@@ -457,94 +450,152 @@ function frontMatterBody(sectionName) {
     return [placeholder(`[INSERT ${sectionName.toUpperCase()}]`)];
   }
 
+  if (sectionName === "Abstract") {
+    return [
+      new Paragraph({
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { after: 160, line: 360 },
+        children: [textRun(text.replace(/\n+/g, " ").trim())],
+      }),
+    ];
+  }
+
+  if (sectionName === "Dedication") {
+    return text
+      .split("\n")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((line) =>
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 400, after: 200, line: 360 },
+          children: [textRun(line.trim(), { italics: true })],
+        }),
+      );
+  }
+
   return markdownToDocx(text);
+}
+
+function candidateNamesLine() {
+  return CANDIDATES.map((c) => `${c.name} (${c.index})`).join("; ");
+}
+
+function frontCover() {
+  return [
+    centered("KNUTSFORD UNIVERSITY", { run: { size: 32, bold: true }, before: 2200, after: 480 }),
+    centered("FACULTY OF COMPUTING & DATA SCIENCE", { run: { size: 26, bold: true }, after: 360 }),
+    centered("NFC-BASED STUDENT PERMIT VERIFICATION AND GOVERNANCE MANAGEMENT SYSTEM FOR KNUTSFORD UNIVERSITY", {
+      run: { size: 28, bold: true },
+      before: 1200,
+      after: 1200,
+    }),
+    ...CANDIDATES.map((c) => centered(c.name, { after: 120 })),
+    centered(SUBMISSION_MONTH_YEAR, { before: 1800, after: 0 }),
+    pageBreak(),
+  ];
+}
+
+function titlePage() {
+  return [
+    centered("KNUTSFORD UNIVERSITY", { run: { size: 30, bold: true }, before: 1200, after: 480 }),
+    centered("NFC-BASED STUDENT PERMIT VERIFICATION AND GOVERNANCE MANAGEMENT SYSTEM FOR KNUTSFORD UNIVERSITY", {
+      run: { size: 26, bold: true },
+      after: 720,
+    }),
+    centered(`BY ${candidateNamesLine()}`, { after: 720 }),
+    centered(
+      "department of computer science, faculty of computing & data science, knutsford university in partial fulfilment of the requirements for the award of the degree of bachelor of science in computer science",
+      { run: { size: 22 }, after: 720 },
+    ),
+    centered(SUBMISSION_MONTH_YEAR, { after: 360 }),
+    pageBreak(),
+  ];
+}
+
+function candidateDeclarations() {
+  const blocks = [heading("DECLARATION", 1)];
+
+  for (const candidate of CANDIDATES) {
+    blocks.push(
+      paragraph(
+        "I hereby declare that this project is the result of my own original research and that no part of it has been presented for another degree in this university or elsewhere.",
+      ),
+      paragraph("Candidate's signature: ______________________________"),
+      paragraph("Date: ___________________________________"),
+      paragraph(`Name: ${candidate.name}`),
+      paragraph(`Index Number: ${candidate.index}`, { after: 280 }),
+    );
+  }
+
+  blocks.push(pageBreak());
+
+  return blocks;
+}
+
+function supervisorDeclaration() {
+  return [
+    heading("SUPERVISOR'S DECLARATION", 1),
+    paragraph(
+      "I hereby declare that the preparation and presentation of the project were supervised in accordance with the guidelines on supervision of project laid down by Knutsford University.",
+    ),
+    paragraph("Supervisor's signature: ______________________________"),
+    paragraph("Date: ___________________________________"),
+    paragraph(`Name: ${SUPERVISOR_NAME}`),
+    pageBreak(),
+  ];
 }
 
 function preliminaryPages() {
   return [
-    centered("KNUTSFORD UNIVERSITY", { run: { size: 30, bold: true }, before: 1800, after: 360 }),
-    centered("FACULTY OF COMPUTING AND INFORMATION TECHNOLOGY", { run: { size: 26, bold: true }, after: 360 }),
-    centered("DEPARTMENT OF COMPUTER SCIENCE", { run: { size: 26, bold: true }, after: 720 }),
-    centered("NFC-BASED STUDENT PERMIT VERIFICATION AND GOVERNANCE MANAGEMENT SYSTEM FOR KNUTSFORD UNIVERSITY", {
-      run: { size: 28, bold: true },
-      after: 720,
-    }),
-    centered("A FINAL YEAR PROJECT REPORT SUBMITTED IN PARTIAL FULFILMENT OF THE REQUIREMENTS FOR THE AWARD OF A DEGREE IN COMPUTER SCIENCE", {
-      run: { size: 24 },
-      after: 720,
-    }),
-    centered("Student Name: [INSERT STUDENT NAME]", { after: 180 }),
-    centered("Student ID: [INSERT STUDENT ID]", { after: 180 }),
-    centered("Supervisor: [INSERT SUPERVISOR NAME]", { after: 180 }),
-    centered("Academic Year: [INSERT ACADEMIC YEAR]", { after: 720 }),
-    centered("Date: [INSERT SUBMISSION DATE]", { after: 360 }),
-    pageBreak(),
-    heading("Declaration", 1),
-    paragraph("I declare that this final year project report is my own work and that all sources used or referred to have been properly acknowledged. No part of this report has been submitted for another academic award."),
-    paragraph("Student Name: [INSERT STUDENT NAME]"),
-    paragraph("Signature: ______________________________"),
-    paragraph("Date: ___________________________________"),
-    pageBreak(),
-    heading("Approval Page", 1),
-    paragraph("This project report has been submitted for examination with the approval of the supervisor and the department."),
-    paragraph("Supervisor Name: [INSERT SUPERVISOR NAME]"),
-    paragraph("Signature: ______________________________"),
-    paragraph("Date: ___________________________________"),
-    paragraph("Head of Department: [INSERT NAME]"),
-    paragraph("Signature: ______________________________"),
-    paragraph("Date: ___________________________________"),
-    pageBreak(),
-    heading("Dedication", 1),
+    ...frontCover(),
+    ...titlePage(),
+    ...candidateDeclarations(),
+    ...supervisorDeclaration(),
+    heading("DEDICATION", 1),
     ...frontMatterBody("Dedication"),
     pageBreak(),
-    heading("Acknowledgements", 1),
+    heading("ACKNOWLEDGEMENT", 1),
     ...frontMatterBody("Acknowledgements"),
     pageBreak(),
-    heading("Abstract", 1),
+    heading("ABSTRACT", 1),
     ...frontMatterBody("Abstract"),
     pageBreak(),
-    heading("Table of Contents", 1),
-    new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-3" }),
+    heading("TABLE OF CONTENTS", 1),
+    new TableOfContents("TABLE OF CONTENTS", { hyperlink: true, headingStyleRange: "1-3" }),
     pageBreak(),
-    heading("List of Figures", 1),
-    placeholder("[UPDATE LIST OF FIGURES IN MICROSOFT WORD AFTER FINAL FIGURE INSERTION]"),
+    heading("LIST OF TABLES", 1),
+    placeholder("[UPDATE LIST OF TABLES IN MICROSOFT WORD — USE TABLE AND PAGE COLUMNS]"),
     pageBreak(),
-    heading("List of Tables", 1),
-    placeholder("[UPDATE LIST OF TABLES IN MICROSOFT WORD AFTER FINAL TABLE CAPTION REVIEW]"),
-    pageBreak(),
-    heading("List of Appendices", 1),
-    placeholder("[UPDATE LIST OF APPENDICES AFTER FINAL APPENDIX ASSEMBLY]"),
+    heading("LIST OF FIGURES", 1),
+    placeholder("[UPDATE LIST OF FIGURES IN MICROSOFT WORD — USE FIGURE AND PAGE COLUMNS]"),
     pageBreak(),
   ];
 }
 
 function readAppendixMarkdown(fileName) {
-  return read(fileName).replace(/^# Appendix [A-L][^\n]*\n+/, "");
+  return read(fileName).replace(/^# Appendix \d+[^\n]*\n+/, "");
 }
 
-function appendixHeadings() {
-  const master = read("APPENDICES_MASTER.md");
-  const matches = [...master.matchAll(/^### Appendix ([A-L]) — (.+)$/gm)];
-  const children = [heading("APPENDICES", 1, true)];
-  children.push(
-    paragraph(
-      "This section contains supplementary material that supports the main report. Text appendices A–E, G–L are assembled from markdown sources. Appendix F remains for screenshot evidence. See APPENDICES_MASTER.md for the full assembly plan.",
-    ),
-  );
+function appendixSection() {
+  const children = [
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      pageBreakBefore: true,
+      spacing: { before: 2400, after: 480 },
+      children: [textRun("APPENDICES", { size: 32, bold: true })],
+    }),
+    pageBreak(),
+  ];
 
-  for (const match of matches) {
-    const letter = match[1];
-    const title = match[2];
-    const appendixFile = appendixMarkdownFiles[letter];
+  for (const appendix of appendices) {
+    children.push(heading(`Appendix ${appendix.number}: ${appendix.title}`, 2));
 
-    children.push(heading(`Appendix ${letter} — ${title}`, 2));
-
-    if (appendixFile && fs.existsSync(path.join(root, appendixFile))) {
-      console.log(`Appendix ${letter}: loaded ${appendixFile}`);
-      children.push(...markdownToDocx(readAppendixMarkdown(appendixFile)));
+    if (fs.existsSync(path.join(root, appendix.file))) {
+      console.log(`Appendix ${appendix.number}: loaded ${appendix.file}`);
+      children.push(...markdownToDocx(readAppendixMarkdown(appendix.file)));
     } else {
-      console.warn(`Appendix ${letter}: missing markdown at ${appendixFile ?? "(not mapped)"}`);
-      children.push(placeholder(`[INSERT APPENDIX ${letter} CONTENT — ${title}]`));
+      children.push(placeholder(`[INSERT APPENDIX ${appendix.number} — ${appendix.title}]`));
     }
   }
 
@@ -553,17 +604,6 @@ function appendixHeadings() {
 
 function referencesSection() {
   const children = [heading("REFERENCES", 1, true)];
-  const verifiedPath = path.join(root, "REFERENCES_VERIFIED.md");
-
-  if (!fs.existsSync(verifiedPath)) {
-    children.push(
-      paragraph("This section is reserved for the final APA 7th edition reference list."),
-      placeholder("[INSERT VERIFIED APA 7TH EDITION REFERENCES]"),
-    );
-
-    return children;
-  }
-
   let inBibliography = false;
 
   for (const line of read("REFERENCES_VERIFIED.md").split("\n")) {
@@ -586,13 +626,6 @@ function referencesSection() {
     );
   }
 
-  children.push(
-    paragraph(
-      "Additional peer-reviewed sources marked [VERIFY SOURCE] in the chapters must be confirmed and added before final submission. Use REFERENCES_MASTER.md to track remaining gaps.",
-      { after: 200 },
-    ),
-  );
-
   return children;
 }
 
@@ -600,10 +633,7 @@ const children = [
   ...preliminaryPages(),
   ...chapterFiles.flatMap((file) => markdownToDocx(read(file), { pageBreakFirstHeading: true })),
   ...referencesSection(),
-  ...appendixHeadings(),
-  heading("ASSEMBLY NOTES", 1, true),
-  paragraph("This Word document is assembled from markdown sources in academic-documentation/. Phase A text assembly includes verified references, front matter markdown, Chapter Two citations, Appendix G code excerpts, and chapter content. Remaining work includes screenshots, additional appendices, peer-reviewed sources marked [VERIFY SOURCE], pagination review, and manual list updates in Microsoft Word."),
-  placeholder("[PENDING: SCREENSHOTS, REMAINING APPENDICES A-F AND H-L, VERIFY-SOURCE CITATIONS, ROMAN/ARABIC PAGE NUMBER REVIEW, LIST OF FIGURES/TABLES UPDATES]"),
+  ...appendixSection(),
 ];
 
 const doc = new Document({
@@ -657,7 +687,10 @@ const doc = new Document({
           children: [
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              children: [textRun("Page ", { size: 20 }), new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 20 })],
+              children: [
+                textRun("Page ", { size: 20 }),
+                new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 20 }),
+              ],
             }),
           ],
         }),

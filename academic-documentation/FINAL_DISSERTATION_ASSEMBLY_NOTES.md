@@ -6,7 +6,7 @@ Generated document:
 academic-documentation/KNTSF_FINAL_DISSERTATION.docx
 ```
 
-Assembly status: **Phase A text assembly in progress**
+Assembly status: **KUC condensed edition (Option A, ~60-page target) — generated May 2026**
 
 ## Completed in This Pass
 
