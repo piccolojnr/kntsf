@@ -6,10 +6,15 @@ Generated document:
 academic-documentation/KNTSF_FINAL_DISSERTATION.docx
 ```
 
-Assembly status: **initial structured Word assembly completed**
+Assembly status: **Phase A text assembly in progress**
 
 ## Completed in This Pass
 
+- Added `FRONT_MATTER.md` for dedication, acknowledgements, and abstract text.
+- Added `REFERENCES_VERIFIED.md` with verified official documentation and foundational sources.
+- Replaced Chapter Two citation placeholders with APA in-text citations (one topic still marked `[VERIFY SOURCE]`).
+- Removed duplicate Table 5.1 placeholder in Chapter Five.
+- Wired front matter, verified references, and Appendix G into the assembly script.
 - Created preliminary pages with placeholders for manual completion.
 - Inserted Chapter One to Chapter Five from the generated markdown files.
 - Preserved heading hierarchy for Word navigation and table of contents generation.

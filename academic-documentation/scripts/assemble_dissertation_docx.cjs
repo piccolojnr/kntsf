@@ -399,6 +399,57 @@ return;
   return children;
 }
 
+const appendixMarkdownFiles = {
+  G: "appendices/APPENDIX_G_SELECTED_CODE_SNIPPETS.md",
+};
+
+function parseFrontMatterSections() {
+  const filePath = path.join(root, "FRONT_MATTER.md");
+
+  if (!fs.existsSync(filePath)) {
+    return {};
+  }
+
+  const sections = {};
+  let current = null;
+  let buffer = [];
+
+  for (const line of read("FRONT_MATTER.md").split("\n")) {
+    const match = line.match(/^## (.+)$/);
+
+    if (match) {
+      if (current) {
+        sections[current] = buffer.join("\n").trim();
+      }
+
+      current = match[1];
+      buffer = [];
+      continue;
+    }
+
+    if (current && !line.startsWith("# ")) {
+      buffer.push(line);
+    }
+  }
+
+  if (current) {
+    sections[current] = buffer.join("\n").trim();
+  }
+
+  return sections;
+}
+
+function frontMatterBody(sectionName) {
+  const sections = parseFrontMatterSections();
+  const text = sections[sectionName] ?? "";
+
+  if (!text || /^\[INSERT /.test(text.trim())) {
+    return [placeholder(`[INSERT ${sectionName.toUpperCase()}]`)];
+  }
+
+  return markdownToDocx(text);
+}
+
 function preliminaryPages() {
   return [
     centered("KNUTSFORD UNIVERSITY", { run: { size: 30, bold: true }, before: 1800, after: 360 }),
@@ -434,14 +485,13 @@ function preliminaryPages() {
     paragraph("Date: ___________________________________"),
     pageBreak(),
     heading("Dedication", 1),
-    placeholder("[INSERT DEDICATION]"),
+    ...frontMatterBody("Dedication"),
     pageBreak(),
     heading("Acknowledgements", 1),
-    placeholder("[INSERT ACKNOWLEDGEMENTS]"),
+    ...frontMatterBody("Acknowledgements"),
     pageBreak(),
     heading("Abstract", 1),
-    paragraph("This section will contain the final abstract after screenshots, references, implementation evidence, and appendices have been finalized. It should summarize the problem, aim, methodology, implementation, key modules, testing, and conclusion in a concise academic form."),
-    placeholder("[INSERT FINAL ABSTRACT]"),
+    ...frontMatterBody("Abstract"),
     pageBreak(),
     heading("Table of Contents", 1),
     new TableOfContents("Table of Contents", { hyperlink: true, headingStyleRange: "1-3" }),
@@ -458,31 +508,80 @@ function preliminaryPages() {
   ];
 }
 
+function readAppendixMarkdown(fileName) {
+  return read(fileName).replace(/^# Appendix [A-L][^\n]*\n+/, "");
+}
+
 function appendixHeadings() {
   const master = read("APPENDICES_MASTER.md");
   const matches = [...master.matchAll(/^### Appendix ([A-L]) — (.+)$/gm)];
   const children = [heading("APPENDICES", 1, true)];
   children.push(
     paragraph(
-      "This section is prepared for final appendix assembly. The full appendix contents will be inserted after screenshots, route exports, test summaries, deployment extracts, payment samples, NFC samples, and permission matrices have been finalized.",
+      "This section contains supplementary material that supports the main report. Appendix G includes selected implementation excerpts. Remaining appendices will be assembled in later passes using route exports, screenshots, schema summaries, and other evidence described in APPENDICES_MASTER.md.",
     ),
   );
 
   for (const match of matches) {
-    children.push(heading(`Appendix ${match[1]} — ${match[2]}`, 2));
-    children.push(placeholder(`[INSERT APPENDIX ${match[1]} CONTENT — ${match[2]}]`));
+    const letter = match[1];
+    const title = match[2];
+    const appendixFile = appendixMarkdownFiles[letter];
+
+    children.push(heading(`Appendix ${letter} — ${title}`, 2));
+
+    if (appendixFile && fs.existsSync(path.join(root, appendixFile))) {
+      children.push(...markdownToDocx(readAppendixMarkdown(appendixFile)));
+    } else {
+      children.push(placeholder(`[INSERT APPENDIX ${letter} CONTENT — ${title}]`));
+    }
   }
 
   return children;
 }
 
 function referencesSection() {
-  return [
-    heading("REFERENCES", 1, true),
-    paragraph("This section is reserved for the final APA 7th edition reference list. The sources must be verified before final submission. Do not insert fabricated authors, journals, DOIs, URLs, publishers, or publication years."),
-    placeholder("[INSERT VERIFIED APA 7TH EDITION REFERENCES]"),
-    paragraph("Use REFERENCES_MASTER.md to track missing sources, verify official documentation references, replace chapter citation placeholders, alphabetize the final bibliography, and remove uncited sources."),
-  ];
+  const children = [heading("REFERENCES", 1, true)];
+  const verifiedPath = path.join(root, "REFERENCES_VERIFIED.md");
+
+  if (!fs.existsSync(verifiedPath)) {
+    children.push(
+      paragraph("This section is reserved for the final APA 7th edition reference list."),
+      placeholder("[INSERT VERIFIED APA 7TH EDITION REFERENCES]"),
+    );
+
+    return children;
+  }
+
+  let inBibliography = false;
+
+  for (const line of read("REFERENCES_VERIFIED.md").split("\n")) {
+    if (line.startsWith("## Bibliography")) {
+      inBibliography = true;
+      continue;
+    }
+
+    if (!inBibliography || !line.trim() || line.startsWith("#")) {
+      continue;
+    }
+
+    children.push(
+      new Paragraph({
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { after: 120, line: 300 },
+        indent: { left: 720, hanging: 360 },
+        children: [textRun(line.trim(), { size: 22 })],
+      }),
+    );
+  }
+
+  children.push(
+    paragraph(
+      "Additional peer-reviewed sources marked [VERIFY SOURCE] in the chapters must be confirmed and added before final submission. Use REFERENCES_MASTER.md to track remaining gaps.",
+      { after: 200 },
+    ),
+  );
+
+  return children;
 }
 
 const children = [
@@ -491,8 +590,8 @@ const children = [
   ...referencesSection(),
   ...appendixHeadings(),
   heading("ASSEMBLY NOTES", 1, true),
-  paragraph("This initial Word document establishes dissertation structure, heading hierarchy, figure placement, table conversion, and visible placeholders. It still requires screenshot insertion, final APA references, appendix content, pagination review, caption review, and manual table/list updates in Microsoft Word."),
-  placeholder("[PENDING: SCREENSHOTS, FINAL REFERENCES, APPENDIX CONTENTS, ROMAN/ARABIC PAGE NUMBER REVIEW, LIST OF FIGURES/TABLES UPDATES]"),
+  paragraph("This Word document is assembled from markdown sources in academic-documentation/. Phase A text assembly includes verified references, front matter markdown, Chapter Two citations, Appendix G code excerpts, and chapter content. Remaining work includes screenshots, additional appendices, peer-reviewed sources marked [VERIFY SOURCE], pagination review, and manual list updates in Microsoft Word."),
+  placeholder("[PENDING: SCREENSHOTS, REMAINING APPENDICES A-F AND H-L, VERIFY-SOURCE CITATIONS, ROMAN/ARABIC PAGE NUMBER REVIEW, LIST OF FIGURES/TABLES UPDATES]"),
 ];
 
 const doc = new Document({

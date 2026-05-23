@@ -50,8 +50,6 @@ This section evaluates the completed system against the objectives stated in Cha
 
 Table 5.1 summarizes the major objectives and the corresponding outcomes achieved by the implemented system.
 
-[INSERT TABLE — Summary of Objectives Achieved]
-
 Table 5.1: Summary of Objectives Achieved
 
 | Objective | Outcome Achieved | Institutional Value |

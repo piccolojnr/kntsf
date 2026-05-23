@@ -8,7 +8,7 @@ A literature review in a technical project should do more than list definitions.
 
 The chapter is organized into four main parts. The first part presents the theoretical framework for the proposed system. It discusses the architectural and security principles that support the design of the dashboard, public portal, mobile application, mobile API, NFC verification workflow, and election module. The second part reviews the main technologies used in the project and explains why each technology is relevant to the system. The third part examines categories of existing systems, including student permit systems, university election systems, student identity verification systems, and NFC attendance or verification systems. The final part identifies gaps in the reviewed systems and explains how those gaps justify the proposed platform.
 
-Citation placeholders are included where academic research, standards, or official documentation should later be inserted. They should be replaced with verified APA-style references during the final referencing stage. No invented authors, journal names, or publication details are used in this chapter.
+This chapter uses verified APA-style in-text citations for established publications, standards, and official documentation. Topics that still require additional peer-reviewed literature remain marked with `[VERIFY SOURCE]` until those sources are confirmed in `REFERENCES_MASTER.md` and added to `REFERENCES_VERIFIED.md`.
 
 ## 2.2 Theoretical Framework
 
@@ -18,7 +18,7 @@ These concepts are connected by a common concern: how to manage institutional ac
 
 ### 2.2.1 Client-server architecture
 
-Client-server architecture is a computing model in which client applications request services from a centralized server or backend system. The client may be a web browser, mobile application, desktop application, or another software component. The server processes requests, applies business rules, manages authentication, communicates with the database, and returns responses to the client. This model is common in institutional information systems because it allows shared data and rules to be managed centrally while still providing different access interfaces to users. [Reference to client-server architecture literature]
+Client-server architecture is a computing model in which client applications request services from a centralized server or backend system. The client may be a web browser, mobile application, desktop application, or another software component. The server processes requests, applies business rules, manages authentication, communicates with the database, and returns responses to the client. This model is common in institutional information systems because it allows shared data and rules to be managed centrally while still providing different access interfaces to users. (Tanenbaum & Wetherall, 2011)
 
 In a student governance system, centralization has practical value. Permit records, payment statuses, student accounts, verification logs, election records, and published content must remain consistent. If each access channel keeps its own separate record, the system can produce conflicting results. For example, a student might appear to have an active permit in one spreadsheet but not in another. A payment could be marked successful in a receipt folder while the permit record remains pending. Client-server architecture reduces this problem by placing the authoritative data and business rules on the backend.
 
@@ -38,7 +38,7 @@ Despite these limitations, client-server architecture suits the proposed student
 
 ### 2.2.2 Role-based access control (RBAC)
 
-Role-Based Access Control (RBAC) is an authorization approach in which permissions are assigned to roles, and users receive permissions through their assigned roles. Instead of granting every permission directly to each user, the system groups permissions according to responsibilities. For example, an administrator may manage users and system settings, a staff member may verify permits, an executive may publish governance content, and a student may view personal records or participate in eligible elections. [Reference to RBAC model or access control literature]
+Role-Based Access Control (RBAC) is an authorization approach in which permissions are assigned to roles, and users receive permissions through their assigned roles. Instead of granting every permission directly to each user, the system groups permissions according to responsibilities. For example, an administrator may manage users and system settings, a staff member may verify permits, an executive may publish governance content, and a student may view personal records or participate in eligible elections. (Sandhu et al., 1996)
 
 RBAC is useful in institutional systems because different users should not have equal access to all functions. Student governance workflows include sensitive actions such as issuing permits, verifying payments, approving candidates, registering NFC cards, publishing documents, and viewing reports. If the system allows all authenticated users to perform these actions, it creates security and accountability problems. Role separation helps limit access according to actual responsibility.
 
@@ -52,7 +52,7 @@ In the proposed system, RBAC relates to administrative roles, staff roles, execu
 
 Figure 2.4 presents the role-based access control model used to separate administrative, staff, executive, and student responsibilities. The model shows that users do not receive unrestricted system access simply because they are authenticated; instead, their assigned roles determine the permissions available to them.
 
-RBAC is not a complete security solution by itself. Poorly designed roles can become too broad, giving users more authority than required. Too many roles can also make administration difficult. A system may pass a role check but still expose too much data if the underlying query or response is not properly scoped. Therefore, RBAC must be combined with validation, authentication, data filtering, audit logging, and secure defaults. [Reference to access control security research]
+RBAC is not a complete security solution by itself. Poorly designed roles can become too broad, giving users more authority than required. Too many roles can also make administration difficult. A system may pass a role check but still expose too much data if the underlying query or response is not properly scoped. Therefore, RBAC must be combined with validation, authentication, data filtering, audit logging, and secure defaults. (OWASP Foundation, 2021)
 
 For this project, RBAC provides a practical model for controlling institutional workflows. It aligns well with the structure of a university environment, where responsibilities are already separated across students, SRC executives, staff, and administrators. It also gives the proposed system a clear security foundation before more detailed implementation decisions are made in later chapters.
 
@@ -62,7 +62,7 @@ Mobile application architecture concerns the organization of software that runs 
 
 Mobile-first thinking has become relevant in educational institutions because many students interact with digital services through smartphones rather than desktop computers. A student may check announcements, submit a request, confirm a payment, or vote in an election from a mobile device. For staff and security personnel, a mobile device may also be more practical for verification because permit checks can occur away from an office environment.
 
-Cross-platform mobile development allows one codebase to target more than one mobile operating system. Frameworks such as React Native and Expo are commonly used for this purpose because they allow developers to build mobile interfaces with JavaScript or TypeScript while still accessing native mobile capabilities through supported APIs. [Reference to mobile application architecture or React Native/Expo documentation] The main advantage is development efficiency, especially for academic projects or institutions with limited resources.
+Cross-platform mobile development allows one codebase to target more than one mobile operating system. Frameworks such as React Native and Expo are commonly used for this purpose because they allow developers to build mobile interfaces with JavaScript or TypeScript while still accessing native mobile capabilities through supported APIs. (Meta, n.d.-b; Expo, n.d.) The main advantage is development efficiency, especially for academic projects or institutions with limited resources.
 
 The proposed system benefits from a mobile application because several workflows naturally fit mobile use. Students can view permit information, initiate permit requests, access governance content, and participate in election voting without depending entirely on desktop access. Authorized staff can use mobile-assisted verification, including NFC scanning where device support is available. This helps connect the verification task to the actual context in which verification occurs.
 
@@ -76,7 +76,7 @@ In this project, mobile application architecture supports accessibility and oper
 
 ### 2.2.4 REST API architecture
 
-Representational State Transfer (REST) is an architectural style commonly used for web APIs. RESTful APIs expose resources through structured endpoints and usually use HTTP methods such as GET, POST, PATCH, and DELETE to retrieve or modify data. In many modern systems, REST APIs exchange data in JavaScript Object Notation (JSON), making them suitable for communication between backend servers and web or mobile clients. [Reference to REST architecture literature]
+Representational State Transfer (REST) is an architectural style commonly used for web APIs. RESTful APIs expose resources through structured endpoints and usually use HTTP methods such as GET, POST, PATCH, and DELETE to retrieve or modify data. In many modern systems, REST APIs exchange data in JavaScript Object Notation (JSON), making them suitable for communication between backend servers and web or mobile clients. (Fielding, 2000)
 
 REST API architecture supports interoperability because different clients can communicate with the same backend using agreed request and response structures. A mobile application, public portal, and dashboard can each request information from the backend while presenting that information differently to users. This fits the proposed system because student governance workflows involve multiple access surfaces but must preserve consistent backend rules.
 
@@ -96,7 +96,7 @@ For the proposed student governance platform, REST API architecture provides a p
 
 ### 2.2.5 Digital identity verification systems
 
-Digital identity verification systems are used to confirm that a person, account, card, or presented identifier corresponds to an authorized record. In educational institutions, identity verification may be required for examinations, library access, permit checks, student service requests, elections, and administrative approvals. A digital identity system usually depends on stored identity records, authentication credentials, verification identifiers, and rules for determining whether a person is eligible for a service. [Reference to digital identity verification literature]
+Digital identity verification systems are used to confirm that a person, account, card, or presented identifier corresponds to an authorized record. In educational institutions, identity verification may be required for examinations, library access, permit checks, student service requests, elections, and administrative approvals. A digital identity system usually depends on stored identity records, authentication credentials, verification identifiers, and rules for determining whether a person is eligible for a service. (National Institute of Standards and Technology, 2017)
 
 Authentication and verification are related but different concepts. Authentication confirms that a user can prove control of an account or credential, such as a password or token. Verification checks whether a presented identity or permit is valid for a specific purpose. A student may authenticate into a mobile application, but permit verification may still require checking whether the student has an active permit for the current academic period. Similarly, an NFC card may identify a linked student record, but the system must still verify whether the associated permit is valid.
 
@@ -114,13 +114,13 @@ The relevance of digital identity verification to this study is direct. Permit f
 
 Contactless authentication systems allow users or objects to be identified without inserting a card or manually entering all details. They commonly use technologies such as Near Field Communication (NFC), Radio Frequency Identification (RFID), contactless smart cards, or mobile wallet credentials. In this study, the focus is on NFC because it can be used with compatible mobile devices and registered cards to support student permit verification.
 
-NFC is a short-range wireless communication technology. It operates over a very limited distance, typically requiring the reader and card or tag to be placed close together. This short range makes it practical for intentional interactions, such as tapping a student card against a verification device. NFC systems usually involve a reader device and a card or tag that contains an identifier or data payload. [Reference to NFC standards or NFC technical documentation]
+NFC is a short-range wireless communication technology. It operates over a very limited distance, typically requiring the reader and card or tag to be placed close together. This short range makes it practical for intentional interactions, such as tapping a student card against a verification device. NFC systems usually involve a reader device and a card or tag that contains an identifier or data payload. (NFC Forum, n.d.)
 
 The main advantage of NFC in institutional verification is speed. A verification officer can scan a card rather than manually typing a student number or searching through paper records. This is useful in situations where many students must be checked within a limited time. NFC can also reduce typing errors because the identifier is read directly from the card. In a student permit context, the scan can trigger a lookup that checks the linked student, card status, and permit status.
 
 NFC also supports a more structured user experience. Instead of asking a student to present several documents, the verifier can scan one registered card and receive a system-generated response. This response can show whether the card is active, whether the student is linked correctly, and whether the permit is valid. When combined with audit logging, each verification event can become part of the operational record.
 
-The security of NFC systems depends heavily on design. A common mistake is to treat the presence of an NFC card as proof of authorization. In reality, an NFC card may be lost, copied in some contexts, misused, or linked to an outdated record. A secure design should not rely only on the raw card identifier. It should check the card lifecycle status, linked student, permit validity, and relevant institutional rules. [Reference to NFC security research]
+The security of NFC systems depends heavily on design. A common mistake is to treat the presence of an NFC card as proof of authorization. In reality, an NFC card may be lost, copied in some contexts, misused, or linked to an outdated record. A secure design should not rely only on the raw card identifier. It should check the card lifecycle status, linked student, permit validity, and relevant institutional rules. (Google, n.d.; OWASP Foundation, 2021)
 
 Another issue is data exposure. If raw NFC identifiers are stored or displayed carelessly, they may become sensitive operational data. A more careful approach is to store a protected representation, such as a hashed form, so that the system can compare scanned identifiers without unnecessarily exposing the raw value. The exact protection method depends on implementation design, but the principle is that identifiers used for verification should be handled as sensitive data.
 
@@ -138,7 +138,7 @@ NFC does not solve all verification problems. It cannot guarantee internet acces
 
 ### 2.2.7 Electronic voting systems
 
-Electronic voting systems allow voters to cast votes using digital devices or software platforms. In institutional settings, they may be used for student elections, association elections, board elections, surveys, or referenda. A proper electronic voting system must address authentication, eligibility, ballot presentation, vote recording, duplicate prevention, result calculation, and auditability. [Reference to electronic voting systems literature]
+Electronic voting systems allow voters to cast votes using digital devices or software platforms. In institutional settings, they may be used for student elections, association elections, board elections, surveys, or referenda. A proper electronic voting system must address authentication, eligibility, ballot presentation, vote recording, duplicate prevention, result calculation, and auditability. (ACE Electoral Knowledge Network, n.d.)
 
 Student elections require more control than ordinary polls. A poll may allow flexible participation or opinion gathering, but an election determines representation. Therefore, the voting process must be designed to prevent duplicate voting, restrict ineligible participation, manage candidate approval, and preserve result integrity. The system should also distinguish between active, scheduled, closed, and archived elections.
 
@@ -160,7 +160,7 @@ The proposed system uses a backend-centered architecture with web, public, and m
 
 ### 2.3.1 Laravel framework
 
-Laravel is a PHP web application framework that supports routing, controllers, middleware, validation, authentication, database access, queues, events, notifications, and API development. It follows patterns commonly associated with Model-View-Controller (MVC) architecture, although modern Laravel applications may also use actions, services, policies, form requests, and frontend integration tools. [Reference to Laravel official documentation]
+Laravel is a PHP web application framework that supports routing, controllers, middleware, validation, authentication, database access, queues, events, notifications, and API development. It follows patterns commonly associated with Model-View-Controller (MVC) architecture, although modern Laravel applications may also use actions, services, policies, form requests, and frontend integration tools. (Laravel, n.d.-a)
 
 Laravel is relevant to the proposed system because the project requires a backend capable of handling several modules. These include students, permits, payments, NFC cards, verification logs, elections, announcements, documents, audit logs, reports, and mobile API endpoints. A framework with established support for routing, validation, authorization, database models, and background jobs reduces the amount of low-level infrastructure that must be built manually.
 
@@ -176,7 +176,7 @@ For this project, Laravel provides a practical backend foundation. It supports t
 
 ### 2.3.2 React and Inertia.js
 
-React is a JavaScript library for building component-based user interfaces. It allows developers to divide an interface into reusable components that manage presentation and interaction. Inertia.js is a tool that connects server-side frameworks such as Laravel with modern frontend frameworks such as React. It allows applications to feel closer to single-page applications while still using server-side routing and controllers. [Reference to React documentation] [Reference to Inertia.js documentation]
+React is a JavaScript library for building component-based user interfaces. It allows developers to divide an interface into reusable components that manage presentation and interaction. Inertia.js is a tool that connects server-side frameworks such as Laravel with modern frontend frameworks such as React. It allows applications to feel closer to single-page applications while still using server-side routing and controllers. (Meta, n.d.-a; Inertia.js, n.d.)
 
 This combination is relevant to dashboard development. Administrative dashboards often require tables, filters, forms, dialogs, status indicators, charts, and detail pages. React's component model supports reusable interface elements, while Inertia.js allows the backend to send page data directly to frontend components without building a completely separate API for every dashboard screen.
 
@@ -190,7 +190,7 @@ For the proposed system, React and Inertia.js support the operations dashboard b
 
 ### 2.3.3 Expo React Native
 
-Expo React Native is a development platform for building cross-platform mobile applications using React Native. React Native allows developers to write mobile interfaces using JavaScript or TypeScript while rendering native mobile components. Expo provides tooling, libraries, build services, and development workflows that simplify mobile application creation and testing. [Reference to Expo documentation] [Reference to React Native documentation]
+Expo React Native is a development platform for building cross-platform mobile applications using React Native. React Native allows developers to write mobile interfaces using JavaScript or TypeScript while rendering native mobile components. Expo provides tooling, libraries, build services, and development workflows that simplify mobile application creation and testing. (Expo, n.d.; Meta, n.d.-b)
 
 The relevance of Expo React Native to this project is tied to mobile access. The proposed system includes a mobile application for student and staff workflows. Students may use the mobile application to access permit information, view relevant governance content, submit permit requests, and participate in eligible elections. Staff may use mobile workflows for verification activities. A cross-platform approach is suitable because the project should not be limited to a single operating system where avoidable.
 
@@ -204,7 +204,7 @@ In this project, Expo React Native provides a practical way to extend the studen
 
 ### 2.3.4 PostgreSQL
 
-PostgreSQL is an open-source relational database management system known for structured data storage, transactional consistency, constraints, indexing, and support for complex queries. Relational databases are suitable for systems where records have clear relationships and where data integrity is important. [Reference to PostgreSQL official documentation]
+PostgreSQL is an open-source relational database management system known for structured data storage, transactional consistency, constraints, indexing, and support for complex queries. Relational databases are suitable for systems where records have clear relationships and where data integrity is important. (PostgreSQL Global Development Group, n.d.)
 
 The proposed system contains many related entities: users, students, academic periods, permits, permit requests, payments, NFC cards, verification logs, audit logs, announcements, events, documents, polls, elections, candidates, and votes. These records are connected. A permit belongs to a student. A payment may be linked to a permit request. An NFC card is associated with a student. A vote is tied to an election position and candidate. A relational database provides a structured way to manage these relationships.
 
@@ -218,7 +218,7 @@ For the proposed system, PostgreSQL supports the need for consistency across per
 
 ### 2.3.5 NFC technology
 
-Near Field Communication (NFC) is a contactless communication technology that allows data exchange between compatible devices over a short distance. NFC is commonly used in access cards, contactless payments, identity cards, transport cards, and device pairing. In a student governance context, NFC can support identity-linked verification by allowing a registered card to be scanned and checked against backend records. [Reference to NFC standards or technical overview]
+Near Field Communication (NFC) is a contactless communication technology that allows data exchange between compatible devices over a short distance. NFC is commonly used in access cards, contactless payments, identity cards, transport cards, and device pairing. In a student governance context, NFC can support identity-linked verification by allowing a registered card to be scanned and checked against backend records. (NFC Forum, n.d.)
 
 An NFC system usually involves a reader and a tag or card. The reader may be a dedicated device or a compatible smartphone. The card or tag contains an identifier or data that can be read when placed near the reader. The short operating distance is useful because the interaction is usually intentional: the card must be close to the reader before data is exchanged.
 
@@ -228,7 +228,7 @@ The main benefit of NFC technology in this project is operational speed. Manual 
 
 NFC also supports cleaner audit records. A verification event can record that a card-based check occurred, which method was used, whether it succeeded, and when it happened. This provides better operational evidence than informal confirmation. It can also help administrators identify repeated failed verification attempts or card misuse patterns.
 
-Security must be considered carefully. NFC identifiers may be readable by compatible devices, and cards can be lost or misused. Depending on card type and configuration, some identifiers may be easier to clone than others. For this reason, an NFC verification system should not treat the card identifier alone as proof of authorization. It should combine the scan with backend checks, card lifecycle management, student status, permit status, and audit logging. [Reference to NFC security research]
+Security must be considered carefully. NFC identifiers may be readable by compatible devices, and cards can be lost or misused. Depending on card type and configuration, some identifiers may be easier to clone than others. For this reason, an NFC verification system should not treat the card identifier alone as proof of authorization. It should combine the scan with backend checks, card lifecycle management, student status, permit status, and audit logging. (Google, n.d.; OWASP Foundation, 2021)
 
 Privacy is another concern. If the raw identifier of a card is stored or displayed, it may expose sensitive operational data. The system should minimize exposure of raw identifiers and avoid displaying them to users who do not need them. Hashing or other protective approaches may be used so that the system can compare identifiers without storing them in plain form. This principle will be considered further in the system design chapter.
 
@@ -238,11 +238,11 @@ NFC is therefore valuable but not sufficient on its own. In the proposed system,
 
 ### 2.3.6 Paystack payment gateway
 
-Digital payment gateways allow systems to initiate, process, and verify online payments. Paystack is a payment gateway commonly used for card, bank, transfer, and other supported payment channels in applicable markets. In an institutional workflow, a payment gateway can help connect student payments to system records, provided that the application verifies payment status through trusted server-side mechanisms. [Reference to Paystack official documentation]
+Digital payment gateways allow systems to initiate, process, and verify online payments. Paystack is a payment gateway commonly used for card, bank, transfer, and other supported payment channels in applicable markets. In an institutional workflow, a payment gateway can help connect student payments to system records, provided that the application verifies payment status through trusted server-side mechanisms. (Paystack, n.d.-a)
 
 The proposed system uses payment integration for self-service permit issuance. A student may initiate a permit request, proceed to payment, and wait for the system to verify whether the transaction was successful. This is more structured than relying only on physical receipts or screenshots because the system can connect the payment reference to the permit request.
 
-Payment callbacks and webhooks are important in gateway integration. A callback may occur when a user is redirected back to the application after payment. A webhook is a server-to-server notification sent by the payment provider when a transaction event occurs. Both can help update the application's records, but neither should be trusted blindly. The application should verify transaction status with the payment provider before completing a sensitive workflow such as permit issuance. [Reference to payment gateway verification documentation]
+Payment callbacks and webhooks are important in gateway integration. A callback may occur when a user is redirected back to the application after payment. A webhook is a server-to-server notification sent by the payment provider when a transaction event occurs. Both can help update the application's records, but neither should be trusted blindly. The application should verify transaction status with the payment provider before completing a sensitive workflow such as permit issuance. (Paystack, n.d.-b)
 
 Transaction integrity is essential. A student should not receive a permit simply because a browser was redirected to a success page. Network interruptions, abandoned payments, duplicate callbacks, delayed webhooks, or failed transactions may occur. The system needs idempotent processing, meaning repeated verification attempts should not create duplicate permits or inconsistent payment records. This issue is especially important in permit workflows because duplicate active permits can undermine verification.
 
@@ -252,9 +252,9 @@ For the proposed system, Paystack supports the self-service permit issuance work
 
 ### 2.3.7 Queue and cache systems
 
-Queue systems allow applications to process selected tasks in the background rather than during the main user request. A queue worker retrieves jobs from a queue and executes them separately. This is useful for tasks such as sending notifications, processing media, generating reports, or handling work that may take longer than a typical web request should allow. [Reference to queue processing literature or framework documentation]
+Queue systems allow applications to process selected tasks in the background rather than during the main user request. A queue worker retrieves jobs from a queue and executes them separately. This is useful for tasks such as sending notifications, processing media, generating reports, or handling work that may take longer than a typical web request should allow. (Laravel, n.d.-c)
 
-Caching stores frequently used data so it can be retrieved faster without repeating expensive operations. In web applications, caching may be used for configuration values, dashboard summaries, public content, lookup lists, or computed counts. A cache can improve response time and reduce database load when used carefully. [Reference to caching strategies]
+Caching stores frequently used data so it can be retrieved faster without repeating expensive operations. In web applications, caching may be used for configuration values, dashboard summaries, public content, lookup lists, or computed counts. A cache can improve response time and reduce database load when used carefully. (Laravel, n.d.-d)
 
 In the proposed student governance platform, queues and caches support performance and maintainability. Notifications related to account activation or permit workflows may be handled through queues. Dashboard summaries and public content can benefit from caching, especially where the same data is requested repeatedly. Reports may also use cached aggregates where real-time precision is not required for every view.
 
@@ -268,7 +268,7 @@ For this project, queues and caches are supporting technologies. They do not def
 
 ### 2.3.8 API authentication using Sanctum
 
-API authentication is the process of verifying the identity of a client or user making API requests. In mobile applications, token-based authentication is commonly used because mobile clients do not rely on browser sessions in the same way as web dashboards. Laravel Sanctum provides mechanisms for issuing and validating API tokens in Laravel applications. [Reference to Laravel Sanctum documentation]
+API authentication is the process of verifying the identity of a client or user making API requests. In mobile applications, token-based authentication is commonly used because mobile clients do not rely on browser sessions in the same way as web dashboards. Laravel Sanctum provides mechanisms for issuing and validating API tokens in Laravel applications. (Laravel, n.d.-b)
 
 Sanctum is relevant to the proposed system because the mobile application requires authenticated access to student and staff operations. A student should be able to view personal permit information or submit permitted actions only after authentication. Staff or executives using mobile operational features should also be identified before accessing verification or management endpoints.
 
@@ -328,7 +328,7 @@ The proposed system focuses on student governance identity rather than replacing
 
 ### 2.4.4 Existing NFC attendance and verification systems
 
-NFC attendance systems are commonly used to record presence in classes, meetings, events, or controlled access points. A person taps a card or device, and the system records the event. These systems show that NFC can reduce manual entry and speed up identification. [Reference to NFC attendance system research]
+NFC attendance systems are commonly used to record presence in classes, meetings, events, or controlled access points. A person taps a card or device, and the system records the event. These systems show that NFC can reduce manual entry and speed up identification. [VERIFY SOURCE — NFC attendance or contactless access literature]
 
 The strength of NFC attendance systems is operational speed. They reduce the need to call names or manually sign registers. They can also produce attendance records that are easier to search and summarize. In educational settings, NFC can support lecturer attendance, student class attendance, library entry, or event participation.
 
