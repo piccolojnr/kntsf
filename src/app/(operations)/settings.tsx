@@ -8,7 +8,7 @@ import { DetailRow } from "@/components/ui/detail-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
-import { getPermitIssuanceConfig } from "@/features/permits/permit-api";
+import { getOperationsPermitIssuanceConfig } from "@/features/permits/permit-api";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 function formatCurrency(amount: number) {
@@ -16,6 +16,10 @@ function formatCurrency(amount: number) {
 }
 
 function formatDate(dateString: string) {
+  if (!dateString) {
+    return "Unavailable";
+  }
+
   return new Date(dateString).toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
@@ -25,8 +29,8 @@ function formatDate(dateString: string) {
 
 export default function OperationsSettingsScreen() {
   const configQuery = useQuery({
-    queryKey: ["permit-issuance-config"],
-    queryFn: getPermitIssuanceConfig,
+    queryKey: ["operations-permit-issuance-config"],
+    queryFn: () => getOperationsPermitIssuanceConfig(),
   });
   const refreshControl = usePullToRefresh(async () => {
     await configQuery.refetch();
@@ -91,6 +95,20 @@ export default function OperationsSettingsScreen() {
               value={formatDate(config.expiryDate)}
               helper="All newly issued permits use this expiry date."
             />
+            {config.validityDays ? (
+              <DetailRow
+                label="Validity Days"
+                value={String(config.validityDays)}
+                helper="Default permit validity returned by the operations API."
+              />
+            ) : null}
+            {config.studentNumberPrefix ? (
+              <DetailRow
+                label="Student Prefix"
+                value={config.studentNumberPrefix}
+                helper="Default student number prefix used by operations forms."
+              />
+            ) : null}
           </SectionCard>
 
           <View style={styles.notice}>

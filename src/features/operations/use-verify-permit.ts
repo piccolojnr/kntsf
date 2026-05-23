@@ -36,7 +36,7 @@ export type UseVerifyPermitReturn = UseVerifyPermitState & {
   verifyByStudentId: (studentId: string) => Promise<VerificationResult>;
   verifyByCardUid: (uid: string) => Promise<VerificationResult>;
   verifyByNfc: () => Promise<VerificationResult>;
-  issuePermit: (studentId: string) => Promise<Permit>;
+  issuePermit: () => Promise<Permit>;
   reset: () => void;
 };
 
@@ -230,7 +230,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
   }, [beginOperation, commitFailure, runCardUidVerification, updatePhase]);
 
   const issuePermit = useCallback(
-    async (studentId: string) => {
+    async () => {
       const operationId = beginOperation({ phase: "issuing_permit" });
 
       try {
@@ -240,7 +240,11 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
           throw new Error("No student record was found for this student ID.");
         }
 
-        const response = await issuePermitRequest(student.studentId ?? student.id);
+        const response = await issuePermitRequest({
+          studentId: student.id,
+          studentEmail: student.email,
+          academicPeriodId: state.result?.issuanceConfig?.activeAcademicPeriod?.id,
+        });
         const issuedPermit = response.permit;
         const refreshedResult =
           response.verification ?? (await verifyPermitByStudentId(student.studentId));
@@ -258,7 +262,7 @@ export function useVerifyPermit(): UseVerifyPermitReturn {
         throw error;
       }
     },
-    [beginOperation, commitFailure, commitSuccess, currentStudent],
+    [beginOperation, commitFailure, commitSuccess, currentStudent, state.result],
   );
 
   const reset = useCallback(() => {

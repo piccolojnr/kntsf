@@ -136,6 +136,7 @@ Migration notes:
 - Verification results are normalized from Laravel `method`, `result`, `reason`, `student`, and `permit` fields into existing UI-compatible result objects.
 - Card mutation responses expose masked UID data only through `uid_last4` normalization.
 - Student detail/search now uses Laravel operations student endpoints.
+- Staff verification uses staff-scoped `GET /api/mobile/operations/permits/options` for permit issue defaults and selected-student blocking state. It no longer calls the student-scoped `GET /api/mobile/permit-requests/options` endpoint after lookup.
 
 ## Operations Aggregate Endpoint Alignment
 

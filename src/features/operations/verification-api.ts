@@ -1,7 +1,10 @@
-import { getPermitIssuanceConfig, normalizePermit } from "@/features/permits/permit-api";
-import { Permit, PermitDto } from "@/features/permits/permit-types";
 import { normalizeCard } from "@/features/cards/card-api";
 import { StudentCardDto } from "@/features/cards/card-types";
+import {
+  getOperationsPermitIssuanceConfig,
+  normalizePermit,
+} from "@/features/permits/permit-api";
+import { Permit, PermitDto } from "@/features/permits/permit-types";
 import { normalizeStudent } from "@/features/students/student-api";
 import { StudentDto } from "@/features/students/student-types";
 import { apiClient } from "@/lib/api/api-client";
@@ -10,12 +13,12 @@ import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
 import { ApiListResponse } from "@/lib/api/api-types";
 
 import {
+  VerificationDecision,
+  VerificationLog,
   VerificationLogDto,
   VerificationMethod,
   VerificationOutcome,
   VerificationReason,
-  VerificationDecision,
-  VerificationLog,
   VerificationResult,
   VerificationResultDto,
 } from "./verification-types";
@@ -27,7 +30,7 @@ type MobileApiResponse<T> = {
 };
 
 type IssuePermitResponseDto = {
-  permit: Permit | PermitDto;
+  permit?: Permit | PermitDto | null;
   verificationResult?: VerificationResultDto | null;
   verification?: VerificationResultDto;
 };
@@ -42,6 +45,7 @@ type LaravelVerificationResultDto = Partial<VerificationResultDto> & {
   checked_at?: string;
   checkedAt?: string;
   message?: string;
+  can_issue_permit?: boolean;
 };
 
 export type VerificationLogListParams = {
@@ -97,31 +101,39 @@ function normalizeVerificationResult(
     dto.checkedAt ??
     ("checked_at" in dto ? dto.checked_at : undefined) ??
     new Date().toISOString();
-  const reason = normalizeVerificationReason(dto.reason ?? dto.result);
-  const decision = dto.decision ?? getDecisionFromReason(reason);
-  const outcome = dto.outcome ?? getOutcomeFromReason(reason);
   const method = normalizeVerificationMethod(dto.method);
   const value = dto.value ?? "";
   const message = dto.message ?? "Verification completed.";
   const student = dto.student ? normalizeStudent(dto.student as StudentDto) : null;
   const permit = dto.permit ? normalizePermit(dto.permit as PermitDto) : null;
   const card = dto.card ? normalizeCard(dto.card as StudentCardDto) : null;
+  const rawResult = "result" in dto ? dto.result : undefined;
+  const reason = normalizeVerificationReason(rawResult ?? dto.reason, {
+    hasPermit: Boolean(permit),
+    hasStudent: Boolean(student),
+    method,
+  });
+  const decision = dto.decision ?? getDecisionFromReason(reason);
+  const outcome = dto.outcome ?? getOutcomeFromReason(reason);
+  const explicitCanIssue =
+    dto.canIssuePermit ??
+    ("can_issue_permit" in dto ? dto.can_issue_permit : undefined);
   const log = dto.log
     ? normalizeVerificationLog(dto.log)
     : {
-        id: `verification-${checkedAt}`,
-        method,
-        value,
-        scannedAt: checkedAt,
-        checkedAt,
-        outcome,
-        reason,
-        decision,
-        message,
-        cardId: card?.id,
-        permitId: permit?.id,
-        studentId: student?.id,
-      };
+      id: `verification-${checkedAt}`,
+      method,
+      value,
+      scannedAt: checkedAt,
+      checkedAt,
+      outcome,
+      reason,
+      decision,
+      message,
+      cardId: card?.id,
+      permitId: permit?.id,
+      studentId: student?.id,
+    };
 
   return {
     ...dto,
@@ -136,9 +148,7 @@ function normalizeVerificationResult(
     card,
     permit,
     student,
-    canIssuePermit:
-      dto.canIssuePermit ??
-      (outcome === "warning" && reason !== "permit_issuance_disabled"),
+    canIssuePermit: explicitCanIssue ?? canOpenPermitIssueFlow(reason, student),
     issuanceConfig: dto.issuanceConfig ?? null,
     log,
   };
@@ -156,8 +166,44 @@ function normalizeVerificationMethod(method: unknown): VerificationMethod {
   return "student_id";
 }
 
-function normalizeVerificationReason(reason: unknown): VerificationReason {
-  switch (reason) {
+function normalizeVerificationReason(
+  reason: unknown,
+  context?: {
+    hasPermit?: boolean;
+    hasStudent?: boolean;
+    method?: VerificationMethod;
+  },
+): VerificationReason {
+  const normalizedReason =
+    typeof reason === "string"
+      ? reason.trim().toLowerCase().replace(/[\s-]+/g, "_")
+      : "";
+
+  if (
+    normalizedReason.includes("no_active_permit") ||
+    normalizedReason.includes("missing_permit") ||
+    normalizedReason.includes("permit_missing") ||
+    normalizedReason.includes("missing") ||
+    normalizedReason.includes("no_permit")
+  ) {
+    return "no_active_permit";
+  }
+
+  if (
+    normalizedReason.includes("student_not_found") ||
+    normalizedReason.includes("student_not_registered")
+  ) {
+    return context?.hasStudent ? "no_active_permit" : "student_not_found";
+  }
+
+  if (
+    normalizedReason.includes("permit_not_found") ||
+    normalizedReason.includes("permit_not_registered")
+  ) {
+    return context?.hasStudent ? "no_active_permit" : "permit_not_found";
+  }
+
+  switch (normalizedReason) {
     case "valid":
     case "active_permit":
       return "active_permit";
@@ -168,6 +214,19 @@ function normalizeVerificationReason(reason: unknown): VerificationReason {
     case "revoked_permit":
       return "revoked_permit";
     case "not_found":
+      if (context?.hasStudent && !context.hasPermit) {
+        return "no_active_permit";
+      }
+
+      if (context?.method === "student_id") {
+        return "student_not_found";
+      }
+
+      if (context?.method === "card_uid") {
+        return "card_not_registered";
+      }
+
+      return "permit_not_found";
     case "permit_not_found":
       return "permit_not_found";
     case "card_inactive":
@@ -181,6 +240,10 @@ function normalizeVerificationReason(reason: unknown): VerificationReason {
     case "invalid":
     case "mismatch":
     case "invalid_input":
+      if (context?.hasStudent && !context.hasPermit) {
+        return "no_active_permit";
+      }
+
       return "invalid_input";
     case "permit_issuance_disabled":
       return "permit_issuance_disabled";
@@ -227,6 +290,43 @@ function getDecisionFromReason(reason: VerificationReason): VerificationDecision
   }
 }
 
+function canOpenPermitIssueFlow(
+  reason: VerificationReason,
+  student: ReturnType<typeof normalizeStudent> | null,
+) {
+  return Boolean(
+    student &&
+      (reason === "no_active_permit" ||
+        reason === "expired_permit" ||
+        reason === "revoked_permit" ||
+        reason === "permit_not_found"),
+  );
+}
+
+function hasHardIssuanceBlock(result: VerificationResult) {
+  return Boolean(!result.issuanceConfig?.enabled);
+}
+
+function isPermitLike(value: unknown): value is PermitDto {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      ("id" in value || "code_last4" in value || "status" in value),
+  );
+}
+
+function getIssuedPermit(data: IssuePermitResponseDto | PermitDto) {
+  if ("permit" in data && data.permit) {
+    return data.permit as PermitDto;
+  }
+
+  if (isPermitLike(data)) {
+    return data;
+  }
+
+  return null;
+}
+
 async function postVerification<TBody>(
   endpoint: string,
   body: TBody,
@@ -243,8 +343,19 @@ async function postVerification<TBody>(
       ),
     );
 
-    if (result.canIssuePermit && !result.issuanceConfig) {
-      result.issuanceConfig = await getPermitIssuanceConfig();
+    if (result.canIssuePermit && result.student && !result.issuanceConfig) {
+      try {
+        result.issuanceConfig = await getOperationsPermitIssuanceConfig(
+          result.student.id,
+        );
+        result.canIssuePermit = !hasHardIssuanceBlock(result);
+      } catch (error) {
+        const normalizedError = normalizeApiError(error);
+
+        if (normalizedError.status === 403) {
+          result.canIssuePermit = false;
+        }
+      }
     }
 
     return result;
@@ -253,13 +364,21 @@ async function postVerification<TBody>(
   }
 }
 
-async function postIssuePermit(studentId: string) {
+async function postIssuePermit(input: {
+  studentId: string;
+  studentEmail?: string | null;
+  academicPeriodId?: string | number | null;
+}) {
   try {
     const response = await apiClient.post<
       IssuePermitResponseDto | { data: IssuePermitResponseDto } | MobileApiResponse<IssuePermitResponseDto>
     >(
       "/api/mobile/operations/permits/issue",
-      { student_number: studentId, student_id: studentId },
+      {
+        student_id: input.studentId,
+        student_email: input.studentEmail || undefined,
+        academic_period_id: input.academicPeriodId ?? undefined,
+      },
     );
 
     const data = unwrapData<IssuePermitResponseDto>(response.data);
@@ -268,12 +387,25 @@ async function postIssuePermit(studentId: string) {
       ? normalizeVerificationResult(data.verificationResult ?? data.verification!)
       : null;
 
-    if (verification?.canIssuePermit && !verification.issuanceConfig) {
-      verification.issuanceConfig = await getPermitIssuanceConfig();
+    if (verification?.canIssuePermit && verification.student && !verification.issuanceConfig) {
+      try {
+        verification.issuanceConfig = await getOperationsPermitIssuanceConfig(
+          verification.student.id,
+        );
+        verification.canIssuePermit = !hasHardIssuanceBlock(verification);
+      } catch {
+        verification.canIssuePermit = false;
+      }
+    }
+
+    const issuedPermit = getIssuedPermit(data);
+
+    if (!issuedPermit) {
+      throw new Error("The permit issue response did not include a permit.");
     }
 
     return {
-      permit: normalizePermit(data.permit as PermitDto),
+      permit: normalizePermit(issuedPermit),
       verification,
     };
   } catch (error) {
@@ -366,12 +498,20 @@ export async function verifyPermit(input: {
   return verifyPermitByStudentId(input.value);
 }
 
-export async function issuePermitWithVerification(studentId: string) {
-  return postIssuePermit(studentId);
+export async function issuePermitWithVerification(input: {
+  studentId: string;
+  studentEmail?: string | null;
+  academicPeriodId?: string | number | null;
+}) {
+  return postIssuePermit(input);
 }
 
-export async function issuePermit(studentId: string) {
-  const response = await issuePermitWithVerification(studentId);
+export async function issuePermit(input: {
+  studentId: string;
+  studentEmail?: string | null;
+  academicPeriodId?: string | number | null;
+}) {
+  const response = await issuePermitWithVerification(input);
   return response.permit;
 }
 
@@ -380,8 +520,11 @@ export async function issuePermitFromVerification(result: VerificationResult) {
     throw new Error("A student record is required before issuing a permit.");
   }
 
-  const studentId = result.student.studentId ?? result.student.id;
-  const response = await issuePermitWithVerification(studentId);
+  const response = await issuePermitWithVerification({
+    studentId: result.student.id,
+    studentEmail: result.student.email,
+    academicPeriodId: result.issuanceConfig?.activeAcademicPeriod?.id,
+  });
 
   return {
     permit: response.permit,
