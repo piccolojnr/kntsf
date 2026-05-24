@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -35,6 +35,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'payments/paystack/webhook',
         ]);
 
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
@@ -47,7 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
-            if (! in_array($response->getStatusCode(), [403, 404, 500, 503], true)) {
+            if (!in_array($response->getStatusCode(), [403, 404, 500, 503], true)) {
                 return $response;
             }
 
