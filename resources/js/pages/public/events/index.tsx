@@ -15,7 +15,7 @@ export default function PublicEventsIndex({
 }: {
     events: Paginated<EventSummary>;
 }) {
-    const items = events.data;
+    const items = events.data ?? [];
 
     return (
         <>

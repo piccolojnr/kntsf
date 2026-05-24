@@ -15,7 +15,7 @@ export default function PublicAnnouncementsIndex({
 }: {
     announcements: Paginated<AnnouncementSummary>;
 }) {
-    const items = announcements.data;
+    const items = announcements.data ?? [];
 
     return (
         <>
