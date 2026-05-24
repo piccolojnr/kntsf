@@ -14,7 +14,7 @@ export default function PublicElectionsIndex({
 }: {
     elections: Paginated<ElectionSummary>;
 }) {
-    const items = elections.data;
+    const items = elections.data ?? [];
 
     return (
         <>

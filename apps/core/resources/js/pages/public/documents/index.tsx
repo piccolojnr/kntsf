@@ -15,7 +15,7 @@ export default function PublicDocumentsIndex({
 }: {
     documents: Paginated<DocumentSummary>;
 }) {
-    const items = documents.data;
+    const items = documents.data ?? [];
 
     return (
         <>
