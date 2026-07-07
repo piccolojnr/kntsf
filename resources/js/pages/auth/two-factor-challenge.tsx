@@ -70,7 +70,7 @@ export default function TwoFactorChallenge() {
                                         placeholder="Enter recovery code"
                                         autoFocus={showRecoveryInput}
                                         required
-                                        className="bg-app-surface"
+                                        className="h-11 rounded-xl bg-app-surface"
                                     />
                                     <InputError
                                         message={errors.recovery_code}
@@ -107,13 +107,13 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                className="w-full"
+                                className="h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                                 disabled={processing}
                             >
                                 Continue
                             </Button>
 
-                            <div className="rounded-md border border-app-border bg-app-surface-muted px-3 py-2 text-center text-xs leading-5 text-app-muted">
+                            <div className="rounded-xl border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
                                 <span>or you can </span>
                                 <button
                                     type="button"

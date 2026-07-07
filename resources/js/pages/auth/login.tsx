@@ -15,10 +15,7 @@ type Props = {
     canResetPassword: boolean;
 };
 
-export default function Login({
-    status,
-    canResetPassword,
-}: Props) {
+export default function Login({ status, canResetPassword }: Props) {
     return (
         <>
             <Head title="Log in" />
@@ -31,7 +28,7 @@ export default function Login({
                 {({ processing, errors }) => (
                     <>
                         {status && (
-                            <div className="rounded-md border border-app-green/30 bg-app-green/10 px-3 py-2.5 text-center text-sm text-app-ink">
+                            <div className="border-app-green/30 bg-app-green/10 rounded-xl border px-4 py-3 text-sm leading-6 text-app-ink">
                                 {status}
                             </div>
                         )}
@@ -48,7 +45,7 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
-                                    className="bg-app-surface"
+                                    className="h-11 rounded-xl bg-app-surface"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -73,12 +70,12 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
-                                    className="bg-app-surface"
+                                    className="h-11 rounded-xl bg-app-surface"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center gap-3 rounded-md border border-app-border bg-app-surface-muted px-3 py-2">
+                            <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-surface-muted px-4 py-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -89,7 +86,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-2 h-[39.5px] w-full bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                                className="mt-2 h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -99,7 +96,7 @@ export default function Login({
                             </Button>
                         </div>
 
-                        <div className="rounded-md border border-app-border bg-app-surface-muted px-3 py-2 text-center text-xs leading-5 text-app-muted">
+                        <div className="rounded-xl border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
                             Accounts are created by administrators.
                         </div>
                     </>
