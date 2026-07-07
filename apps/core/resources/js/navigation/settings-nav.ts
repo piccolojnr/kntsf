@@ -1,6 +1,7 @@
-import { CreditCard, Palette, Shield, User } from 'lucide-react';
+import { CreditCard, Palette, ServerCog, Shield, User } from 'lucide-react';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editPermitSettings } from '@/routes/permit-settings';
+import { edit as editPlatformSettings } from '@/routes/platform-settings';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
@@ -29,5 +30,11 @@ export const settingsNavItems: NavItem[] = [
         href: editPermitSettings(),
         icon: CreditCard,
         permission: 'permit_settings.view',
+    },
+    {
+        title: 'Platform settings',
+        href: editPlatformSettings(),
+        icon: ServerCog,
+        permission: 'settings.view',
     },
 ];

@@ -31,6 +31,8 @@ class ApplicationCache
 
     public const ContentSettings = 'settings:content';
 
+    public const PlatformSettings = 'settings:platform';
+
     public function remember(string $scope, string $key, int $seconds, Closure $callback): mixed
     {
         return Cache::remember($this->key($scope, $key), $seconds, $callback);
@@ -60,6 +62,7 @@ class ApplicationCache
     {
         $this->forget(self::PermitSettings);
         $this->forget(self::ContentSettings);
+        $this->forget(self::PlatformSettings);
         $this->flushDashboard();
         $this->bump(self::PublicHome);
     }

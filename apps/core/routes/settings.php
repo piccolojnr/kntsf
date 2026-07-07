@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\PermitSettingsController;
+use App\Http\Controllers\Settings\PlatformSettingsController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,12 @@ Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
 
     Route::patch('settings/permit-settings', [PermitSettingsController::class, 'update'])
         ->name('permit-settings.update');
+
+    Route::get('settings/platform-settings', [PlatformSettingsController::class, 'edit'])
+        ->name('platform-settings.edit');
+
+    Route::patch('settings/platform-settings', [PlatformSettingsController::class, 'update'])
+        ->name('platform-settings.update');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
         ->middleware('throttle:6,1')
