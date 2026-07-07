@@ -23,7 +23,9 @@ class PublicExecutiveController extends Controller
                     ->with(['user:id,name', 'media'])
                     ->orderBy('sort_order')
                     ->get()
-                    ->map(fn (ExecutiveProfile $profile): array => self::payload($profile)),
+                    ->map(fn (ExecutiveProfile $profile): array => self::payload($profile))
+                    ->values()
+                    ->all(),
             ),
         ]);
     }

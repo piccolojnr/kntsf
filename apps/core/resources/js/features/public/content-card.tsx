@@ -32,9 +32,9 @@ export function PublicContentCard({
     return (
         <Link
             href={href}
-            className="public-sketch-card public-scroll-rise group relative flex min-h-[24rem] flex-col overflow-hidden rounded-[1.35rem] border border-app-border bg-white/76 shadow-[0_18px_55px_rgba(28,24,38,0.055)] transition duration-300 hover:bg-white dark:bg-app-surface/70"
+            className="public-sketch-card public-scroll-rise group relative flex min-h-[19.5rem] flex-col overflow-hidden rounded-[1.25rem] border border-app-border bg-white/76 shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:bg-app-surface/70"
         >
-            <div className="relative aspect-[4/3] overflow-hidden bg-app-surface-muted/70 dark:bg-app-page">
+            <div className="relative aspect-[16/9] overflow-hidden bg-app-surface-muted/70 dark:bg-app-page">
                 {imageUrl ? (
                     <img
                         src={imageUrl}
@@ -48,16 +48,16 @@ export function PublicContentCard({
                             aria-hidden="true"
                         />
                         <div
-                            className="absolute right-8 bottom-8 h-20 w-32 rotate-[-8deg] rounded-full bg-app-brass/18 blur-2xl"
+                            className="absolute right-8 bottom-6 h-14 w-28 rotate-[-8deg] rounded-full bg-app-brass/18 blur-2xl"
                             aria-hidden="true"
                         />
-                        <div className="relative grid size-14 place-items-center rounded-full bg-white text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-app-ink group-hover:text-white dark:bg-app-surface">
+                        <div className="relative grid size-12 place-items-center rounded-full bg-white text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-app-ink group-hover:text-white dark:bg-app-surface">
                             <FileText className="size-5" />
                         </div>
                     </div>
                 )}
                 <div
-                    className="absolute inset-4 rounded-[1rem] border border-white/18"
+                    className="absolute inset-3 rounded-[0.9rem] border border-white/18"
                     aria-hidden="true"
                 />
                 {category && (
@@ -69,21 +69,21 @@ export function PublicContentCard({
                 )}
             </div>
 
-            <div className="flex flex-1 flex-col p-6">
+            <div className="flex flex-1 flex-col p-5">
                 {meta && (
                     <p className="mb-3 text-[11px] font-medium tracking-[0.16em] text-app-muted uppercase">
                         {meta}
                     </p>
                 )}
-                <h2 className="text-xl leading-tight font-semibold tracking-[-0.02em] text-app-ink transition-colors duration-300 group-hover:text-app-red md:text-2xl">
+                <h2 className="text-lg leading-tight font-semibold tracking-[-0.02em] text-app-ink transition-colors duration-300 group-hover:text-app-red md:text-xl">
                     {title}
                 </h2>
                 {description && (
-                    <p className="mt-3.5 line-clamp-3 text-sm leading-7 text-app-muted/90">
+                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-app-muted/90">
                         {description}
                     </p>
                 )}
-                <div className="mt-auto flex items-center justify-between pt-6">
+                <div className="mt-auto flex items-center justify-between pt-5">
                     <span className="h-px flex-1 bg-app-border" />
                     <span className="ml-4 inline-flex items-center gap-1.5 text-xs font-medium text-app-muted transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-app-red">
                         Open
@@ -152,7 +152,7 @@ export function PublicPageHeader({
 
     return (
         <section
-            className={`relative overflow-hidden  border-app-border/80 ${
+            className={`relative overflow-hidden border-app-border/80 ${
                 hasBackgroundImage ? 'bg-app-ink text-white' : 'bg-[#f8f7f3]'
             }`}
         >
@@ -196,7 +196,7 @@ export function PublicPageHeader({
             <div
                 className={`public-scroll-rise relative mx-auto grid w-full max-w-7xl gap-8 px-5 md:px-8 lg:grid-cols-[1fr_16rem] ${
                     hasBackgroundImage
-                        ? 'min-h-[66svh] items-end pt-28 pb-18 md:min-h-[90svh] lg:pt-32 lg:pb-24'
+                        ? 'min-h-[76svh] items-end pt-28 pb-18 md:min-h-[90svh] lg:pt-32 lg:pb-24'
                         : 'pt-32 pb-14 lg:pt-36 lg:pb-18'
                 }`}
             >
