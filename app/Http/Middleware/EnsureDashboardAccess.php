@@ -16,7 +16,7 @@ class EnsureDashboardAccess
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user()?->hasOnlyStudentRole()) {
-            if ($request->routeIs('dashboard', 'profile.*', 'security.*', 'appearance.*', 'permit-settings.*')) {
+            if ($request->routeIs('dashboard', 'profile.*', 'security.*', 'appearance.*', 'permit-settings.*', 'platform-settings.*')) {
                 return redirect()->route('account.mobile-app');
             }
 

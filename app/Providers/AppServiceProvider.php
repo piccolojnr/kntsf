@@ -16,9 +16,11 @@ use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
 use App\Models\PermitRequest;
+use App\Models\PlatformSetting;
 use App\Models\Student;
 use App\Models\VerificationLog;
 use App\Support\ApplicationCache;
+use App\Support\PlatformSettings;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -44,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        app(PlatformSettings::class)->applyToConfig();
         $this->configureRateLimiting();
         $this->configureCacheInvalidation();
     }
@@ -126,6 +129,8 @@ class AppServiceProvider extends ServiceProvider
 
         AppSetting::saved(fn () => app(ApplicationCache::class)->flushSettings());
         AppSetting::deleted(fn () => app(ApplicationCache::class)->flushSettings());
+        PlatformSetting::saved(fn () => app(ApplicationCache::class)->flushSettings());
+        PlatformSetting::deleted(fn () => app(ApplicationCache::class)->flushSettings());
 
         foreach ([Announcement::class, Event::class, Document::class, ExecutiveProfile::class, Election::class] as $model) {
             $model::saved($flushPublicContent);
