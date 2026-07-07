@@ -16,7 +16,7 @@ import type { ElectionDetail } from '../types';
 const statusStyles: Record<string, string> = {
     active: 'bg-app-red/10 text-app-red',
     scheduled: 'bg-app-brass/18 text-app-ink',
-    closed: 'bg-app-ink/8 text-app-ink',
+    closed: 'theme-ink-soft text-app-ink',
     archived: 'bg-app-muted/12 text-app-muted',
 };
 
@@ -42,8 +42,8 @@ export default function PublicElectionShow({
                 />
             </Head>
 
-            <article className="bg-[#f8f7f3]">
-                <section className="relative overflow-hidden border-b border-app-border/80 bg-[#f8f7f3]">
+            <article className="theme-paper">
+                <section className="theme-paper relative overflow-hidden border-b border-app-border/80">
                     <div
                         className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                         aria-hidden="true"
@@ -86,7 +86,9 @@ export default function PublicElectionShow({
 
                             {election.description && (
                                 <div className="mt-6 max-w-3xl text-base leading-8 text-app-muted">
-                                    <RichTextViewer value={election.description} />
+                                    <RichTextViewer
+                                        value={election.description}
+                                    />
                                 </div>
                             )}
 
@@ -107,10 +109,18 @@ export default function PublicElectionShow({
                                 value={candidateCount}
                             />
                             <ElectionMetric
-                                icon={election.results_visible ? <Eye /> : <EyeOff />}
+                                icon={
+                                    election.results_visible ? (
+                                        <Eye />
+                                    ) : (
+                                        <EyeOff />
+                                    )
+                                }
                                 label="Results"
                                 value={
-                                    election.results_visible ? 'Visible' : 'Hidden'
+                                    election.results_visible
+                                        ? 'Visible'
+                                        : 'Hidden'
                                 }
                             />
                         </div>
@@ -124,14 +134,14 @@ export default function PublicElectionShow({
                     />
                     <div className="public-scroll-rise mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:py-18">
                         <aside className="lg:pt-3">
-                            <div className="public-sketch-card sticky top-28 rounded-[1.25rem] border border-app-border bg-white/74 p-5 shadow-[0_16px_45px_rgba(28,24,38,0.055)]">
+                            <div className="public-sketch-card theme-surface sticky top-28 rounded-[1.25rem] border border-app-border p-5 shadow-[0_16px_45px_rgba(28,24,38,0.055)]">
                                 <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
                                     Election desk
                                 </p>
                                 <p className="mt-4 text-sm leading-7 text-app-muted">
-                                    Positions and approved candidates are grouped
-                                    below. Vote counts only appear when results are
-                                    public.
+                                    Positions and approved candidates are
+                                    grouped below. Vote counts only appear when
+                                    results are public.
                                 </p>
                                 <div className="mt-5 border-t border-app-border pt-5">
                                     <p className="text-3xl font-semibold tracking-[-0.04em] text-app-ink">
@@ -150,13 +160,13 @@ export default function PublicElectionShow({
                         </aside>
 
                         {election.positions.length === 0 ? (
-                            <div className="public-sketch-card public-paper-grain relative min-h-80 overflow-hidden rounded-[1.4rem] border border-app-border bg-white/64 p-6">
+                            <div className="public-sketch-card public-paper-grain theme-surface relative min-h-80 overflow-hidden rounded-[1.4rem] border border-app-border p-6">
                                 <div
                                     className="public-float absolute top-8 right-9 size-24 rounded-full border border-dashed border-app-ink/12"
                                     aria-hidden="true"
                                 />
                                 <div className="relative flex min-h-68 flex-col justify-between">
-                                    <span className="grid size-14 place-items-center rounded-full bg-app-ink/6 text-app-muted">
+                                    <span className="theme-ink-soft grid size-14 place-items-center rounded-full text-app-muted">
                                         <Vote className="size-8" />
                                     </span>
                                     <div>
@@ -165,8 +175,8 @@ export default function PublicElectionShow({
                                             aria-hidden="true"
                                         />
                                         <p className="max-w-sm text-sm leading-7 text-app-muted">
-                                            No positions have been listed for this
-                                            election.
+                                            No positions have been listed for
+                                            this election.
                                         </p>
                                         <p className="public-hand mt-3 rotate-[-2deg] text-base text-app-muted/80">
                                             space reserved
@@ -176,52 +186,67 @@ export default function PublicElectionShow({
                             </div>
                         ) : (
                             <div className="grid gap-10">
-                                {election.positions.map((position, positionIndex) => (
-                                    <section
-                                        key={position.id}
-                                        className="public-scroll-rise"
-                                    >
-                                        <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-                                            <div>
-                                                <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
-                                                    Position {positionIndex + 1}
-                                                </p>
-                                                <h2 className="mt-2 text-3xl leading-tight font-semibold tracking-[-0.03em] text-app-ink md:text-4xl">
-                                                    {position.title}
-                                                </h2>
-                                                {position.description && (
-                                                    <p className="mt-3 max-w-2xl text-sm leading-7 text-app-muted">
-                                                        {position.description}
+                                {election.positions.map(
+                                    (position, positionIndex) => (
+                                        <section
+                                            key={position.id}
+                                            className="public-scroll-rise"
+                                        >
+                                            <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                                                <div>
+                                                    <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
+                                                        Position{' '}
+                                                        {positionIndex + 1}
                                                     </p>
-                                                )}
+                                                    <h2 className="mt-2 text-3xl leading-tight font-semibold tracking-[-0.03em] text-app-ink md:text-4xl">
+                                                        {position.title}
+                                                    </h2>
+                                                    {position.description && (
+                                                        <p className="mt-3 max-w-2xl text-sm leading-7 text-app-muted">
+                                                            {
+                                                                position.description
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <p className="theme-surface rounded-full border border-app-border px-4 py-2 text-xs font-medium tracking-[0.14em] text-app-muted uppercase">
+                                                    {position.candidates.length}{' '}
+                                                    candidate
+                                                    {position.candidates
+                                                        .length === 1
+                                                        ? ''
+                                                        : 's'}
+                                                </p>
                                             </div>
-                                            <p className="rounded-full border border-app-border bg-white/64 px-4 py-2 text-xs font-medium tracking-[0.14em] text-app-muted uppercase">
-                                                {position.candidates.length} candidate
-                                                {position.candidates.length === 1
-                                                    ? ''
-                                                    : 's'}
-                                            </p>
-                                        </div>
 
-                                        {position.candidates.length === 0 ? (
-                                            <div className="public-sketch-card rounded-[1.2rem] border border-dashed border-app-border bg-white/58 p-5 text-sm leading-7 text-app-muted">
-                                                No candidates listed for this position.
-                                            </div>
-                                        ) : (
-                                            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                                                {position.candidates.map((candidate) => (
-                                                    <CandidateCard
-                                                        key={candidate.id}
-                                                        candidate={candidate}
-                                                        resultsVisible={
-                                                            election.results_visible
-                                                        }
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </section>
-                                ))}
+                                            {position.candidates.length ===
+                                            0 ? (
+                                                <div className="public-sketch-card theme-surface rounded-[1.2rem] border border-dashed border-app-border p-5 text-sm leading-7 text-app-muted">
+                                                    No candidates listed for
+                                                    this position.
+                                                </div>
+                                            ) : (
+                                                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                                                    {position.candidates.map(
+                                                        (candidate) => (
+                                                            <CandidateCard
+                                                                key={
+                                                                    candidate.id
+                                                                }
+                                                                candidate={
+                                                                    candidate
+                                                                }
+                                                                resultsVisible={
+                                                                    election.results_visible
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                        </section>
+                                    ),
+                                )}
                             </div>
                         )}
                     </div>
@@ -241,8 +266,8 @@ function ElectionMetric({
     value: number | string;
 }) {
     return (
-        <div className="public-sketch-card flex items-center gap-4 rounded-[1.2rem] border border-app-border bg-white/72 p-4 shadow-[0_14px_45px_rgba(28,24,38,0.045)]">
-            <span className="grid size-11 place-items-center rounded-full bg-app-ink/6 text-app-red [&_svg]:size-5">
+        <div className="public-sketch-card theme-surface flex items-center gap-4 rounded-[1.2rem] border border-app-border p-4 shadow-[0_14px_45px_rgba(28,24,38,0.045)]">
+            <span className="theme-ink-soft grid size-11 place-items-center rounded-full text-app-red [&_svg]:size-5">
                 {icon}
             </span>
             <span>
@@ -267,7 +292,7 @@ function CandidateCard({
     const initial = candidate.student_name?.slice(0, 1) ?? '?';
 
     return (
-        <article className="public-sketch-card public-scroll-rise group overflow-hidden rounded-[1.25rem] border border-app-border bg-white/76 shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white">
+        <article className="public-sketch-card public-scroll-rise group theme-surface overflow-hidden rounded-[1.25rem] border border-app-border shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:hover:bg-app-surface">
             <div className="relative aspect-[4/3] overflow-hidden bg-app-surface-muted/70">
                 {candidate.poster_url ? (
                     <img
@@ -291,7 +316,7 @@ function CandidateCard({
                     aria-hidden="true"
                 />
                 {resultsVisible && candidate.votes_count !== null && (
-                    <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-app-ink px-3 py-2 text-xs font-semibold tracking-[0.12em] text-white uppercase">
+                    <span className="theme-primary-active absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold tracking-[0.12em] uppercase">
                         <Trophy className="size-4 text-app-brass" />
                         {candidate.votes_count} votes
                     </span>

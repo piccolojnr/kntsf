@@ -68,7 +68,7 @@ export default function PublicHome({
                 />
             </Head>
 
-            <section className="relative min-h-screen overflow-hidden bg-app-ink text-white">
+            <section className="theme-ink-panel relative min-h-screen overflow-hidden">
                 <div
                     className="absolute inset-0 bg-cover bg-center lg:bg-[center_left]"
                     style={{
@@ -81,7 +81,7 @@ export default function PublicHome({
                     aria-hidden="true"
                 />
                 <div
-                    className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-app-ink/72 to-transparent"
+                    className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#1c1826]/72 to-transparent"
                     aria-hidden="true"
                 />
 
@@ -102,7 +102,7 @@ export default function PublicHome({
                                 Clear campus information, all in one place.
                             </h1>
                             <span
-                                className="mt-4 block h-1.5 w-44 rounded-full bg-white/80 [clip-path:polygon(0_45%,18%_30%,38%_58%,58%_36%,78%_54%,100%_40%,100%_76%,0_84%)]"
+                                className="theme-surface-strong mt-4 block h-1.5 w-44 rounded-full [clip-path:polygon(0_45%,18%_30%,38%_58%,58%_36%,78%_54%,100%_40%,100%_76%,0_84%)]"
                                 aria-hidden="true"
                             />
                         </div>
@@ -110,7 +110,7 @@ export default function PublicHome({
                             Notices, services, events, documents, elections, and
                             SRC leadership records for students.
                         </p>
-                        <div className="mt-8 flex flex-wrap gap-3">
+                        <div className="mt-8 inline-flex flex-wrap gap-2 rounded-full border border-white/14 bg-black/12 p-1.5 backdrop-blur-md">
                             <HeroAction
                                 href={announcementsIndex()}
                                 label="View notices"
@@ -125,7 +125,7 @@ export default function PublicHome({
                 </div>
             </section>
 
-            <section className="relative overflow-hidden border-b border-app-border/80 bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden border-b border-app-border/80">
                 <div
                     className="public-notebook-grid pointer-events-none absolute inset-0 opacity-45"
                     aria-hidden="true"
@@ -151,7 +151,7 @@ export default function PublicHome({
                             noticeCount={secondaryNotices.length}
                         />
 
-                        <div className="grid overflow-hidden rounded-[1.4rem] border border-app-border bg-white/80 shadow-[0_18px_55px_rgba(28,24,38,0.06)] sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="theme-surface-strong grid overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_18px_55px_rgba(28,24,38,0.06)] sm:grid-cols-2 lg:grid-cols-4">
                             <ServiceLink
                                 href={announcementsIndex()}
                                 icon={<Bell />}
@@ -199,7 +199,7 @@ export default function PublicHome({
                 </div>
             </section>
 
-            <section className="relative overflow-hidden border-y border-app-border/80 bg-white/58 dark:bg-app-surface/30">
+            <section className="theme-surface relative overflow-hidden border-y border-app-border/80 dark:bg-app-surface/30">
                 <div
                     className="pointer-events-none absolute top-10 right-0 h-64 w-64 rounded-full border border-app-red/8"
                     aria-hidden="true"
@@ -223,7 +223,7 @@ export default function PublicHome({
                         <p className="public-hand absolute -top-5 right-8 z-10 hidden rotate-[-5deg] text-base text-app-muted md:block">
                             next up
                         </p>
-                        <div className="public-sketch-card divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border bg-[#f8f7f3] shadow-[0_18px_55px_rgba(28,24,38,0.06)] dark:bg-app-page">
+                        <div className="public-sketch-card theme-paper divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_18px_55px_rgba(28,24,38,0.06)] dark:bg-app-page">
                             {eventItems.length > 0 ? (
                                 eventItems
                                     .slice(0, 5)
@@ -251,7 +251,7 @@ export default function PublicHome({
                         title="Recent documents"
                         href={documentsIndex()}
                     />
-                    <div className="public-sketch-card mt-6 divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border bg-white/76 shadow-[0_18px_55px_rgba(28,24,38,0.05)] dark:bg-app-surface/60">
+                    <div className="public-sketch-card theme-surface mt-6 divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_18px_55px_rgba(28,24,38,0.05)] dark:bg-app-surface/60">
                         {documentItems.length > 0 ? (
                             documentItems
                                 .slice(0, 4)
@@ -276,7 +276,7 @@ export default function PublicHome({
                         title="Elections"
                         href={electionsIndex()}
                     />
-                    <div className="public-sketch-card mt-6 divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border bg-white/76 shadow-[0_18px_55px_rgba(28,24,38,0.05)] dark:bg-app-surface/60">
+                    <div className="public-sketch-card theme-surface mt-6 divide-y divide-app-border overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_18px_55px_rgba(28,24,38,0.05)] dark:bg-app-surface/60">
                         {electionItems.length > 0 ? (
                             electionItems
                                 .slice(0, 4)
@@ -295,7 +295,7 @@ export default function PublicHome({
 
             {executiveItems.length > 0 && (
                 <section className="public-rise mx-auto w-full max-w-7xl px-5 pb-20 md:px-8">
-                    <div className="public-sketch-card grid overflow-hidden rounded-[1.6rem] border border-app-border bg-app-ink text-white shadow-[0_22px_70px_rgba(28,24,38,0.16)] lg:grid-cols-[0.8fr_1.2fr] dark:bg-app-surface">
+                    <div className="public-sketch-card theme-ink-panel grid overflow-hidden rounded-[1.6rem] border border-app-border shadow-[0_22px_70px_rgba(28,24,38,0.16)] lg:grid-cols-[0.8fr_1.2fr]">
                         <div className="border-b border-white/10 p-6 md:p-8 lg:border-r lg:border-b-0">
                             <div>
                                 <p className="text-xs font-semibold tracking-[0.22em] text-white/50 uppercase">
@@ -366,10 +366,10 @@ function HeroAction({
     return (
         <Link
             href={href}
-            className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition duration-300 hover:-translate-y-0.5 ${
+            className={`inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 md:px-5 ${
                 variant === 'primary'
-                    ? 'bg-white text-app-ink hover:bg-white/88'
-                    : 'border border-white/28 bg-black/10 text-white backdrop-blur-sm hover:bg-white/12'
+                    ? 'bg-white text-[#1c1826] shadow-[0_12px_34px_rgba(0,0,0,0.18)] hover:bg-white/88'
+                    : 'border border-white/14 bg-white/8 text-white hover:bg-white/14'
             }`}
         >
             {label}
@@ -387,7 +387,7 @@ function LatestNotice({
 }) {
     if (!notice) {
         return (
-            <div className="public-sketch-card rounded-2xl border border-app-border bg-white/75 p-5">
+            <div className="public-sketch-card theme-surface rounded-2xl border border-app-border p-5">
                 <EmptyLine message="No public notice has been published yet." />
             </div>
         );
@@ -396,14 +396,14 @@ function LatestNotice({
     return (
         <Link
             href={announcementShow(notice.slug)}
-            className="public-sketch-card group flex min-h-full flex-col justify-between rounded-2xl border border-app-border bg-white/75 p-5 transition duration-300 hover:border-app-red/35 hover:bg-white"
+            className="public-sketch-card group theme-surface flex min-h-full flex-col justify-between rounded-2xl border border-app-border p-5 transition duration-300 hover:border-app-red/35 hover:bg-white dark:hover:bg-app-surface"
         >
             <div>
                 <div className="flex items-center justify-between gap-4">
                     <p className="text-xs font-semibold tracking-[0.18em] text-app-red uppercase">
                         Latest notice
                     </p>
-                    <span className="rounded-full bg-app-ink/6 px-2.5 py-1 text-[0.68rem] font-semibold text-app-muted">
+                    <span className="theme-ink-soft rounded-full px-2.5 py-1 text-[0.68rem] font-semibold text-app-muted">
                         {noticeCount} more
                     </span>
                 </div>
@@ -442,9 +442,9 @@ function ServiceLink({
     return (
         <Link
             href={href}
-            className="group relative border-b border-app-border p-5 transition duration-300 last:border-b-0 hover:z-10 hover:bg-[#f8f7f3] hover:shadow-[0_18px_50px_rgba(28,24,38,0.08)] sm:odd:border-r lg:border-r lg:border-b-0 lg:last:border-r-0 sm:[&:nth-child(3)]:border-b-0"
+            className="group relative border-b border-app-border p-5 transition duration-300 last:border-b-0 hover:z-10 hover:bg-[#f8f7f3] hover:shadow-[0_18px_50px_rgba(28,24,38,0.08)] sm:odd:border-r lg:border-r lg:border-b-0 lg:last:border-r-0 dark:hover:bg-app-page sm:[&:nth-child(3)]:border-b-0"
         >
-            <span className="mb-8 flex size-9 items-center justify-center rounded-full bg-app-ink/6 text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-app-ink group-hover:text-white [&_svg]:size-4">
+            <span className="mb-8 flex size-9 items-center justify-center rounded-full bg-[#1c1826]/6 text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-[#1c1826] group-hover:text-white dark:bg-white/8 dark:group-hover:bg-app-brass dark:group-hover:text-[#1c1826] [&_svg]:size-4">
                 {icon}
             </span>
             <span className="block text-sm font-semibold text-app-ink">
@@ -475,7 +475,7 @@ function ImagePanel({
             className={`public-sketch-card group relative min-h-72 overflow-hidden rounded-[1.4rem] border ${
                 dark
                     ? 'border-white/12 bg-white/[0.06]'
-                    : 'border-app-border bg-white/72'
+                    : 'theme-surface border-app-border'
             } ${className}`}
         >
             <img
@@ -486,8 +486,8 @@ function ImagePanel({
             <div
                 className={`absolute inset-0 ${
                     dark
-                        ? 'bg-gradient-to-t from-app-ink/80 via-app-ink/12 to-transparent'
-                        : 'bg-gradient-to-t from-app-ink/55 via-app-ink/5 to-transparent'
+                        ? 'bg-gradient-to-t from-[#1c1826]/80 via-[#1c1826]/12 to-transparent'
+                        : 'bg-gradient-to-t from-[#1c1826]/55 via-[#1c1826]/5 to-transparent'
                 }`}
                 aria-hidden="true"
             />
@@ -495,7 +495,7 @@ function ImagePanel({
                 className="absolute inset-4 rounded-[1.05rem] border border-white/18"
                 aria-hidden="true"
             />
-            <figcaption className="public-hand absolute right-5 bottom-5 rotate-[-3deg] rounded-full bg-white/88 px-4 py-2 text-base text-app-ink shadow-[0_14px_40px_rgba(12,10,18,0.16)]">
+            <figcaption className="public-hand theme-surface-strong absolute right-5 bottom-5 rotate-[-3deg] rounded-full px-4 py-2 text-base text-app-ink shadow-[0_14px_40px_rgba(12,10,18,0.16)]">
                 <span className="sr-only">{alt}: </span>
                 <span aria-hidden="true">{label}</span>
             </figcaption>
@@ -590,7 +590,7 @@ function SectionHeader({
 
 function StatPill({ label, value }: { label: string; value: number }) {
     return (
-        <div className="public-sketch-card group relative overflow-hidden rounded-[1.2rem] border border-app-border bg-white/72 p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)] transition duration-300 hover:-translate-y-1 hover:bg-white dark:bg-app-surface/60">
+        <div className="public-sketch-card group theme-surface relative overflow-hidden rounded-[1.2rem] border border-app-border p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)] transition duration-300 hover:-translate-y-1 hover:bg-white dark:hover:bg-app-surface">
             <span
                 className="absolute top-4 right-4 h-8 w-8 rounded-full border border-dashed border-app-ink/12"
                 aria-hidden="true"
@@ -611,7 +611,7 @@ function EventRow({ event }: { event: EventSummary }) {
             href={eventShow(event.slug)}
             className="group grid gap-4 p-5 transition duration-300 hover:bg-white md:grid-cols-[8rem_minmax(0,1fr)_auto] md:items-center dark:hover:bg-app-surface"
         >
-            <div className="rounded-full border border-app-border bg-white/60 px-3 py-2 text-center dark:bg-app-surface">
+            <div className="theme-surface rounded-full border border-app-border px-3 py-2 text-center dark:bg-app-surface">
                 <MetaLine label={formatPublicDate(event.starts_at)} />
             </div>
             <span>
@@ -712,7 +712,7 @@ function EmptyLine({ message }: { message: string }) {
                 aria-hidden="true"
             />
             <div className="relative flex min-h-46 flex-col justify-between">
-                <div className="grid size-10 place-items-center rounded-full bg-app-ink/6 text-app-muted">
+                <div className="theme-ink-soft grid size-10 place-items-center rounded-full text-app-muted">
                     <Bell className="size-4" />
                 </div>
                 <div>

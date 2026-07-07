@@ -39,7 +39,7 @@ export function PermitFlowSteps({ current }: { current: PermitFlowStage }) {
     const currentIndex = stageOrder[current];
 
     return (
-        <div className="public-sketch-card public-scroll-rise rounded-[1.2rem] border border-app-border bg-white/68 p-2 shadow-[0_14px_44px_rgba(28,24,38,0.045)]">
+        <div className="public-sketch-card public-scroll-rise theme-surface rounded-[1.2rem] border border-app-border p-2 shadow-[0_14px_44px_rgba(28,24,38,0.045)]">
             <div className="grid gap-2 md:grid-cols-3">
                 {steps.map((step, index) => {
                     const isComplete = index < currentIndex;
@@ -50,10 +50,10 @@ export function PermitFlowSteps({ current }: { current: PermitFlowStage }) {
                             key={step.key}
                             className={`rounded-[1rem] border px-4 py-3 transition duration-300 ${
                                 isActive
-                                    ? 'border-app-ink bg-app-ink text-white shadow-[0_14px_32px_rgba(28,24,38,0.16)]'
+                                    ? 'theme-primary-active border-transparent shadow-[0_14px_32px_rgba(28,24,38,0.16)]'
                                     : isComplete
                                       ? 'border-app-green/30 bg-app-green/10 text-app-ink'
-                                      : 'border-transparent bg-[#f8f7f3]/68 text-app-muted'
+                                      : 'theme-surface-muted border-transparent text-app-muted'
                             }`}
                         >
                             <div className="flex items-start gap-3">
@@ -62,8 +62,8 @@ export function PermitFlowSteps({ current }: { current: PermitFlowStage }) {
                                         isActive
                                             ? 'bg-white/14 text-white'
                                             : isComplete
-                                              ? 'text-app-green bg-white'
-                                              : 'bg-white text-app-muted'
+                                              ? 'theme-surface-strong text-app-green'
+                                              : 'theme-surface-strong text-app-muted'
                                     }`}
                                 >
                                     {isComplete ? (

@@ -15,7 +15,7 @@ export function PermitRequestSummary({
               : 'This request includes a self-service student record and may require administrative review after payment.';
 
     return (
-        <section className="public-sketch-card public-scroll-rise rounded-[1.35rem] border border-app-border bg-white/76 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]">
+        <section className="public-sketch-card public-scroll-rise theme-surface rounded-[1.35rem] border border-app-border p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
@@ -65,7 +65,7 @@ export function PermitRequestSummary({
 
 function Detail({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-[1rem] border border-app-border bg-[#f8f7f3]/74 p-3">
+        <div className="theme-surface-muted rounded-[1rem] border border-app-border p-3">
             <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-app-muted uppercase">
                 {label}
             </p>

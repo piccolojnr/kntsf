@@ -27,7 +27,7 @@ export default function PublicEventsIndex({
                 count={items.length}
                 backgroundImageUrl="/images/events.jpg"
             />
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="absolute top-20 right-[8%] size-48 rounded-full bg-app-brass/12 blur-3xl"
                     aria-hidden="true"
@@ -41,8 +41,8 @@ export default function PublicEventsIndex({
                             What is happening next
                         </h2>
                         <p className="mt-4 text-sm leading-7 text-app-muted">
-                            Browse public programmes, meetings, and student activities
-                            worth noting.
+                            Browse public programmes, meetings, and student
+                            activities worth noting.
                         </p>
                         <p className="public-hand public-scroll-mark mt-6 rotate-[-2deg] text-base text-app-muted">
                             save the date

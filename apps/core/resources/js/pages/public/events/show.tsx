@@ -13,11 +13,14 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
         <>
             <Head>
                 <title>{event.title}</title>
-                <meta name="description" content={event.excerpt ?? event.title} />
+                <meta
+                    name="description"
+                    content={event.excerpt ?? event.title}
+                />
             </Head>
 
             <article>
-                <section className="relative overflow-hidden bg-[#f8f7f3]">
+                <section className="theme-paper relative overflow-hidden">
                     <div
                         className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                         aria-hidden="true"
@@ -60,7 +63,7 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                             </p>
                         </div>
 
-                        <figure className="public-sketch-card relative min-h-72 overflow-hidden rounded-[1.5rem] border border-app-border bg-app-ink shadow-[0_20px_60px_rgba(28,24,38,0.09)]">
+                        <figure className="public-sketch-card theme-ink-panel relative min-h-72 overflow-hidden rounded-[1.5rem] border border-app-border shadow-[0_20px_60px_rgba(28,24,38,0.09)]">
                             {event.image_url ? (
                                 <img
                                     src={event.image_url}
@@ -68,7 +71,7 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                                     className="public-scroll-drift size-full object-cover"
                                 />
                             ) : (
-                                <div className="public-paper-grain flex size-full min-h-72 items-center justify-center bg-app-ink text-white">
+                                <div className="public-paper-grain theme-ink-panel flex size-full min-h-72 items-center justify-center">
                                     <div
                                         className="public-float absolute top-8 right-8 size-24 rounded-full border border-dashed border-white/20"
                                         aria-hidden="true"
@@ -77,7 +80,7 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                                 </div>
                             )}
                             <div
-                                className="absolute inset-0 bg-gradient-to-t from-app-ink/42 via-transparent to-transparent"
+                                className="absolute inset-0 bg-gradient-to-t from-[#1c1826]/42 via-transparent to-transparent"
                                 aria-hidden="true"
                             />
                             <div
@@ -88,10 +91,10 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                     </div>
                 </section>
 
-                <section className="relative overflow-hidden bg-[#f8f7f3]">
+                <section className="theme-paper relative overflow-hidden">
                     <div className="public-scroll-rise mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_1fr] lg:py-18">
                         <aside>
-                            <div className="public-sketch-card sticky top-28 rounded-[1.25rem] border border-app-border bg-white/74 p-5 shadow-[0_16px_45px_rgba(28,24,38,0.055)]">
+                            <div className="public-sketch-card theme-surface sticky top-28 rounded-[1.25rem] border border-app-border p-5 shadow-[0_16px_45px_rgba(28,24,38,0.055)]">
                                 <p className="mb-5 text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
                                     Event details
                                 </p>
@@ -103,18 +106,25 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                                         {formatDateTime(event.starts_at)}
                                         {event.ends_at && (
                                             <span className="mt-1 block text-xs text-app-muted">
-                                                Until {formatDateTime(event.ends_at)}
+                                                Until{' '}
+                                                {formatDateTime(event.ends_at)}
                                             </span>
                                         )}
                                     </DetailRow>
                                 )}
                                 {event.location && (
-                                    <DetailRow icon={<MapPin />} label="Location">
+                                    <DetailRow
+                                        icon={<MapPin />}
+                                        label="Location"
+                                    >
                                         {event.location}
                                     </DetailRow>
                                 )}
                                 {event.organizer && (
-                                    <DetailRow icon={<User />} label="Organiser">
+                                    <DetailRow
+                                        icon={<User />}
+                                        label="Organiser"
+                                    >
                                         {event.organizer.name}
                                     </DetailRow>
                                 )}
@@ -123,7 +133,7 @@ export default function PublicEventShow({ event }: { event: EventDetail }) {
                                 </p>
                             </div>
                         </aside>
-                        <div className="public-sketch-card max-w-3xl rounded-[1.4rem] border border-app-border bg-white/78 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)] md:p-9">
+                        <div className="public-sketch-card theme-surface max-w-3xl rounded-[1.4rem] border border-app-border p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)] md:p-9">
                             <RichTextViewer value={event.description} />
                         </div>
                     </div>
@@ -150,7 +160,9 @@ function DetailRow({
                     {label}
                 </p>
             </div>
-            <div className="text-sm leading-6 font-semibold text-app-ink">{children}</div>
+            <div className="text-sm leading-6 font-semibold text-app-ink">
+                {children}
+            </div>
         </div>
     );
 }

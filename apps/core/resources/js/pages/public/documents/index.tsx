@@ -27,9 +27,9 @@ export default function PublicDocumentsIndex({
                 count={items.length}
                 backgroundImageUrl="/images/campus-moment.jpg"
             />
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
-                    className="absolute top-16 right-[7%] size-52 rounded-full bg-app-ink/6 blur-3xl"
+                    className="theme-ink-soft absolute top-16 right-[7%] size-52 rounded-full blur-3xl"
                     aria-hidden="true"
                 />
                 <div className="public-scroll-rise mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:py-18">
@@ -41,8 +41,8 @@ export default function PublicDocumentsIndex({
                             Filed for public access
                         </h2>
                         <p className="mt-4 text-sm leading-7 text-app-muted">
-                            Policies, forms, minutes, and reports stay arranged here
-                            for students to find quickly.
+                            Policies, forms, minutes, and reports stay arranged
+                            here for students to find quickly.
                         </p>
                         <p className="public-hand public-scroll-mark mt-6 rotate-[-2deg] text-base text-app-muted">
                             filed neatly
@@ -63,7 +63,9 @@ export default function PublicDocumentsIndex({
                                         title={document.title}
                                         description={document.excerpt}
                                         imageUrl={document.image_url}
-                                        meta={formatPublicDate(document.published_at)}
+                                        meta={formatPublicDate(
+                                            document.published_at,
+                                        )}
                                         category={document.category}
                                         href={show(document.slug)}
                                         tone="ink"

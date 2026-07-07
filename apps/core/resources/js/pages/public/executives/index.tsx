@@ -30,7 +30,7 @@ export default function PublicExecutivesIndex({
                 backgroundImageUrl="/images/leadership-photo.jpg"
             />
 
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="absolute top-14 right-[8%] size-52 rounded-full bg-app-brass/12 blur-3xl"
                     aria-hidden="true"
@@ -65,7 +65,7 @@ export default function PublicExecutivesIndex({
                                 {items.map((executive) => (
                                     <article
                                         key={executive.id}
-                                        className="public-sketch-card public-scroll-rise group overflow-hidden rounded-[1.25rem] border border-app-border bg-white/76 shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:bg-app-surface/70"
+                                        className="public-sketch-card public-scroll-rise group theme-surface overflow-hidden rounded-[1.25rem] border border-app-border shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:hover:bg-app-surface"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden bg-app-surface-muted/70">
                                             {executive.avatar_url ? (
@@ -102,13 +102,17 @@ export default function PublicExecutivesIndex({
                                             </p>
                                             {executive.position_description && (
                                                 <p className="mt-3 line-clamp-2 text-sm leading-6 text-app-muted">
-                                                    {executive.position_description}
+                                                    {
+                                                        executive.position_description
+                                                    }
                                                 </p>
                                             )}
                                             {executive.biography && (
                                                 <div className="mt-4 line-clamp-4 border-t border-app-border pt-4 text-sm leading-6 text-app-muted">
                                                     <RichTextViewer
-                                                        value={executive.biography}
+                                                        value={
+                                                            executive.biography
+                                                        }
                                                     />
                                                 </div>
                                             )}

@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Activity, ArrowLeft, LockKeyhole, ShieldCheck } from 'lucide-react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { home } from '@/routes';
 import type { AuthLayoutProps, SharedPageProps } from '@/types';
 
@@ -12,7 +13,7 @@ export default function AuthSimpleLayout({
     const { name } = usePage<SharedPageProps>().props;
 
     return (
-        <div className="app-page relative min-h-svh overflow-hidden bg-[#f8f7f3] text-app-ink dark:bg-app-page">
+        <div className="app-page theme-paper relative min-h-svh overflow-hidden text-app-ink">
             <div
                 className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                 aria-hidden="true"
@@ -22,12 +23,12 @@ export default function AuthSimpleLayout({
                 aria-hidden="true"
             />
             <div
-                className="absolute bottom-[-9rem] left-[-7rem] size-72 rounded-full border border-app-border/80 bg-app-ink/5 dark:bg-white/5"
+                className="absolute bottom-[-9rem] left-[-7rem] size-72 rounded-full border border-app-border/80 bg-[#1c1826]/5 dark:bg-white/5"
                 aria-hidden="true"
             />
 
             <main className="relative mx-auto grid min-h-svh w-full max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(25rem,31rem)] lg:items-stretch lg:px-8 lg:py-8">
-                <section className="relative hidden overflow-hidden rounded-[1.5rem] border border-app-border bg-app-ink p-8 text-white shadow-[0_24px_80px_rgba(28,24,38,0.18)] lg:flex lg:flex-col lg:justify-between">
+                <section className="theme-ink-panel relative hidden overflow-hidden rounded-[1.5rem] border border-app-border p-8 shadow-[0_24px_80px_rgba(28,24,38,0.18)] lg:flex lg:flex-col lg:justify-between">
                     <div
                         className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(255,182,6,0.18),transparent_28%),radial-gradient(circle_at_88%_12%,rgba(255,255,255,0.12),transparent_24%)]"
                         aria-hidden="true"
@@ -80,18 +81,21 @@ export default function AuthSimpleLayout({
                                 <ArrowLeft className="size-4" />
                                 Public portal
                             </Link>
-                            <div className="flex items-center gap-2 lg:hidden">
-                                <span className="grid size-9 place-items-center overflow-hidden rounded-full bg-app-ink">
-                                    <AppLogoIcon className="size-full object-cover" />
-                                </span>
-                                <span className="text-sm font-semibold text-app-ink">
-                                    {name}
-                                </span>
+                            <div className="flex items-center gap-2">
+                                <ThemeToggle />
+                                <div className="hidden items-center gap-2 sm:flex lg:hidden">
+                                    <span className="grid size-9 place-items-center overflow-hidden rounded-full bg-[#1c1826] dark:bg-app-brass">
+                                        <AppLogoIcon className="size-full object-cover" />
+                                    </span>
+                                    <span className="text-sm font-semibold text-app-ink">
+                                        {name}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[1.35rem] border border-app-border bg-white/82 shadow-[0_22px_70px_rgba(28,24,38,0.09)] backdrop-blur-xl dark:bg-app-surface/88 dark:shadow-none">
-                            <div className="border-b border-app-border bg-[#fbfaf7]/86 px-6 py-6 sm:px-8 dark:bg-app-surface-muted/50">
+                        <div className="theme-surface-strong overflow-hidden rounded-[1.35rem] border border-app-border shadow-[0_22px_70px_rgba(28,24,38,0.09)] backdrop-blur-xl dark:shadow-none">
+                            <div className="theme-paper-soft border-b border-app-border px-6 py-6 sm:px-8">
                                 <p className="text-xs font-semibold tracking-[0.2em] text-app-red uppercase">
                                     Staff dashboard
                                 </p>

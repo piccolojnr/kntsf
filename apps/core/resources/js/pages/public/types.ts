@@ -44,7 +44,12 @@ export type DocumentSummary = {
     published_at: string | null;
     image_url: string | null;
     author: { name: string } | null;
-    files: Array<{ id: number; file_name: string; human_size: string; url: string }>;
+    files: Array<{
+        id: number;
+        file_name: string;
+        human_size: string;
+        url: string;
+    }>;
 };
 
 export type DocumentDetail = DocumentSummary & {

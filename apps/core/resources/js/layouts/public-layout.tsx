@@ -3,6 +3,7 @@ import { ArrowUpRight, ChevronRight, Menu, ShieldCheck, X } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { home } from '@/routes';
 import { index as announcementsIndex } from '@/routes/public/announcements';
 import { index as documentsIndex } from '@/routes/public/documents';
@@ -67,7 +68,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
     }
 
     return (
-        <div className="public-page relative overflow-x-hidden bg-[#f8f7f3] text-app-ink dark:bg-app-page">
+        <div className="public-page theme-paper relative overflow-x-hidden text-app-ink">
             <header
                 className={`top-0 z-40 w-full px-3 py-3 text-app-ink transition-all duration-300 ${
                     hasImageBackedHeader ? 'fixed' : 'sticky'
@@ -77,7 +78,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                     className={`mx-auto flex h-15 w-full max-w-7xl items-center justify-between rounded-full border px-3 shadow-[0_18px_60px_rgba(12,10,18,0.08)] transition-all duration-300 md:px-4 ${
                         transparentHeader
                             ? 'border-white/16 bg-white/[0.07] shadow-none backdrop-blur-[2px]'
-                            : 'border-app-border/80 bg-[#f8f7f3]/92 backdrop-blur-xl dark:bg-app-page/92'
+                            : 'border-app-border/80 bg-[#f8f7f3]/92 backdrop-blur-xl dark:bg-app-surface/92'
                     }`}
                 >
                     <Link
@@ -88,7 +89,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                             className={`grid size-10 shrink-0 place-items-center overflow-hidden rounded-full transition duration-300 group-hover:scale-95 ${
                                 transparentHeader
                                     ? 'bg-white/14 ring-1 ring-white/18'
-                                    : 'bg-app-ink ring-1 ring-app-border dark:bg-app-surface'
+                                    : 'bg-[#1c1826] ring-1 ring-app-border dark:bg-app-brass'
                             }`}
                         >
                             <AppLogoIcon className="size-full object-cover" />
@@ -119,21 +120,21 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                         className={`hidden items-center gap-1 rounded-full border p-1 lg:flex ${
                             transparentHeader
                                 ? 'border-white/12 bg-black/10'
-                                : 'border-app-border bg-white/60 dark:bg-app-surface/60'
+                                : 'border-app-border bg-white/60 dark:bg-app-page/60'
                         }`}
                     >
                         {navItems.map((item) => (
                             <Link
                                 key={item.label}
                                 href={item.href}
-                                className={`rounded-full px-3.5 py-2 text-xs font-semibold transition duration-200 ${
+                                className={`rounded-full border border-transparent px-3.5 py-2 text-xs font-semibold transition duration-200 ${
                                     transparentHeader
                                         ? isActive(item.url)
-                                            ? 'bg-white text-app-ink'
+                                            ? 'border border-white/18 bg-white/14 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]'
                                             : 'text-white/72 hover:bg-white/10 hover:text-white'
                                         : isActive(item.url)
-                                          ? 'bg-app-ink text-white'
-                                          : 'text-app-muted hover:bg-app-ink/5 hover:text-app-ink'
+                                          ? 'theme-primary-active'
+                                          : 'text-app-muted hover:bg-[#1c1826]/5 hover:text-app-ink dark:hover:bg-white/8'
                                 }`}
                             >
                                 {item.label}
@@ -141,30 +142,43 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                         ))}
                     </nav>
 
-                    <Link
-                        href={permitRequestIndex()}
-                        className={`hidden items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition duration-200 md:flex ${
+                    <div
+                        className={`hidden items-center gap-1 rounded-full border p-1 md:flex ${
                             transparentHeader
-                                ? 'border-white/18 bg-white text-app-ink hover:bg-white/88'
-                                : 'border-app-ink bg-app-ink text-white hover:border-app-red hover:bg-app-red'
+                                ? 'border-white/12 bg-black/10'
+                                : 'border-app-border bg-white/60 dark:bg-app-page/60'
                         }`}
                     >
-                        <ShieldCheck
-                            className={`size-3.5 ${
+                        <Link
+                            href={permitRequestIndex()}
+                            className={`inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition duration-200 ${
                                 transparentHeader
-                                    ? 'text-app-red'
-                                    : 'text-white'
+                                    ? 'border border-white/14 bg-white/12 text-white hover:bg-white/18'
+                                    : 'theme-primary-action'
                             }`}
+                        >
+                            <ShieldCheck
+                                className={`size-3.5 ${
+                                    transparentHeader
+                                        ? 'text-app-brass'
+                                        : 'text-current'
+                                }`}
+                            />
+                            Permit
+                        </Link>
+
+                        <ThemeToggle
+                            variant={transparentHeader ? 'glass' : 'default'}
+                            className="size-9 shadow-none"
                         />
-                        Permit
-                    </Link>
+                    </div>
 
                     <button
                         type="button"
                         className={`grid size-10 place-items-center rounded-full border transition md:hidden ${
                             transparentHeader
                                 ? 'border-white/18 bg-white/10 text-white hover:bg-white/15'
-                                : 'border-app-border bg-white/70 text-app-ink hover:bg-app-surface-muted dark:bg-app-surface'
+                                : 'border-app-border bg-app-surface/80 text-app-ink hover:bg-app-surface-muted dark:bg-app-page'
                         }`}
                         onClick={() => setOpen((value) => !value)}
                         aria-label="Toggle menu"
@@ -178,7 +192,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                 </div>
 
                 {open && (
-                    <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-app-border bg-[#f8f7f3] p-2 shadow-[0_24px_70px_rgba(12,10,18,0.16)] md:hidden dark:bg-app-page">
+                    <div className="theme-paper mx-auto mt-2 max-w-7xl rounded-3xl border border-app-border p-2 shadow-[0_24px_70px_rgba(12,10,18,0.16)] md:hidden">
                         <nav className="grid gap-1">
                             {navItems.map((item) => (
                                 <Link
@@ -186,7 +200,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                     href={item.href}
                                     className={`flex items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition ${
                                         isActive(item.url)
-                                            ? 'bg-app-ink text-white dark:bg-app-surface-muted dark:text-app-ink'
+                                            ? 'theme-primary-active'
                                             : 'text-app-muted hover:bg-white hover:text-app-ink dark:hover:bg-app-surface'
                                     }`}
                                     onClick={() => setOpen(false)}
@@ -196,13 +210,19 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 </Link>
                             ))}
                         </nav>
+                        <div className="mt-2 flex items-center justify-between border-t border-app-border px-3 pt-2">
+                            <span className="text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
+                                Theme
+                            </span>
+                            <ThemeToggle />
+                        </div>
                     </div>
                 )}
             </header>
 
             <main>{children}</main>
 
-            <footer className="relative overflow-hidden border-t border-app-border/80 bg-[#f8f7f3] dark:bg-app-page">
+            <footer className="theme-paper relative overflow-hidden border-t border-app-border/80">
                 <div
                     className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                     aria-hidden="true"
@@ -222,7 +242,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 href={home()}
                                 className="group inline-flex items-center gap-3"
                             >
-                                <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-app-ink ring-1 ring-app-border transition duration-300 group-hover:scale-95 dark:bg-app-surface">
+                                <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-[#1c1826] ring-1 ring-app-border transition duration-300 group-hover:scale-95 dark:bg-app-brass">
                                     <AppLogoIcon className="size-full object-cover" />
                                 </span>
                                 <span>
@@ -243,7 +263,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                             <div className="mt-7 flex flex-wrap items-center gap-3">
                                 <Link
                                     href={permitRequestIndex()}
-                                    className="inline-flex items-center gap-2 rounded-full bg-app-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-app-red"
+                                    className="theme-primary-action inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition"
                                 >
                                     Request permit
                                     <ArrowUpRight className="size-4" />

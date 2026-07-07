@@ -254,6 +254,42 @@
         @apply text-app-muted;
     }
 
+    .theme-paper {
+        @apply bg-[#f8f7f3] dark:bg-app-page;
+    }
+
+    .theme-paper-soft {
+        @apply bg-[#fbfaf7]/86 dark:bg-app-surface-muted/50;
+    }
+
+    .theme-surface {
+        @apply bg-white/76 dark:bg-app-surface/70;
+    }
+
+    .theme-surface-strong {
+        @apply bg-white/88 dark:bg-app-surface;
+    }
+
+    .theme-surface-muted {
+        @apply bg-[#f8f7f3]/74 dark:bg-app-surface-muted/70;
+    }
+
+    .theme-ink-panel {
+        @apply bg-[#1c1826] text-white dark:bg-[#09070d] dark:text-white;
+    }
+
+    .theme-primary-action {
+        @apply bg-[#1c1826] text-white hover:bg-app-red dark:bg-app-brass dark:text-[#1c1826] dark:hover:bg-app-brass/85;
+    }
+
+    .theme-primary-active {
+        @apply bg-[#1c1826] text-white dark:bg-app-brass dark:text-[#1c1826];
+    }
+
+    .theme-ink-soft {
+        @apply bg-[#1c1826]/6 dark:bg-white/8;
+    }
+
     .public-action {
         @apply inline-flex items-center justify-center gap-2 rounded-md bg-app-ink px-4 py-2.5 text-xs font-black tracking-[0.16em] text-app-surface uppercase transition hover:bg-app-red;
     }

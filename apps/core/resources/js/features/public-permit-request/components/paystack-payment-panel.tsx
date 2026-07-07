@@ -19,9 +19,9 @@ export function PaystackPaymentPanel({
     const paymentStatus = permitRequest.payment?.status ?? 'pending';
 
     return (
-        <section className="public-sketch-card public-scroll-rise rounded-[1.35rem] border border-app-border bg-white/76 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]">
+        <section className="public-sketch-card public-scroll-rise theme-surface rounded-[1.35rem] border border-app-border p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]">
             <div className="flex items-start gap-4">
-                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-app-ink/6 text-app-red">
+                <span className="theme-ink-soft grid size-11 shrink-0 place-items-center rounded-full text-app-red">
                     <LockKeyhole className="size-5" />
                 </span>
                 <div>
@@ -38,7 +38,7 @@ export function PaystackPaymentPanel({
                 browser redirect alone will not issue a permit.
             </p>
 
-            <div className="mt-5 rounded-[1rem] border border-app-border bg-[#f8f7f3]/74 p-4 text-sm">
+            <div className="theme-surface-muted mt-5 rounded-[1rem] border border-app-border p-4 text-sm">
                 <div className="flex items-center justify-between gap-4">
                     <span className="text-app-muted">Payment reference</span>
                     <span className="text-right font-semibold break-all">
@@ -67,7 +67,7 @@ export function PaystackPaymentPanel({
             ) : authorizationUrl ? (
                 <a
                     href={authorizationUrl}
-                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-app-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-app-red"
+                    className="theme-primary-action mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition"
                 >
                     Continue to Paystack
                     <ExternalLink className="size-4" />
