@@ -6,9 +6,13 @@ use App\Enums\CandidateStatus;
 use App\Enums\ElectionStatus;
 use App\Enums\NfcCardStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\PermitRequestReviewStatus;
+use App\Enums\PermitRequestStatus;
 use App\Enums\PermitStatus;
 use App\Enums\PollType;
 use App\Enums\PublishStatus;
+use App\Enums\StudentSource;
+use App\Enums\StudentVerificationStatus;
 use App\Enums\VerificationMethod;
 use App\Enums\VerificationResult;
 use App\Enums\Visibility;
@@ -25,6 +29,7 @@ use App\Models\ExecutiveProfile;
 use App\Models\NfcCard;
 use App\Models\Payment;
 use App\Models\Permit;
+use App\Models\PermitRequest;
 use App\Models\Poll;
 use App\Models\PollOption;
 use App\Models\PollVote;
@@ -32,17 +37,22 @@ use App\Models\Student;
 use App\Models\User;
 use App\Models\VerificationLog;
 use App\Support\AuditEvents;
+use App\Support\MediaCollections;
 use App\Support\NfcUidHasher;
 use App\Support\PermitCodeHasher;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DevelopmentSeeder extends Seeder
 {
-    /**
-     * Seed a representative local development dataset.
-     */
+    private const AssetDirectory = 'database/seeders/assets/presentation';
+
+    private const Password = 'password';
+
     public function run(): void
     {
         if (app()->isProduction()) {
@@ -65,7 +75,8 @@ class DevelopmentSeeder extends Seeder
 
             $this->seedExecutiveProfiles($users);
             $permits = $this->seedPermits($students, $periods, $users['admin']);
-            $this->seedPayments($students, $permits, $users['admin']);
+            $payments = $this->seedPayments($students, $permits, $users['admin']);
+            $this->seedPermitRequests($students, $periods->firstWhere('is_active', true), $payments, $users);
             $this->seedNfcCards($students, $users['staff']);
             $this->seedContent($users['admin']);
             $this->seedPolls($students, $users['admin']);
@@ -80,24 +91,24 @@ class DevelopmentSeeder extends Seeder
      */
     private function seedUsers(): array
     {
-        $users = [
-            'super_admin' => $this->demoUser('Local Super Admin', 'superadmin@kntsf.test', 'super_admin'),
-            'admin' => $this->demoUser('Demo SRC Admin', 'admin@kntsf.test', 'admin'),
-            'staff' => $this->demoUser('Demo SRC Staff', 'staff@kntsf.test', 'staff'),
-            'executive' => $this->demoUser('Demo SRC Executive', 'executive@kntsf.test', 'admin'),
+        return [
+            'super_admin' => $this->user('Dr. Miriam Agyeman', 'miriam.agyeman@kntsf.edu.gh', 'super_admin'),
+            'admin' => $this->user('Nathaniel K. Ansah', 'nathaniel.ansah@kntsf.edu.gh', 'admin'),
+            'staff' => $this->user('Selina Adomako', 'selina.adomako@kntsf.edu.gh', 'staff'),
+            'president' => $this->user('Evelyn Boakye', 'evelyn.boakye@kntsf.edu.gh', 'admin'),
+            'secretary' => $this->user('Caleb Mensah', 'caleb.mensah@kntsf.edu.gh', 'admin'),
+            'treasurer' => $this->user('Abigail Tetteh', 'abigail.tetteh@kntsf.edu.gh', 'admin'),
         ];
-
-        return $users;
     }
 
-    private function demoUser(string $name, string $email, string $role): User
+    private function user(string $name, string $email, string $role): User
     {
         $user = User::query()->updateOrCreate([
             'email' => $email,
         ], [
             'name' => $name,
-            'password' => 'password',
-            'email_verified_at' => now(),
+            'password' => self::Password,
+            'email_verified_at' => now()->subMonths(3),
             'is_active' => true,
         ]);
 
@@ -111,31 +122,29 @@ class DevelopmentSeeder extends Seeder
      */
     private function seedAcademicPeriods(): Collection
     {
-        AcademicPeriod::query()->updateOrCreate([
-            'name' => 'First Semester 2025/2026',
-            'academic_year' => '2025/2026',
-        ], [
-            'semester' => 'First Semester',
-            'starts_at' => now()->subMonths(2)->startOfMonth()->toDateString(),
-            'ends_at' => now()->addMonths(2)->endOfMonth()->toDateString(),
-            'is_active' => true,
-            'metadata' => ['seeded' => true],
-        ]);
+        $periods = [
+            ['First Semester 2025/2026', 'First Semester', now()->subMonths(5), now()->subMonths(1), false],
+            ['Second Semester 2025/2026', 'Second Semester', now()->subMonth(), now()->addMonths(3), true],
+            ['First Semester 2026/2027', 'First Semester', now()->addMonths(4), now()->addMonths(8), false],
+        ];
 
-        AcademicPeriod::query()->updateOrCreate([
-            'name' => 'Second Semester 2025/2026',
-            'academic_year' => '2025/2026',
-        ], [
-            'semester' => 'Second Semester',
-            'starts_at' => now()->addMonths(3)->startOfMonth()->toDateString(),
-            'ends_at' => now()->addMonths(7)->endOfMonth()->toDateString(),
-            'is_active' => false,
-            'metadata' => ['seeded' => true],
-        ]);
+        foreach ($periods as [$name, $semester, $startsAt, $endsAt, $active]) {
+            AcademicPeriod::query()->updateOrCreate([
+                'name' => $name,
+                'academic_year' => str_contains($name, '2026/2027') ? '2026/2027' : '2025/2026',
+            ], [
+                'semester' => $semester,
+                'starts_at' => $startsAt->startOfMonth()->toDateString(),
+                'ends_at' => $endsAt->endOfMonth()->toDateString(),
+                'is_active' => $active,
+                'metadata' => ['source' => 'presentation'],
+            ]);
+        }
 
         return AcademicPeriod::query()
-            ->where('academic_year', '2025/2026')
+            ->whereIn('academic_year', ['2025/2026', '2026/2027'])
             ->orderByDesc('is_active')
+            ->orderBy('starts_at')
             ->get();
     }
 
@@ -145,23 +154,39 @@ class DevelopmentSeeder extends Seeder
      */
     private function seedStudents(array $users): Collection
     {
-        $students = collect([
-            ['26100001', 'Ama Serwaa Mensah', 'ama.mensah@student.kntsf.test', 'Computer Science', '400', true],
-            ['26100002', 'Kojo Asare Boateng', 'kojo.boateng@student.kntsf.test', 'Information Technology', '300', true],
-            ['26100003', 'Efua Nkrumah', 'efua.nkrumah@student.kntsf.test', 'Business Administration', '200', true],
-            ['26100004', 'Yaw Osei', 'yaw.osei@student.kntsf.test', 'Public Administration', '100', true],
-            ['26100005', 'Akua Frimpong', 'akua.frimpong@student.kntsf.test', 'Accounting', '300', false],
-            ['26100006', 'Kwame Owusu', 'kwame.owusu@student.kntsf.test', 'Marketing', '200', false],
-            ['26100007', 'Abena Darko', 'abena.darko@student.kntsf.test', 'Mass Communication', '400', false],
-            ['26100008', 'Kofi Addo', 'kofi.addo@student.kntsf.test', 'Economics', '100', false],
-            ['26100009', 'Esi Badu', 'esi.badu@student.kntsf.test', 'Computer Science', '200', false],
-            ['26100010', 'Nana Prempeh', 'nana.prempeh@student.kntsf.test', 'Information Technology', '300', false],
-            ['26100011', 'Afia Adjei', 'afia.adjei@student.kntsf.test', 'Business Administration', '400', false],
-            ['26100012', 'Kweku Sarpong', 'kweku.sarpong@student.kntsf.test', 'Public Administration', '100', false],
-        ]);
+        $rows = [
+            ['26100001', 'Ama Serwaa Mensah', 'ama.mensah@students.kntsf.edu.gh', 'Computer Science', '400', true, StudentVerificationStatus::Verified],
+            ['26100002', 'Kojo Asare Boateng', 'kojo.boateng@students.kntsf.edu.gh', 'Information Technology', '300', true, StudentVerificationStatus::Verified],
+            ['26100003', 'Efua Nkrumah', 'efua.nkrumah@students.kntsf.edu.gh', 'Business Administration', '200', true, StudentVerificationStatus::Verified],
+            ['26100004', 'Yaw Osei', 'yaw.osei@students.kntsf.edu.gh', 'Public Administration', '100', true, StudentVerificationStatus::Verified],
+            ['26100005', 'Akua Frimpong', 'akua.frimpong@students.kntsf.edu.gh', 'Accounting', '300', true, StudentVerificationStatus::Verified],
+            ['26100006', 'Kwame Owusu', 'kwame.owusu@students.kntsf.edu.gh', 'Marketing', '200', true, StudentVerificationStatus::Verified],
+            ['26100007', 'Abena Darko', 'abena.darko@students.kntsf.edu.gh', 'Mass Communication', '400', true, StudentVerificationStatus::Verified],
+            ['26100008', 'Kofi Addo', 'kofi.addo@students.kntsf.edu.gh', 'Economics', '100', true, StudentVerificationStatus::Verified],
+            ['26100009', 'Esi Badu', 'esi.badu@students.kntsf.edu.gh', 'Computer Science', '200', true, StudentVerificationStatus::Verified],
+            ['26100010', 'Nana Prempeh', 'nana.prempeh@students.kntsf.edu.gh', 'Information Technology', '300', true, StudentVerificationStatus::Verified],
+            ['26100011', 'Afia Adjei', 'afia.adjei@students.kntsf.edu.gh', 'Business Administration', '400', false, StudentVerificationStatus::Verified],
+            ['26100012', 'Kweku Sarpong', 'kweku.sarpong@students.kntsf.edu.gh', 'Public Administration', '100', false, StudentVerificationStatus::PendingReview],
+            ['26100013', 'Mawuli Dzifa', 'mawuli.dzifa@students.kntsf.edu.gh', 'Procurement and Supply Chain', '300', false, StudentVerificationStatus::Verified],
+            ['26100014', 'Priscilla Aidoo', 'priscilla.aidoo@students.kntsf.edu.gh', 'Hospitality Management', '200', false, StudentVerificationStatus::Verified],
+            ['26100015', 'Daniel Kwesi Appiah', 'daniel.appiah@students.kntsf.edu.gh', 'Electrical Engineering', '400', false, StudentVerificationStatus::Verified],
+            ['26100016', 'Nadia Owuraku', 'nadia.owuraku@students.kntsf.edu.gh', 'Nursing', '300', false, StudentVerificationStatus::PendingReview],
+            ['26100017', 'Samuel Fiifi Quayson', 'samuel.quayson@students.kntsf.edu.gh', 'Mechanical Engineering', '200', false, StudentVerificationStatus::Verified],
+            ['26100018', 'Linda Akosua Martey', 'linda.martey@students.kntsf.edu.gh', 'Banking and Finance', '400', false, StudentVerificationStatus::Verified],
+            ['26100019', 'Elorm Sena Gakpo', 'elorm.gakpo@students.kntsf.edu.gh', 'Computer Science', '100', false, StudentVerificationStatus::Verified],
+            ['26100020', 'Josephine Nyarko', 'josephine.nyarko@students.kntsf.edu.gh', 'Information Technology', '200', false, StudentVerificationStatus::PendingReview],
+            ['26100021', 'Bright Kwaku Adu', 'bright.adu@students.kntsf.edu.gh', 'Accounting', '300', false, StudentVerificationStatus::Verified],
+            ['26100022', 'Portia Amankwah', 'portia.amankwah@students.kntsf.edu.gh', 'Marketing', '400', false, StudentVerificationStatus::Verified],
+            ['26100023', 'Michael Essien Jr', 'michael.essien@students.kntsf.edu.gh', 'Economics', '200', false, StudentVerificationStatus::Verified],
+            ['26100024', 'Adwoa Sika Baah', 'adwoa.baah@students.kntsf.edu.gh', 'Public Administration', '300', false, StudentVerificationStatus::Rejected],
+            ['26100025', 'Julius Annan', 'julius.annan@students.kntsf.edu.gh', 'Business Administration', '100', false, StudentVerificationStatus::Verified],
+            ['26100026', 'Bernice Ofori', 'bernice.ofori@students.kntsf.edu.gh', 'Mass Communication', '300', false, StudentVerificationStatus::Verified],
+            ['26100027', 'Isaac Tandoh', 'isaac.tandoh@students.kntsf.edu.gh', 'Procurement and Supply Chain', '400', false, StudentVerificationStatus::Verified],
+            ['26100028', 'Theresa Naa Korkor', 'theresa.korkor@students.kntsf.edu.gh', 'Hospitality Management', '200', false, StudentVerificationStatus::Verified],
+        ];
 
-        return $students->map(function (array $row) use ($users): Student {
-            [$number, $name, $email, $course, $level, $activated] = $row;
+        return collect($rows)->map(function (array $row, int $index) use ($users): Student {
+            [$number, $name, $email, $course, $level, $activated, $verificationStatus] = $row;
 
             $studentUser = null;
 
@@ -170,8 +195,8 @@ class DevelopmentSeeder extends Seeder
                     'email' => $email,
                 ], [
                     'name' => $name,
-                    'password' => 'password',
-                    'email_verified_at' => now(),
+                    'password' => self::Password,
+                    'email_verified_at' => now()->subMonths(2),
                     'is_active' => true,
                 ]);
                 $studentUser->syncRoles(['student']);
@@ -183,12 +208,17 @@ class DevelopmentSeeder extends Seeder
                 'user_id' => $studentUser?->id,
                 'name' => $name,
                 'email' => $email,
-                'phone' => '+233 24 '.fake()->unique()->numerify('### ####'),
+                'phone' => '+233 '.(20 + ($index % 8)).' '.str_pad((string) (4100000 + ($index * 1739)), 7, '0', STR_PAD_LEFT),
                 'course' => $course,
                 'level' => $level,
+                'source' => $index >= 12 ? StudentSource::SelfService : StudentSource::AdminImport,
+                'verification_status' => $verificationStatus,
+                'verified_at' => $verificationStatus === StudentVerificationStatus::Verified ? now()->subDays(30 - min($index, 20)) : null,
+                'verified_by_id' => $verificationStatus === StudentVerificationStatus::Verified ? $users['staff']->id : null,
+                'review_notes' => $verificationStatus === StudentVerificationStatus::Rejected ? 'Student number could not be matched with current registry records.' : null,
                 'created_by_id' => $users['admin']->id,
                 'updated_by_id' => $users['admin']->id,
-                'metadata' => ['seeded' => true],
+                'metadata' => ['source' => 'presentation'],
             ]);
         })->values();
     }
@@ -199,23 +229,26 @@ class DevelopmentSeeder extends Seeder
     private function seedExecutiveProfiles(array $users): void
     {
         $profiles = [
-            [$users['executive'], 'SRC President', 'Leads the council and coordinates executive priorities.', 1],
-            [$users['admin'], 'SRC Administrator', 'Maintains operational records and administrative workflows.', 2],
-            [$users['staff'], 'Verification Officer', 'Supports permit, NFC, and verification operations.', 3],
+            ['president', 'SRC President', 'Coordinates council priorities, student welfare advocacy, and inter-office accountability.', 'Evelyn has led residence engagement campaigns, fee dialogue sessions, and peer support initiatives across the student body.', 1, ['linkedin' => 'https://linkedin.com/in/evelyn-boakye']],
+            ['secretary', 'General Secretary', 'Keeps council records, publishes communiques, and supervises administrative correspondence.', 'Caleb is focused on timely information flow, transparent minutes, and stronger class representative coordination.', 2, ['linkedin' => 'https://linkedin.com/in/caleb-mensah']],
+            ['treasurer', 'Financial Secretary', 'Tracks budgets, payment records, and council financial reporting.', 'Abigail supports accountable spending and clear financial updates for committees and students.', 3, ['linkedin' => 'https://linkedin.com/in/abigail-tetteh']],
+            ['staff', 'Verification Officer', 'Manages permit checks, NFC card registration, and student record verification.', 'Selina supports front-desk verification operations and daily permit reconciliation.', 4, []],
         ];
 
-        foreach ($profiles as [$user, $position, $description, $sortOrder]) {
-            ExecutiveProfile::query()->updateOrCreate([
-                'user_id' => $user->id,
+        foreach ($profiles as [$key, $position, $description, $biography, $sortOrder, $links]) {
+            $profile = ExecutiveProfile::query()->updateOrCreate([
+                'user_id' => $users[$key]->id,
             ], [
                 'position' => $position,
                 'position_description' => $description,
-                'biography' => 'Demo profile for local development and public portal previews.',
+                'biography' => $biography,
                 'category' => 'SRC Executive',
                 'sort_order' => $sortOrder,
                 'is_published' => true,
-                'social_links' => [],
+                'social_links' => $links,
             ]);
+
+            $this->attachSeedImage($profile, MediaCollections::AVATAR, "executives/{$key}.jpg");
         }
     }
 
@@ -229,11 +262,11 @@ class DevelopmentSeeder extends Seeder
         $activePeriod = $periods->firstWhere('is_active', true);
         $hasher = app(PermitCodeHasher::class);
 
-        return $students->take(8)->values()->map(function (Student $student, int $index) use ($activePeriod, $admin, $hasher): Permit {
-            $code = 'KNT-DEV-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT);
+        return $students->take(22)->values()->map(function (Student $student, int $index) use ($activePeriod, $admin, $hasher): Permit {
+            $code = 'KNT-'.now()->format('y').'-'.str_pad((string) ($index + 431), 4, '0', STR_PAD_LEFT).'-'.str_pad((string) (($index + 7) * 37), 4, '0', STR_PAD_LEFT);
             $status = match ($index) {
-                5 => PermitStatus::Expired,
-                6 => PermitStatus::Revoked,
+                15, 16 => PermitStatus::Expired,
+                17, 18 => PermitStatus::Revoked,
                 default => PermitStatus::Active,
             };
 
@@ -245,15 +278,15 @@ class DevelopmentSeeder extends Seeder
                 'issued_by_id' => $admin->id,
                 'code_last4' => mb_substr($code, -4),
                 'status' => $status,
-                'starts_at' => now()->subMonth(),
-                'expires_at' => $status === PermitStatus::Expired ? now()->subDay() : now()->addMonths(3),
+                'starts_at' => now()->subDays(45 - min($index, 25)),
+                'expires_at' => $status === PermitStatus::Expired ? now()->subDays(3 + $index) : now()->addDays(95 + $index),
                 'amount_paid' => 50,
                 'currency' => 'GHS',
-                'card_delivered_at' => $index < 4 ? now()->subDays(5) : null,
-                'revoked_at' => $status === PermitStatus::Revoked ? now()->subDays(2) : null,
+                'card_delivered_at' => $index < 14 ? now()->subDays(20 - min($index, 18)) : null,
+                'revoked_at' => $status === PermitStatus::Revoked ? now()->subDays(4) : null,
                 'revoked_by_id' => $status === PermitStatus::Revoked ? $admin->id : null,
-                'revocation_reason' => $status === PermitStatus::Revoked ? 'Demo revoked permit.' : null,
-                'metadata' => ['seeded' => true, 'plain_demo_code' => $code],
+                'revocation_reason' => $status === PermitStatus::Revoked ? 'Card reported as transferred to another student.' : null,
+                'metadata' => ['source' => 'presentation', 'reference_hint' => $code],
             ]);
         });
     }
@@ -261,38 +294,102 @@ class DevelopmentSeeder extends Seeder
     /**
      * @param  Collection<int, Student>  $students
      * @param  Collection<int, Permit>  $permits
+     * @return Collection<string, Payment>
      */
-    private function seedPayments(Collection $students, Collection $permits, User $admin): void
+    private function seedPayments(Collection $students, Collection $permits, User $admin): Collection
     {
-        foreach ($permits->take(5)->values() as $index => $permit) {
-            Payment::query()->updateOrCreate([
-                'reference' => 'PAY-DEV-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+        $payments = collect();
+
+        foreach ($permits as $index => $permit) {
+            $payment = Payment::query()->updateOrCreate([
+                'reference' => 'KNT-PAY-'.now()->format('ym').'-'.str_pad((string) ($index + 1001), 5, '0', STR_PAD_LEFT),
             ], [
                 'student_id' => $permit->student_id,
                 'permit_id' => $permit->id,
-                'gateway' => 'manual',
+                'gateway' => $index % 3 === 0 ? 'paystack' : 'manual',
+                'gateway_reference' => $index % 3 === 0 ? 'ps_'.now()->format('ymd').'_'.str_pad((string) ($index + 501), 6, '0', STR_PAD_LEFT) : null,
                 'status' => PaymentStatus::Success,
                 'amount' => 50,
                 'currency' => 'GHS',
-                'paid_at' => now()->subDays(8 - $index),
-                'verified_at' => now()->subDays(8 - $index),
+                'paid_at' => now()->subDays(28 - min($index, 24)),
+                'verified_at' => now()->subDays(27 - min($index, 23)),
                 'created_by_id' => $admin->id,
-                'metadata' => ['seeded' => true],
+                'metadata' => ['source' => 'presentation'],
             ]);
+
+            $payments->put((string) $permit->student_id, $payment);
         }
 
-        foreach ($students->slice(8, 2)->values() as $index => $student) {
-            Payment::query()->updateOrCreate([
-                'reference' => 'PAY-DEV-PENDING-'.($index + 1),
+        foreach ($students->slice(22, 4)->values() as $index => $student) {
+            $status = match ($index) {
+                1 => PaymentStatus::Failed,
+                2 => PaymentStatus::Cancelled,
+                default => PaymentStatus::Pending,
+            };
+
+            $payment = Payment::query()->updateOrCreate([
+                'reference' => 'KNT-PAY-'.now()->format('ym').'-'.str_pad((string) ($index + 2101), 5, '0', STR_PAD_LEFT),
             ], [
                 'student_id' => $student->id,
-                'gateway' => 'manual',
-                'status' => $index === 0 ? PaymentStatus::Pending : PaymentStatus::Failed,
+                'gateway' => 'paystack',
+                'gateway_reference' => 'ps_'.now()->format('ymd').'_'.str_pad((string) ($index + 801), 6, '0', STR_PAD_LEFT),
+                'status' => $status,
                 'amount' => 50,
                 'currency' => 'GHS',
-                'failure_reason' => $index === 1 ? 'Demo failed payment.' : null,
+                'failure_reason' => $status === PaymentStatus::Failed ? 'Issuer declined the transaction during authorization.' : null,
                 'created_by_id' => $admin->id,
-                'metadata' => ['seeded' => true],
+                'metadata' => ['source' => 'presentation'],
+            ]);
+
+            $payments->put((string) $student->id, $payment);
+        }
+
+        return $payments;
+    }
+
+    /**
+     * @param  Collection<int, Student>  $students
+     * @param  Collection<string, Payment>  $payments
+     * @param  array<string, User>  $users
+     */
+    private function seedPermitRequests(Collection $students, ?AcademicPeriod $period, Collection $payments, array $users): void
+    {
+        if (! $period) {
+            return;
+        }
+
+        foreach ($students->slice(18, 9)->values() as $index => $student) {
+            $payment = $payments->get((string) $student->id);
+            $status = match ($index) {
+                0, 1, 2 => PermitRequestStatus::Issued,
+                3 => PermitRequestStatus::Paid,
+                4, 5 => PermitRequestStatus::AwaitingPayment,
+                6 => PermitRequestStatus::Failed,
+                7 => PermitRequestStatus::Cancelled,
+                default => PermitRequestStatus::Pending,
+            };
+            $requiresReview = in_array($student->verification_status, [StudentVerificationStatus::PendingReview, StudentVerificationStatus::Rejected], true)
+                || $status === PermitRequestStatus::Paid;
+
+            PermitRequest::query()->updateOrCreate([
+                'request_reference' => 'KNT-REQ-'.now()->format('ym').'-'.str_pad((string) ($index + 301), 4, '0', STR_PAD_LEFT),
+            ], [
+                'student_id' => $student->id,
+                'academic_period_id' => $period->id,
+                'payment_id' => $payment?->id,
+                'requested_by_user_id' => $student->user_id,
+                'source' => 'self_service',
+                'status' => $status,
+                'amount' => 50,
+                'currency' => 'GHS',
+                'contact_email' => $student->email,
+                'contact_phone' => $student->phone,
+                'requires_review' => $requiresReview,
+                'review_status' => $requiresReview ? PermitRequestReviewStatus::PendingReview : PermitRequestReviewStatus::Approved,
+                'reviewed_by_id' => $requiresReview ? null : $users['staff']->id,
+                'reviewed_at' => $requiresReview ? null : now()->subDays(5),
+                'expires_at' => $status === PermitRequestStatus::AwaitingPayment ? now()->addHours(18 - $index) : null,
+                'metadata' => ['source' => 'presentation'],
             ]);
         }
     }
@@ -304,11 +401,13 @@ class DevelopmentSeeder extends Seeder
     {
         $hasher = app(NfcUidHasher::class);
 
-        foreach ($students->take(7)->values() as $index => $student) {
-            $uid = '04:A1:B2:C3:'.str_pad(dechex($index + 1), 2, '0', STR_PAD_LEFT);
+        foreach ($students->take(20)->values() as $index => $student) {
+            $uid = '04:'.str_pad(dechex(70 + $index), 2, '0', STR_PAD_LEFT).':'.str_pad(dechex(120 + $index), 2, '0', STR_PAD_LEFT).':'.str_pad(dechex(30 + $index), 2, '0', STR_PAD_LEFT).':'.str_pad(dechex(200 - $index), 2, '0', STR_PAD_LEFT);
             $status = match ($index) {
-                5 => NfcCardStatus::Lost,
-                6 => NfcCardStatus::Revoked,
+                14 => NfcCardStatus::Lost,
+                15 => NfcCardStatus::Revoked,
+                16 => NfcCardStatus::Damaged,
+                17 => NfcCardStatus::Replaced,
                 default => NfcCardStatus::Active,
             };
 
@@ -318,64 +417,103 @@ class DevelopmentSeeder extends Seeder
                 'student_id' => $student->id,
                 'uid_last4' => $hasher->lastFour($uid),
                 'status' => $status,
-                'issued_at' => now()->subWeeks(2),
-                'activated_at' => $status === NfcCardStatus::Active ? now()->subWeeks(2) : null,
-                'deactivated_at' => $status === NfcCardStatus::Active ? null : now()->subDays(3),
-                'lost_at' => $status === NfcCardStatus::Lost ? now()->subDays(3) : null,
+                'issued_at' => now()->subWeeks(6)->addDays($index),
+                'activated_at' => $status === NfcCardStatus::Active ? now()->subWeeks(6)->addDays($index) : null,
+                'deactivated_at' => $status === NfcCardStatus::Active ? null : now()->subDays(4),
+                'replaced_at' => $status === NfcCardStatus::Replaced ? now()->subDays(4) : null,
+                'lost_at' => $status === NfcCardStatus::Lost ? now()->subDays(4) : null,
                 'created_by_id' => $staff->id,
-                'metadata' => ['seeded' => true],
+                'metadata' => ['source' => 'presentation'],
             ]);
         }
     }
 
     private function seedContent(User $author): void
     {
-        Announcement::query()->updateOrCreate([
-            'slug' => 'src-permit-verification-rollout',
-        ], [
-            'author_id' => $author->id,
-            'title' => 'SRC permit verification rollout',
-            'excerpt' => 'A demo announcement showing the public portal and dashboard publishing flow.',
-            'content' => 'The SRC permit verification platform is ready for local development testing.',
-            'category' => 'SRC',
-            'status' => PublishStatus::Published,
-            'visibility' => Visibility::Public,
-            'is_featured' => true,
-            'published_at' => now()->subDays(3),
-            'metadata' => ['seeded' => true],
-        ]);
+        $announcements = [
+            ['permit-card-distribution-window', 'Permit card distribution window announced', 'Students with verified payments can collect printed permit cards from the SRC office between 9:00 AM and 4:00 PM on weekdays.', 'The SRC has opened a two-week distribution window for students whose permit payments and student records have been verified. Students should bring a valid student ID and confirm their phone number at the desk.', 'Permits', true, 5],
+            ['library-access-validation-update', 'Library access validation update', 'Permit verification checks will be used at selected library entrances during evening study hours.', 'The evening study access desk will begin confirming active permit status from Monday. Students are encouraged to resolve pending payments before arriving at the entrance desk.', 'Campus', false, 8],
+            ['student-transport-safety-briefing', 'Student transport safety briefing', 'A safety briefing for shuttle users and volunteer marshals will be held at the main auditorium.', 'The briefing will cover route discipline, incident reporting, and how permit records support quick identity verification during high-traffic periods.', 'Welfare', false, 12],
+            ['src-front-desk-service-hours', 'SRC front desk service hours revised', 'The SRC front desk will operate extended service hours during the permit renewal period.', 'Front desk officers will support account activation, payment confirmation, NFC card replacement, and general student record enquiries during the renewal period.', 'SRC', false, 15],
+        ];
 
-        Event::query()->updateOrCreate([
-            'slug' => 'src-town-hall-demo',
-        ], [
-            'organizer_id' => $author->id,
-            'title' => 'SRC town hall demo',
-            'description' => 'Demo event for checking event listings, detail pages, and public portal layout.',
-            'excerpt' => 'A campus town hall for validating the events module.',
-            'location' => 'Main Auditorium',
-            'category' => 'SRC',
-            'status' => PublishStatus::Published,
-            'visibility' => Visibility::Public,
-            'is_featured' => true,
-            'starts_at' => now()->addWeeks(2),
-            'ends_at' => now()->addWeeks(2)->addHours(2),
-            'published_at' => now()->subDays(2),
-            'metadata' => ['seeded' => true],
-        ]);
+        foreach ($announcements as [$slug, $title, $excerpt, $content, $category, $featured, $daysAgo]) {
+            $announcement = Announcement::query()->updateOrCreate([
+                'slug' => $slug,
+            ], [
+                'author_id' => $author->id,
+                'title' => $title,
+                'excerpt' => $excerpt,
+                'content' => $content,
+                'category' => $category,
+                'status' => PublishStatus::Published,
+                'visibility' => Visibility::Public,
+                'is_featured' => $featured,
+                'published_at' => now()->subDays($daysAgo),
+                'metadata' => ['source' => 'presentation'],
+            ]);
 
-        Document::query()->updateOrCreate([
-            'slug' => 'permit-requirements-demo',
-        ], [
-            'author_id' => $author->id,
-            'title' => 'Permit requirements demo',
-            'excerpt' => 'A demo public document record without uploaded files.',
-            'description' => 'Use this record to validate document listings and document metadata in local development.',
-            'category' => 'Permits',
-            'status' => PublishStatus::Draft,
-            'visibility' => Visibility::Public,
-            'is_featured' => true,
-            'metadata' => ['seeded' => true],
-        ]);
+            $this->attachSeedImage($announcement, MediaCollections::FEATURED_IMAGE, "announcements/{$slug}.jpg");
+        }
+
+        $events = [
+            ['permit-renewal-clinic', 'Permit renewal clinic', 'SRC Office Forecourt', 'Permits', 'A practical support clinic for students renewing permits, resolving pending payments, and activating accounts.', true, now()->addDays(6), 180, 64],
+            ['student-leadership-forum', 'Student leadership forum', 'Main Auditorium', 'Governance', 'A forum for class representatives, society leaders, and SRC executives to align student welfare priorities.', true, now()->addDays(12), 350, 211],
+            ['campus-safety-walkthrough', 'Campus safety walkthrough', 'Security Post', 'Welfare', 'A joint walkthrough with hall leaders, security officers, and transport marshals.', false, now()->addDays(18), 80, 28],
+            ['finance-accountability-session', 'Finance accountability session', 'Conference Room B', 'Finance', 'A public briefing on dues, permit revenue reconciliation, and semester expenditure priorities.', false, now()->addDays(25), 120, 47],
+        ];
+
+        foreach ($events as [$slug, $title, $location, $category, $description, $featured, $startsAt, $maxAttendees, $currentAttendees]) {
+            $event = Event::query()->updateOrCreate([
+                'slug' => $slug,
+            ], [
+                'organizer_id' => $author->id,
+                'title' => $title,
+                'description' => $description,
+                'excerpt' => $description,
+                'location' => $location,
+                'category' => $category,
+                'status' => PublishStatus::Published,
+                'visibility' => Visibility::Public,
+                'is_featured' => $featured,
+                'starts_at' => $startsAt,
+                'ends_at' => $startsAt->copy()->addHours(2),
+                'max_attendees' => $maxAttendees,
+                'current_attendees' => $currentAttendees,
+                'published_at' => now()->subDays(4),
+                'metadata' => ['source' => 'presentation'],
+            ]);
+
+            $this->attachSeedImage($event, MediaCollections::BANNER, "events/{$slug}.jpg");
+        }
+
+        $documents = [
+            ['permit-renewal-guidelines-2026', 'Permit Renewal Guidelines 2026', 'Step-by-step guidance for student permit renewal, payment confirmation, and collection.', 'Permits', true],
+            ['src-financial-statement-q2', 'SRC Financial Statement Q2', 'Summary of receipts, expenditure lines, and balances for the second quarter.', 'Finance', true],
+            ['student-representative-council-minutes-june', 'Student Representative Council Minutes - June', 'Approved minutes from the June council meeting.', 'Minutes', false],
+            ['campus-safety-protocol-for-events', 'Campus Safety Protocol for Events', 'Operational checklist for SRC events, ushers, marshals, and venue leads.', 'Governance', false],
+            ['election-code-of-conduct', 'Election Code of Conduct', 'Candidate and campaign rules for the student election cycle.', 'Elections', false],
+        ];
+
+        foreach ($documents as [$slug, $title, $description, $category, $featured]) {
+            $document = Document::query()->updateOrCreate([
+                'slug' => $slug,
+            ], [
+                'author_id' => $author->id,
+                'title' => $title,
+                'excerpt' => $description,
+                'description' => $description."\n\nThis file is maintained by the SRC secretariat for student access and administrative reference.",
+                'category' => $category,
+                'status' => PublishStatus::Published,
+                'visibility' => Visibility::Public,
+                'is_featured' => $featured,
+                'published_at' => now()->subDays(10),
+                'metadata' => ['source' => 'presentation'],
+            ]);
+
+            $this->attachSeedImage($document, MediaCollections::FEATURED_IMAGE, "documents/{$slug}.jpg");
+            $this->attachGeneratedDocument($document, $slug, $title, $description);
+        }
     }
 
     /**
@@ -383,38 +521,46 @@ class DevelopmentSeeder extends Seeder
      */
     private function seedPolls(Collection $students, User $admin): void
     {
-        $poll = Poll::query()->updateOrCreate([
-            'slug' => 'preferred-src-office-hours',
-        ], [
-            'created_by_id' => $admin->id,
-            'title' => 'Preferred SRC office hours',
-            'description' => 'Demo poll for testing voting and results display.',
-            'type' => PollType::FixedOptions,
-            'status' => PublishStatus::Published,
-            'visibility' => Visibility::Internal,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addWeek(),
-            'show_results' => true,
-            'allow_vote_change' => false,
-            'metadata' => ['seeded' => true],
-        ]);
+        $polls = [
+            ['preferred-src-office-hours', 'Preferred SRC office hours', 'Which office hour window works best for permit and account support?', ['8:00 AM - 11:00 AM', '11:00 AM - 2:00 PM', '2:00 PM - 5:00 PM', 'After 5:00 PM']],
+            ['priority-student-welfare-channel', 'Priority student welfare channel', 'Which communication channel should the SRC prioritize for urgent student welfare updates?', ['SMS alerts', 'Email bulletin', 'WhatsApp broadcast', 'Notice board']],
+            ['permit-card-collection-location', 'Permit card collection location', 'Where should permit card collection desks be located during renewal week?', ['SRC office', 'Main auditorium lobby', 'Library entrance', 'Department offices']],
+        ];
 
-        $options = collect(['Morning', 'Afternoon', 'Evening'])->map(function (string $label, int $index) use ($poll): PollOption {
-            return PollOption::query()->updateOrCreate([
-                'poll_id' => $poll->id,
-                'text' => $label,
+        foreach ($polls as $pollIndex => [$slug, $title, $description, $optionLabels]) {
+            $poll = Poll::query()->updateOrCreate([
+                'slug' => $slug,
             ], [
-                'sort_order' => $index,
+                'created_by_id' => $admin->id,
+                'title' => $title,
+                'description' => $description,
+                'type' => PollType::FixedOptions,
+                'status' => PublishStatus::Published,
+                'visibility' => Visibility::Internal,
+                'starts_at' => now()->subDays(3 + $pollIndex),
+                'ends_at' => now()->addDays(7 + $pollIndex),
+                'show_results' => true,
+                'allow_vote_change' => $pollIndex === 1,
+                'metadata' => ['source' => 'presentation'],
             ]);
-        });
 
-        foreach ($students->take(6) as $index => $student) {
-            PollVote::query()->updateOrCreate([
-                'poll_id' => $poll->id,
-                'student_id' => $student->id,
-            ], [
-                'poll_option_id' => $options[$index % $options->count()]->id,
-            ]);
+            $options = collect($optionLabels)->map(function (string $label, int $index) use ($poll): PollOption {
+                return PollOption::query()->updateOrCreate([
+                    'poll_id' => $poll->id,
+                    'text' => $label,
+                ], [
+                    'sort_order' => $index,
+                ]);
+            });
+
+            foreach ($students->slice($pollIndex * 3, 18)->values() as $voteIndex => $student) {
+                PollVote::query()->updateOrCreate([
+                    'poll_id' => $poll->id,
+                    'student_id' => $student->id,
+                ], [
+                    'poll_option_id' => $options[($voteIndex + $pollIndex) % $options->count()]->id,
+                ]);
+            }
         }
     }
 
@@ -428,45 +574,57 @@ class DevelopmentSeeder extends Seeder
         }
 
         $election = Election::query()->updateOrCreate([
-            'slug' => 'src-general-election-demo',
+            'slug' => 'src-general-election-2026',
         ], [
             'academic_period_id' => $period->id,
             'created_by_id' => $admin->id,
-            'title' => 'SRC general election demo',
-            'description' => 'Demo election for testing positions, candidates, voting, and public election pages.',
+            'title' => 'SRC General Election 2026',
+            'description' => 'Council election for executive offices, focused on welfare delivery, accountability, and student services.',
             'status' => ElectionStatus::Active,
-            'starts_at' => now()->subHour(),
-            'ends_at' => now()->addDays(2),
+            'starts_at' => now()->subHours(2),
+            'ends_at' => now()->addDays(3),
             'results_visible' => true,
-            'metadata' => ['seeded' => true],
+            'metadata' => ['source' => 'presentation'],
         ]);
 
-        $positions = collect(['SRC President', 'General Secretary'])->map(function (string $title, int $index) use ($election): ElectionPosition {
-            return ElectionPosition::query()->updateOrCreate([
+        $positions = [
+            ['SRC President', 'Leads the student council and represents student interests to management.'],
+            ['General Secretary', 'Maintains council records, notices, and official correspondence.'],
+            ['Financial Secretary', 'Oversees dues reconciliation, budget reporting, and payment records.'],
+            ['Womens Commissioner', 'Coordinates welfare advocacy and inclusion initiatives.'],
+        ];
+
+        $approvedCandidates = collect();
+
+        foreach ($positions as $positionIndex => [$title, $description]) {
+            $position = ElectionPosition::query()->updateOrCreate([
                 'election_id' => $election->id,
                 'title' => $title,
             ], [
-                'description' => 'Demo position for local election testing.',
+                'description' => $description,
                 'max_winners' => 1,
-                'sort_order' => $index,
+                'sort_order' => $positionIndex,
             ]);
-        });
 
-        foreach ($positions as $positionIndex => $position) {
-            $candidateStudents = $students->slice($positionIndex * 2, 2)->values();
-
-            foreach ($candidateStudents as $student) {
-                ElectionCandidate::query()->updateOrCreate([
+            foreach ($students->slice($positionIndex * 3, 3)->values() as $candidateIndex => $student) {
+                $candidate = ElectionCandidate::query()->updateOrCreate([
                     'election_position_id' => $position->id,
                     'student_id' => $student->id,
                 ], [
                     'approved_by_id' => $admin->id,
-                    'slogan' => 'Service, transparency, results.',
-                    'manifesto' => 'Demo manifesto for candidate profile testing.',
+                    'slogan' => [
+                        'Service with accountability',
+                        'Reliable welfare, responsive leadership',
+                        'Clear records, stronger representation',
+                    ][$candidateIndex],
+                    'manifesto' => 'My priority is to improve student support response time, publish clearer council updates, and keep campus services accessible throughout the semester.',
                     'status' => CandidateStatus::Approved,
-                    'approved_at' => now()->subDay(),
-                    'metadata' => ['seeded' => true],
+                    'approved_at' => now()->subDays(5),
+                    'metadata' => ['source' => 'presentation'],
                 ]);
+
+                $this->attachSeedImage($candidate, MediaCollections::POSTER, "candidates/{$student->student_number}.jpg");
+                $approvedCandidates->push($candidate);
             }
 
             $candidates = ElectionCandidate::query()
@@ -474,15 +632,15 @@ class DevelopmentSeeder extends Seeder
                 ->where('status', CandidateStatus::Approved)
                 ->get();
 
-            foreach ($students->slice(4, 5) as $voteIndex => $student) {
+            foreach ($students->slice(10, 16)->values() as $voteIndex => $student) {
                 ElectionVote::query()->updateOrCreate([
                     'election_position_id' => $position->id,
                     'student_id' => $student->id,
                 ], [
                     'election_id' => $election->id,
-                    'election_candidate_id' => $candidates[$voteIndex % $candidates->count()]->id,
-                    'cast_at' => now()->subMinutes(30 - $voteIndex),
-                    'metadata' => ['seeded' => true],
+                    'election_candidate_id' => $candidates[($voteIndex + $positionIndex) % $candidates->count()]->id,
+                    'cast_at' => now()->subMinutes(150 - ($voteIndex * 4)),
+                    'metadata' => ['source' => 'presentation'],
                 ]);
             }
         }
@@ -496,24 +654,33 @@ class DevelopmentSeeder extends Seeder
     {
         $results = [
             VerificationResult::Valid,
-            VerificationResult::Invalid,
+            VerificationResult::Valid,
+            VerificationResult::Valid,
             VerificationResult::Expired,
             VerificationResult::Revoked,
             VerificationResult::NotFound,
+            VerificationResult::CardInactive,
+            VerificationResult::Mismatch,
         ];
 
-        foreach ($students->take(8)->values() as $index => $student) {
-            VerificationLog::query()->create([
-                'method' => $index % 2 === 0 ? VerificationMethod::StudentNumber : VerificationMethod::PermitCode,
+        foreach ($students->take(24)->values() as $index => $student) {
+            VerificationLog::query()->firstOrCreate([
+                'identifier_hash' => hash('sha256', 'presentation-verification-'.$student->student_number.'-'.$index),
+            ], [
+                'method' => match ($index % 3) {
+                    0 => VerificationMethod::StudentNumber,
+                    1 => VerificationMethod::PermitCode,
+                    default => VerificationMethod::Nfc,
+                },
                 'result' => $results[$index % count($results)],
-                'identifier_hash' => hash('sha256', 'demo-verification-'.$student->student_number),
-                'reason' => 'Demo verification attempt.',
+                'reason' => $index % 5 === 0 ? 'Manual desk check during card collection.' : null,
                 'student_id' => $student->id,
-                'permit_id' => $permits->get($index)?->id,
+                'permit_id' => $permits->get($index % max($permits->count(), 1))?->id,
                 'verifier_id' => $staff->id,
-                'ip_address' => '127.0.0.1',
-                'user_agent' => 'DevelopmentSeeder',
-                'metadata' => ['seeded' => true],
+                'ip_address' => '10.24.'.$index.'.'.(40 + $index),
+                'user_agent' => 'KntsfPortal/1.0',
+                'metadata' => ['source' => 'presentation'],
+                'created_at' => now()->subHours(36 - $index),
             ]);
         }
     }
@@ -525,11 +692,12 @@ class DevelopmentSeeder extends Seeder
     private function seedAuditLogs(User $admin, Collection $students, Collection $permits): void
     {
         $events = [
-            [AuditEvents::StudentCreated, $students->first(), 'Created demo student profile.'],
-            [AuditEvents::PermitIssued, $permits->first(), 'Issued demo permit.'],
-            [AuditEvents::PaymentSuccessful, null, 'Confirmed demo payment.'],
-            [AuditEvents::NfcRegistered, null, 'Registered demo NFC card.'],
-            [AuditEvents::VerificationPerformed, null, 'Performed demo verification.'],
+            [AuditEvents::StudentCreated, $students->first(), 'Imported verified student records for the current semester.'],
+            [AuditEvents::PermitIssued, $permits->first(), 'Issued permit after payment confirmation.'],
+            [AuditEvents::PaymentSuccessful, null, 'Confirmed Paystack payment and linked it to a student permit.'],
+            [AuditEvents::NfcRegistered, null, 'Registered NFC card for front desk verification.'],
+            [AuditEvents::VerificationPerformed, null, 'Completed permit verification at the SRC service desk.'],
+            [AuditEvents::PermitRevoked, $permits->firstWhere('status', PermitStatus::Revoked), 'Revoked permit after a transfer report was confirmed.'],
         ];
 
         foreach ($events as [$event, $auditable, $description]) {
@@ -540,9 +708,49 @@ class DevelopmentSeeder extends Seeder
             ], [
                 'auditable_type' => $auditable ? $auditable::class : null,
                 'auditable_id' => $auditable?->id,
-                'metadata' => ['seeded' => true],
-                'created_at' => now(),
+                'metadata' => ['source' => 'presentation'],
+                'created_at' => now()->subHours(6),
             ]);
         }
+    }
+
+    private function attachSeedImage(Model $model, string $collection, string $relativePath): void
+    {
+        $path = base_path(self::AssetDirectory.'/images/'.$relativePath);
+
+        if (! File::exists($path) || $model->hasMedia($collection)) {
+            return;
+        }
+
+        $model
+            ->addMedia($path)
+            ->preservingOriginal()
+            ->toMediaCollection($collection);
+    }
+
+    private function attachGeneratedDocument(Document $document, string $slug, string $title, string $description): void
+    {
+        if ($document->hasMedia(MediaCollections::FILES)) {
+            return;
+        }
+
+        $directory = 'seeded-documents';
+        $fileName = $slug.'.txt';
+        $path = $directory.'/'.$fileName;
+
+        Storage::disk('local')->put($path, implode(PHP_EOL.PHP_EOL, [
+            $title,
+            $description,
+            'Prepared by the SRC Secretariat.',
+            'Reference date: '.now()->toFormattedDateString(),
+            'For student access, administrative review, and public information.',
+        ]));
+
+        $document
+            ->addMedia(Storage::disk('local')->path($path))
+            ->preservingOriginal()
+            ->usingName($title)
+            ->usingFileName($fileName)
+            ->toMediaCollection(MediaCollections::FILES);
     }
 }
