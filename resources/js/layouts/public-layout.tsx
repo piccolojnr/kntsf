@@ -37,7 +37,9 @@ export default function PublicLayout({ children }: PropsWithChildren) {
     const [scrolled, setScrolled] = useState(false);
     const currentUrl = usePage().url;
     const isHome = currentUrl === '/' || currentUrl.startsWith('/?');
-    const transparentHeader = isHome && !scrolled && !open;
+    const hasImageBackedHeader =
+        isHome  || currentUrl.startsWith(eventsIndex.url()) || currentUrl.startsWith(announcementsIndex.url());
+    const transparentHeader = hasImageBackedHeader && !scrolled && !open;
 
     useEffect(() => {
         function updateScrolledState() {
@@ -60,7 +62,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
         <div className="public-page relative overflow-x-hidden bg-[#f8f7f3] text-app-ink dark:bg-app-page">
             <header
                 className={`top-0 z-40 w-full px-3 py-3 text-app-ink transition-all duration-300 ${
-                    isHome ? 'fixed' : 'sticky'
+                    hasImageBackedHeader ? 'fixed' : 'sticky'
                 } ${transparentHeader ? 'text-white' : 'text-app-ink'}`}
             >
                 <div

@@ -20,64 +20,100 @@ export default function PublicAnnouncementShow({
                 />
             </Head>
 
-            <article>
-                <section className="relative overflow-hidden border-b border-app-border bg-app-surface-muted">
-                    <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1fr_24rem] lg:py-16">
-                        <div>
+            <article className="relative overflow-hidden">
+                <section className="relative overflow-hidden border-b border-app-border/80 bg-[#f8f7f3]">
+                    <div
+                        className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
+                        aria-hidden="true"
+                    />
+                    <div
+                        className="public-float pointer-events-none absolute -top-12 right-[14%] size-36 rounded-full border border-dashed border-app-ink/10"
+                        aria-hidden="true"
+                    />
+                    <div className="public-scroll-rise relative mx-auto grid w-full max-w-7xl gap-10 px-5 pt-32 pb-14 md:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:pt-36 lg:pb-18">
+                        <div className="flex flex-col justify-center">
                             <Link
                                 href={index()}
-                                className="mb-8 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-app-teal dark:text-app-brass"
+                                className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-app-muted transition hover:gap-3 hover:text-app-red"
                             >
                                 <ArrowLeft className="size-4" />
                                 All announcements
                             </Link>
-                            <div className="flex flex-wrap items-center gap-3">
+                            <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
+                                SRC bulletin
+                            </p>
+                            <h1 className="mt-4 max-w-4xl text-4xl leading-[1.04] font-semibold tracking-[-0.035em] text-app-ink md:text-6xl">
+                                {announcement.title}
+                            </h1>
+                            <div className="mt-6 flex flex-wrap items-center gap-3">
                                 {announcement.category && (
-                                    <span className="rounded-md bg-app-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white">
+                                    <span className="rounded-full bg-app-red/10 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-app-red uppercase">
                                         {announcement.category}
                                     </span>
                                 )}
-                                <span className="text-xs font-black uppercase tracking-[0.22em] text-app-muted">
-                                    {formatPublicDate(announcement.published_at, true) ?? 'Published'}
+                                <span className="rounded-full border border-app-border bg-white/68 px-3 py-1 text-[10px] font-medium tracking-[0.16em] text-app-muted uppercase">
+                                    {formatPublicDate(
+                                        announcement.published_at,
+                                        true,
+                                    ) ?? 'Published'}
                                 </span>
                             </div>
-                            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.95] tracking-normal md:text-7xl">
-                                {announcement.title}
-                            </h1>
                             {announcement.excerpt && (
-                                <p className="mt-6 max-w-2xl text-lg leading-8 text-app-muted">
+                                <p className="mt-6 max-w-2xl text-base leading-8 text-app-muted md:text-lg">
                                     {announcement.excerpt}
                                 </p>
                             )}
+                            <p className="public-hand public-scroll-mark mt-7 rotate-[-2deg] text-base text-app-muted">
+                                official notice
+                            </p>
                         </div>
+
                         <div className="flex items-end">
                             {announcement.image_url ? (
-                                <img
-                                    src={announcement.image_url}
-                                    alt=""
-                                    className="aspect-[4/5] w-full rounded-md object-cover shadow-[12px_12px_0_var(--app-brass)]"
-                                />
+                                <figure className="public-sketch-card group relative min-h-[28rem] w-full overflow-hidden rounded-[1.4rem] border border-app-border bg-white/72 shadow-[0_22px_70px_rgba(28,24,38,0.12)]">
+                                    <img
+                                        src={announcement.image_url}
+                                        alt=""
+                                        className="public-scroll-drift absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-105"
+                                    />
+                                    <div
+                                        className="absolute inset-0 bg-gradient-to-t from-app-ink/55 via-app-ink/5 to-transparent"
+                                        aria-hidden="true"
+                                    />
+                                    <div
+                                        className="absolute inset-4 rounded-[1.05rem] border border-white/18"
+                                        aria-hidden="true"
+                                    />
+                                </figure>
                             ) : (
-                                <div className="grid aspect-[4/5] w-full place-items-center rounded-md border border-app-ink bg-app-ink text-app-surface shadow-[12px_12px_0_var(--app-brass)]">
-                                    <Newspaper className="size-16 text-app-brass" />
+                                <div className="public-sketch-card public-paper-grain relative grid min-h-[28rem] w-full place-items-center overflow-hidden rounded-[1.4rem] border border-app-border bg-app-ink text-app-surface shadow-[0_22px_70px_rgba(28,24,38,0.16)]">
+                                    <div
+                                        className="public-float absolute top-8 right-8 size-24 rounded-full border border-dashed border-white/14"
+                                        aria-hidden="true"
+                                    />
+                                    <Newspaper className="relative size-16 text-app-brass" />
                                 </div>
                             )}
                         </div>
                     </div>
                 </section>
 
-                <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:px-8 lg:grid-cols-[14rem_1fr]">
+                <section className="public-scroll-rise mx-auto grid w-full max-w-7xl gap-10 px-5 py-16 md:px-8 lg:grid-cols-[14rem_1fr]">
                     <aside className="hidden lg:block">
-                        <div className="sticky top-28 rounded-md border-l-4 border-app-red bg-app-surface/60 p-5">
-                            <p className="text-xs font-black uppercase tracking-[0.24em] text-app-red">
-                                Author
+                        <div className="public-sketch-card sticky top-28 rounded-[1.2rem] border border-app-border bg-white/72 p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)]">
+                            <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
+                                Posted by
                             </p>
-                            <p className="mt-2 font-black">
+                            <p className="mt-3 text-base font-semibold text-app-ink">
                                 {announcement.author?.name ?? 'Knutsford SRC'}
                             </p>
+                            <div
+                                className="public-empty-lines mt-8 h-20"
+                                aria-hidden="true"
+                            />
                         </div>
                     </aside>
-                    <div className="max-w-3xl border-t border-app-border pt-10">
+                    <div className="public-sketch-card max-w-3xl rounded-[1.4rem] border border-app-border bg-white/78 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)] md:p-9">
                         <RichTextViewer value={announcement.content} />
                     </div>
                 </section>
