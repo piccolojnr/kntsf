@@ -21,10 +21,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::query()->firstOrCreate([
-            'email' => 'test@example.com',
+            'email' => 'registry@kntsf.edu.gh',
         ], [
-            'name' => 'Test User',
+            'name' => 'Campus Registry',
             'password' => 'password',
+            'is_active' => true,
         ]);
 
         if ($this->shouldSeedDevelopmentData()) {
