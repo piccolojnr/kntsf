@@ -36,9 +36,17 @@ export default function PublicLayout({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const currentUrl = usePage().url;
-    const isHome = currentUrl === '/' || currentUrl.startsWith('/?');
+    const currentPath = currentUrl.split('?')[0];
+    const isHome = currentPath === '/';
+    const imageBackedHeaderPaths = [
+        announcementsIndex.url(),
+        documentsIndex.url(),
+        electionsIndex.url(),
+        eventsIndex.url(),
+        executivesIndex.url(),
+    ];
     const hasImageBackedHeader =
-        isHome  || currentUrl.startsWith(eventsIndex.url()) || currentUrl.startsWith(announcementsIndex.url());
+        isHome || imageBackedHeaderPaths.includes(currentPath);
     const transparentHeader = hasImageBackedHeader && !scrolled && !open;
 
     useEffect(() => {
