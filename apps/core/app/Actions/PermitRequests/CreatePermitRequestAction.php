@@ -124,13 +124,23 @@ class CreatePermitRequestAction
     }
 
     /**
-     * @return array{name: string|null, student_number: string, course: string|null, level: string|null, has_email: bool, has_phone: bool, can_request: bool, block_reason: string|null}
+     * @return array{name: string|null, student_number: string, course: string|null, level: string|null, has_email: bool, has_phone: bool, can_request: bool, can_resume_request: bool, open_request_status: string|null, block_reason: string|null}
      */
     public function maskedStudentPreview(Student $student, ?AcademicPeriod $academicPeriod = null): array
     {
         $blockReason = $academicPeriod instanceof AcademicPeriod
             ? $this->studentRequestBlockReason($student, $academicPeriod)
             : null;
+        $openRequest = $academicPeriod instanceof AcademicPeriod
+            ? $this->openRequestForStudent($student, $academicPeriod)
+            : null;
+        $canResumeRequest = $openRequest instanceof PermitRequest
+            && in_array($openRequest->status, [
+                PermitRequestStatus::Pending,
+                PermitRequestStatus::AwaitingPayment,
+                PermitRequestStatus::Paid,
+                PermitRequestStatus::Issued,
+            ], true);
 
         return [
             'name' => $this->maskName($student->name),
@@ -140,8 +150,44 @@ class CreatePermitRequestAction
             'has_email' => filled($student->email),
             'has_phone' => filled($student->phone),
             'can_request' => $blockReason === null,
+            'can_resume_request' => $canResumeRequest,
+            'open_request_status' => $openRequest?->status->value,
             'block_reason' => $blockReason,
         ];
+    }
+
+    public function openRequestForStudentNumber(string $studentNumber): ?PermitRequest
+    {
+        $academicPeriod = $this->activeAcademicPeriod->get();
+
+        if (! $academicPeriod instanceof AcademicPeriod) {
+            return null;
+        }
+
+        $student = Student::query()
+            ->where('student_number', trim($studentNumber))
+            ->first();
+
+        if (! $student instanceof Student) {
+            return null;
+        }
+
+        return $this->openRequestForStudent($student, $academicPeriod);
+    }
+
+    public function openRequestForStudent(Student $student, AcademicPeriod $academicPeriod): ?PermitRequest
+    {
+        return PermitRequest::query()
+            ->where('student_id', $student->id)
+            ->where('academic_period_id', $academicPeriod->id)
+            ->whereIn('status', [
+                PermitRequestStatus::Pending,
+                PermitRequestStatus::AwaitingPayment,
+                PermitRequestStatus::Paid,
+                PermitRequestStatus::Issued,
+            ])
+            ->latest()
+            ->first();
     }
 
     private function guardStudentCanRequestPermit(Student $student, AcademicPeriod $academicPeriod): void
@@ -166,18 +212,7 @@ class CreatePermitRequestAction
             return 'This student already has an active permit for the current academic period.';
         }
 
-        $openRequestExists = PermitRequest::query()
-            ->where('student_id', $student->id)
-            ->where('academic_period_id', $academicPeriod->id)
-            ->whereIn('status', [
-                PermitRequestStatus::Pending,
-                PermitRequestStatus::AwaitingPayment,
-                PermitRequestStatus::Paid,
-                PermitRequestStatus::Issued,
-            ])
-            ->exists();
-
-        if ($openRequestExists) {
+        if ($this->openRequestForStudent($student, $academicPeriod) instanceof PermitRequest) {
             return 'This student already has an open permit request for the current academic period.';
         }
 

@@ -243,6 +243,94 @@ test('preview flags student with active permit as unable to request', function (
         ->assertJsonPath('student.block_reason', 'This student already has an active permit for the current academic period.');
 });
 
+test('preview flags student with unfinished request as resumable', function () {
+    $period = AcademicPeriod::query()->where('is_active', true)->firstOrFail();
+    $student = Student::factory()->create([
+        'student_number' => '26102859',
+        'email' => 'student@example.com',
+        'phone' => '0240000000',
+    ]);
+    $payment = Payment::factory()->create([
+        'student_id' => $student->id,
+        'status' => PaymentStatus::Pending,
+    ]);
+    PermitRequest::factory()->create([
+        'student_id' => $student->id,
+        'academic_period_id' => $period->id,
+        'payment_id' => $payment->id,
+        'status' => PermitRequestStatus::AwaitingPayment,
+    ]);
+
+    $this->getJson(route('public.permit-request.preview', [
+        'student_number' => $student->student_number,
+    ]))
+        ->assertOk()
+        ->assertJsonPath('student.can_request', false)
+        ->assertJsonPath('student.can_resume_request', true)
+        ->assertJsonPath('student.open_request_status', PermitRequestStatus::AwaitingPayment->value)
+        ->assertJsonPath('student.block_reason', 'This student already has an unfinished permit request. Continue it instead of starting over.');
+});
+
+test('public submit resumes unfinished request instead of creating duplicate', function () {
+    fakePaystackInitialize();
+
+    $period = AcademicPeriod::query()->where('is_active', true)->firstOrFail();
+    $student = Student::factory()->create([
+        'student_number' => '26102859',
+        'email' => 'student@example.com',
+        'phone' => '0240000000',
+    ]);
+    $payment = Payment::factory()->create([
+        'student_id' => $student->id,
+        'status' => PaymentStatus::Pending,
+        'metadata' => [
+            'paystack_authorization_url' => 'https://checkout.paystack.test/old',
+        ],
+    ]);
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $student->id,
+        'academic_period_id' => $period->id,
+        'payment_id' => $payment->id,
+        'status' => PermitRequestStatus::AwaitingPayment,
+    ]);
+
+    $this->post(route('public.permit-request.store'), [
+        'student_exists' => true,
+        'student_number' => $student->student_number,
+    ])->assertRedirect(route('public.permit-request.show', $permitRequest->request_reference));
+
+    expect(PermitRequest::query()->count())->toBe(1)
+        ->and(Payment::query()->count())->toBe(1)
+        ->and($payment->refresh()->metadata['paystack_authorization_url'])->toBe('https://checkout.paystack.test/pay');
+});
+
+test('public submit initializes payment for pending resumable request', function () {
+    fakePaystackInitialize();
+
+    $period = AcademicPeriod::query()->where('is_active', true)->firstOrFail();
+    $student = Student::factory()->create([
+        'student_number' => '26102859',
+        'email' => 'student@example.com',
+        'phone' => '0240000000',
+    ]);
+    $permitRequest = PermitRequest::factory()->create([
+        'student_id' => $student->id,
+        'academic_period_id' => $period->id,
+        'payment_id' => null,
+        'status' => PermitRequestStatus::Pending,
+    ]);
+
+    $this->post(route('public.permit-request.store'), [
+        'student_exists' => true,
+        'student_number' => $student->student_number,
+    ])->assertRedirect(route('public.permit-request.show', $permitRequest->request_reference));
+
+    expect(PermitRequest::query()->count())->toBe(1)
+        ->and(Payment::query()->count())->toBe(1)
+        ->and($permitRequest->refresh()->status)->toBe(PermitRequestStatus::AwaitingPayment)
+        ->and($permitRequest->payment_id)->not->toBeNull();
+});
+
 test('existing student email cannot be overwritten through self service', function () {
     fakePaystackInitialize();
 

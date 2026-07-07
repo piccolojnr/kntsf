@@ -158,13 +158,18 @@ export function StudentLookupForm({
                     previewState.status === 'found'
                         ? previewState.student
                         : null;
+                const canResumeRequest =
+                    foundStudent?.can_resume_request ?? false;
                 const needsContact =
                     foundStudent?.can_request &&
+                    !canResumeRequest &&
                     (!foundStudent.has_email || !foundStudent.has_phone);
                 const canCreate =
                     settings.permit_requests_enabled &&
                     (showSelfServiceForm || previewState.status === 'found') &&
-                    (!foundStudent || foundStudent.can_request);
+                    (!foundStudent ||
+                        foundStudent.can_request ||
+                        canResumeRequest);
 
                 return (
                     <div className="grid gap-5">
@@ -325,7 +330,15 @@ export function StudentLookupForm({
                                             : 'needed'}
                                     </span>
                                 </div>
+                                {canResumeRequest &&
+                                    foundStudent.block_reason && (
+                                        <div className="border-app-brass/40 bg-app-brass/10 mt-4 flex gap-3 rounded-[1rem] border px-4 py-3 text-sm leading-6 text-app-ink">
+                                            <Clock className="mt-0.5 size-4 shrink-0 text-app-red" />
+                                            {foundStudent.block_reason}
+                                        </div>
+                                    )}
                                 {!foundStudent.can_request &&
+                                    !canResumeRequest &&
                                     foundStudent.block_reason && (
                                         <div className="mt-4 flex gap-3 rounded-[1rem] border border-app-red/30 bg-app-red/10 px-4 py-3 text-sm leading-6 text-app-red">
                                             <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -416,8 +429,12 @@ export function StudentLookupForm({
                             >
                                 <ShieldCheck className="size-4" />
                                 {processing
-                                    ? 'Creating request'
-                                    : 'Create request'}
+                                    ? canResumeRequest
+                                        ? 'Continuing request'
+                                        : 'Creating request'
+                                    : canResumeRequest
+                                      ? 'Continue request'
+                                      : 'Create request'}
                             </Button>
                         </div>
                     </div>

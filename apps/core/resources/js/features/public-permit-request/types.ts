@@ -6,6 +6,8 @@ export type PermitRequestPreview = {
     has_email: boolean;
     has_phone: boolean;
     can_request: boolean;
+    can_resume_request: boolean;
+    open_request_status: string | null;
     block_reason: string | null;
 };
 

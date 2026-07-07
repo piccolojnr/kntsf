@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Actions\PermitRequests\CreatePermitRequestAction;
 use App\Actions\PermitRequests\InitializePaystackPaymentAction;
 use App\Actions\PermitRequests\VerifyPaystackPaymentAction;
+use App\Enums\PermitRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StorePermitRequestRequest;
 use App\Models\PermitRequest;
@@ -14,10 +15,10 @@ use App\Support\PermitSettings;
 use App\Support\StudentOptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use RuntimeException;
-use Log;
 
 class PermitRequestController extends Controller
 {
@@ -34,18 +35,24 @@ class PermitRequestController extends Controller
         CreatePermitRequestAction $createPermitRequest,
         InitializePaystackPaymentAction $initializePaystackPayment,
     ): RedirectResponse {
+        $validated = $request->validated();
+        $existingPermitRequest = $createPermitRequest->openRequestForStudentNumber((string) $validated['student_number']);
+
+        if ($existingPermitRequest instanceof PermitRequest) {
+            return $this->resumePermitRequest($existingPermitRequest, $initializePaystackPayment);
+        }
+
         try {
-            Log::info('Creating permit request', ['request' => $request->validated()]);
-            $permitRequest = $createPermitRequest->handle($request->validated());
+            Log::info('Creating permit request', ['request' => $validated]);
+            $permitRequest = $createPermitRequest->handle($validated);
             Log::info('Permit request created', ['permit_request_id' => $permitRequest->id]);
-            $initializePaystackPayment->handle($permitRequest);
-            Log::info('Paystack payment initialized', ['permit_request_id' => $permitRequest->id, 'payment_id' => $permitRequest->payment?->id]);
         } catch (RuntimeException $exception) {
-            Log::error('Error creating permit request', ['error' => $exception->getMessage(), 'request' => $request->validated()]);
+            Log::error('Error creating permit request', ['error' => $exception->getMessage(), 'request' => $validated]);
+
             return back()->withErrors(['permit_request' => $exception->getMessage()])->withInput();
         }
 
-        return to_route('public.permit-request.show', $permitRequest->request_reference);
+        return $this->resumePermitRequest($permitRequest, $initializePaystackPayment);
     }
 
     public function show(string $reference): Response
@@ -101,13 +108,47 @@ class PermitRequestController extends Controller
             ->where('student_number', $studentNumber)
             ->first();
 
+        $activePeriod = $activeAcademicPeriod->get();
+        $studentPreview = $student === null ? null : $createPermitRequest->maskedStudentPreview(
+            $student,
+            $activePeriod,
+        );
+
+        if ($studentPreview !== null && $studentPreview['can_resume_request']) {
+            $studentPreview['block_reason'] = match ($studentPreview['open_request_status']) {
+                PermitRequestStatus::Paid->value => 'A payment has already been received for this permit request. Continue to check the request status.',
+                PermitRequestStatus::Issued->value => 'This permit request has already been issued. Continue to view the permit status.',
+                default => 'This student already has an unfinished permit request. Continue it instead of starting over.',
+            };
+        }
+
         return [
             'exists' => $student !== null,
-            'student' => $student === null ? null : $createPermitRequest->maskedStudentPreview(
-                $student,
-                $activeAcademicPeriod->get(),
-            ),
+            'student' => $studentPreview,
         ];
+    }
+
+    private function resumePermitRequest(
+        PermitRequest $permitRequest,
+        InitializePaystackPaymentAction $initializePaystackPayment,
+    ): RedirectResponse {
+        if (in_array($permitRequest->status, [PermitRequestStatus::Paid, PermitRequestStatus::Issued], true)) {
+            return to_route('public.permit-request.success', $permitRequest->request_reference);
+        }
+
+        try {
+            $initializePaystackPayment->handle($permitRequest);
+            Log::info('Paystack payment initialized for permit request', [
+                'permit_request_id' => $permitRequest->id,
+            ]);
+        } catch (RuntimeException $exception) {
+            Log::warning('Could not initialize Paystack payment for resumable permit request', [
+                'permit_request_id' => $permitRequest->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return to_route('public.permit-request.show', $permitRequest->request_reference);
     }
 
     /**
