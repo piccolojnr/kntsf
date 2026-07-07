@@ -26,7 +26,7 @@ export default function PublicPermitRequestIndex({
                 description="Create a student permit request, confirm your masked record, and continue to secure Paystack checkout."
             />
 
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="absolute top-16 right-[8%] size-52 rounded-full bg-app-brass/12 blur-3xl"
                     aria-hidden="true"
@@ -80,8 +80,8 @@ function InfoCard({
     children: ReactNode;
 }) {
     return (
-        <div className="public-sketch-card rounded-[1.25rem] border border-app-border bg-white/64 p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
-            <span className="grid size-11 place-items-center rounded-full bg-app-ink/6 text-app-red [&_svg]:size-5">
+        <div className="public-sketch-card theme-surface rounded-[1.25rem] border border-app-border p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
+            <span className="theme-ink-soft grid size-11 place-items-center rounded-full text-app-red [&_svg]:size-5">
                 {icon}
             </span>
             <h2 className="mt-4 text-lg leading-tight font-semibold tracking-[-0.02em] text-app-ink">

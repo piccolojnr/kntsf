@@ -28,7 +28,7 @@ export default function PublicAnnouncementsIndex({
                 backgroundImageUrl="/images/ceremony.jpg"
             />
 
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="pointer-events-none absolute top-12 left-[8%] h-16 w-44 rotate-[-5deg] rounded-full bg-app-brass/16 blur-2xl"
                     aria-hidden="true"

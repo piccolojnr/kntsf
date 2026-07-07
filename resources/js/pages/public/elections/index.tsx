@@ -26,7 +26,7 @@ export default function PublicElectionsIndex({
                 count={items.length}
                 backgroundImageUrl="/images/campus-hero.jpg"
             />
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="absolute top-12 right-[9%] size-48 rounded-full bg-app-red/8 blur-3xl"
                     aria-hidden="true"
@@ -40,8 +40,9 @@ export default function PublicElectionsIndex({
                             Civic records in view
                         </h2>
                         <p className="mt-4 text-sm leading-7 text-app-muted">
-                            Election pages collect approved timelines, candidates,
-                            and results when the rules make them public.
+                            Election pages collect approved timelines,
+                            candidates, and results when the rules make them
+                            public.
                         </p>
                         <p className="public-hand public-scroll-mark mt-6 rotate-[-2deg] text-base text-app-muted">
                             ballot notes
@@ -63,7 +64,8 @@ export default function PublicElectionsIndex({
                                         description={election.description}
                                         meta={[
                                             election.academic_period.name,
-                                            election.academic_period.academic_year,
+                                            election.academic_period
+                                                .academic_year,
                                         ]
                                             .filter(Boolean)
                                             .join(' / ')}

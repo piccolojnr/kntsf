@@ -21,7 +21,7 @@ export default function PublicAnnouncementShow({
             </Head>
 
             <article className="relative overflow-hidden">
-                <section className="relative overflow-hidden border-b border-app-border/80 bg-[#f8f7f3]">
+                <section className="theme-paper relative overflow-hidden border-b border-app-border/80">
                     <div
                         className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                         aria-hidden="true"
@@ -51,7 +51,7 @@ export default function PublicAnnouncementShow({
                                         {announcement.category}
                                     </span>
                                 )}
-                                <span className="rounded-full border border-app-border bg-white/68 px-3 py-1 text-[10px] font-medium tracking-[0.16em] text-app-muted uppercase">
+                                <span className="theme-surface rounded-full border border-app-border px-3 py-1 text-[10px] font-medium tracking-[0.16em] text-app-muted uppercase">
                                     {formatPublicDate(
                                         announcement.published_at,
                                         true,
@@ -70,14 +70,14 @@ export default function PublicAnnouncementShow({
 
                         <div className="flex items-end">
                             {announcement.image_url ? (
-                                <figure className="public-sketch-card group relative min-h-[28rem] w-full overflow-hidden rounded-[1.4rem] border border-app-border bg-white/72 shadow-[0_22px_70px_rgba(28,24,38,0.12)]">
+                                <figure className="public-sketch-card group theme-surface relative min-h-[28rem] w-full overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_22px_70px_rgba(28,24,38,0.12)]">
                                     <img
                                         src={announcement.image_url}
                                         alt=""
                                         className="public-scroll-drift absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-105"
                                     />
                                     <div
-                                        className="absolute inset-0 bg-gradient-to-t from-app-ink/55 via-app-ink/5 to-transparent"
+                                        className="absolute inset-0 bg-gradient-to-t from-[#1c1826]/55 via-[#1c1826]/5 to-transparent"
                                         aria-hidden="true"
                                     />
                                     <div
@@ -86,7 +86,7 @@ export default function PublicAnnouncementShow({
                                     />
                                 </figure>
                             ) : (
-                                <div className="public-sketch-card public-paper-grain relative grid min-h-[28rem] w-full place-items-center overflow-hidden rounded-[1.4rem] border border-app-border bg-app-ink text-app-surface shadow-[0_22px_70px_rgba(28,24,38,0.16)]">
+                                <div className="public-sketch-card public-paper-grain theme-ink-panel relative grid min-h-[28rem] w-full place-items-center overflow-hidden rounded-[1.4rem] border border-app-border shadow-[0_22px_70px_rgba(28,24,38,0.16)]">
                                     <div
                                         className="public-float absolute top-8 right-8 size-24 rounded-full border border-dashed border-white/14"
                                         aria-hidden="true"
@@ -100,7 +100,7 @@ export default function PublicAnnouncementShow({
 
                 <section className="public-scroll-rise mx-auto grid w-full max-w-7xl gap-10 px-5 py-16 md:px-8 lg:grid-cols-[14rem_1fr]">
                     <aside className="hidden lg:block">
-                        <div className="public-sketch-card sticky top-28 rounded-[1.2rem] border border-app-border bg-white/72 p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)]">
+                        <div className="public-sketch-card theme-surface sticky top-28 rounded-[1.2rem] border border-app-border p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)]">
                             <p className="text-xs font-semibold tracking-[0.22em] text-app-red uppercase">
                                 Posted by
                             </p>
@@ -113,7 +113,7 @@ export default function PublicAnnouncementShow({
                             />
                         </div>
                     </aside>
-                    <div className="public-sketch-card max-w-3xl rounded-[1.4rem] border border-app-border bg-white/78 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)] md:p-9">
+                    <div className="public-sketch-card theme-surface max-w-3xl rounded-[1.4rem] border border-app-border p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)] md:p-9">
                         <RichTextViewer value={announcement.content} />
                     </div>
                 </section>

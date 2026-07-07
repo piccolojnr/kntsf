@@ -16,7 +16,7 @@ export default function PublicPermitRequestSuccess({
         <>
             <Head title="Permit Request Status" />
 
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                     aria-hidden="true"
@@ -28,7 +28,7 @@ export default function PublicPermitRequestSuccess({
                 <div className="public-scroll-rise relative mx-auto grid w-full max-w-5xl gap-6 px-5 pt-32 pb-16 md:px-8 lg:pt-36">
                     <PermitFlowSteps current="complete" />
 
-                    <div className="public-sketch-card rounded-[1.5rem] border border-app-border bg-white/76 p-8 text-center shadow-[0_20px_60px_rgba(28,24,38,0.07)]">
+                    <div className="public-sketch-card theme-surface rounded-[1.5rem] border border-app-border p-8 text-center shadow-[0_20px_60px_rgba(28,24,38,0.07)]">
                         <div
                             className={`mx-auto grid size-16 place-items-center rounded-full border ${
                                 issued
@@ -54,7 +54,7 @@ export default function PublicPermitRequestSuccess({
                                 : 'Your payment was verified. This request is waiting for administrative review before issuance.'}
                         </p>
                         {permitRequest.payment?.permit_code_last4 && (
-                            <p className="mx-auto mt-5 max-w-sm rounded-full border border-app-border bg-[#f8f7f3]/74 px-4 py-2 text-sm font-semibold text-app-ink">
+                            <p className="theme-surface-muted mx-auto mt-5 max-w-sm rounded-full border border-app-border px-4 py-2 text-sm font-semibold text-app-ink">
                                 Permit code last four:{' '}
                                 <span className="font-bold">
                                     {permitRequest.payment.permit_code_last4}
@@ -63,7 +63,7 @@ export default function PublicPermitRequestSuccess({
                         )}
                         <Link
                             href={index()}
-                            className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-app-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-app-red"
+                            className="theme-primary-action mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition"
                         >
                             Start another request
                             <ArrowRight className="size-4" />

@@ -17,7 +17,7 @@ const toneClasses = {
     gold: 'bg-app-brass/12 text-app-ink',
     green: 'bg-app-surface-muted text-app-ink',
     red: 'bg-app-red/10 text-app-red',
-    ink: 'bg-app-ink/8 text-app-ink dark:bg-white/10',
+    ink: 'theme-ink-soft text-app-ink dark:bg-white/10',
 };
 
 export function PublicContentCard({
@@ -32,7 +32,7 @@ export function PublicContentCard({
     return (
         <Link
             href={href}
-            className="public-sketch-card public-scroll-rise group relative flex min-h-[19.5rem] flex-col overflow-hidden rounded-[1.25rem] border border-app-border bg-white/76 shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:bg-app-surface/70"
+            className="public-sketch-card public-scroll-rise theme-surface group relative flex min-h-[19.5rem] flex-col overflow-hidden rounded-[1.25rem] border border-app-border shadow-[0_14px_42px_rgba(28,24,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:bg-white dark:hover:bg-app-surface"
         >
             <div className="relative aspect-[16/9] overflow-hidden bg-app-surface-muted/70 dark:bg-app-page">
                 {imageUrl ? (
@@ -51,7 +51,7 @@ export function PublicContentCard({
                             className="absolute right-8 bottom-6 h-14 w-28 rotate-[-8deg] rounded-full bg-app-brass/18 blur-2xl"
                             aria-hidden="true"
                         />
-                        <div className="relative grid size-12 place-items-center rounded-full bg-white text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-app-ink group-hover:text-white dark:bg-app-surface">
+                        <div className="theme-surface-strong relative grid size-12 place-items-center rounded-full text-app-muted transition duration-300 group-hover:scale-110 group-hover:rotate-[-7deg] group-hover:bg-[#1c1826] group-hover:text-white dark:group-hover:bg-app-brass dark:group-hover:text-[#1c1826]">
                             <FileText className="size-5" />
                         </div>
                     </div>
@@ -103,7 +103,7 @@ export function PublicContentEmpty({
     message: string;
 }) {
     return (
-        <div className="public-sketch-card public-paper-grain relative col-span-full min-h-80 overflow-hidden rounded-[1.4rem] border border-app-border bg-white/64 p-6 dark:bg-app-surface/50">
+        <div className="public-sketch-card public-paper-grain theme-surface relative col-span-full min-h-80 overflow-hidden rounded-[1.4rem] border border-app-border p-6">
             <div
                 className="public-float absolute top-8 right-9 size-24 rounded-full border border-dashed border-app-ink/12"
                 aria-hidden="true"
@@ -114,7 +114,7 @@ export function PublicContentEmpty({
             />
             <div className="relative flex min-h-68 flex-col justify-between">
                 {icon && (
-                    <span className="grid size-14 place-items-center rounded-full bg-app-ink/6 text-app-muted dark:bg-app-page">
+                    <span className="theme-ink-soft grid size-14 place-items-center rounded-full text-app-muted dark:bg-app-page">
                         {icon}
                     </span>
                 )}
@@ -153,7 +153,7 @@ export function PublicPageHeader({
     return (
         <section
             className={`relative overflow-hidden border-app-border/80 ${
-                hasBackgroundImage ? 'bg-app-ink text-white' : 'bg-[#f8f7f3]'
+                hasBackgroundImage ? 'bg-[#1c1826] text-white' : 'theme-paper'
             }`}
         >
             {backgroundImageUrl && (
@@ -164,7 +164,7 @@ export function PublicPageHeader({
                         className="absolute inset-0 size-full object-cover"
                     />
                     <div
-                        className="absolute inset-0 bg-app-ink/28"
+                        className="absolute inset-0 bg-[#1c1826]/28"
                         aria-hidden="true"
                     />
                     <div
@@ -172,11 +172,11 @@ export function PublicPageHeader({
                         aria-hidden="true"
                     />
                     <div
-                        className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-app-ink/34 to-transparent"
+                        className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#1c1826]/34 to-transparent"
                         aria-hidden="true"
                     />
                     <div
-                        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f7f3] via-[#f8f7f3]/34 to-transparent"
+                        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f8f7f3] via-[#f8f7f3]/34 to-transparent dark:from-app-page dark:via-app-page/34"
                         aria-hidden="true"
                     />
                 </>
@@ -203,7 +203,9 @@ export function PublicPageHeader({
                 <div className="flex flex-col justify-center">
                     <p
                         className={`text-xs font-semibold tracking-[0.22em] uppercase ${
-                            hasBackgroundImage ? 'text-app-brass' : 'text-app-red'
+                            hasBackgroundImage
+                                ? 'text-app-brass'
+                                : 'text-app-red'
                         }`}
                     >
                         {eyebrow}
@@ -217,14 +219,18 @@ export function PublicPageHeader({
                     </h1>
                     <p
                         className={`mt-5 max-w-2xl text-base leading-8 ${
-                            hasBackgroundImage ? 'text-white/76' : 'text-app-muted'
+                            hasBackgroundImage
+                                ? 'text-white/76'
+                                : 'text-app-muted'
                         }`}
                     >
                         {description}
                     </p>
                     <p
                         className={`public-hand public-scroll-mark mt-6 rotate-[-2deg] text-base ${
-                            hasBackgroundImage ? 'text-white/72' : 'text-app-muted'
+                            hasBackgroundImage
+                                ? 'text-white/72'
+                                : 'text-app-muted'
                         }`}
                     >
                         public record
@@ -236,12 +242,14 @@ export function PublicPageHeader({
                             className={`public-sketch-card w-full rounded-[1.2rem] border p-5 shadow-[0_14px_45px_rgba(28,24,38,0.045)] ${
                                 hasBackgroundImage
                                     ? 'border-white/16 bg-white/12 backdrop-blur-md'
-                                    : 'border-app-border bg-white/72 dark:bg-app-surface/70'
+                                    : 'theme-surface border-app-border'
                             }`}
                         >
                             <p
                                 className={`text-4xl font-semibold tracking-[-0.04em] ${
-                                    hasBackgroundImage ? 'text-white' : 'text-app-ink'
+                                    hasBackgroundImage
+                                        ? 'text-white'
+                                        : 'text-app-ink'
                                 }`}
                             >
                                 {count}
@@ -281,15 +289,15 @@ export function PublicPagination({
                         href={link.url}
                         className={`rounded-full border px-5 py-2.5 text-xs font-bold tracking-wide transition-all duration-300 ${
                             link.active
-                                ? 'border-app-ink bg-app-ink text-white shadow-md shadow-app-ink/15 dark:border-app-brass dark:bg-app-brass dark:text-app-ink'
-                                : 'border-app-border bg-white/72 text-app-ink hover:border-app-red hover:bg-app-red/5 hover:text-app-red dark:border-app-border/30 dark:bg-app-surface dark:hover:border-app-brass dark:hover:bg-app-brass/5'
+                                ? 'theme-primary-active border-transparent shadow-md shadow-app-ink/15'
+                                : 'theme-surface border-app-border text-app-ink hover:border-app-red hover:bg-app-red/5 hover:text-app-red dark:border-app-border/30 dark:hover:border-app-brass dark:hover:bg-app-brass/5'
                         }`}
                         dangerouslySetInnerHTML={{ __html: link.label }}
                     />
                 ) : (
                     <span
                         key={`${link.label}-${index}`}
-                        className="rounded-full border border-app-border/30 bg-white/50 px-5 py-2.5 text-xs font-bold tracking-wide text-app-muted/60 dark:bg-app-surface/50"
+                        className="theme-surface rounded-full border border-app-border/30 px-5 py-2.5 text-xs font-bold tracking-wide text-app-muted/60"
                         dangerouslySetInnerHTML={{ __html: link.label }}
                     />
                 ),

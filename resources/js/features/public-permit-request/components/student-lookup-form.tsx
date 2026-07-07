@@ -142,7 +142,7 @@ export function StudentLookupForm({
     return (
         <Form
             {...store.form()}
-            className="public-sketch-card public-scroll-rise rounded-[1.35rem] border border-app-border bg-white/76 p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]"
+            className="public-sketch-card public-scroll-rise theme-surface rounded-[1.35rem] border border-app-border p-6 shadow-[0_18px_55px_rgba(28,24,38,0.055)]"
         >
             {({ processing, errors }) => {
                 const hasSelfServiceErrors = [
@@ -196,7 +196,7 @@ export function StudentLookupForm({
                             value={previewState.exists === true ? '1' : '0'}
                         />
 
-                        <div className="rounded-[1.15rem] border border-app-border bg-[#f8f7f3]/72 p-4">
+                        <div className="theme-surface-muted rounded-[1.15rem] border border-app-border p-4">
                             <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
                                 <div className="grid gap-2">
                                     <Label htmlFor="student_number">
@@ -216,13 +216,13 @@ export function StudentLookupForm({
                                                 ? `${studentOptions.student_number_prefix}...`
                                                 : '26102859'
                                         }
-                                        className="h-12 rounded-xl border-app-border bg-white/82 px-4"
+                                        className="theme-surface-strong h-12 rounded-xl border-app-border px-4"
                                     />
                                 </div>
                                 <Button
                                     type="button"
                                     variant="secondary"
-                                    className="h-12 rounded-full border border-app-border bg-white px-5 text-app-ink hover:bg-app-ink hover:text-white md:min-w-34"
+                                    className="h-12 rounded-full border border-app-border bg-white px-5 text-app-ink hover:bg-[#1c1826] hover:text-white md:min-w-34 dark:bg-app-surface dark:hover:bg-app-brass dark:hover:text-[#1c1826]"
                                     onClick={lookup}
                                     disabled={
                                         previewState.status === 'loading' ||
@@ -275,7 +275,7 @@ export function StudentLookupForm({
                         {foundStudent && (
                             <div className="public-sketch-card border-app-green/35 bg-app-green/10 rounded-[1.15rem] border p-5">
                                 <div className="flex items-start gap-3">
-                                    <span className="text-app-green grid size-10 shrink-0 place-items-center rounded-full bg-white/70">
+                                    <span className="text-app-green theme-surface grid size-10 shrink-0 place-items-center rounded-full">
                                         <CheckCircle2 className="size-5" />
                                     </span>
                                     <div>
@@ -312,13 +312,13 @@ export function StudentLookupForm({
                                     />
                                 </div>
                                 <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                                    <span className="rounded-full border border-app-border bg-white/72 px-3 py-1.5 text-app-muted">
+                                    <span className="theme-surface rounded-full border border-app-border px-3 py-1.5 text-app-muted">
                                         Email{' '}
                                         {foundStudent.has_email
                                             ? 'already on file'
                                             : 'needed'}
                                     </span>
-                                    <span className="rounded-full border border-app-border bg-white/72 px-3 py-1.5 text-app-muted">
+                                    <span className="theme-surface rounded-full border border-app-border px-3 py-1.5 text-app-muted">
                                         Phone{' '}
                                         {foundStudent.has_phone
                                             ? 'already on file'
@@ -343,7 +343,7 @@ export function StudentLookupForm({
                         )}
 
                         {foundStudent && needsContact && (
-                            <div className="public-sketch-card grid gap-4 rounded-[1.15rem] border border-app-border bg-white/64 p-5 sm:grid-cols-2">
+                            <div className="public-sketch-card theme-surface grid gap-4 rounded-[1.15rem] border border-app-border p-5 sm:grid-cols-2">
                                 <div className="sm:col-span-2">
                                     <p className="text-sm font-semibold text-app-ink">
                                         Add missing contact details
@@ -363,7 +363,7 @@ export function StudentLookupForm({
                                             id="email"
                                             name="email"
                                             type="email"
-                                            className="h-11 rounded-xl border-app-border bg-white/74"
+                                            className="theme-surface h-11 rounded-xl border-app-border"
                                         />
                                         <InputError message={errors.email} />
                                     </div>
@@ -376,7 +376,7 @@ export function StudentLookupForm({
                                         <Input
                                             id="phone"
                                             name="phone"
-                                            className="h-11 rounded-xl border-app-border bg-white/74"
+                                            className="theme-surface h-11 rounded-xl border-app-border"
                                         />
                                         <InputError message={errors.phone} />
                                     </div>
@@ -398,7 +398,7 @@ export function StudentLookupForm({
 
                         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-app-border pt-5">
                             <div className="flex items-center gap-3 text-sm text-app-muted">
-                                <span className="grid size-10 place-items-center rounded-full bg-app-ink/6 text-app-red">
+                                <span className="theme-ink-soft grid size-10 place-items-center rounded-full text-app-red">
                                     <CreditCard className="size-5" />
                                 </span>
                                 <span>
@@ -411,7 +411,7 @@ export function StudentLookupForm({
                             </div>
                             <Button
                                 type="submit"
-                                className="h-12 rounded-full bg-app-ink px-6 text-white hover:bg-app-red"
+                                className="theme-primary-action h-12 rounded-full px-6"
                                 disabled={processing || !canCreate}
                             >
                                 <ShieldCheck className="size-4" />
@@ -429,7 +429,7 @@ export function StudentLookupForm({
 
 function PreviewDetail({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-[0.9rem] border border-app-border bg-white/64 p-3">
+        <div className="theme-surface rounded-[0.9rem] border border-app-border p-3">
             <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-app-muted uppercase">
                 {label}
             </p>

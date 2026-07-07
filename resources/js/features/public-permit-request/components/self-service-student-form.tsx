@@ -18,7 +18,7 @@ export function SelfServiceStudentForm({
     errors?: Record<string, string | undefined>;
 }) {
     return (
-        <div className="public-sketch-card relative overflow-hidden rounded-[1.15rem] border border-app-border bg-white/64 p-5">
+        <div className="public-sketch-card theme-surface relative overflow-hidden rounded-[1.15rem] border border-app-border p-5">
             <div
                 className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                 aria-hidden="true"
@@ -50,7 +50,7 @@ export function SelfServiceStudentForm({
                     <Select name="course">
                         <SelectTrigger
                             id="course"
-                            className="h-11 rounded-xl border-app-border bg-white/80"
+                            className="theme-surface-strong h-11 rounded-xl border-app-border"
                         >
                             <SelectValue placeholder="Select course" />
                         </SelectTrigger>
@@ -72,7 +72,7 @@ export function SelfServiceStudentForm({
                     <Select name="level">
                         <SelectTrigger
                             id="level"
-                            className="h-11 rounded-xl border-app-border bg-white/80"
+                            className="theme-surface-strong h-11 rounded-xl border-app-border"
                         >
                             <SelectValue placeholder="Select level" />
                         </SelectTrigger>
@@ -119,7 +119,7 @@ function Field({
                 name={id}
                 type={type}
                 placeholder={placeholder}
-                className="h-11 rounded-xl border-app-border bg-white/80"
+                className="theme-surface-strong h-11 rounded-xl border-app-border"
             />
             <InputError message={error} />
         </div>

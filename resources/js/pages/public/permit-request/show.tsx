@@ -15,7 +15,7 @@ export default function PublicPermitRequestShow({
         <>
             <Head title={`Permit Request ${permitRequest.reference}`} />
 
-            <section className="relative overflow-hidden bg-[#f8f7f3]">
+            <section className="theme-paper relative overflow-hidden">
                 <div
                     className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                     aria-hidden="true"
@@ -51,7 +51,7 @@ export default function PublicPermitRequestShow({
                     </div>
 
                     <aside className="grid content-end gap-4">
-                        <div className="public-sketch-card rounded-[1.25rem] border border-app-border bg-white/64 p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
+                        <div className="public-sketch-card theme-surface rounded-[1.25rem] border border-app-border p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
                             <CreditCard className="size-5 text-app-red" />
                             <p className="mt-4 text-sm leading-7 text-app-muted">
                                 If payment succeeds, return through the Paystack
@@ -59,7 +59,7 @@ export default function PublicPermitRequestShow({
                                 transaction.
                             </p>
                         </div>
-                        <div className="public-sketch-card rounded-[1.25rem] border border-app-border bg-white/64 p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
+                        <div className="public-sketch-card theme-surface rounded-[1.25rem] border border-app-border p-5 shadow-[0_14px_42px_rgba(28,24,38,0.045)]">
                             <Clock className="size-5 text-app-red" />
                             <p className="mt-4 text-sm leading-7 text-app-muted">
                                 Some requests wait for administrative review
