@@ -1,13 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import {
-    ChevronRight,
-    GraduationCap,
-    Menu,
-    ShieldCheck,
-    X,
-} from 'lucide-react';
+import { ChevronRight, Menu, ShieldCheck, X } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 import { home } from '@/routes';
 import { index as announcementsIndex } from '@/routes/public/announcements';
@@ -25,7 +19,11 @@ const navItems = [
     },
     { label: 'Events', href: eventsIndex(), url: eventsIndex.url() },
     { label: 'Documents', href: documentsIndex(), url: documentsIndex.url() },
-    { label: 'Executives', href: executivesIndex(), url: executivesIndex.url() },
+    {
+        label: 'Executives',
+        href: executivesIndex(),
+        url: executivesIndex.url(),
+    },
     { label: 'Elections', href: electionsIndex(), url: electionsIndex.url() },
     {
         label: 'Permit Request',
@@ -36,52 +34,96 @@ const navItems = [
 
 export default function PublicLayout({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const currentUrl = usePage().url;
+    const isHome = currentUrl === '/' || currentUrl.startsWith('/?');
+    const transparentHeader = isHome && !scrolled && !open;
+
+    useEffect(() => {
+        function updateScrolledState() {
+            setScrolled(window.scrollY > 36);
+        }
+
+        updateScrolledState();
+        window.addEventListener('scroll', updateScrolledState, {
+            passive: true,
+        });
+
+        return () => window.removeEventListener('scroll', updateScrolledState);
+    }, []);
 
     function isActive(href: string) {
         return currentUrl === href || currentUrl.startsWith(`${href}/`);
     }
 
     return (
-        <div className="public-page">
-            {/* Ambient gradient blobs */}
-            <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-                <div className="absolute -top-40 -right-32 size-[48rem] rounded-full bg-app-teal/5 blur-3xl dark:bg-app-teal/8" />
-                <div className="absolute top-1/3 -left-40 size-[36rem] rounded-full bg-app-red/4 blur-3xl dark:bg-app-red/6" />
-                <div className="absolute -bottom-20 right-1/4 size-[40rem] rounded-full bg-app-brass/5 blur-3xl dark:bg-app-brass/6" />
-            </div>
-
-            {/* Subtle dot texture */}
-            <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.025] [background-image:radial-gradient(#17211b_1px,transparent_1px)] [background-size:20px_20px] dark:opacity-[0.045] dark:[background-image:radial-gradient(#f5ead2_1px,transparent_1px)]" />
-
-            {/* Header */}
-            <header className="sticky top-0 z-40 border-b border-app-border/25 bg-white/75 backdrop-blur-xl dark:bg-app-page/80">
-                <div className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between px-5 md:px-8">
-                    {/* Brand */}
-                    <Link href={home()} className="group flex items-center gap-3">
-                        <div className="grid size-10 place-items-center overflow-hidden rounded-2xl border border-app-border/40 bg-white shadow-md shadow-app-teal/10 transition duration-300 group-hover:scale-105 group-hover:shadow-app-teal/20 dark:border-app-border/20 dark:bg-app-surface">
+        <div className="public-page relative overflow-x-hidden bg-[#f8f7f3] text-app-ink dark:bg-app-page">
+            <header
+                className={`top-0 z-40 w-full px-3 py-3 text-app-ink transition-all duration-300 ${
+                    isHome ? 'fixed' : 'sticky'
+                } ${transparentHeader ? 'text-white' : 'text-app-ink'}`}
+            >
+                <div
+                    className={`mx-auto flex h-15 w-full max-w-7xl items-center justify-between rounded-full border px-3 shadow-[0_18px_60px_rgba(12,10,18,0.08)] transition-all duration-300 md:px-4 ${
+                        transparentHeader
+                            ? 'border-white/16 bg-white/[0.07] shadow-none backdrop-blur-[2px]'
+                            : 'border-app-border/80 bg-[#f8f7f3]/92 backdrop-blur-xl dark:bg-app-page/92'
+                    }`}
+                >
+                    <Link
+                        href={home()}
+                        className="group flex min-w-0 items-center gap-3"
+                    >
+                        <span
+                            className={`grid size-10 shrink-0 place-items-center overflow-hidden rounded-full transition duration-300 group-hover:scale-95 ${
+                                transparentHeader
+                                    ? 'bg-white/14 ring-1 ring-white/18'
+                                    : 'bg-app-ink ring-1 ring-app-border dark:bg-app-surface'
+                            }`}
+                        >
                             <AppLogoIcon className="size-full object-cover" />
-                        </div>
-                        <div className="leading-tight">
-                            <span className="block text-[15px] font-extrabold tracking-tight text-app-ink">
+                        </span>
+                        <span className="min-w-0 leading-tight">
+                            <span
+                                className={`block truncate text-sm font-semibold tracking-tight ${
+                                    transparentHeader
+                                        ? 'text-white'
+                                        : 'text-app-ink'
+                                }`}
+                            >
                                 Knutsford SRC
                             </span>
-                            <span className="block text-[9px] font-bold uppercase tracking-[0.22em] text-app-teal dark:text-app-brass">
+                            <span
+                                className={`block text-[0.68rem] font-medium tracking-[0.18em] uppercase ${
+                                    transparentHeader
+                                        ? 'text-white/62'
+                                        : 'text-app-muted'
+                                }`}
+                            >
                                 Public portal
                             </span>
-                        </div>
+                        </span>
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden items-center gap-1 lg:flex">
+                    <nav
+                        className={`hidden items-center gap-1 rounded-full border p-1 lg:flex ${
+                            transparentHeader
+                                ? 'border-white/12 bg-black/10'
+                                : 'border-app-border bg-white/60 dark:bg-app-surface/60'
+                        }`}
+                    >
                         {navItems.map((item) => (
                             <Link
                                 key={item.label}
                                 href={item.href}
-                                className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
-                                    isActive(item.url)
-                                        ? 'bg-app-teal/10 text-app-teal dark:bg-app-brass/10 dark:text-app-brass'
-                                        : 'text-app-muted hover:bg-app-surface-muted/60 hover:text-app-ink dark:hover:bg-app-surface/30'
+                                className={`rounded-full px-3.5 py-2 text-xs font-semibold transition duration-200 ${
+                                    transparentHeader
+                                        ? isActive(item.url)
+                                            ? 'bg-white text-app-ink'
+                                            : 'text-white/72 hover:bg-white/10 hover:text-white'
+                                        : isActive(item.url)
+                                          ? 'bg-app-ink text-white'
+                                          : 'text-app-muted hover:bg-app-ink/5 hover:text-app-ink'
                                 }`}
                             >
                                 {item.label}
@@ -89,42 +131,58 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                         ))}
                     </nav>
 
-                    {/* Right side */}
-                    <div className="hidden items-center gap-3 md:flex">
-                        <div className="hidden items-center gap-2 rounded-full border border-app-border/40 bg-app-surface-muted/50 px-3.5 py-2 text-xs font-semibold text-app-muted xl:flex">
-                            <ShieldCheck className="size-3.5 text-app-teal dark:text-app-brass" />
-                            Official SRC information
-                        </div>
-                    </div>
+                    <Link
+                        href={permitRequestIndex()}
+                        className={`hidden items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition duration-200 md:flex ${
+                            transparentHeader
+                                ? 'border-white/18 bg-white text-app-ink hover:bg-white/88'
+                                : 'border-app-ink bg-app-ink text-white hover:border-app-red hover:bg-app-red'
+                        }`}
+                    >
+                        <ShieldCheck
+                            className={`size-3.5 ${
+                                transparentHeader
+                                    ? 'text-app-red'
+                                    : 'text-white'
+                            }`}
+                        />
+                        Permit
+                    </Link>
 
-                    {/* Mobile menu button */}
                     <button
                         type="button"
-                        className="grid size-10 place-items-center rounded-2xl border border-app-border/35 bg-white/80 text-app-ink shadow-sm backdrop-blur-sm transition hover:bg-app-surface-muted/60 md:hidden dark:border-app-border/25 dark:bg-app-surface/60"
+                        className={`grid size-10 place-items-center rounded-full border transition md:hidden ${
+                            transparentHeader
+                                ? 'border-white/18 bg-white/10 text-white hover:bg-white/15'
+                                : 'border-app-border bg-white/70 text-app-ink hover:bg-app-surface-muted dark:bg-app-surface'
+                        }`}
                         onClick={() => setOpen((value) => !value)}
                         aria-label="Toggle menu"
                     >
-                        {open ? <X className="size-4.5" /> : <Menu className="size-4.5" />}
+                        {open ? (
+                            <X className="size-4" />
+                        ) : (
+                            <Menu className="size-4" />
+                        )}
                     </button>
                 </div>
 
-                {/* Mobile Menu Drawer */}
                 {open && (
-                    <div className="border-t border-app-border/20 bg-white/90 px-5 py-4 backdrop-blur-xl md:hidden dark:bg-app-page/90">
-                        <nav className="grid gap-1.5">
+                    <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-app-border bg-[#f8f7f3] p-2 shadow-[0_24px_70px_rgba(12,10,18,0.16)] md:hidden dark:bg-app-page">
+                        <nav className="grid gap-1">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                                    className={`flex items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition ${
                                         isActive(item.url)
-                                            ? 'bg-app-teal/10 text-app-teal dark:bg-app-brass/10 dark:text-app-brass'
-                                            : 'text-app-ink hover:bg-app-surface-muted/60'
+                                            ? 'bg-app-ink text-white dark:bg-app-surface-muted dark:text-app-ink'
+                                            : 'text-app-muted hover:bg-white hover:text-app-ink dark:hover:bg-app-surface'
                                     }`}
                                     onClick={() => setOpen(false)}
                                 >
                                     {item.label}
-                                    <ChevronRight className="size-4 opacity-40" />
+                                    <ChevronRight className="size-4 opacity-50" />
                                 </Link>
                             ))}
                         </nav>
@@ -132,80 +190,82 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                 )}
             </header>
 
-            <main className="relative z-10">{children}</main>
+            <main>{children}</main>
 
-            {/* Footer */}
-            <footer className="relative z-10 mt-24 border-t border-app-border/25 bg-white/60 backdrop-blur-xl dark:bg-app-surface/40">
-                <div className="mx-auto grid w-full max-w-7xl gap-12 px-5 py-14 md:grid-cols-[1fr_auto_auto] md:px-8">
-                    {/* Brand column */}
+            <footer className="relative overflow-hidden border-t border-app-border/80 bg-[#f8f7f3] dark:bg-app-page">
+                <div
+                    className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
+                    aria-hidden="true"
+                />
+                <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
                     <div className="max-w-sm">
-                        <Link href={home()} className="group inline-flex items-center gap-3">
-                            <div className="grid size-10 place-items-center overflow-hidden rounded-2xl border border-app-border/40 bg-white shadow-md shadow-app-teal/8 transition duration-300 group-hover:scale-105 dark:border-app-border/20 dark:bg-app-surface">
+                        <Link
+                            href={home()}
+                            className="inline-flex items-center gap-3"
+                        >
+                            <span className="grid size-9 place-items-center overflow-hidden rounded-md bg-app-ink dark:bg-app-surface">
                                 <AppLogoIcon className="size-full object-cover" />
-                            </div>
-                            <div className="leading-tight">
-                                <p className="text-[15px] font-extrabold tracking-tight text-app-ink">
+                            </span>
+                            <span>
+                                <span className="block text-sm font-semibold text-app-ink">
                                     Knutsford SRC
-                                </p>
-                                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-app-teal dark:text-app-brass">
+                                </span>
+                                <span className="block text-xs text-app-muted">
                                     Student Representative Council
-                                </p>
-                            </div>
+                                </span>
+                            </span>
                         </Link>
-                        <p className="mt-5 text-sm leading-relaxed text-app-muted">
-                            Official announcements, events, documents, leadership
-                            profiles, and election information from the Student
-                            Representative Council.
+                        <p className="mt-5 text-sm leading-7 text-app-muted">
+                            A calm public record for notices, events, documents,
+                            leadership, elections, and student services.
                         </p>
-                        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-app-border/30 bg-app-surface-muted/50 px-3.5 py-2 text-xs font-semibold text-app-muted">
-                            <GraduationCap className="size-3.5 text-app-teal dark:text-app-brass" />
-                            Knutsford University College
-                        </div>
+                        <p className="public-hand mt-5 rotate-[-2deg] text-base text-app-muted">
+                            official student desk
+                        </p>
                     </div>
 
-                    {/* Portal links column */}
-                    <div>
-                        <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.22em] text-app-teal dark:text-app-brass">
-                            Portal
-                        </p>
-                        <ul className="grid gap-3">
-                            {navItems.slice(0, 3).map((item) => (
-                                <li key={item.label}>
-                                    <Link
-                                        href={item.href}
-                                        className="text-sm font-medium text-app-muted transition-colors duration-200 hover:text-app-ink dark:hover:text-app-surface"
-                                    >
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* More links column */}
-                    <div>
-                        <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.22em] text-app-teal dark:text-app-brass">
-                            More
-                        </p>
-                        <ul className="grid gap-3">
-                            {navItems.slice(3).map((item) => (
-                                <li key={item.label}>
-                                    <Link
-                                        href={item.href}
-                                        className="text-sm font-medium text-app-muted transition-colors duration-200 hover:text-app-ink dark:hover:text-app-surface"
-                                    >
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <FooterLinks title="Browse" items={navItems.slice(0, 3)} />
+                    <FooterLinks title="Services" items={navItems.slice(3)} />
                 </div>
 
-                <div className="border-t border-app-border/20 px-5 py-5 text-center text-xs font-medium text-app-muted/70">
-                    © {new Date().getFullYear()} Knutsford University SRC. All rights reserved.
+                <div className="relative border-t border-app-border/70 px-5 py-5 text-xs text-app-muted">
+                    <div className="mx-auto flex max-w-7xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <span>
+                            © {new Date().getFullYear()} Knutsford University
+                            SRC.
+                        </span>
+                        <span>Official student information portal.</span>
+                    </div>
                 </div>
             </footer>
+        </div>
+    );
+}
+
+function FooterLinks({
+    title,
+    items,
+}: {
+    title: string;
+    items: typeof navItems;
+}) {
+    return (
+        <div className="rounded-[1.2rem] border border-app-border bg-white/48 p-5 dark:bg-app-surface/40">
+            <p className="mb-4 text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
+                {title}
+            </p>
+            <ul className="grid gap-3">
+                {items.map((item) => (
+                    <li key={item.label}>
+                        <Link
+                            href={item.href}
+                            className="text-sm font-medium text-app-ink transition hover:text-app-red"
+                        >
+                            {item.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
