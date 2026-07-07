@@ -7,10 +7,9 @@ import {
     Pencil,
     Phone,
     Trash2,
-    UserRound
-    
+    UserRound,
 } from 'lucide-react';
-import type {LucideIcon} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Heading from '@/components/shared/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,7 @@ export default function ShowStudent({
         <>
             <Head title={student.student_number} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <Button asChild variant="ghost" className="w-fit">
                     <Link href={index()}>
                         <ArrowLeft />
@@ -49,60 +48,63 @@ export default function ShowStudent({
                     </Link>
                 </Button>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title={student.name ?? 'Unnamed student'}
-                        description={`Student number ${student.student_number}`}
-                    />
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title={student.name ?? 'Unnamed student'}
+                            description={`Student number ${student.student_number}`}
+                        />
 
-                    <div className="flex gap-2">
-                        {can.activateAccount &&
-                            student.account_status !== 'activated' && (
-                                <StudentActivateAccountDialog
+                        <div className="flex gap-2">
+                            {can.activateAccount &&
+                                student.account_status !== 'activated' && (
+                                    <StudentActivateAccountDialog
+                                        student={student}
+                                        trigger={
+                                            <Button variant="secondary">
+                                                <KeyRound />
+                                                {student.account_status ===
+                                                'pending_setup'
+                                                    ? 'Resend setup'
+                                                    : 'Activate account'}
+                                            </Button>
+                                        }
+                                    />
+                                )}
+
+                            {can.update && (
+                                <StudentFormDialog
+                                    mode="edit"
+                                    options={options}
                                     student={student}
                                     trigger={
-                                        <Button variant="secondary">
-                                            <KeyRound />
-                                            {student.account_status ===
-                                            'pending_setup'
-                                                ? 'Resend setup'
-                                                : 'Activate account'}
+                                        <Button variant="outline">
+                                            <Pencil />
+                                            Edit
                                         </Button>
                                     }
                                 />
                             )}
 
-                        {can.update && (
-                            <StudentFormDialog
-                                mode="edit"
-                                options={options}
-                                student={student}
-                                trigger={
-                                    <Button variant="outline">
-                                        <Pencil />
-                                        Edit
-                                    </Button>
-                                }
-                            />
-                        )}
-
-                        {can.delete && (
-                            <StudentDeleteDialog
-                                student={student}
-                                trigger={
-                                    <Button variant="destructive">
-                                        <Trash2 />
-                                        Delete
-                                    </Button>
-                                }
-                            />
-                        )}
+                            {can.delete && (
+                                <StudentDeleteDialog
+                                    student={student}
+                                    trigger={
+                                        <Button variant="destructive">
+                                            <Trash2 />
+                                            Delete
+                                        </Button>
+                                    }
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                    <Card className="gap-0 py-0">
-                        <CardHeader className="border-b py-4">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="border-b border-app-border py-4">
                             <CardTitle>Student profile</CardTitle>
                             <CardDescription>
                                 Core profile fields used across student
@@ -147,8 +149,8 @@ export default function ShowStudent({
                         </CardContent>
                     </Card>
 
-                    <Card className="gap-0 py-0">
-                        <CardHeader className="border-b py-4">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="border-b border-app-border py-4">
                             <CardTitle>Account readiness</CardTitle>
                             <CardDescription>
                                 Student login access is handled through account
@@ -156,7 +158,7 @@ export default function ShowStudent({
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 py-4">
-                            <div className="flex items-center justify-between rounded-md border bg-muted/20 p-4">
+                            <div className="app-panel-muted flex items-center justify-between p-4">
                                 <div>
                                     <p className="text-xs text-muted-foreground">
                                         Current state
@@ -188,7 +190,7 @@ export default function ShowStudent({
                     </Card>
                 </div>
 
-                <Card className="max-w-3xl gap-0 py-0">
+                <Card className="app-panel max-w-3xl gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <CardTitle>Configured options</CardTitle>
                         <CardDescription>
@@ -196,7 +198,7 @@ export default function ShowStudent({
                             expanded later from a settings screen.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex flex-wrap gap-2 border-t py-4">
+                    <CardContent className="flex flex-wrap gap-2 border-t border-app-border py-4">
                         {options.levels.map((level) => (
                             <Badge key={level.value} variant="outline">
                                 Level {level.label}
@@ -222,13 +224,15 @@ function Detail({
     value: string | null;
 }) {
     return (
-        <div className="flex gap-3 rounded-md border p-4">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+        <div className="app-panel-muted flex gap-3 p-4">
+            <div className="theme-ink-soft flex size-8 shrink-0 items-center justify-center rounded-lg text-app-red">
                 <Icon className="size-4" />
             </div>
             <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">{label}</dt>
-                <dd className="mt-1 truncate text-sm font-medium">
+                <dt className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                    {label}
+                </dt>
+                <dd className="mt-1 truncate text-sm font-semibold text-app-ink">
                     {value ?? 'Not provided'}
                 </dd>
             </div>
@@ -245,7 +249,7 @@ function ReadinessRow({
 }) {
     return (
         <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{label}</span>
+            <span className="text-app-muted">{label}</span>
             <Badge variant={complete ? 'secondary' : 'outline'}>
                 {complete ? 'Ready' : 'Pending'}
             </Badge>

@@ -1,16 +1,14 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { Archive, ArrowLeft, Pencil, Send, Trash2 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+    ContentPage,
+    ContentToolbar,
+    DetailItem,
+    DetailPanel,
+} from '@/features/content/components/content-admin-surface';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { EventFeaturedBadge } from '@/features/events/components/event-featured-badge';
@@ -29,7 +27,7 @@ export default function ShowEvent({
         <>
             <Head title={event.title} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <ContentPage>
                 <Button asChild variant="ghost" className="w-fit">
                     <Link href={index()}>
                         <ArrowLeft />
@@ -37,7 +35,7 @@ export default function ShowEvent({
                     </Link>
                 </Button>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <ContentToolbar>
                     <Heading
                         title={event.title}
                         description={event.excerpt ?? event.slug}
@@ -95,92 +93,71 @@ export default function ShowEvent({
                             />
                         )}
                     </div>
-                </div>
+                </ContentToolbar>
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
-                    <Card className="gap-0 py-0">
+                    <DetailPanel
+                        title="Description"
+                        description="Event details as currently stored."
+                    >
                         {event.banner_url && (
                             <img
                                 src={event.banner_url}
                                 alt=""
-                                className="max-h-80 w-full rounded-t-lg object-cover"
+                                className="-mx-5 -mt-5 mb-5 max-h-80 w-[calc(100%+2.5rem)] object-cover"
                             />
                         )}
-                        <CardHeader className="border-b py-4">
-                            <CardTitle>Description</CardTitle>
-                            <CardDescription>
-                                Event details as currently stored.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="max-w-none py-4">
-                            <RichTextViewer value={event.description} />
-                        </CardContent>
-                    </Card>
+                        <RichTextViewer value={event.description} />
+                    </DetailPanel>
 
-                    <Card className="h-fit gap-0 py-0">
-                        <CardHeader className="border-b py-4">
-                            <CardTitle>Event details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 py-4">
-                            <Detail label="Status">
+                    <DetailPanel title="Event details" className="h-fit">
+                        <div className="space-y-3">
+                            <DetailItem label="Status">
                                 <EventStatusBadge event={event} />
-                            </Detail>
-                            <Detail label="Visibility">
-                                <VisibilityBadge visibility={event.visibility} />
-                            </Detail>
-                            <Detail label="Featured">
+                            </DetailItem>
+                            <DetailItem label="Visibility">
+                                <VisibilityBadge
+                                    visibility={event.visibility}
+                                />
+                            </DetailItem>
+                            <DetailItem label="Featured">
                                 {event.is_featured ? (
                                     <EventFeaturedBadge isFeatured />
                                 ) : (
                                     'No'
                                 )}
-                            </Detail>
-                            <Detail label="Starts">
+                            </DetailItem>
+                            <DetailItem label="Starts">
                                 {formatDate(event.starts_at)}
-                            </Detail>
-                            <Detail label="Ends">
+                            </DetailItem>
+                            <DetailItem label="Ends">
                                 {formatDate(event.ends_at)}
-                            </Detail>
-                            <Detail label="Location">
+                            </DetailItem>
+                            <DetailItem label="Location">
                                 {event.location ?? 'Not set'}
-                            </Detail>
-                            <Detail label="Category">
+                            </DetailItem>
+                            <DetailItem label="Category">
                                 {event.category ?? 'Not set'}
-                            </Detail>
-                            <Detail label="Capacity">
+                            </DetailItem>
+                            <DetailItem label="Capacity">
                                 {event.max_attendees === null
                                     ? 'Unlimited'
                                     : `${event.current_attendees} / ${event.max_attendees}`}
-                            </Detail>
-                            <Detail label="Organizer">
+                            </DetailItem>
+                            <DetailItem label="Organizer">
                                 {event.organizer.name}
-                            </Detail>
-                            <Detail label="Published">
+                            </DetailItem>
+                            <DetailItem label="Published">
                                 {formatDate(event.published_at)}
-                            </Detail>
-                            <Detail label="Archived">
+                            </DetailItem>
+                            <DetailItem label="Archived">
                                 {formatDate(event.archived_at)}
-                            </Detail>
-                        </CardContent>
-                    </Card>
+                            </DetailItem>
+                        </div>
+                    </DetailPanel>
                 </div>
-            </div>
+            </ContentPage>
         </>
-    );
-}
-
-function Detail({
-    label,
-    children,
-}: {
-    label: string;
-    children: ReactNode;
-}) {
-    return (
-        <div className="rounded-md border bg-muted/20 p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="mt-1 text-sm font-medium">{children}</div>
-        </div>
     );
 }
 

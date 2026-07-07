@@ -38,7 +38,6 @@ export default function PermitsIndex({
     issuedPermitCode?: string | null;
     can: PermitPermissions;
 }) {
-    console.log('options', options);
     const { url } = usePage();
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
     const shouldOpenIssueDialog = useMemo(
@@ -86,12 +85,15 @@ export default function PermitsIndex({
         <>
             <Head title="Permits" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title="Permits"
-                        description="Issue and manage student permits for academic periods."
-                    />
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title="Permits"
+                            description="Issue and manage student permits for academic periods."
+                        />
+                    </div>
                 </div>
 
                 {can.issue && shouldOpenIssueDialog && (
@@ -105,7 +107,7 @@ export default function PermitsIndex({
                 )}
 
                 {issuedPermitCode && (
-                    <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+                    <div className="rounded-2xl border border-app-brass/45 bg-app-brass/12 p-4 text-sm text-app-ink">
                         <p className="font-medium">Permit code generated</p>
                         <p className="mt-1">
                             Code:{' '}
@@ -138,7 +140,7 @@ export default function PermitsIndex({
                     />
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -152,7 +154,7 @@ export default function PermitsIndex({
                             </Badge>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-4 border-t py-4">
+                    <CardContent className="space-y-4 border-t border-app-border py-4">
                         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                             <form
                                 onSubmit={submitSearch}
@@ -165,7 +167,7 @@ export default function PermitsIndex({
                                         onChange={(event) =>
                                             setSearchTerm(event.target.value)
                                         }
-                                        className="pl-9"
+                                        className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
                                         placeholder="Search permits"
                                     />
                                 </div>
@@ -223,13 +225,15 @@ function OverviewTile({
     value: string;
 }) {
     return (
-        <div className="flex items-center gap-3 rounded-md border bg-card p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="app-panel-muted flex items-center gap-3 p-4 transition duration-300 hover:-translate-y-0.5">
+            <div className="theme-primary-active flex size-10 shrink-0 items-center justify-center rounded-xl">
                 <Icon className="size-5" />
             </div>
             <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-medium">{value}</p>
+                <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                    {label}
+                </p>
+                <p className="text-sm font-semibold text-app-ink">{value}</p>
             </div>
         </div>
     );

@@ -19,9 +19,11 @@ export function PaymentList({
 }) {
     if (payments.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No payments found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No payments found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
                     Create a manual payment or adjust the filters.
                 </p>
             </div>
@@ -29,48 +31,51 @@ export function PaymentList({
     }
 
     return (
-        <div className="overflow-hidden rounded-md border bg-card">
+        <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-[0_18px_48px_rgba(17,24,19,0.06)] dark:shadow-none">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[980px] text-sm">
-                    <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                         <tr>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Reference
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Student
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Amount
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Permit
                             </th>
-                            <th className="px-4 py-3 text-right font-medium">
+                            <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-app-border">
                         {payments.data.map((payment) => (
                             <tr
                                 key={payment.id}
-                                className="bg-card hover:bg-muted/30"
+                                className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
                             >
                                 <td className="px-4 py-3">
-                                    <p className="font-medium">{payment.reference}</p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="font-semibold text-app-ink">
+                                        {payment.reference}
+                                    </p>
+                                    <p className="text-xs text-app-muted">
                                         {payment.gateway}
                                     </p>
                                 </td>
                                 <td className="px-4 py-3">
-                                    <p className="font-medium">
-                                        {payment.student.name ?? 'Unnamed student'}
+                                    <p className="font-semibold text-app-ink">
+                                        {payment.student.name ??
+                                            'Unnamed student'}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-app-muted">
                                         {payment.student.student_number}
                                     </p>
                                 </td>
@@ -85,53 +90,64 @@ export function PaymentList({
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex justify-end gap-2">
-                                        <Button asChild size="sm" variant="ghost">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            variant="ghost"
+                                        >
                                             <Link href={show(payment.id)}>
                                                 <Eye />
                                                 View
                                             </Link>
                                         </Button>
 
-                                        {canManage && payment.status === 'pending' && (
-                                            <>
-                                                <PaymentStatusDialog
-                                                    payment={payment}
-                                                    options={options}
-                                                    action="success"
-                                                    trigger={
-                                                        <Button
-                                                            size="sm"
-                                                            variant="secondary"
-                                                        >
-                                                            <CheckCircle2 />
-                                                            Success
-                                                        </Button>
-                                                    }
-                                                />
-                                                <PaymentStatusDialog
-                                                    payment={payment}
-                                                    options={options}
-                                                    action="failed"
-                                                    trigger={
-                                                        <Button size="sm" variant="outline">
-                                                            <XCircle />
-                                                            Failed
-                                                        </Button>
-                                                    }
-                                                />
-                                                <PaymentStatusDialog
-                                                    payment={payment}
-                                                    options={options}
-                                                    action="cancel"
-                                                    trigger={
-                                                        <Button size="sm" variant="outline">
-                                                            <Ban />
-                                                            Cancel
-                                                        </Button>
-                                                    }
-                                                />
-                                            </>
-                                        )}
+                                        {canManage &&
+                                            payment.status === 'pending' && (
+                                                <>
+                                                    <PaymentStatusDialog
+                                                        payment={payment}
+                                                        options={options}
+                                                        action="success"
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                            >
+                                                                <CheckCircle2 />
+                                                                Success
+                                                            </Button>
+                                                        }
+                                                    />
+                                                    <PaymentStatusDialog
+                                                        payment={payment}
+                                                        options={options}
+                                                        action="failed"
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <XCircle />
+                                                                Failed
+                                                            </Button>
+                                                        }
+                                                    />
+                                                    <PaymentStatusDialog
+                                                        payment={payment}
+                                                        options={options}
+                                                        action="cancel"
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <Ban />
+                                                                Cancel
+                                                            </Button>
+                                                        }
+                                                    />
+                                                </>
+                                            )}
 
                                         {canManage && (
                                             <ConfirmActionDialog
@@ -165,10 +181,10 @@ function PaymentPermitLink({ payment }: { payment: Payment }) {
     if (payment.permit) {
         return (
             <div>
-                <p className="font-medium">
+                <p className="font-semibold text-app-ink">
                     Last 4: {payment.permit.code_last4 ?? '----'}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-app-muted">
                     {payment.permit.status}
                 </p>
             </div>
@@ -183,7 +199,7 @@ function PaymentPermitLink({ payment }: { payment: Payment }) {
                         {payment.permit_request.reference}
                     </Link>
                 </Button>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-app-muted">
                     {payment.permit_request.requires_review &&
                     payment.permit_request.review_status === 'pending_review'
                         ? 'Awaiting student review'
@@ -193,5 +209,5 @@ function PaymentPermitLink({ payment }: { payment: Payment }) {
         );
     }
 
-    return <span className="text-muted-foreground">Not linked</span>;
+    return <span className="text-app-muted">Not linked</span>;
 }

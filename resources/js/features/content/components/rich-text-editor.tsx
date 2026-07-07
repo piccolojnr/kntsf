@@ -27,9 +27,9 @@ export function RichTextEditor({
     }, [value]);
 
     return (
-        <div className="overflow-hidden rounded-md border bg-background">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-3 py-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface-muted">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-app-border bg-app-surface px-4 py-3">
+                <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
                     <AlignLeft className="size-4" />
                     {label ?? 'Rich text'}
                 </div>
@@ -50,13 +50,13 @@ export function RichTextEditor({
                     props.onChange?.(event);
                 }}
                 className={cn(
-                    'min-h-48 resize-y rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0',
+                    'min-h-48 resize-y rounded-none border-0 bg-transparent text-app-ink shadow-none focus-visible:ring-0',
                     className,
                 )}
                 {...props}
             />
             {helperText && (
-                <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                <div className="border-t border-app-border bg-app-surface px-4 py-3 text-xs leading-5 text-app-muted">
                     {helperText}
                 </div>
             )}

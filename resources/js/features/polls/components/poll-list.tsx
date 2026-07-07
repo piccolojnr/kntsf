@@ -15,9 +15,11 @@ export function PollList({
 }) {
     if (polls.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No polls found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No polls found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
                     Create a poll or adjust your filters.
                 </p>
             </div>
@@ -25,38 +27,43 @@ export function PollList({
     }
 
     return (
-        <div className="overflow-hidden rounded-md border bg-card">
+        <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[980px] text-sm">
-                    <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                         <tr>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Poll
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Type
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Votes
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Creator
                             </th>
-                            <th className="px-4 py-3 text-right font-medium">
+                            <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-app-border">
                         {polls.data.map((poll) => (
-                            <tr key={poll.id} className="bg-card hover:bg-muted/30">
+                            <tr
+                                key={poll.id}
+                                className="transition duration-200 hover:bg-app-surface-muted"
+                            >
                                 <td className="px-4 py-3">
                                     <div className="space-y-1">
-                                        <p className="font-medium">{poll.title}</p>
-                                        <p className="max-w-md truncate text-xs text-muted-foreground">
+                                        <p className="font-semibold text-app-ink">
+                                            {poll.title}
+                                        </p>
+                                        <p className="max-w-md truncate text-xs text-app-muted">
                                             {poll.description ?? poll.slug}
                                         </p>
                                     </div>
@@ -64,23 +71,33 @@ export function PollList({
                                 <td className="px-4 py-3">
                                     <PollStatusBadge poll={poll} />
                                 </td>
-                                <td className="px-4 py-3 capitalize">
+                                <td className="px-4 py-3 text-app-ink capitalize">
                                     {poll.type.replace('_', ' ')}
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground">
+                                <td className="px-4 py-3 text-app-muted">
                                     {poll.votes_count}
                                 </td>
-                                <td className="px-4 py-3">{poll.creator.name}</td>
+                                <td className="px-4 py-3 text-app-ink">
+                                    {poll.creator.name}
+                                </td>
                                 <td className="px-4 py-3">
                                     <div className="flex justify-end gap-2">
-                                        <Button asChild size="sm" variant="ghost">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            variant="ghost"
+                                        >
                                             <Link href={show(poll.id)}>
                                                 <Eye />
                                                 View
                                             </Link>
                                         </Button>
                                         {can.update && (
-                                            <Button asChild size="sm" variant="outline">
+                                            <Button
+                                                asChild
+                                                size="sm"
+                                                variant="outline"
+                                            >
                                                 <Link href={edit(poll.id)}>
                                                     <Pencil />
                                                     Edit
@@ -94,7 +111,10 @@ export function PollList({
                                                 description={`This will remove "${poll.title}" from normal poll records.`}
                                                 confirmLabel="Delete poll"
                                                 trigger={
-                                                    <Button size="sm" variant="destructive">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                    >
                                                         <Trash2 />
                                                         Delete
                                                     </Button>

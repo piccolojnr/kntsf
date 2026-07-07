@@ -18,14 +18,14 @@ export function StudentNumberVerificationForm({
     options: VerificationOptions;
 }) {
     return (
-        <Card className="gap-0 py-0">
+        <Card className="app-panel gap-0 overflow-hidden py-0 transition duration-300 hover:-translate-y-0.5">
             <CardHeader className="py-4">
                 <CardTitle>Student number</CardTitle>
                 <CardDescription>
                     Verify against the student record and current permit.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="border-t py-4">
+            <CardContent className="border-t border-app-border py-4">
                 <Form
                     {...studentNumber.form()}
                     options={{ preserveScroll: true }}

@@ -75,15 +75,18 @@ export default function AuditLogsIndex({
         <>
             <Head title="Audit Logs" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <Heading
                     title="Audit Logs"
                     description="Review important system actions across students, permits, payments, NFC cards, and verification."
                 />
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
-                        <CardTitle>Operational audit trail</CardTitle>
+                        <p className="app-kicker">Audit stream</p>
+                        <CardTitle className="mt-1">
+                            Operational audit trail
+                        </CardTitle>
                         <CardDescription>
                             Filter by event, actor, date range, or subject type.
                         </CardDescription>
@@ -91,7 +94,7 @@ export default function AuditLogsIndex({
                     <CardContent className="space-y-4 border-t py-4">
                         <form
                             onSubmit={submit}
-                            className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
+                            className="app-panel-muted grid gap-3 p-3 lg:grid-cols-[1fr_1fr_10rem_10rem_1.2fr]"
                         >
                             <Select
                                 name="event"
@@ -148,7 +151,12 @@ export default function AuditLogsIndex({
                                     }
                                     placeholder="Subject type"
                                 />
-                                <Button type="submit">Filter</Button>
+                                <Button
+                                    type="submit"
+                                    className="theme-primary-action"
+                                >
+                                    Filter
+                                </Button>
                                 <Button
                                     type="button"
                                     variant="outline"

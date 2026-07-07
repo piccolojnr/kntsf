@@ -44,7 +44,7 @@ export function StudentFormDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
-            <DialogContent className="sm:max-w-2xl">
+            <DialogContent className="app-panel sm:max-w-2xl">
                 <div className="space-y-1">
                     <DialogTitle>
                         {isEditing ? 'Edit student' : 'Create student'}
@@ -72,7 +72,7 @@ export function StudentFormDialog({
                                 errors={errors}
                             />
 
-                            <DialogFooter className="border-t pt-4">
+                            <DialogFooter className="border-t border-app-border pt-4">
                                 <DialogClose asChild>
                                     <Button
                                         type="button"
@@ -83,7 +83,9 @@ export function StudentFormDialog({
                                     </Button>
                                 </DialogClose>
                                 <Button disabled={processing}>
-                                    {isEditing ? 'Save changes' : 'Create student'}
+                                    {isEditing
+                                        ? 'Save changes'
+                                        : 'Create student'}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -109,10 +111,12 @@ function StudentFields({
 
     return (
         <div className="space-y-5">
-            <div className="rounded-md border bg-muted/10 p-4">
+            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
-                    <p className="text-sm font-medium">Identity</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-semibold text-app-ink">
+                        Identity
+                    </p>
+                    <p className="text-xs text-app-muted">
                         Core student number and display name.
                     </p>
                 </div>
@@ -152,16 +156,20 @@ function StudentFields({
                 </div>
             </div>
 
-            <div className="rounded-md border bg-muted/10 p-4">
+            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
-                    <p className="text-sm font-medium">Contact</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-semibold text-app-ink">
+                        Contact
+                    </p>
+                    <p className="text-xs text-app-muted">
                         Email and phone details used for account activation.
                     </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="grid gap-2">
-                        <Label htmlFor={`student_email_${fieldId}`}>Email</Label>
+                        <Label htmlFor={`student_email_${fieldId}`}>
+                            Email
+                        </Label>
                         <Input
                             id={`student_email_${fieldId}`}
                             name="email"
@@ -174,7 +182,9 @@ function StudentFields({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor={`student_phone_${fieldId}`}>Phone</Label>
+                        <Label htmlFor={`student_phone_${fieldId}`}>
+                            Phone
+                        </Label>
                         <Input
                             id={`student_phone_${fieldId}`}
                             name="phone"
@@ -187,16 +197,20 @@ function StudentFields({
                 </div>
             </div>
 
-            <div className="rounded-md border bg-muted/10 p-4">
+            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
-                    <p className="text-sm font-medium">Academic profile</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-semibold text-app-ink">
+                        Academic profile
+                    </p>
+                    <p className="text-xs text-app-muted">
                         Course and level placement for this student.
                     </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="grid gap-2">
-                        <Label htmlFor={`student_course_${fieldId}`}>Course</Label>
+                        <Label htmlFor={`student_course_${fieldId}`}>
+                            Course
+                        </Label>
                         <Select
                             name="course"
                             defaultValue={student?.course ?? undefined}
@@ -222,7 +236,9 @@ function StudentFields({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor={`student_level_${fieldId}`}>Level</Label>
+                        <Label htmlFor={`student_level_${fieldId}`}>
+                            Level
+                        </Label>
                         <Select
                             name="level"
                             defaultValue={student?.level ?? undefined}

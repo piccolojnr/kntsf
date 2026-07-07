@@ -19,9 +19,15 @@ export default function EditElection({
     return (
         <>
             <Head title={`Edit ${election.title}`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex justify-between gap-4">
-                    <Heading title="Edit election" description={election.title} />
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p className="app-kicker">Election setup</p>
+                        <Heading
+                            title="Edit election"
+                            description={election.title}
+                        />
+                    </div>
                     <Button asChild variant="outline">
                         <Link href={show(election.id)}>
                             <ArrowLeft />

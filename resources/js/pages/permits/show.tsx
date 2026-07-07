@@ -27,7 +27,7 @@ export default function ShowPermit({
         <>
             <Head title={`Permit ${permit.code_last4 ?? permit.id}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <Button asChild variant="ghost" className="w-fit">
                     <Link href={index()}>
                         <ArrowLeft />
@@ -35,47 +35,50 @@ export default function ShowPermit({
                     </Link>
                 </Button>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title={`Permit ending ${permit.code_last4 ?? '----'}`}
-                        description={`${permit.student.student_number} · ${permit.student.name ?? 'Unnamed student'}`}
-                    />
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title={`Permit ending ${permit.code_last4 ?? '----'}`}
+                            description={`${permit.student.student_number} · ${permit.student.name ?? 'Unnamed student'}`}
+                        />
 
-                    <div className="flex gap-2">
-                        {can.markCardDelivered &&
-                            permit.card_delivered_at === null && (
-                                <Form
-                                    {...markCardDelivered.form(permit.id)}
-                                    options={{ preserveScroll: true }}
-                                >
-                                    {({ processing }) => (
-                                        <Button
-                                            variant="secondary"
-                                            disabled={processing}
-                                        >
-                                            <CheckCircle2 />
-                                            Mark delivered
+                        <div className="flex gap-2">
+                            {can.markCardDelivered &&
+                                permit.card_delivered_at === null && (
+                                    <Form
+                                        {...markCardDelivered.form(permit.id)}
+                                        options={{ preserveScroll: true }}
+                                    >
+                                        {({ processing }) => (
+                                            <Button
+                                                variant="secondary"
+                                                disabled={processing}
+                                            >
+                                                <CheckCircle2 />
+                                                Mark delivered
+                                            </Button>
+                                        )}
+                                    </Form>
+                                )}
+
+                            {can.revoke && permit.status !== 'revoked' && (
+                                <PermitRevokeDialog
+                                    permit={permit}
+                                    trigger={
+                                        <Button variant="destructive">
+                                            <XCircle />
+                                            Revoke
                                         </Button>
-                                    )}
-                                </Form>
+                                    }
+                                />
                             )}
-
-                        {can.revoke && permit.status !== 'revoked' && (
-                            <PermitRevokeDialog
-                                permit={permit}
-                                trigger={
-                                    <Button variant="destructive">
-                                        <XCircle />
-                                        Revoke
-                                    </Button>
-                                }
-                            />
-                        )}
+                        </div>
                     </div>
                 </div>
 
                 {issuedPermitCode && (
-                    <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+                    <div className="rounded-2xl border border-app-brass/45 bg-app-brass/12 p-4 text-sm text-app-ink">
                         <p className="font-medium">One-time permit code</p>
                         <p className="mt-1">
                             Code:{' '}
@@ -91,8 +94,8 @@ export default function ShowPermit({
                 )}
 
                 <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                    <Card className="gap-0 py-0">
-                        <CardHeader className="border-b py-4">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="border-b border-app-border py-4">
                             <CardTitle>Permit details</CardTitle>
                             <CardDescription>
                                 Public code is represented only by last four
@@ -130,8 +133,8 @@ export default function ShowPermit({
                         </CardContent>
                     </Card>
 
-                    <Card className="gap-0 py-0">
-                        <CardHeader className="border-b py-4">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="border-b border-app-border py-4">
                             <CardTitle>Student</CardTitle>
                             <CardDescription>
                                 Permit owner summary.
@@ -162,8 +165,8 @@ export default function ShowPermit({
                     </Card>
                 </div>
 
-                <Card className="max-w-3xl gap-0 py-0">
-                    <CardHeader className="border-b py-4">
+                <Card className="app-panel max-w-3xl gap-0 overflow-hidden py-0">
+                    <CardHeader className="border-b border-app-border py-4">
                         <CardTitle>Academic period</CardTitle>
                         <CardDescription>
                             Semester linkage for this permit.
@@ -196,8 +199,8 @@ export default function ShowPermit({
                 </Card>
 
                 {permit.status === 'revoked' && (
-                    <Card className="max-w-3xl gap-0 py-0">
-                        <CardHeader className="border-b py-4">
+                    <Card className="app-panel max-w-3xl gap-0 overflow-hidden py-0">
+                        <CardHeader className="border-b border-app-border py-4">
                             <CardTitle>Revocation</CardTitle>
                             <CardDescription>
                                 Revoked permit audit details.
@@ -210,7 +213,9 @@ export default function ShowPermit({
                             />
                             <Detail
                                 label="Revoked by"
-                                value={permit.revoked_by?.name ?? 'Not provided'}
+                                value={
+                                    permit.revoked_by?.name ?? 'Not provided'
+                                }
                             />
                             <div className="sm:col-span-2">
                                 <Detail
@@ -239,9 +244,11 @@ function Detail({
     children?: React.ReactNode;
 }) {
     return (
-        <div className="rounded-md border p-4">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="mt-1 text-sm font-medium">
+        <div className="app-panel-muted p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </p>
+            <div className="mt-1 text-sm font-semibold text-app-ink">
                 {children ?? value ?? 'Not provided'}
             </div>
         </div>

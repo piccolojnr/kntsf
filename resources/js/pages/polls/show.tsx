@@ -1,16 +1,14 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { Archive, ArrowLeft, Pencil, Send, Trash2 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+    ContentPage,
+    ContentToolbar,
+    DetailItem,
+    DetailPanel,
+} from '@/features/content/components/content-admin-surface';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { PollResults } from '@/features/polls/components/poll-results';
@@ -29,7 +27,7 @@ export default function ShowPoll({
     return (
         <>
             <Head title={poll.title} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <ContentPage>
                 <Button asChild variant="ghost" className="w-fit">
                     <Link href={index()}>
                         <ArrowLeft />
@@ -37,7 +35,7 @@ export default function ShowPoll({
                     </Link>
                 </Button>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <ContentToolbar>
                     <Heading
                         title={poll.title}
                         description={poll.description ?? poll.slug}
@@ -101,96 +99,68 @@ export default function ShowPoll({
                             />
                         )}
                     </div>
-                </div>
+                </ContentToolbar>
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
                     <div className="space-y-4">
                         {poll.description && (
-                            <Card className="gap-0 py-0">
-                                <CardHeader className="border-b py-4">
-                                    <CardTitle>About this poll</CardTitle>
-                                </CardHeader>
-                                <CardContent className="py-4">
-                                    <RichTextViewer value={poll.description} />
-                                </CardContent>
-                            </Card>
+                            <DetailPanel title="About this poll">
+                                <RichTextViewer value={poll.description} />
+                            </DetailPanel>
                         )}
 
-                        <Card className="gap-0 py-0">
-                            <CardHeader className="border-b py-4">
-                                <CardTitle>Vote</CardTitle>
-                                <CardDescription>
-                                    Student accounts can vote once unless vote
-                                    changes are enabled.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="py-4">
-                                <PollVotePanel
-                                    poll={poll}
-                                    canVote={can.vote ?? false}
-                                />
-                            </CardContent>
-                        </Card>
+                        <DetailPanel
+                            title="Vote"
+                            description="Student accounts can vote once unless vote changes are enabled."
+                        >
+                            <PollVotePanel
+                                poll={poll}
+                                canVote={can.vote ?? false}
+                            />
+                        </DetailPanel>
 
-                        <Card className="gap-0 py-0">
-                            <CardHeader className="border-b py-4">
-                                <CardTitle>Results</CardTitle>
-                                <CardDescription>
-                                    Results follow the poll visibility setting.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="py-4">
-                                {can.view_results ? (
-                                    <PollResults poll={poll} />
-                                ) : (
-                                    <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
-                                        Results are hidden.
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        <DetailPanel
+                            title="Results"
+                            description="Results follow the poll visibility setting."
+                        >
+                            {can.view_results ? (
+                                <PollResults poll={poll} />
+                            ) : (
+                                <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
+                                    Results are hidden.
+                                </div>
+                            )}
+                        </DetailPanel>
                     </div>
 
-                    <Card className="h-fit gap-0 py-0">
-                        <CardHeader className="border-b py-4">
-                            <CardTitle>Poll details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 py-4">
-                            <Detail label="Status">
+                    <DetailPanel title="Poll details" className="h-fit">
+                        <div className="space-y-3">
+                            <DetailItem label="Status">
                                 <PollStatusBadge poll={poll} />
-                            </Detail>
-                            <Detail label="Visibility">
+                            </DetailItem>
+                            <DetailItem label="Visibility">
                                 <VisibilityBadge visibility={poll.visibility} />
-                            </Detail>
-                            <Detail label="Type">
+                            </DetailItem>
+                            <DetailItem label="Type" className="capitalize">
                                 {poll.type.replace('_', ' ')}
-                            </Detail>
-                            <Detail label="Votes">{poll.votes_count}</Detail>
-                            <Detail label="Starts">
+                            </DetailItem>
+                            <DetailItem label="Votes">
+                                {poll.votes_count}
+                            </DetailItem>
+                            <DetailItem label="Starts">
                                 {formatDate(poll.starts_at)}
-                            </Detail>
-                            <Detail label="Ends">{formatDate(poll.ends_at)}</Detail>
-                            <Detail label="Creator">{poll.creator.name}</Detail>
-                        </CardContent>
-                    </Card>
+                            </DetailItem>
+                            <DetailItem label="Ends">
+                                {formatDate(poll.ends_at)}
+                            </DetailItem>
+                            <DetailItem label="Creator">
+                                {poll.creator.name}
+                            </DetailItem>
+                        </div>
+                    </DetailPanel>
                 </div>
-            </div>
+            </ContentPage>
         </>
-    );
-}
-
-function Detail({
-    label,
-    children,
-}: {
-    label: string;
-    children: ReactNode;
-}) {
-    return (
-        <div className="rounded-md border bg-muted/20 p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="mt-1 text-sm font-medium capitalize">{children}</div>
-        </div>
     );
 }
 

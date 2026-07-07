@@ -34,7 +34,7 @@ export function AppSidebar() {
         <Sidebar
             collapsible="icon"
             variant="inset"
-            className="border-sidebar-border/70"
+            className="admin-rail border-sidebar-border/70 shadow-[16px_0_60px_rgba(18,13,28,0.18)]"
         >
             <SidebarHeader className="border-b border-sidebar-border/60 p-3">
                 <SidebarMenu>
@@ -42,7 +42,7 @@ export function AppSidebar() {
                         <SidebarMenuButton
                             size="lg"
                             asChild
-                            className="h-14 rounded-md px-3 text-sidebar-foreground hover:bg-sidebar-accent data-active:bg-sidebar-accent"
+                            className="h-14 rounded-[1rem] px-3 text-sidebar-foreground transition duration-200 hover:bg-white/8 data-active:bg-white/8"
                         >
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />

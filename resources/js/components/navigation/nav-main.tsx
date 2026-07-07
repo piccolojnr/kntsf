@@ -62,10 +62,8 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                             isActive={isActive}
                                             tooltip={{ children: item.title }}
                                             className={cn(
-                                                'h-10 rounded-md border border-transparent px-2.5 text-sidebar-foreground/72',
-                                                'hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                                                'data-active:border-sidebar-primary/45 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground',
-                                                '[&_svg]:text-sidebar-foreground/52 data-active:[&_svg]:text-sidebar-primary',
+                                                'admin-nav-item',
+                                                '[&_svg]:text-sidebar-foreground/52',
                                             )}
                                         >
                                             <Link href={item.href} prefetch>
@@ -85,7 +83,7 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
                                                             isActive={isCurrentUrl(
                                                                 child.href,
                                                             )}
-                                                            className="rounded-md text-sidebar-foreground/65 data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
+                                                            className="rounded-[0.7rem] text-sidebar-foreground/65 transition duration-200 data-active:bg-app-brass data-active:text-[#1c1826]"
                                                         >
                                                             <Link
                                                                 href={

@@ -30,22 +30,25 @@ export default function PaymentShow({
         <>
             <Head title={payment.reference} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title={payment.reference}
-                        description="Payment details, linked student, and permit status."
-                    />
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title={payment.reference}
+                            description="Payment details, linked student, and permit status."
+                        />
 
-                    <Button asChild variant="outline">
-                        <Link href={index()}>
-                            <ArrowLeft />
-                            Back to payments
-                        </Link>
-                    </Button>
+                        <Button asChild variant="outline">
+                            <Link href={index()}>
+                                <ArrowLeft />
+                                Back to payments
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -57,12 +60,24 @@ export default function PaymentShow({
                             <PaymentStatusBadge payment={payment} />
                         </div>
                     </CardHeader>
-                    <CardContent className="grid gap-3 border-t py-4 md:grid-cols-2">
-                        <Detail label="Amount" value={`${payment.currency} ${payment.amount}`} />
+                    <CardContent className="grid gap-3 border-t border-app-border py-4 md:grid-cols-2">
+                        <Detail
+                            label="Amount"
+                            value={`${payment.currency} ${payment.amount}`}
+                        />
                         <Detail label="Gateway" value={payment.gateway} />
-                        <Detail label="Paid at" value={formatDate(payment.paid_at)} />
-                        <Detail label="Verified at" value={formatDate(payment.verified_at)} />
-                        <Detail label="Student" value={`${payment.student.name ?? 'Unnamed student'} (${payment.student.student_number})`} />
+                        <Detail
+                            label="Paid at"
+                            value={formatDate(payment.paid_at)}
+                        />
+                        <Detail
+                            label="Verified at"
+                            value={formatDate(payment.verified_at)}
+                        />
+                        <Detail
+                            label="Student"
+                            value={`${payment.student.name ?? 'Unnamed student'} (${payment.student.student_number})`}
+                        />
                         <Detail
                             label="Permit"
                             value={
@@ -83,14 +98,15 @@ export default function PaymentShow({
                 </Card>
 
                 {payment.permit_request && (
-                    <Card className="gap-0 py-0">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
                         <CardHeader className="py-4">
                             <CardTitle>Permit request</CardTitle>
                             <CardDescription>
-                                This payment was collected through the self-service permit request flow.
+                                This payment was collected through the
+                                self-service permit request flow.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="grid gap-3 border-t py-4 md:grid-cols-2">
+                        <CardContent className="grid gap-3 border-t border-app-border py-4 md:grid-cols-2">
                             <Detail
                                 label="Request reference"
                                 value={
@@ -132,8 +148,10 @@ export default function PaymentShow({
                                 value={
                                     payment.permit
                                         ? 'Permit issued'
-                                        : payment.permit_request.requires_review &&
-                                            payment.permit_request.review_status ===
+                                        : payment.permit_request
+                                                .requires_review &&
+                                            payment.permit_request
+                                                .review_status ===
                                                 'pending_review'
                                           ? 'Waiting for student review approval'
                                           : 'Waiting for permit issuance'
@@ -144,14 +162,14 @@ export default function PaymentShow({
                 )}
 
                 {can.manage && (
-                    <Card className="gap-0 py-0">
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
                         <CardHeader className="py-4">
                             <CardTitle>Actions</CardTitle>
                             <CardDescription>
                                 Admin-only payment status updates.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="flex flex-wrap gap-2 border-t py-4">
+                        <CardContent className="flex flex-wrap gap-2 border-t border-app-border py-4">
                             {payment.status === 'pending' && (
                                 <>
                                     <PaymentStatusDialog
@@ -196,9 +214,7 @@ export default function PaymentShow({
                                 description={`This will remove payment ${payment.reference} from normal payment records. This is a destructive action.`}
                                 confirmLabel="Delete payment"
                                 trigger={
-                                    <Button
-                                        variant="destructive"
-                                    >
+                                    <Button variant="destructive">
                                         <Trash2 />
                                         Delete
                                     </Button>
@@ -214,9 +230,11 @@ export default function PaymentShow({
 
 function Detail({ label, value }: { label: string; value: ReactNode }) {
     return (
-        <div className="rounded-md border bg-muted/20 p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 font-medium">{value}</p>
+        <div className="app-panel-muted p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </p>
+            <p className="mt-1 font-semibold text-app-ink">{value}</p>
         </div>
     );
 }

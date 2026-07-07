@@ -15,14 +15,14 @@ import { permitCode } from '@/routes/verification';
 
 export function PermitCodeVerificationForm() {
     return (
-        <Card className="gap-0 py-0">
+        <Card className="app-panel gap-0 overflow-hidden py-0 transition duration-300 hover:-translate-y-0.5">
             <CardHeader className="py-4">
                 <CardTitle>Permit code</CardTitle>
                 <CardDescription>
                     Check a submitted code without storing it in plaintext.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="border-t py-4">
+            <CardContent className="border-t border-app-border py-4">
                 <Form
                     {...permitCode.form()}
                     options={{ preserveScroll: true }}
@@ -38,6 +38,7 @@ export function PermitCodeVerificationForm() {
                                     maxLength={100}
                                     placeholder="Enter permit code"
                                     required
+                                    className="h-11 rounded-xl border-app-border bg-app-surface"
                                 />
                                 <InputError message={errors.permit_code} />
                             </div>

@@ -16,11 +16,12 @@ export function VerificationResultCard({
 }) {
     if (!result) {
         return (
-            <Card className="gap-0 py-0">
+            <Card className="app-panel gap-0 overflow-hidden py-0">
                 <CardHeader className="py-4">
                     <CardTitle>Verification result</CardTitle>
                     <CardDescription>
-                        Submit a student number or permit code to see the result.
+                        Submit a student number or permit code to see the
+                        result.
                     </CardDescription>
                 </CardHeader>
             </Card>
@@ -39,7 +40,7 @@ export function VerificationResultCard({
     }[result.result];
 
     return (
-        <Card className="gap-0 py-0">
+        <Card className="app-panel gap-0 overflow-hidden py-0">
             <CardHeader className="py-4">
                 <div className="flex items-start justify-between gap-4">
                     <div>
@@ -55,9 +56,9 @@ export function VerificationResultCard({
                     />
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4 border-t py-4 text-sm">
+            <CardContent className="space-y-4 border-t border-app-border py-4 text-sm">
                 {result.reason && (
-                    <p className="text-muted-foreground">{result.reason}</p>
+                    <p className="text-app-muted">{result.reason}</p>
                 )}
 
                 <div className="grid gap-3 md:grid-cols-2">
@@ -79,7 +80,9 @@ export function VerificationResultCard({
                     />
                     <DetailBlock
                         label="Academic period"
-                        value={result.permit?.academic_period?.name ?? 'Not set'}
+                        value={
+                            result.permit?.academic_period?.name ?? 'Not set'
+                        }
                     />
                     <DetailBlock
                         label="Expires"
@@ -93,9 +96,11 @@ export function VerificationResultCard({
 
 function DetailBlock({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-md border bg-muted/20 p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 font-medium">{value}</p>
+        <div className="app-panel-muted p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </p>
+            <p className="mt-1 font-semibold text-app-ink">{value}</p>
         </div>
     );
 }

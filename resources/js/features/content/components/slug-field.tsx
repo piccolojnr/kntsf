@@ -19,7 +19,7 @@ export function SlugField({
                 maxLength={255}
                 placeholder="Leave blank to generate from title"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs leading-5 text-app-muted">
                 Use this only when the public URL needs a specific readable
                 address.
             </p>

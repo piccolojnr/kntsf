@@ -16,7 +16,7 @@ export default function Appearance() {
                     title="Appearance settings"
                     description="Choose how the dashboard should render on this device."
                 />
-                <div className="app-panel-muted p-4">
+                <div className="app-panel-muted p-5">
                     <p className="app-kicker">Theme mode</p>
                     <div className="mt-3">
                         <AppearanceTabs />

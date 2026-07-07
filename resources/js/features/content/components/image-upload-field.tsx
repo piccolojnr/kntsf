@@ -21,7 +21,9 @@ export function ImageUploadField({
     error?: string;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(existingUrl ?? null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+        existingUrl ?? null,
+    );
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -35,13 +37,13 @@ export function ImageUploadField({
     return (
         <div className="grid gap-2">
             <Label htmlFor={id}>{label}</Label>
-            <div className="rounded-md border border-dashed bg-muted/20 p-3">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-3">
                 {previewUrl ? (
                     <div className="space-y-3">
                         <img
                             src={previewUrl}
                             alt=""
-                            className="aspect-video w-full rounded-md object-cover"
+                            className="aspect-video w-full rounded-[0.85rem] object-cover shadow-[0_14px_34px_rgba(23,33,27,0.1)]"
                         />
                         <Button
                             type="button"
@@ -60,10 +62,12 @@ export function ImageUploadField({
                         </Button>
                     </div>
                 ) : (
-                    <div className="flex min-h-32 flex-col items-center justify-center rounded-md bg-background p-4 text-center">
-                        <ImagePlus className="size-8 text-muted-foreground" />
-                        <p className="mt-2 text-sm font-medium">No image selected</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                    <div className="flex min-h-36 flex-col items-center justify-center rounded-[0.85rem] bg-app-surface p-4 text-center">
+                        <ImagePlus className="size-8 text-app-red" />
+                        <p className="mt-2 text-sm font-semibold text-app-ink">
+                            No image selected
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-app-muted">
                             {description}
                         </p>
                     </div>

@@ -1,9 +1,10 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     Activity,
     AlertTriangle,
     ArrowUpRight,
     BadgeCheck,
+    CheckCircle2,
     CreditCard,
     Crown,
     IdCard,
@@ -17,6 +18,12 @@ import {
 import type { ComponentType, ReactNode } from 'react';
 import type { ActivityItem } from '@/features/audit-logs/types';
 import { dashboard } from '@/routes';
+import { index as nfcCardsIndex } from '@/routes/nfc-cards';
+import { index as paymentsIndex } from '@/routes/payments';
+import { index as permitRequestsIndex } from '@/routes/permit-requests';
+import { index as permitsIndex } from '@/routes/permits';
+import { index as studentsIndex } from '@/routes/students';
+import type { RouteDefinition } from '@/wayfinder';
 
 type DashboardSummary = {
     total_students: number;
@@ -28,6 +35,8 @@ type DashboardSummary = {
     active_nfc_cards: number;
     pending_payments: number;
     successful_payments: number;
+    stuck_permit_requests?: number;
+    paid_unissued_permit_requests?: number;
     verification_attempts_today: number;
     failed_verification_attempts_today: number;
     active_elections: number;
@@ -71,10 +80,17 @@ export default function Dashboard({
             summary.failed_verification_attempts_today,
             summary.verification_attempts_today,
         );
+    const verificationSuccessLabel =
+        summary.verification_attempts_today > 0
+            ? `${verificationSuccessRate}%`
+            : 'No checks';
     const permitPressure =
         summary.active_permits +
         summary.expired_permits +
         summary.revoked_permits;
+    const stuckPermitRequests = summary.stuck_permit_requests ?? 0;
+    const paidUnissuedPermitRequests =
+        summary.paid_unissued_permit_requests ?? 0;
 
     const commandCards = [
         {
@@ -82,73 +98,114 @@ export default function Dashboard({
             value: summary.total_students,
             detail: `${activationRate}% activated`,
             icon: Users,
-            tone: 'emerald',
+            tone: 'teal',
             meter: activationRate,
+            href: studentsIndex(),
         },
         {
             label: 'Active permits',
             value: summary.active_permits,
             detail: `${summary.expired_permits} expired / ${summary.revoked_permits} revoked`,
             icon: IdCard,
-            tone: 'amber',
+            tone: 'brass',
             meter: percent(summary.active_permits, permitPressure),
+            href: permitsIndex(),
         },
         {
             label: 'NFC coverage',
             value: summary.active_nfc_cards,
             detail: 'Active cards assigned',
             icon: Wifi,
-            tone: 'cyan',
+            tone: 'ink',
             meter: percent(summary.active_nfc_cards, summary.total_students),
+            href: nfcCardsIndex(),
         },
         {
             label: 'Payment confirmations',
             value: summary.successful_payments,
             detail: `${summary.pending_payments} pending`,
             icon: CreditCard,
-            tone: 'rose',
+            tone: 'red',
             meter: percent(
                 summary.successful_payments,
                 summary.successful_payments + summary.pending_payments,
             ),
+            href: paymentsIndex(),
+        },
+    ] as const;
+
+    const triageItems = [
+        {
+            label: 'Stuck requests',
+            value: stuckPermitRequests,
+            detail: 'Permit requests that need recovery',
+            href: permitRequestsIndex(),
+            alert: stuckPermitRequests > 0,
+        },
+        {
+            label: 'Paid, not issued',
+            value: paidUnissuedPermitRequests,
+            detail: 'Payments confirmed before permit issue',
+            href: permitRequestsIndex(),
+            alert: paidUnissuedPermitRequests > 0,
+        },
+        {
+            label: 'Failed checks',
+            value: summary.failed_verification_attempts_today,
+            detail: 'Verification issues today',
+            href: permitRequestsIndex(),
+            alert: summary.failed_verification_attempts_today > 0,
         },
     ] as const;
 
     return (
         <>
             <Head title="Dashboard" />
-            <div className="app-page p-4 md:p-6">
-                <section className="relative overflow-hidden rounded-md border border-app-border bg-app-ink text-app-surface shadow-[0_24px_80px_rgba(17,24,19,0.18)] dark:shadow-none">
-                    <div className="absolute inset-0 bg-[linear-gradient(90deg,#f5ead2_1px,transparent_1px),linear-gradient(#f5ead2_1px,transparent_1px)] bg-size-[36px_36px] opacity-[0.08]" />
-                    <div className="relative grid gap-8 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
+            <main className="app-page p-4 md:p-6">
+                <section className="theme-ink-panel relative overflow-hidden rounded-[1.35rem] border border-app-border shadow-[0_24px_80px_rgba(17,24,19,0.18)]">
+                    <div
+                        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-size-[34px_34px]"
+                        aria-hidden="true"
+                    />
+                    <div
+                        className="absolute top-8 right-10 size-32 rounded-full border border-dashed border-white/16"
+                        aria-hidden="true"
+                    />
+                    <div className="relative grid gap-8 p-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:p-8">
                         <div>
-                            <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black tracking-[0.22em] text-app-ink uppercase">
+                            <p className="inline-flex items-center gap-2 rounded-full bg-app-brass px-3 py-1.5 text-xs font-semibold tracking-[0.2em] text-[#1c1826] uppercase">
                                 <Landmark className="size-4" />
                                 SRC control room
                             </p>
-                            <h1 className="mt-6 max-w-4xl text-5xl leading-[0.92] font-black tracking-normal md:text-7xl">
+                            <h1 className="mt-6 max-w-4xl text-4xl leading-[0.98] font-semibold tracking-[-0.045em] text-white md:text-6xl">
                                 Operations overview
                             </h1>
-                            <p className="mt-5 max-w-2xl text-sm leading-7 text-app-surface/75">
-                                Live working summary for student records,
+                            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/68">
+                                A live working summary for student records,
                                 permits, NFC cards, payments, verification,
-                                content, and elections.
+                                publishing, and elections.
                             </p>
                         </div>
                         <div className="grid content-end gap-3">
                             <StatusPlate
-                                label="Operational warnings"
+                                label="Warnings"
                                 value={warnings.length}
                                 icon={AlertTriangle}
                                 alert={warnings.length > 0}
                             />
                             <StatusPlate
                                 label="Verification success"
-                                value={`${verificationSuccessRate}%`}
+                                value={verificationSuccessLabel}
                                 icon={ShieldCheck}
                             />
                         </div>
                     </div>
+                </section>
+
+                <section className="mt-5 grid gap-3 lg:grid-cols-3">
+                    {triageItems.map((item) => (
+                        <TriageLink key={item.label} {...item} />
+                    ))}
                 </section>
 
                 <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -157,7 +214,7 @@ export default function Dashboard({
                     ))}
                 </section>
 
-                <section className="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
+                <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]">
                     <div className="grid gap-5">
                         <div className="grid gap-4 lg:grid-cols-3">
                             <SignalCard
@@ -241,7 +298,7 @@ export default function Dashboard({
                         )}
                     </Panel>
                 </section>
-            </div>
+            </main>
         </>
     );
 }
@@ -253,45 +310,88 @@ function CommandCard({
     icon: Icon,
     tone,
     meter,
+    href,
 }: {
     label: string;
     value: number;
     detail: string;
     icon: ComponentType<{ className?: string }>;
-    tone: 'emerald' | 'amber' | 'cyan' | 'rose';
+    tone: 'teal' | 'brass' | 'ink' | 'red';
     meter: number;
+    href: RouteDefinition<'get'>;
 }) {
     const tones = {
-        emerald: 'bg-app-teal text-white',
-        amber: 'bg-app-brass text-app-ink',
-        cyan: 'bg-app-ink text-app-surface',
-        rose: 'bg-app-red text-white',
+        teal: 'bg-app-teal text-white dark:bg-app-teal dark:text-[#0c0a12]',
+        brass: 'bg-app-brass text-[#1c1826]',
+        ink: 'bg-[#1c1826] text-white dark:bg-app-brass dark:text-[#1c1826]',
+        red: 'bg-app-red text-white',
     };
 
     return (
-        <article className="app-panel group p-5 transition hover:-translate-y-1">
+        <Link
+            href={href}
+            className="app-panel group block overflow-hidden p-5 transition duration-300 hover:-translate-y-1"
+        >
             <div className="flex items-start justify-between gap-4">
                 <div
-                    className={`grid size-12 place-items-center rounded-md ${tones[tone]}`}
+                    className={`grid size-12 place-items-center rounded-[0.9rem] ${tones[tone]}`}
                 >
                     <Icon className="size-5" />
                 </div>
-                <ArrowUpRight className="size-5 text-app-muted transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpRight className="size-5 text-app-muted transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-app-red" />
             </div>
-            <p className="mt-6 text-xs font-black tracking-[0.18em] text-app-muted uppercase">
+            <p className="mt-6 text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
                 {label}
             </p>
-            <p className="mt-2 text-4xl font-black tabular-nums">{value}</p>
-            <p className="mt-2 text-sm font-semibold text-app-muted">
-                {detail}
+            <p className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-app-ink tabular-nums">
+                {value}
             </p>
-            <div className="mt-5 h-2 rounded-full bg-app-surface-muted">
+            <p className="mt-2 text-sm leading-6 text-app-muted">{detail}</p>
+            <div className="mt-5 h-2 overflow-hidden rounded-full bg-app-surface-muted">
                 <div
                     className={`h-full rounded-full ${tones[tone]}`}
                     style={{ width: `${meter}%` }}
                 />
             </div>
-        </article>
+        </Link>
+    );
+}
+
+function TriageLink({
+    label,
+    value,
+    detail,
+    href,
+    alert,
+}: {
+    label: string;
+    value: number;
+    detail: string;
+    href: RouteDefinition<'get'>;
+    alert: boolean;
+}) {
+    return (
+        <Link
+            href={href}
+            className="group hover:bg-app-surface-strong flex items-center justify-between gap-4 rounded-[1rem] border border-app-border bg-app-surface px-4 py-3 shadow-[0_14px_36px_rgba(17,24,19,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-app-red/35 dark:shadow-none"
+        >
+            <div className="min-w-0">
+                <p className="text-xs font-semibold tracking-[0.16em] text-app-muted uppercase">
+                    {label}
+                </p>
+                <p className="mt-1 truncate text-sm text-app-muted">{detail}</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+                <span
+                    className={`grid min-w-10 place-items-center rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums ${
+                        alert ? 'bg-app-red text-white' : 'theme-primary-active'
+                    }`}
+                >
+                    {value}
+                </span>
+                <ArrowUpRight className="size-4 text-app-muted transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-app-red" />
+            </div>
+        </Link>
     );
 }
 
@@ -307,18 +407,20 @@ function StatusPlate({
     alert?: boolean;
 }) {
     return (
-        <div className="rounded-md border border-app-surface/15 bg-black/20 p-4">
-            <div className="flex items-center justify-between">
-                <p className="text-xs font-black tracking-[0.22em] text-app-surface/75 uppercase">
+        <div className="rounded-[1rem] border border-white/12 bg-white/8 p-4 backdrop-blur">
+            <div className="flex items-center justify-between gap-4">
+                <p className="text-xs font-semibold tracking-[0.2em] text-white/66 uppercase">
                     {label}
                 </p>
                 <Icon
                     className={
-                        alert ? 'size-5 text-app-brass' : 'size-5 text-app-teal'
+                        alert ? 'size-5 text-app-brass' : 'size-5 text-white/70'
                     }
                 />
             </div>
-            <p className="mt-3 text-4xl font-black">{value}</p>
+            <p className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white">
+                {value}
+            </p>
         </div>
     );
 }
@@ -336,14 +438,16 @@ function SignalCard({
 }) {
     return (
         <article className="app-panel p-5">
-            <Icon className="size-5 text-app-red" />
-            <p className="mt-5 text-xs font-black tracking-[0.18em] text-app-muted uppercase">
+            <span className="theme-ink-soft grid size-10 place-items-center rounded-full text-app-red">
+                <Icon className="size-5" />
+            </span>
+            <p className="mt-5 text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
                 {label}
             </p>
-            <p className="mt-2 text-3xl font-black tabular-nums">{value}</p>
-            <p className="mt-1 text-sm font-semibold text-app-muted">
-                {detail}
+            <p className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-app-ink tabular-nums">
+                {value}
             </p>
+            <p className="mt-1 text-sm leading-6 text-app-muted">{detail}</p>
         </article>
     );
 }
@@ -360,17 +464,17 @@ function Panel({
     children: ReactNode;
 }) {
     return (
-        <section className="app-panel">
-            <header className="flex items-center justify-between border-b border-app-border p-5">
+        <section className="app-panel overflow-hidden">
+            <header className="flex items-center justify-between gap-4 border-b border-app-border p-5">
                 <div>
-                    <p className="text-[10px] font-black tracking-[0.24em] text-app-red uppercase">
+                    <p className="text-[10px] font-semibold tracking-[0.22em] text-app-red uppercase">
                         {eyebrow}
                     </p>
-                    <h2 className="mt-1 text-xl font-black tracking-normal">
+                    <h2 className="mt-1 text-xl font-semibold tracking-[-0.025em] text-app-ink">
                         {title}
                     </h2>
                 </div>
-                <div className="grid size-10 place-items-center rounded-md bg-app-ink text-app-surface dark:bg-app-surface dark:text-app-ink">
+                <div className="theme-primary-active grid size-10 place-items-center rounded-full">
                     <Icon className="size-5" />
                 </div>
             </header>
@@ -382,22 +486,24 @@ function Panel({
 function WarningRow({ item }: { item: DashboardWarning }) {
     const severity =
         item.severity === 'high'
-            ? 'bg-app-red'
+            ? 'bg-app-red text-white'
             : item.severity === 'medium'
-              ? 'bg-app-brass text-app-ink'
-              : 'bg-app-teal';
+              ? 'bg-app-brass text-[#1c1826]'
+              : 'bg-app-teal text-white dark:text-[#0c0a12]';
 
     return (
         <div className="app-panel-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="leading-tight font-black">{item.title}</p>
+                    <p className="leading-tight font-semibold text-app-ink">
+                        {item.title}
+                    </p>
                     <p className="mt-2 text-sm leading-6 text-app-muted">
                         {item.description}
                     </p>
                 </div>
                 <span
-                    className={`${severity} px-2 py-1 text-xs font-black text-white`}
+                    className={`${severity} rounded-full px-2.5 py-1 text-xs font-semibold`}
                 >
                     {item.count ?? '!'}
                 </span>
@@ -410,14 +516,12 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
     return (
         <div className="app-panel-muted p-4">
             <div className="flex items-center gap-2">
-                <span
-                    className={
-                        item.ready
-                            ? 'size-2 rounded-full bg-app-teal'
-                            : 'size-2 rounded-full bg-app-brass'
-                    }
-                />
-                <p className="font-black">{item.title}</p>
+                {item.ready ? (
+                    <CheckCircle2 className="size-4 text-app-teal dark:text-app-brass" />
+                ) : (
+                    <span className="size-2 rounded-full bg-app-brass" />
+                )}
+                <p className="font-semibold text-app-ink">{item.title}</p>
             </div>
             <p className="mt-2 text-sm leading-6 text-app-muted">
                 {item.description}
@@ -428,19 +532,21 @@ function ContentRow({ item }: { item: ContentReadinessItem }) {
 
 function ActivityRow({ item }: { item: ActivityItem }) {
     return (
-        <div className="rounded-md border-app-teal bg-app-surface-muted p-4">
+        <div className="rounded-[1rem] border border-app-border bg-app-surface-muted p-4">
             <div className="flex items-start justify-between gap-3">
                 <div>
-                    <p className="leading-tight font-black">{item.label}</p>
+                    <p className="leading-tight font-semibold text-app-ink">
+                        {item.label}
+                    </p>
                     <p className="mt-1 text-sm leading-6 text-app-muted">
                         {item.description ?? 'System activity'}
                     </p>
                 </div>
-                <span className="shrink-0 text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                <span className="shrink-0 text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
                     {formatActivityDate(item.created_at)}
                 </span>
             </div>
-            <p className="mt-3 text-xs font-black tracking-[0.14em] text-app-red uppercase">
+            <p className="mt-3 text-xs font-semibold tracking-[0.14em] text-app-red uppercase">
                 {item.actor?.name ?? 'System'}
                 {item.subject ? ` / ${item.subject.label}` : ''}
             </p>
@@ -458,11 +564,11 @@ function EmptyState({
     description: string;
 }) {
     return (
-        <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-app-border text-center">
+        <div className="grid min-h-52 place-items-center rounded-[1rem] border border-dashed border-app-border text-center">
             <div>
                 <Icon className="mx-auto mb-4 size-8 text-app-teal dark:text-app-brass" />
-                <p className="font-black">{title}</p>
-                <p className="mt-2 max-w-sm text-sm text-app-muted">
+                <p className="font-semibold text-app-ink">{title}</p>
+                <p className="mt-2 max-w-sm text-sm leading-6 text-app-muted">
                     {description}
                 </p>
             </div>

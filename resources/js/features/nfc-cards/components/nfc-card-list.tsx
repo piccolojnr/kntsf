@@ -16,9 +16,11 @@ export function NfcCardList({
 }) {
     if (cards.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No NFC cards found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No NFC cards found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
                     Register a card or adjust the search.
                 </p>
             </div>
@@ -26,36 +28,39 @@ export function NfcCardList({
     }
 
     return (
-        <div className="overflow-hidden rounded-md border bg-card">
+        <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-[0_18px_48px_rgba(17,24,19,0.06)] dark:shadow-none">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[920px] text-sm">
-                    <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                         <tr>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Student
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 UID
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Status
                             </th>
-                            <th className="px-4 py-3 text-left font-medium">
+                            <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                 Issued
                             </th>
-                            <th className="px-4 py-3 text-right font-medium">
+                            <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-app-border">
                         {cards.data.map((card) => (
-                            <tr key={card.id} className="bg-card hover:bg-muted/30">
+                            <tr
+                                key={card.id}
+                                className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
+                            >
                                 <td className="px-4 py-3">
-                                    <p className="font-medium">
+                                    <p className="font-semibold text-app-ink">
                                         {card.student.name ?? 'Unnamed student'}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-app-muted">
                                         {card.student.student_number}
                                     </p>
                                 </td>
@@ -65,65 +70,74 @@ export function NfcCardList({
                                 <td className="px-4 py-3">
                                     <NfcCardStatusBadge card={card} />
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground">
+                                <td className="px-4 py-3 text-app-muted">
                                     {formatDate(card.issued_at)}
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex justify-end gap-2">
-                                        <Button asChild size="sm" variant="ghost">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            variant="ghost"
+                                        >
                                             <Link href={show(card.id)}>
                                                 <Eye />
                                                 View
                                             </Link>
                                         </Button>
 
-                                        {canManage && card.status === 'active' && (
-                                            <>
-                                                <NfcCardReplaceDialog
-                                                    card={card}
-                                                    trigger={
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <RotateCcw />
-                                                            Replace
-                                                        </Button>
-                                                    }
-                                                />
-                                                <ConfirmActionDialog
-                                                    form={markLost.form(card.id)}
-                                                    title="Mark NFC card as lost?"
-                                                    description="This will deactivate the card and prevent it from verifying as valid."
-                                                    confirmLabel="Mark lost"
-                                                    variant="outline"
-                                                    trigger={
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <TriangleAlert />
-                                                            Lost
-                                                        </Button>
-                                                    }
-                                                />
-                                                <ConfirmActionDialog
-                                                    form={revoke.form(card.id)}
-                                                    title="Revoke NFC card?"
-                                                    description="This will revoke the card and prevent future NFC verification with this UID."
-                                                    confirmLabel="Revoke card"
-                                                    trigger={
-                                                        <Button
-                                                            size="sm"
-                                                            variant="destructive"
-                                                        >
-                                                            <ShieldX />
-                                                            Revoke
-                                                        </Button>
-                                                    }
-                                                />
-                                            </>
-                                        )}
+                                        {canManage &&
+                                            card.status === 'active' && (
+                                                <>
+                                                    <NfcCardReplaceDialog
+                                                        card={card}
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <RotateCcw />
+                                                                Replace
+                                                            </Button>
+                                                        }
+                                                    />
+                                                    <ConfirmActionDialog
+                                                        form={markLost.form(
+                                                            card.id,
+                                                        )}
+                                                        title="Mark NFC card as lost?"
+                                                        description="This will deactivate the card and prevent it from verifying as valid."
+                                                        confirmLabel="Mark lost"
+                                                        variant="outline"
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <TriangleAlert />
+                                                                Lost
+                                                            </Button>
+                                                        }
+                                                    />
+                                                    <ConfirmActionDialog
+                                                        form={revoke.form(
+                                                            card.id,
+                                                        )}
+                                                        title="Revoke NFC card?"
+                                                        description="This will revoke the card and prevent future NFC verification with this UID."
+                                                        confirmLabel="Revoke card"
+                                                        trigger={
+                                                            <Button
+                                                                size="sm"
+                                                                variant="destructive"
+                                                            >
+                                                                <ShieldX />
+                                                                Revoke
+                                                            </Button>
+                                                        }
+                                                    />
+                                                </>
+                                            )}
 
                                         {canManage && (
                                             <ConfirmActionDialog

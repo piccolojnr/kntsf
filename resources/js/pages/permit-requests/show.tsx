@@ -1,5 +1,11 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft, RefreshCcw, RotateCw, TimerOff, XCircle } from 'lucide-react';
+import {
+    ArrowLeft,
+    RefreshCcw,
+    RotateCw,
+    TimerOff,
+    XCircle,
+} from 'lucide-react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
@@ -61,7 +67,7 @@ export default function PermitRequestShow({
         <>
             <Head title={permitRequest.reference} />
 
-            <div className="space-y-6">
+            <div className="app-page space-y-5 p-4 md:p-6">
                 <Link
                     href={index()}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-app-muted hover:text-app-ink"
@@ -70,34 +76,77 @@ export default function PermitRequestShow({
                     Back to permit requests
                 </Link>
 
-                <section className="app-panel p-6">
+                <section className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
                     <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <p className="app-kicker">Permit request</p>
-                            <h1 className="mt-2 text-3xl font-black tracking-tight">
+                            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-app-ink">
                                 {permitRequest.reference}
                             </h1>
                         </div>
-                        <PermitRequestStatusBadge status={permitRequest.status} />
+                        <PermitRequestStatusBadge
+                            status={permitRequest.status}
+                        />
                     </div>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-3">
-                        <Detail label="Student" value={permitRequest.student?.name ?? 'Unnamed'} />
-                        <Detail label="Student number" value={permitRequest.student?.student_number ?? 'Unknown'} />
-                        <Detail label="Verification" value={permitRequest.student?.verification_status ?? 'Unknown'} />
-                        <Detail label="Course" value={permitRequest.student?.course ?? 'Pending'} />
-                        <Detail label="Level" value={permitRequest.student?.level ?? 'Pending'} />
-                        <Detail label="Payment" value={permitRequest.payment?.status ?? 'No payment'} />
-                        <Detail label="Email" value={permitRequest.contact_email ?? 'Missing'} />
-                        <Detail label="Phone" value={permitRequest.contact_phone ?? 'Missing'} />
-                        <Detail label="Amount" value={`${permitRequest.currency} ${Number(permitRequest.amount).toFixed(2)}`} />
-                        <Detail label="Recovery state" value={permitRequest.recovery_state ?? 'Normal'} />
+                        <Detail
+                            label="Student"
+                            value={permitRequest.student?.name ?? 'Unnamed'}
+                        />
+                        <Detail
+                            label="Student number"
+                            value={
+                                permitRequest.student?.student_number ??
+                                'Unknown'
+                            }
+                        />
+                        <Detail
+                            label="Verification"
+                            value={
+                                permitRequest.student?.verification_status ??
+                                'Unknown'
+                            }
+                        />
+                        <Detail
+                            label="Course"
+                            value={permitRequest.student?.course ?? 'Pending'}
+                        />
+                        <Detail
+                            label="Level"
+                            value={permitRequest.student?.level ?? 'Pending'}
+                        />
+                        <Detail
+                            label="Payment"
+                            value={
+                                permitRequest.payment?.status ?? 'No payment'
+                            }
+                        />
+                        <Detail
+                            label="Email"
+                            value={permitRequest.contact_email ?? 'Missing'}
+                        />
+                        <Detail
+                            label="Phone"
+                            value={permitRequest.contact_phone ?? 'Missing'}
+                        />
+                        <Detail
+                            label="Amount"
+                            value={`${permitRequest.currency} ${Number(permitRequest.amount).toFixed(2)}`}
+                        />
+                        <Detail
+                            label="Recovery state"
+                            value={permitRequest.recovery_state ?? 'Normal'}
+                        />
                     </div>
                 </section>
 
                 {can.recover && (
-                    <section className="app-panel p-6">
-                        <h2 className="text-lg font-black">Recovery actions</h2>
+                    <section className="app-panel p-5 md:p-6">
+                        <h2 className="text-lg font-semibold tracking-[-0.02em] text-app-ink">
+                            Recovery actions
+                        </h2>
                         <p className="mt-2 text-sm text-app-muted">
                             Use these only when Paystack callbacks arrive late,
                             issuance fails after a verified payment, or an
@@ -157,27 +206,34 @@ export default function PermitRequestShow({
                     </section>
                 )}
 
-                {permitRequest.requires_review && can.review && permitRequest.review_status === 'pending_review' && (
-                    <section className="app-panel p-6">
-                        <h2 className="text-lg font-black">Review student record</h2>
-                        <p className="mt-2 text-sm text-app-muted">
-                            Approving verifies the provisional student record
-                            and attempts permit issuance if payment is verified.
-                        </p>
+                {permitRequest.requires_review &&
+                    can.review &&
+                    permitRequest.review_status === 'pending_review' && (
+                        <section className="app-panel p-5 md:p-6">
+                            <h2 className="text-lg font-semibold tracking-[-0.02em] text-app-ink">
+                                Review student record
+                            </h2>
+                            <p className="mt-2 text-sm text-app-muted">
+                                Approving verifies the provisional student
+                                record and attempts permit issuance if payment
+                                is verified.
+                            </p>
 
-                        <div className="mt-5 grid gap-4 md:grid-cols-2">
-                            <ReviewForm
-                                action={approveReview.form(permitRequest.id)}
-                                buttonLabel="Approve review"
-                            />
-                            <ReviewForm
-                                action={rejectReview.form(permitRequest.id)}
-                                buttonLabel="Reject review"
-                                destructive
-                            />
-                        </div>
-                    </section>
-                )}
+                            <div className="mt-5 grid gap-4 md:grid-cols-2">
+                                <ReviewForm
+                                    action={approveReview.form(
+                                        permitRequest.id,
+                                    )}
+                                    buttonLabel="Approve review"
+                                />
+                                <ReviewForm
+                                    action={rejectReview.form(permitRequest.id)}
+                                    buttonLabel="Reject review"
+                                    destructive
+                                />
+                            </div>
+                        </section>
+                    )}
             </div>
         </>
     );
@@ -185,11 +241,11 @@ export default function PermitRequestShow({
 
 function Detail({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-md border border-app-border bg-app-surface-muted p-3">
-            <p className="text-xs font-black uppercase tracking-[0.14em] text-app-muted">
+        <div className="app-panel-muted p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
                 {label}
             </p>
-            <p className="mt-1 font-semibold">{value}</p>
+            <p className="mt-1 font-semibold text-app-ink">{value}</p>
         </div>
     );
 }
@@ -204,13 +260,16 @@ function ReviewForm({
     destructive?: boolean;
 }) {
     return (
-        <Form {...action} className="rounded-md border border-app-border bg-app-surface-muted p-4">
+        <Form
+            {...action}
+            className="rounded-2xl border border-app-border bg-app-surface-muted p-4"
+        >
             {({ processing, errors }) => (
                 <div className="grid gap-3">
                     <Textarea
                         name="review_notes"
                         placeholder="Review notes"
-                        className="min-h-24 bg-app-surface"
+                        className="min-h-24 rounded-xl border-app-border bg-app-surface"
                     />
                     <InputError message={errors.review_notes} />
                     <Button

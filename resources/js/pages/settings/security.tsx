@@ -55,7 +55,7 @@ export default function Security({
 
             <h1 className="sr-only">Security settings</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
                 <Heading
                     variant="small"
                     title="Update password"
@@ -82,7 +82,7 @@ export default function Security({
                             currentPasswordInput.current?.focus();
                         }
                     }}
-                    className="space-y-6"
+                    className="app-panel-muted space-y-5 p-4"
                 >
                     {({ errors, processing }) => (
                         <>
@@ -140,6 +140,7 @@ export default function Security({
                                 <Button
                                     disabled={processing}
                                     data-test="update-password-button"
+                                    className="theme-primary-action"
                                 >
                                     Save password
                                 </Button>
@@ -150,15 +151,15 @@ export default function Security({
             </div>
 
             {canManageTwoFactor && (
-                <div className="space-y-6">
+                <div className="space-y-5">
                     <Heading
                         variant="small"
                         title="Two-factor authentication"
                         description="Manage your two-factor authentication settings"
                     />
                     {twoFactorEnabled ? (
-                        <div className="flex flex-col items-start justify-start space-y-4">
-                            <p className="text-sm text-muted-foreground">
+                        <div className="app-panel-muted flex flex-col items-start justify-start gap-4 p-4">
+                            <p className="text-sm leading-6 text-app-muted">
                                 You will be prompted for a secure, random pin
                                 during login, which you can retrieve from the
                                 TOTP-supported application on your phone.
@@ -185,8 +186,8 @@ export default function Security({
                             />
                         </div>
                     ) : (
-                        <div className="flex flex-col items-start justify-start space-y-4">
-                            <p className="text-sm text-muted-foreground">
+                        <div className="app-panel-muted flex flex-col items-start justify-start gap-4 p-4">
+                            <p className="text-sm leading-6 text-app-muted">
                                 When you enable two-factor authentication, you
                                 will be prompted for a secure pin during login.
                                 This pin can be retrieved from a TOTP-supported
@@ -196,6 +197,7 @@ export default function Security({
                             <div>
                                 {hasSetupData ? (
                                     <Button
+                                        className="theme-primary-action"
                                         onClick={() => setShowSetupModal(true)}
                                     >
                                         <ShieldCheck />
@@ -212,6 +214,7 @@ export default function Security({
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
+                                                className="theme-primary-action"
                                             >
                                                 Enable 2FA
                                             </Button>

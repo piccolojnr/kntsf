@@ -26,16 +26,14 @@ export default function RolesShow({
         <>
             <Head title={role.label} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-sm text-muted-foreground">
-                            Role
-                        </p>
-                        <h1 className="text-2xl font-semibold">
+                        <p className="app-kicker">Role</p>
+                        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-app-ink">
                             {role.label}
                         </h1>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-app-muted">
                             {role.permissions.length} permissions,{' '}
                             {role.users_count} users
                         </p>
@@ -45,7 +43,9 @@ export default function RolesShow({
                             <RoleFormDialog
                                 role={role}
                                 permissionGroups={permissionGroups}
-                                trigger={<Button variant="outline">Edit</Button>}
+                                trigger={
+                                    <Button variant="outline">Edit</Button>
+                                }
                             />
                         )}
                         {can.delete && (
@@ -55,9 +55,7 @@ export default function RolesShow({
                                 description={`This will delete the ${role.label} role. Protected starter roles cannot be deleted.`}
                                 confirmLabel="Delete role"
                                 trigger={
-                                    <Button
-                                        variant="destructive"
-                                    >
+                                    <Button variant="destructive">
                                         <Trash2 />
                                         Delete
                                     </Button>
@@ -67,7 +65,7 @@ export default function RolesShow({
                     </div>
                 </div>
 
-                <Card>
+                <Card className="app-panel">
                     <CardHeader>
                         <CardTitle>Permissions</CardTitle>
                         <CardDescription>
@@ -78,7 +76,7 @@ export default function RolesShow({
                         {role.permissions.map((permission) => (
                             <div
                                 key={permission}
-                                className="rounded-md border bg-muted/20 p-2 text-sm"
+                                className="app-panel-muted p-3 text-sm font-medium text-app-ink"
                             >
                                 {permission}
                             </div>

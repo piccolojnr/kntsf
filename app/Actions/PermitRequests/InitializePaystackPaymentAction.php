@@ -11,6 +11,7 @@ use App\Support\AuditEvents;
 use App\Support\PaymentReferenceGenerator;
 use App\Support\PaystackClient;
 use Illuminate\Support\Facades\DB;
+use Log;
 use RuntimeException;
 
 class InitializePaystackPaymentAction
@@ -19,7 +20,8 @@ class InitializePaystackPaymentAction
         private readonly PaymentReferenceGenerator $paymentReferenceGenerator,
         private readonly PaystackClient $paystackClient,
         private readonly CreateAuditLogAction $createAuditLog,
-    ) {}
+    ) {
+    }
 
     /**
      * @return array{authorization_url: string, access_code: string, reference: string}
@@ -31,6 +33,7 @@ class InitializePaystackPaymentAction
                 ->with(['student', 'academicPeriod', 'payment'])
                 ->lockForUpdate()
                 ->findOrFail($permitRequest->id);
+            Log::info('Locked permit request for payment initialization', ['permit_request_id' => $permitRequest->id]);
 
             if ($permitRequest->status === PermitRequestStatus::Issued) {
                 throw new RuntimeException('This permit request has already been issued.');
@@ -38,6 +41,7 @@ class InitializePaystackPaymentAction
 
             if ($permitRequest->payment instanceof Payment) {
                 $payment = $permitRequest->payment;
+                Log::info('Existing payment record found for permit request', ['permit_request_id' => $permitRequest->id, 'payment_id' => $payment->id]);
             } else {
                 $payment = Payment::query()->create([
                     'student_id' => $permitRequest->student_id,
@@ -53,14 +57,23 @@ class InitializePaystackPaymentAction
                     ],
                 ]);
 
+                Log::info('Created new payment record for permit request', ['permit_request_id' => $permitRequest->id, 'payment_id' => $payment->id]);
+
                 $permitRequest->forceFill([
                     'payment_id' => $payment->id,
                     'status' => PermitRequestStatus::AwaitingPayment,
                 ])->save();
+                Log::info('Updated permit request status to AwaitingPayment', ['permit_request_id' => $permitRequest->id]);
             }
 
             $paystackCallbackUrl = $callbackUrl ?: route('public.permit-request.callback');
 
+            Log::info('Initializing Paystack payment', [
+                'permit_request_id' => $permitRequest->id,
+                'payment_id' => $payment->id,
+                'paystack_callback_url' => $paystackCallbackUrl,
+                'redirect_url' => $redirectUrl,
+            ]);
             $response = $this->paystackClient->initializeTransaction([
                 'email' => $permitRequest->contact_email ?? $permitRequest->student?->email,
                 'amount' => (int) round(((float) $permitRequest->amount) * 100),
@@ -77,6 +90,11 @@ class InitializePaystackPaymentAction
                 ],
             ]);
 
+            Log::info('Paystack initialization response', [
+                'permit_request_id' => $permitRequest->id,
+                'payment_id' => $payment->id,
+                'response' => $response,
+            ]);
             $data = is_array($response['data'] ?? null) ? $response['data'] : [];
 
             if (($response['status'] ?? false) !== true || blank($data['authorization_url'] ?? null)) {

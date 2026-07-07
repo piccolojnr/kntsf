@@ -25,7 +25,7 @@ export function ElectionVotingWorkspace({
 
     if (!canVote || !election.is_open) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                 Voting is unavailable for this election.
             </div>
         );
@@ -33,7 +33,7 @@ export function ElectionVotingWorkspace({
 
     if (!activePosition) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                 No approved candidates are available yet.
             </div>
         );
@@ -41,12 +41,12 @@ export function ElectionVotingWorkspace({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="app-panel-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-semibold text-app-ink">
                         Step {activeIndex + 1} of {votablePositions.length}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-app-muted">
                         Vote for one position, then move to the next position.
                     </p>
                 </div>
@@ -56,7 +56,9 @@ export function ElectionVotingWorkspace({
                             key={position.id}
                             type="button"
                             size="sm"
-                            variant={index === activeIndex ? 'default' : 'outline'}
+                            variant={
+                                index === activeIndex ? 'default' : 'outline'
+                            }
                             onClick={() => setActiveIndex(index)}
                         >
                             {index + 1}
@@ -65,10 +67,12 @@ export function ElectionVotingWorkspace({
                 </div>
             </div>
 
-            <div className="rounded-md border bg-card p-4">
+            <div className="app-panel-muted p-4">
                 <div className="mb-4">
-                    <p className="font-medium">{activePosition.title}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-semibold text-app-ink">
+                        {activePosition.title}
+                    </p>
+                    <p className="text-sm text-app-muted">
                         {activePosition.description ?? 'Choose one candidate.'}
                     </p>
                 </div>

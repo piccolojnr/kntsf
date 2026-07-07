@@ -9,11 +9,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {
-    PublishStatusSelect
-    
-} from './publish-status-select';
-import type {PublishStatus} from './publish-status-select';
+import { PublishStatusSelect } from './publish-status-select';
+import type { PublishStatus } from './publish-status-select';
 
 export function PublishingSettings({
     status,
@@ -63,7 +60,7 @@ export function PublishingSettings({
                 <InputError message={errors.published_at} />
             </div>
 
-            <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+            <div className="flex items-center gap-3 rounded-[0.9rem] border border-app-border bg-app-surface-muted p-3 transition duration-300 hover:bg-app-surface">
                 <input type="hidden" name="is_featured" value="0" />
                 <Checkbox
                     id="is_featured"
@@ -71,7 +68,9 @@ export function PublishingSettings({
                     value="1"
                     defaultChecked={isFeatured}
                 />
-                <Label htmlFor="is_featured">{featuredLabel}</Label>
+                <Label htmlFor="is_featured" className="text-app-ink">
+                    {featuredLabel}
+                </Label>
             </div>
         </>
     );
