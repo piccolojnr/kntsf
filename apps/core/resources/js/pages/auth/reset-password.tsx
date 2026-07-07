@@ -33,7 +33,7 @@ export default function ResetPassword({ token, email }: Props) {
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="bg-app-surface-muted"
+                                className="h-11 rounded-xl bg-app-surface-muted"
                                 readOnly
                             />
                             <InputError
@@ -48,7 +48,7 @@ export default function ResetPassword({ token, email }: Props) {
                                 id="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="bg-app-surface"
+                                className="h-11 rounded-xl bg-app-surface"
                                 autoFocus
                                 placeholder="Password"
                             />
@@ -63,7 +63,7 @@ export default function ResetPassword({ token, email }: Props) {
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="bg-app-surface"
+                                className="h-11 rounded-xl bg-app-surface"
                                 placeholder="Confirm password"
                             />
                             <InputError
@@ -74,7 +74,7 @@ export default function ResetPassword({ token, email }: Props) {
 
                         <Button
                             type="submit"
-                            className="mt-2 w-full"
+                            className="mt-2 h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                             disabled={processing}
                             data-test="reset-password-button"
                         >
