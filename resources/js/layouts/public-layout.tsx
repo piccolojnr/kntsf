@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronRight, Menu, ShieldCheck, X } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Menu, ShieldCheck, X } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
@@ -207,44 +207,73 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                     className="public-notebook-grid pointer-events-none absolute inset-0 opacity-35"
                     aria-hidden="true"
                 />
-                <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
-                    <div className="max-w-sm">
-                        <Link
-                            href={home()}
-                            className="inline-flex items-center gap-3"
-                        >
-                            <span className="grid size-9 place-items-center overflow-hidden rounded-md bg-app-ink dark:bg-app-surface">
-                                <AppLogoIcon className="size-full object-cover" />
-                            </span>
-                            <span>
-                                <span className="block text-sm font-semibold text-app-ink">
-                                    Knutsford SRC
+                <div
+                    className="absolute top-0 left-1/2 h-px w-[min(72rem,82vw)] -translate-x-1/2 bg-gradient-to-r from-transparent via-app-red/35 to-transparent"
+                    aria-hidden="true"
+                />
+                <div
+                    className="absolute right-[12%] bottom-16 h-24 w-24 rounded-full border border-app-border/80 opacity-70"
+                    aria-hidden="true"
+                />
+                <div className="relative mx-auto w-full max-w-7xl px-5 py-14 md:px-8 lg:py-18">
+                    <div className="grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(34rem,0.95fr)] lg:items-end">
+                        <div className="max-w-3xl">
+                            <Link
+                                href={home()}
+                                className="group inline-flex items-center gap-3"
+                            >
+                                <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-app-ink ring-1 ring-app-border transition duration-300 group-hover:scale-95 dark:bg-app-surface">
+                                    <AppLogoIcon className="size-full object-cover" />
                                 </span>
-                                <span className="block text-xs text-app-muted">
-                                    Student Representative Council
+                                <span>
+                                    <span className="block text-sm font-semibold text-app-ink">
+                                        Knutsford SRC
+                                    </span>
+                                    <span className="block text-[0.68rem] font-semibold tracking-[0.18em] text-app-muted uppercase">
+                                        Public portal
+                                    </span>
                                 </span>
-                            </span>
-                        </Link>
-                        <p className="mt-5 text-sm leading-7 text-app-muted">
-                            A calm public record for notices, events, documents,
-                            leadership, elections, and student services.
-                        </p>
-                        <p className="public-hand mt-5 rotate-[-2deg] text-base text-app-muted">
-                            official student desk
-                        </p>
+                            </Link>
+
+                            <p className="mt-8 max-w-2xl text-3xl leading-[1.06] font-semibold tracking-[-0.035em] text-app-ink md:text-5xl">
+                                Student information, kept clear and easy to
+                                reach.
+                            </p>
+
+                            <div className="mt-7 flex flex-wrap items-center gap-3">
+                                <Link
+                                    href={permitRequestIndex()}
+                                    className="inline-flex items-center gap-2 rounded-full bg-app-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-app-red"
+                                >
+                                    Request permit
+                                    <ArrowUpRight className="size-4" />
+                                </Link>
+                                <span className="public-hand rotate-[-2deg] text-base text-app-muted">
+                                    official student desk
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-8 sm:grid-cols-2">
+                            <FooterLinks
+                                title="Browse"
+                                items={navItems.slice(0, 3)}
+                            />
+                            <FooterLinks
+                                title="Services"
+                                items={navItems.slice(3)}
+                            />
+                        </div>
                     </div>
 
-                    <FooterLinks title="Browse" items={navItems.slice(0, 3)} />
-                    <FooterLinks title="Services" items={navItems.slice(3)} />
-                </div>
-
-                <div className="relative border-t border-app-border/70 px-5 py-5 text-xs text-app-muted">
-                    <div className="mx-auto flex max-w-7xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                        <span>
+                    <div className="mt-12 grid gap-3 border-t border-app-border/70 pt-5 text-xs text-app-muted md:grid-cols-[1fr_auto] md:items-center">
+                        <p>
                             © {new Date().getFullYear()} Knutsford University
-                            SRC.
-                        </span>
-                        <span>Official student information portal.</span>
+                            SRC. Official student information portal.
+                        </p>
+                        <p className="font-semibold tracking-[0.16em] uppercase">
+                            Notices · Events · Records · Services
+                        </p>
                     </div>
                 </div>
             </footer>
@@ -260,18 +289,19 @@ function FooterLinks({
     items: typeof navItems;
 }) {
     return (
-        <div className="rounded-[1.2rem] border border-app-border bg-white/48 p-5 dark:bg-app-surface/40">
-            <p className="mb-4 text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
+        <div>
+            <p className="text-xs font-semibold tracking-[0.18em] text-app-muted uppercase">
                 {title}
             </p>
-            <ul className="grid gap-3">
+            <ul className="mt-4 grid gap-1">
                 {items.map((item) => (
                     <li key={item.label}>
                         <Link
                             href={item.href}
-                            className="text-sm font-medium text-app-ink transition hover:text-app-red"
+                            className="group flex items-center justify-between gap-3 border-b border-app-border/70 py-3 text-sm font-semibold text-app-ink transition hover:border-app-red/50 hover:text-app-red"
                         >
-                            {item.label}
+                            <span>{item.label}</span>
+                            <ArrowUpRight className="size-3.5 opacity-35 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
                         </Link>
                     </li>
                 ))}
