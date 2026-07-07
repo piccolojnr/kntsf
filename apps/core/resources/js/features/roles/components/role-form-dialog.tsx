@@ -33,15 +33,18 @@ export function RoleFormDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger ?? (
-                    <Button>
+                    <Button className="theme-primary-action">
                         <Plus />
                         Create Role
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl">
+            <DialogContent className="app-panel sm:max-w-4xl">
                 <DialogHeader>
-                    <DialogTitle>{role ? 'Edit Role' : 'Create Role'}</DialogTitle>
+                    <p className="app-kicker">Access control</p>
+                    <DialogTitle>
+                        {role ? 'Edit Role' : 'Create Role'}
+                    </DialogTitle>
                     <DialogDescription>
                         Assign permissions by grouped checklist.
                     </DialogDescription>
@@ -73,7 +76,10 @@ export function RoleFormDialog({
                             <InputError message={errors.permissions} />
 
                             <div className="flex justify-end">
-                                <Button disabled={processing}>
+                                <Button
+                                    disabled={processing}
+                                    className="theme-primary-action"
+                                >
                                     <Save />
                                     Save
                                 </Button>

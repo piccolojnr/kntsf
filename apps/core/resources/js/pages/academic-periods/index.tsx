@@ -31,7 +31,7 @@ export default function AcademicPeriodsIndex({
         <>
             <Head title="Academic Periods" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <Heading
                         title="Academic Periods"
@@ -42,7 +42,7 @@ export default function AcademicPeriodsIndex({
                         <AcademicPeriodFormDialog
                             mode="create"
                             trigger={
-                                <Button>
+                                <Button className="theme-primary-action">
                                     <Plus />
                                     New period
                                 </Button>
@@ -62,9 +62,10 @@ export default function AcademicPeriodsIndex({
                     />
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
-                        <CardTitle>Periods</CardTitle>
+                        <p className="app-kicker">Academic calendar</p>
+                        <CardTitle className="mt-1">Periods</CardTitle>
                         <CardDescription>
                             Create the semester windows now. Permit tables are
                             intentionally not built yet.
@@ -72,21 +73,21 @@ export default function AcademicPeriodsIndex({
                     </CardHeader>
                     <CardContent className="border-t py-4">
                         {periods.length === 0 ? (
-                            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                                <CalendarDays className="mx-auto size-8 text-muted-foreground" />
-                                <p className="mt-3 text-sm font-medium">
+                            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                                <CalendarDays className="mx-auto size-8 text-app-muted" />
+                                <p className="mt-3 text-sm font-semibold text-app-ink">
                                     No academic periods yet
                                 </p>
-                                <p className="mt-1 text-sm text-muted-foreground">
+                                <p className="mt-1 text-sm text-app-muted">
                                     Add the current semester before permit
                                     issuance begins.
                                 </p>
                             </div>
                         ) : (
-                            <div className="overflow-hidden rounded-md border">
+                            <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface">
                                 <div className="w-full overflow-x-auto">
                                     <table className="w-full min-w-[760px] text-sm">
-                                        <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                                        <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                                             <tr>
                                                 <th className="px-4 py-3 text-left font-medium">
                                                     Period
@@ -102,25 +103,29 @@ export default function AcademicPeriodsIndex({
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y">
+                                        <tbody className="divide-y divide-app-border">
                                             {periods.map((period) => (
                                                 <tr
                                                     key={period.id}
-                                                    className="bg-card hover:bg-muted/30"
+                                                    className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
                                                 >
                                                     <td className="px-4 py-3">
-                                                        <p className="font-medium">
+                                                        <p className="font-semibold text-app-ink">
                                                             {period.name}
                                                         </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {period.academic_year}
+                                                        <p className="text-xs text-app-muted">
+                                                            {
+                                                                period.academic_year
+                                                            }
                                                             {period.semester
                                                                 ? ` · ${period.semester}`
                                                                 : ''}
                                                         </p>
                                                     </td>
-                                                    <td className="px-4 py-3 text-muted-foreground">
-                                                        {formatPeriodDates(period)}
+                                                    <td className="px-4 py-3 text-app-muted">
+                                                        {formatPeriodDates(
+                                                            period,
+                                                        )}
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         {period.is_active ? (
@@ -143,8 +148,7 @@ export default function AcademicPeriodsIndex({
                                                                             period.id,
                                                                         )}
                                                                         options={{
-                                                                            preserveScroll:
-                                                                                true,
+                                                                            preserveScroll: true,
                                                                         }}
                                                                     >
                                                                         {({
@@ -157,7 +161,8 @@ export default function AcademicPeriodsIndex({
                                                                                     processing
                                                                                 }
                                                                             >
-                                                                                Set active
+                                                                                Set
+                                                                                active
                                                                             </Button>
                                                                         )}
                                                                     </Form>
@@ -166,7 +171,9 @@ export default function AcademicPeriodsIndex({
                                                             {can.manage && (
                                                                 <AcademicPeriodFormDialog
                                                                     mode="edit"
-                                                                    period={period}
+                                                                    period={
+                                                                        period
+                                                                    }
                                                                     trigger={
                                                                         <Button
                                                                             size="sm"
@@ -181,7 +188,9 @@ export default function AcademicPeriodsIndex({
 
                                                             {can.manage && (
                                                                 <AcademicPeriodDeleteDialog
-                                                                    period={period}
+                                                                    period={
+                                                                        period
+                                                                    }
                                                                     trigger={
                                                                         <Button
                                                                             size="sm"
@@ -211,9 +220,11 @@ export default function AcademicPeriodsIndex({
 
 function OverviewTile({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-md border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 text-sm font-medium">{value}</p>
+        <div className="app-panel p-4">
+            <p className="text-xs font-semibold tracking-[0.16em] text-app-muted uppercase">
+                {label}
+            </p>
+            <p className="mt-2 text-lg font-semibold text-app-ink">{value}</p>
         </div>
     );
 }

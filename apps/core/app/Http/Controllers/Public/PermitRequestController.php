@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use RuntimeException;
+use Log;
 
 class PermitRequestController extends Controller
 {
@@ -34,9 +35,13 @@ class PermitRequestController extends Controller
         InitializePaystackPaymentAction $initializePaystackPayment,
     ): RedirectResponse {
         try {
+            Log::info('Creating permit request', ['request' => $request->validated()]);
             $permitRequest = $createPermitRequest->handle($request->validated());
+            Log::info('Permit request created', ['permit_request_id' => $permitRequest->id]);
             $initializePaystackPayment->handle($permitRequest);
+            Log::info('Paystack payment initialized', ['permit_request_id' => $permitRequest->id, 'payment_id' => $permitRequest->payment?->id]);
         } catch (RuntimeException $exception) {
+            Log::error('Error creating permit request', ['error' => $exception->getMessage(), 'request' => $request->validated()]);
             return back()->withErrors(['permit_request' => $exception->getMessage()])->withInput();
         }
 

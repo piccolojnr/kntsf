@@ -23,17 +23,19 @@ export function ElectionPositionList({
 }) {
     if (election.positions.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-8 text-center">
-                <p className="text-sm font-medium">No positions yet</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Add the first position before adding candidates or publishing
-                    the election.
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-8 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No positions yet
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
+                    Add the first position before adding candidates or
+                    publishing the election.
                 </p>
                 {can.update && (
                     <ElectionPositionFormDialog
                         election={election}
                         trigger={
-                            <Button className="mt-4">
+                            <Button className="theme-primary-action mt-4">
                                 <Plus />
                                 Add position
                             </Button>
@@ -47,14 +49,16 @@ export function ElectionPositionList({
     return (
         <div className="space-y-4">
             {election.positions.map((position) => (
-                <div key={position.id} className="rounded-md border bg-card p-4">
+                <div key={position.id} className="app-panel p-4">
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <p className="font-medium">{position.title}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="font-semibold text-app-ink">
+                                {position.title}
+                            </p>
+                            <p className="mt-1 text-sm text-app-muted">
                                 {position.description ?? 'No description set.'}
                             </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
+                            <p className="mt-2 text-xs font-semibold tracking-[0.12em] text-app-muted uppercase">
                                 {position.candidates.length} candidates ·{' '}
                                 {position.max_winners} winner
                                 {position.max_winners === 1 ? '' : 's'}
@@ -67,7 +71,10 @@ export function ElectionPositionList({
                                     position={position}
                                     options={options}
                                     trigger={
-                                        <Button size="sm">
+                                        <Button
+                                            size="sm"
+                                            className="theme-primary-action"
+                                        >
                                             <Plus />
                                             Candidate
                                         </Button>
@@ -128,7 +135,7 @@ export function ElectionPositionList({
                         ))}
                     </div>
                     {position.candidates.length === 0 && (
-                        <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+                        <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                             No candidates added to this position yet.
                         </div>
                     )}

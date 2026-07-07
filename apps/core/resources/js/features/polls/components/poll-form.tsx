@@ -29,7 +29,9 @@ export function PollForm({
     defaults: PollDefaults;
 }) {
     const isEditing = poll !== undefined;
-    const options = isEditing ? poll.options : Array.from({ length: 4 }, () => null);
+    const options = isEditing
+        ? poll.options
+        : Array.from({ length: 4 }, () => null);
 
     return (
         <Form
@@ -156,7 +158,9 @@ export function PollForm({
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <InputError message={errors.visibility} />
+                                        <InputError
+                                            message={errors.visibility}
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">
@@ -171,7 +175,9 @@ export function PollForm({
                                                 poll?.starts_at,
                                             )}
                                         />
-                                        <InputError message={errors.starts_at} />
+                                        <InputError
+                                            message={errors.starts_at}
+                                        />
                                     </div>
 
                                     <div className="grid gap-2">
@@ -235,10 +241,17 @@ function ToggleField({
     defaultChecked: boolean;
 }) {
     return (
-        <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+        <div className="flex items-center gap-3 rounded-[0.9rem] border border-app-border bg-app-surface-muted p-3 transition duration-300 hover:bg-app-surface">
             <input type="hidden" name={id} value="0" />
-            <Checkbox id={id} name={id} value="1" defaultChecked={defaultChecked} />
-            <Label htmlFor={id}>{label}</Label>
+            <Checkbox
+                id={id}
+                name={id}
+                value="1"
+                defaultChecked={defaultChecked}
+            />
+            <Label htmlFor={id} className="text-app-ink">
+                {label}
+            </Label>
         </div>
     );
 }

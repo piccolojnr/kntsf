@@ -36,16 +36,15 @@ export function ExecutiveFormDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger ?? (
-                    <Button
-                        className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
-                    >
+                    <Button className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3">
                         <Plus />
                         Create Executive
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl">
+            <DialogContent className="app-panel sm:max-w-3xl">
                 <DialogHeader>
+                    <p className="app-kicker">Executive access</p>
                     <DialogTitle>
                         {executive ? 'Edit Executive' : 'Create Executive'}
                     </DialogTitle>
@@ -107,7 +106,7 @@ export function ExecutiveFormDialog({
                                         }
                                     />
                                 </Field>
-                                <div className="grid gap-3">
+                                <div className="app-panel-muted grid gap-3 p-3">
                                     <Label>Flags</Label>
                                     <label className="flex items-center gap-2 text-sm">
                                         <input
@@ -147,7 +146,7 @@ export function ExecutiveFormDialog({
 
                             <div className="grid gap-3">
                                 <Label>Roles</Label>
-                                <div className="grid gap-2 rounded-md border p-3 sm:grid-cols-3">
+                                <div className="app-panel-muted grid gap-2 p-3 sm:grid-cols-3">
                                     {options.roles.map((role) => (
                                         <label
                                             key={role.name}
@@ -190,8 +189,9 @@ export function ExecutiveFormDialog({
                             </Field>
 
                             <div className="flex justify-end">
-                                <Button disabled={processing}
-                                    className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                                <Button
+                                    disabled={processing}
+                                    className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3"
                                 >
                                     <Save />
                                     Save

@@ -20,9 +20,9 @@ export function AppSidebarHeader({
         auth.user?.permissions.includes('permits.issue') === true;
 
     return (
-        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-app-border bg-app-page/90 px-4 backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-5">
+        <header className="sticky top-0 z-20 m-3 mb-0 flex h-16 shrink-0 items-center justify-between gap-3 rounded-[1.1rem] border border-app-border bg-white/82 px-4 shadow-[0_18px_55px_rgba(23,33,27,0.08)] backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:mx-5 md:px-5 dark:bg-app-surface/82 dark:shadow-none">
             <div className="flex min-w-0 items-center gap-3">
-                <SidebarTrigger className="-ml-1 border border-app-border bg-app-surface text-app-ink hover:bg-app-surface-muted" />
+                <SidebarTrigger className="-ml-1 rounded-full border border-app-border bg-app-surface text-app-ink hover:bg-app-surface-muted" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
 
@@ -30,7 +30,7 @@ export function AppSidebarHeader({
                 {canIssuePermit && (
                     <Button
                         size="sm"
-                        className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
+                        className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3"
                         onClick={() =>
                             router.get(
                                 permitsIndex.url({

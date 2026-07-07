@@ -211,19 +211,19 @@
 
 @layer components {
     .app-page {
-        @apply min-h-full min-w-0 bg-app-page text-app-ink;
+        @apply min-h-full min-w-0 bg-transparent text-app-ink;
     }
 
     .app-shell-surface {
-        @apply bg-app-page text-app-ink;
+        @apply bg-[#f8f7f3] text-app-ink dark:bg-app-page;
     }
 
     .app-panel {
-        @apply rounded-md border border-app-border bg-app-surface shadow-[0_18px_55px_rgba(23,33,27,0.08)] dark:shadow-none;
+        @apply rounded-[1.1rem] border border-app-border bg-app-surface shadow-[0_18px_55px_rgba(23,33,27,0.08)] transition duration-300 dark:shadow-none;
     }
 
     .app-panel-muted {
-        @apply rounded-md border border-app-border bg-app-surface-muted;
+        @apply rounded-[1rem] border border-app-border bg-app-surface-muted;
     }
 
     .app-kicker {
@@ -288,6 +288,60 @@
 
     .theme-ink-soft {
         @apply bg-[#1c1826]/6 dark:bg-white/8;
+    }
+
+    .admin-shell-grid {
+        background-image:
+            linear-gradient(
+                color-mix(in srgb, var(--app-ink) 5%, transparent) 1px,
+                transparent 1px
+            ),
+            linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--app-ink) 4%, transparent) 1px,
+                transparent 1px
+            );
+        background-size: 40px 40px;
+    }
+
+    .admin-rail {
+        background:
+            radial-gradient(
+                circle at 20% 8%,
+                color-mix(in srgb, var(--app-brass) 22%, transparent),
+                transparent 32%
+            ),
+            linear-gradient(180deg, #231a34 0%, #120d1c 100%);
+    }
+
+    .dark .admin-rail {
+        background:
+            radial-gradient(
+                circle at 20% 8%,
+                color-mix(in srgb, var(--app-brass) 14%, transparent),
+                transparent 34%
+            ),
+            linear-gradient(180deg, #120d1c 0%, #08060c 100%);
+    }
+
+    .admin-nav-item {
+        @apply h-10 rounded-[0.8rem] border border-transparent px-2.5 text-sidebar-foreground/72 transition duration-200;
+    }
+
+    .admin-nav-item:hover {
+        @apply border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground;
+    }
+
+    .admin-nav-item[data-active='true'] {
+        @apply border-app-brass/45 bg-app-brass text-[#1c1826] shadow-[0_12px_34px_rgba(255,182,6,0.18)];
+    }
+
+    .admin-nav-item[data-active='true'] svg {
+        @apply text-[#1c1826];
+    }
+
+    .admin-page-reveal {
+        animation: admin-page-reveal 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     .public-action {
@@ -475,10 +529,23 @@
     }
 }
 
+@keyframes admin-page-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .public-reveal,
     .public-rise,
-    .public-float {
+    .public-float,
+    .admin-page-reveal {
         animation: none;
     }
 }

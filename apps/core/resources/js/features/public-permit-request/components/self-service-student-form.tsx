@@ -50,7 +50,7 @@ export function SelfServiceStudentForm({
                     <Select name="course">
                         <SelectTrigger
                             id="course"
-                            className="theme-surface-strong h-11 rounded-xl border-app-border"
+                            className="theme-surface-strong w-full rounded-xl border-app-border"
                         >
                             <SelectValue placeholder="Select course" />
                         </SelectTrigger>
@@ -72,7 +72,7 @@ export function SelfServiceStudentForm({
                     <Select name="level">
                         <SelectTrigger
                             id="level"
-                            className="theme-surface-strong h-11 rounded-xl border-app-border"
+                            className="theme-surface-strong h-11 w-full rounded-xl border-app-border"
                         >
                             <SelectValue placeholder="Select level" />
                         </SelectTrigger>

@@ -4,9 +4,11 @@ import { AuditEventBadge } from './audit-event-badge';
 export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
     if (logs.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No audit logs found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No audit logs found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
                     Adjust the filters or perform an auditable operation.
                 </p>
             </div>
@@ -14,10 +16,10 @@ export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-md border bg-card">
+        <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[980px] text-sm">
-                    <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                         <tr>
                             <th className="px-4 py-3 text-left font-medium">
                                 Event
@@ -36,9 +38,12 @@ export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-app-border">
                         {logs.data.map((log) => (
-                            <tr key={log.id} className="bg-card hover:bg-muted/30">
+                            <tr
+                                key={log.id}
+                                className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
+                            >
                                 <td className="px-4 py-3">
                                     <AuditEventBadge
                                         event={log.event}
@@ -48,15 +53,15 @@ export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
                                 <td className="px-4 py-3">
                                     {log.actor ? (
                                         <>
-                                            <p className="font-medium">
+                                            <p className="font-semibold text-app-ink">
                                                 {log.actor.name}
                                             </p>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-xs text-app-muted">
                                                 {log.actor.email}
                                             </p>
                                         </>
                                     ) : (
-                                        <span className="text-muted-foreground">
+                                        <span className="text-app-muted">
                                             System
                                         </span>
                                     )}
@@ -67,12 +72,12 @@ export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
                                 <td className="px-4 py-3">
                                     <p>{log.description ?? 'No description'}</p>
                                     {log.metadata && (
-                                        <p className="mt-1 max-w-md truncate text-xs text-muted-foreground">
+                                        <p className="mt-1 max-w-md truncate text-xs text-app-muted">
                                             {metadataSummary(log.metadata)}
                                         </p>
                                     )}
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground">
+                                <td className="px-4 py-3 text-app-muted">
                                     {formatDateTime(log.created_at)}
                                 </td>
                             </tr>
@@ -86,7 +91,10 @@ export function AuditLogList({ logs }: { logs: Paginated<AuditLog> }) {
 
 function metadataSummary(metadata: Record<string, unknown>) {
     return Object.entries(metadata)
-        .filter(([, value]) => value !== null && value !== undefined && value !== '')
+        .filter(
+            ([, value]) =>
+                value !== null && value !== undefined && value !== '',
+        )
         .map(([key, value]) => `${key}: ${String(value)}`)
         .join(' | ');
 }

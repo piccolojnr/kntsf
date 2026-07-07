@@ -4,6 +4,10 @@ import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import { AnnouncementForm } from '@/features/announcements/components/announcement-form';
 import type { AnnouncementDefaults } from '@/features/announcements/types';
+import {
+    ContentPage,
+    ContentToolbar,
+} from '@/features/content/components/content-admin-surface';
 import { create, index } from '@/routes/announcements';
 
 export default function CreateAnnouncement({
@@ -15,8 +19,8 @@ export default function CreateAnnouncement({
         <>
             <Head title="Create announcement" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <ContentPage>
+                <ContentToolbar>
                     <Heading
                         title="Create announcement"
                         description="Draft or publish an SRC communication post."
@@ -28,10 +32,10 @@ export default function CreateAnnouncement({
                             Back to announcements
                         </Link>
                     </Button>
-                </div>
+                </ContentToolbar>
 
                 <AnnouncementForm defaults={defaults} />
-            </div>
+            </ContentPage>
         </>
     );
 }

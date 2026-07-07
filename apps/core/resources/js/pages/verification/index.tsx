@@ -25,21 +25,24 @@ export default function VerificationIndex({
         <>
             <Head title="Verification" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title="Verification"
-                        description="Manually verify student numbers and permit codes."
-                    />
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title="Verification"
+                            description="Manually verify student numbers and permit codes."
+                        />
 
-                    {can.view_logs && (
-                        <Button asChild variant="outline">
-                            <Link href={logs()}>
-                                <History />
-                                View logs
-                            </Link>
-                        </Button>
-                    )}
+                        {can.view_logs && (
+                            <Button asChild variant="outline">
+                                <Link href={logs()}>
+                                    <History />
+                                    View logs
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-3">
@@ -50,13 +53,13 @@ export default function VerificationIndex({
 
                 <VerificationResultCard result={result} />
 
-                <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground">
+                <div className="app-panel-muted p-4 text-sm text-app-muted">
                     <div className="flex gap-3">
-                        <ShieldCheck className="mt-0.5 size-4 shrink-0" />
+                        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-app-red" />
                         <p>
-                            Submitted identifiers are hashed before they are stored
-                            in verification logs. Logs show only resolved student or
-                            permit references.
+                            Submitted identifiers are hashed before they are
+                            stored in verification logs. Logs show only resolved
+                            student or permit references.
                         </p>
                     </div>
                 </div>

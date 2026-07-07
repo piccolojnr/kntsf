@@ -4,6 +4,7 @@ namespace App\Support;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Log;
 use RuntimeException;
 
 class PaystackClient
@@ -14,7 +15,16 @@ class PaystackClient
      */
     public function initializeTransaction(array $payload): array
     {
-        return $this->post('/transaction/initialize', $payload);
+        try {
+            $response = $this->post('/transaction/initialize', $payload);
+        } catch (RuntimeException $exception) {
+            Log::error('Paystack transaction initialization failed', [
+                'payload' => $payload,
+                'error' => $exception->getMessage(),
+            ]);
+            throw new RuntimeException('Paystack request failed.');
+        }
+        return $response;
     }
 
     /**
@@ -22,7 +32,7 @@ class PaystackClient
      */
     public function verifyTransaction(string $reference): array
     {
-        return $this->get('/transaction/verify/'.rawurlencode($reference));
+        return $this->get('/transaction/verify/' . rawurlencode($reference));
     }
 
     public function verifyWebhookSignature(string $payload, ?string $signature): bool
@@ -47,7 +57,7 @@ class PaystackClient
                 ->acceptJson()
                 ->timeout(15)
                 ->connectTimeout(5)
-                ->post($this->baseUrl().$path, $payload)
+                ->post($this->baseUrl() . $path, $payload)
         );
     }
 
@@ -61,7 +71,7 @@ class PaystackClient
                 ->acceptJson()
                 ->timeout(15)
                 ->connectTimeout(5)
-                ->get($this->baseUrl().$path)
+                ->get($this->baseUrl() . $path)
         );
     }
 
@@ -76,7 +86,7 @@ class PaystackClient
 
         $payload = $response->json();
 
-        if (! is_array($payload)) {
+        if (!is_array($payload)) {
             throw new RuntimeException('Paystack returned an invalid response.');
         }
 

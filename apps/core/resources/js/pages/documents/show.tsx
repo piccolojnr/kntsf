@@ -1,25 +1,20 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { Archive, ArrowLeft, Pencil, Send, Trash2 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+    ContentPage,
+    ContentToolbar,
+    DetailItem,
+    DetailPanel,
+} from '@/features/content/components/content-admin-surface';
 import { RichTextViewer } from '@/features/content/components/rich-text-viewer';
 import { VisibilityBadge } from '@/features/content/components/visibility-badge';
 import { DocumentFileList } from '@/features/documents/components/document-file-list';
 import { DocumentStatusBadge } from '@/features/documents/components/document-status-badge';
-import type {
-    Document,
-    DocumentPermissions,
-} from '@/features/documents/types';
+import type { Document, DocumentPermissions } from '@/features/documents/types';
 import { archive, destroy, edit, index, publish } from '@/routes/documents';
 
 export default function ShowDocument({
@@ -33,7 +28,7 @@ export default function ShowDocument({
         <>
             <Head title={document.title} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <ContentPage>
                 <Button asChild variant="ghost" className="w-fit">
                     <Link href={index()}>
                         <ArrowLeft />
@@ -41,7 +36,7 @@ export default function ShowDocument({
                     </Link>
                 </Button>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <ContentToolbar>
                     <Heading
                         title={document.title}
                         description={document.excerpt ?? document.slug}
@@ -106,101 +101,72 @@ export default function ShowDocument({
                             />
                         )}
                     </div>
-                </div>
+                </ContentToolbar>
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
                     <div className="space-y-4">
-                        <Card className="gap-0 py-0">
+                        <DetailPanel
+                            title="Description"
+                            description="Internal dashboard description for this downloadable document."
+                        >
                             {document.featured_image_url && (
                                 <img
                                     src={document.featured_image_url}
                                     alt=""
-                                    className="max-h-80 w-full rounded-t-lg object-cover"
+                                    className="-mx-5 -mt-5 mb-5 max-h-80 w-[calc(100%+2.5rem)] object-cover"
                                 />
                             )}
-                            <CardHeader className="border-b py-4">
-                                <CardTitle>Description</CardTitle>
-                                <CardDescription>
-                                    Internal dashboard description for this
-                                    downloadable document.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="max-w-none py-4">
-                                <RichTextViewer
-                                    value={document.description}
-                                    emptyText="No description set."
-                                />
-                            </CardContent>
-                        </Card>
+                            <RichTextViewer
+                                value={document.description}
+                                emptyText="No description set."
+                            />
+                        </DetailPanel>
 
-                        <Card className="gap-0 py-0">
-                            <CardHeader className="border-b py-4">
-                                <CardTitle>Files</CardTitle>
-                                <CardDescription>
-                                    Attached files available to dashboard users.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="py-4">
-                                <DocumentFileList files={document.files} />
-                            </CardContent>
-                        </Card>
+                        <DetailPanel
+                            title="Files"
+                            description="Attached files available to dashboard users."
+                        >
+                            <DocumentFileList files={document.files} />
+                        </DetailPanel>
                     </div>
 
-                    <Card className="h-fit gap-0 py-0">
-                        <CardHeader className="border-b py-4">
-                            <CardTitle>Publishing</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 py-4">
-                            <Detail label="Status">
+                    <DetailPanel title="Publishing" className="h-fit">
+                        <div className="space-y-3">
+                            <DetailItem label="Status">
                                 <DocumentStatusBadge document={document} />
-                            </Detail>
-                            <Detail label="Visibility">
+                            </DetailItem>
+                            <DetailItem label="Visibility">
                                 <VisibilityBadge
                                     visibility={document.visibility}
                                 />
-                            </Detail>
-                            <Detail label="Featured">
+                            </DetailItem>
+                            <DetailItem label="Featured">
                                 {document.is_featured ? (
                                     <Badge variant="secondary">Featured</Badge>
                                 ) : (
                                     'No'
                                 )}
-                            </Detail>
-                            <Detail label="Category">
+                            </DetailItem>
+                            <DetailItem label="Category">
                                 {document.category ?? 'Not set'}
-                            </Detail>
-                            <Detail label="Author">
+                            </DetailItem>
+                            <DetailItem label="Author">
                                 {document.author.name}
-                            </Detail>
-                            <Detail label="Files">
+                            </DetailItem>
+                            <DetailItem label="Files">
                                 {document.files.length}
-                            </Detail>
-                            <Detail label="Published">
+                            </DetailItem>
+                            <DetailItem label="Published">
                                 {formatDate(document.published_at)}
-                            </Detail>
-                            <Detail label="Archived">
+                            </DetailItem>
+                            <DetailItem label="Archived">
                                 {formatDate(document.archived_at)}
-                            </Detail>
-                        </CardContent>
-                    </Card>
+                            </DetailItem>
+                        </div>
+                    </DetailPanel>
                 </div>
-            </div>
+            </ContentPage>
         </>
-    );
-}
-
-function Detail({
-    label,
-    children,
-}: {
-    label: string;
-    children: ReactNode;
-}) {
-    return (
-        <div className="rounded-md border bg-muted/20 p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="mt-1 text-sm font-medium">{children}</div>
-        </div>
     );
 }
 

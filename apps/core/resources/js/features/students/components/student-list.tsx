@@ -24,9 +24,11 @@ export function StudentList({
 }) {
     if (students.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No student records found</p>
-                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No student records found
+                </p>
+                <p className="mx-auto mt-1 max-w-md text-sm text-app-muted">
                     Create the first student record or adjust your search.
                 </p>
             </div>
@@ -35,40 +37,40 @@ export function StudentList({
 
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-md border bg-card">
+            <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-[0_18px_48px_rgba(17,24,19,0.06)] dark:shadow-none">
                 <div className="w-full overflow-x-auto">
                     <table className="w-full min-w-[920px] table-auto text-sm">
-                        <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                        <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                             <tr>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Student
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Contact
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Course
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Level
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Account
                                 </th>
-                                <th className="px-4 py-3 text-right font-medium">
+                                <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y divide-app-border">
                             {students.data.map((student) => (
                                 <tr
                                     key={student.id}
-                                    className="bg-card transition-colors hover:bg-muted/30"
+                                    className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
                                 >
                                     <td className="px-4 py-3 align-middle">
                                         <div className="flex items-center gap-3">
-                                            <div className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-muted/40 text-xs font-semibold">
+                                            <div className="theme-ink-soft flex size-9 shrink-0 items-center justify-center rounded-xl text-xs font-semibold text-app-red">
                                                 {student.name
                                                     ?.slice(0, 2)
                                                     .toUpperCase() ?? 'ST'}
@@ -76,12 +78,12 @@ export function StudentList({
                                             <div>
                                                 <Link
                                                     href={show(student.id)}
-                                                    className="font-medium hover:underline"
+                                                    className="font-semibold text-app-ink transition hover:text-app-red"
                                                 >
                                                     {student.name ??
                                                         'Unnamed student'}
                                                 </Link>
-                                                <p className="text-xs text-muted-foreground">
+                                                <p className="text-xs text-app-muted">
                                                     {student.student_number}
                                                 </p>
                                             </div>
@@ -89,10 +91,8 @@ export function StudentList({
                                     </td>
                                     <td className="px-4 py-3 align-middle">
                                         <div>
-                                            <p>
-                                                {student.email ?? 'No email'}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p>{student.email ?? 'No email'}</p>
+                                            <p className="text-xs text-app-muted">
                                                 {student.phone ?? 'No phone'}
                                             </p>
                                         </div>
@@ -106,7 +106,7 @@ export function StudentList({
                                                 Level {student.level}
                                             </Badge>
                                         ) : (
-                                            <span className="text-muted-foreground">
+                                            <span className="text-app-muted">
                                                 No level
                                             </span>
                                         )}
@@ -210,7 +210,7 @@ export function AccountStatus({ student }: { student: Student }) {
 
 function Pagination({ students }: { students: Paginated<Student> }) {
     return (
-        <div className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 text-sm text-app-muted sm:flex-row sm:items-center sm:justify-between">
             <span>
                 Showing {students.from ?? 0} to {students.to ?? 0} of{' '}
                 {students.total}

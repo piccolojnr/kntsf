@@ -4,8 +4,7 @@ import {
     Plus,
     Search,
     ShieldCheck,
-    UserRoundPlus
-
+    UserRoundPlus,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { FormEvent } from 'react';
@@ -61,27 +60,28 @@ export default function StudentsIndex({
         <>
             <Head title="Students" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title="Students"
-                        description="Manage student profiles, account readiness, and academic details."
-                    />
-
-                    {can.create && (
-                        <StudentFormDialog
-                            mode="create"
-                            options={options}
-                            trigger={
-                                <Button
-                                    className="h-[39.5px] w-[39.5px] bg-app-ink px-0 text-app-surface hover:bg-app-red sm:w-auto sm:px-3"
-                                >
-                                    <Plus />
-                                    New student
-                                </Button>
-                            }
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title="Students"
+                            description="Manage student profiles, account readiness, and academic details."
                         />
-                    )}
+
+                        {can.create && (
+                            <StudentFormDialog
+                                mode="create"
+                                options={options}
+                                trigger={
+                                    <Button className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3">
+                                        <Plus />
+                                        New student
+                                    </Button>
+                                }
+                            />
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-3">
@@ -102,7 +102,7 @@ export default function StudentsIndex({
                     />
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <div className="flex flex-col gap-3 py-1 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -117,19 +117,19 @@ export default function StudentsIndex({
                             </Badge>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-4 border-t py-4">
+                    <CardContent className="space-y-4 border-t border-app-border py-4">
                         <form
                             onSubmit={submitSearch}
                             className="flex flex-col gap-2 sm:flex-row"
                         >
                             <div className="relative flex-1">
-                                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     value={searchTerm}
                                     onChange={(event) =>
                                         setSearchTerm(event.target.value)
                                     }
-                                    className="pl-9"
+                                    className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
                                     placeholder="Search students"
                                 />
                             </div>
@@ -160,13 +160,17 @@ function OverviewTile({
     value: string;
 }) {
     return (
-        <div className="flex items-center gap-3 rounded-md border bg-card p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="app-panel-muted flex items-center gap-3 p-4 transition duration-300 hover:-translate-y-0.5">
+            <div className="theme-primary-active flex size-10 shrink-0 items-center justify-center rounded-xl">
                 <Icon className="size-5" />
             </div>
             <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="truncate text-sm font-medium">{value}</p>
+                <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                    {label}
+                </p>
+                <p className="truncate text-sm font-semibold text-app-ink">
+                    {value}
+                </p>
             </div>
         </div>
     );

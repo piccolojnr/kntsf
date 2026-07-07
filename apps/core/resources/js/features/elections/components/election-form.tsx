@@ -32,7 +32,7 @@ export function ElectionForm({
         <Form
             {...(isEditing ? update.form(election.id) : store.form())}
             options={{ preserveScroll: true }}
-            className="space-y-6"
+            className="space-y-5"
         >
             {({ processing, errors }) => (
                 <>
@@ -78,7 +78,6 @@ export function ElectionForm({
                                         />
                                     </div>
                                 </FormSection>
-
                             </>
                         }
                         sidebar={
@@ -123,7 +122,7 @@ export function ElectionForm({
                                     value={election?.ends_at}
                                     error={errors.ends_at}
                                 />
-                                <div className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+                                <div className="app-panel-muted flex items-center gap-3 p-3">
                                     <input
                                         type="hidden"
                                         name="results_visible"
@@ -145,7 +144,10 @@ export function ElectionForm({
                         }
                     />
                     <div className="flex justify-end">
-                        <Button disabled={processing}>
+                        <Button
+                            disabled={processing}
+                            className="theme-primary-action"
+                        >
                             <Save />
                             {isEditing ? 'Save changes' : 'Create election'}
                         </Button>

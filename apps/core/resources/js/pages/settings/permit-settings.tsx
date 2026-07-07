@@ -25,7 +25,7 @@ export default function PermitSettingsPage({
         <>
             <Head title="Permit settings" />
 
-            <div className="space-y-6">
+            <div className="space-y-5">
                 <Heading
                     variant="small"
                     title="Permit settings"
@@ -35,7 +35,7 @@ export default function PermitSettingsPage({
                 <Form
                     {...update.form()}
                     options={{ preserveScroll: true }}
-                    className="space-y-6"
+                    className="app-panel-muted space-y-5 p-4"
                 >
                     {({ processing, errors }) => (
                         <>
@@ -77,7 +77,9 @@ export default function PermitSettingsPage({
                                     type="number"
                                     min="1"
                                     max="3650"
-                                    defaultValue={settings.default_validity_days}
+                                    defaultValue={
+                                        settings.default_validity_days
+                                    }
                                     disabled={!can.update}
                                 />
                                 <InputError
@@ -85,29 +87,31 @@ export default function PermitSettingsPage({
                                 />
                             </div>
 
-                            <div className="flex items-center gap-3 rounded-md border bg-muted/20 p-4">
-                                <input
-                                    type="hidden"
-                                    name="permit_requests_enabled"
-                                    value="0"
-                                />
-                                <Checkbox
-                                    id="permit_requests_enabled"
-                                    name="permit_requests_enabled"
-                                    value="1"
-                                    defaultChecked={
-                                        settings.permit_requests_enabled
-                                    }
-                                    disabled={!can.update}
-                                />
-                                <div>
-                                    <Label htmlFor="permit_requests_enabled">
-                                        Permit requests enabled
-                                    </Label>
-                                    <p className="text-xs text-muted-foreground">
-                                        This prepares a switch for future permit
-                                        request workflows.
-                                    </p>
+                            <div className="rounded-[1rem] border border-app-border bg-app-surface p-4">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="hidden"
+                                        name="permit_requests_enabled"
+                                        value="0"
+                                    />
+                                    <Checkbox
+                                        id="permit_requests_enabled"
+                                        name="permit_requests_enabled"
+                                        value="1"
+                                        defaultChecked={
+                                            settings.permit_requests_enabled
+                                        }
+                                        disabled={!can.update}
+                                    />
+                                    <div>
+                                        <Label htmlFor="permit_requests_enabled">
+                                            Permit requests enabled
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            This prepares a switch for future
+                                            permit request workflows.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <InputError
@@ -115,7 +119,10 @@ export default function PermitSettingsPage({
                             />
 
                             {can.update && (
-                                <Button disabled={processing}>
+                                <Button
+                                    disabled={processing}
+                                    className="theme-primary-action"
+                                >
                                     Save settings
                                 </Button>
                             )}

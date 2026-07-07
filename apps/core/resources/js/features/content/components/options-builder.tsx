@@ -48,7 +48,7 @@ export function OptionsBuilder({
             {rows.map((row, index) => (
                 <div
                     key={row.key}
-                    className="grid gap-3 rounded-md border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto]"
+                    className="grid gap-3 rounded-[1rem] border border-app-border bg-app-surface-muted p-3 transition duration-300 hover:bg-app-surface sm:grid-cols-[minmax(0,1fr)_auto]"
                 >
                     {row.option?.id && (
                         <input
@@ -63,7 +63,7 @@ export function OptionsBuilder({
                                 {placeholderPrefix} {index + 1}
                             </Label>
                             {row.option?.id && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-app-muted">
                                     Saved
                                     {typeof row.option.votes_count === 'number'
                                         ? ` · ${row.option.votes_count} votes`

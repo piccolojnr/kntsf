@@ -16,10 +16,10 @@ export function RoleList({
     canManage: boolean;
 }) {
     return (
-        <div className="overflow-hidden rounded-md border bg-card">
+        <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[760px] text-sm">
-                    <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                         <tr>
                             <th className="px-4 py-3 text-left font-medium">
                                 Role
@@ -35,22 +35,33 @@ export function RoleList({
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-app-border">
                         {roles.map((role) => (
-                            <tr key={role.id} className="bg-card hover:bg-muted/30">
+                            <tr
+                                key={role.id}
+                                className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
+                            >
                                 <td className="px-4 py-3">
-                                    <p className="font-medium">{role.label}</p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="font-semibold text-app-ink">
+                                        {role.label}
+                                    </p>
+                                    <p className="text-xs text-app-muted">
                                         {role.name}
                                     </p>
                                 </td>
-                                <td className="px-4 py-3">{role.users_count}</td>
+                                <td className="px-4 py-3">
+                                    {role.users_count}
+                                </td>
                                 <td className="px-4 py-3">
                                     {role.permissions.length}
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex justify-end gap-2">
-                                        <Button asChild size="sm" variant="ghost">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            variant="ghost"
+                                        >
                                             <Link href={show(role.id)}>
                                                 <Eye />
                                                 View
@@ -59,7 +70,9 @@ export function RoleList({
                                         {canManage && (
                                             <RoleFormDialog
                                                 role={role}
-                                                permissionGroups={permissionGroups}
+                                                permissionGroups={
+                                                    permissionGroups
+                                                }
                                                 trigger={
                                                     <Button
                                                         size="sm"

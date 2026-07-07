@@ -1,6 +1,15 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { Archive, Pencil, Play, Plus, Send, StopCircle } from 'lucide-react';
-import type { ReactNode } from 'react';
+import {
+    Archive,
+    CheckCircle2,
+    Pencil,
+    Play,
+    Plus,
+    Send,
+    StopCircle,
+    Vote,
+} from 'lucide-react';
+import type { ComponentType, ReactNode } from 'react';
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
@@ -22,7 +31,14 @@ import type {
     ElectionFormOptions,
     ElectionPermissions,
 } from '@/features/elections/types';
-import { archive, close, edit, index, publish, start } from '@/routes/elections';
+import {
+    archive,
+    close,
+    edit,
+    index,
+    publish,
+    start,
+} from '@/routes/elections';
 
 export default function ShowElection({
     election,
@@ -44,7 +60,7 @@ export default function ShowElection({
     return (
         <>
             <Head title={election.title} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <Heading
                         title={election.title}
@@ -56,7 +72,7 @@ export default function ShowElection({
                                 <ElectionPositionFormDialog
                                     election={election}
                                     trigger={
-                                        <Button>
+                                        <Button className="theme-primary-action">
                                             <Plus />
                                             Add position
                                         </Button>
@@ -115,13 +131,14 @@ export default function ShowElection({
                     </div>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
-                    <div className="space-y-4">
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+                    <div className="space-y-5">
                         <div className="grid gap-3 md:grid-cols-3">
                             <SetupTile
                                 label="Positions"
                                 value={election.positions.length}
                                 detail="Dynamic election posts"
+                                icon={Vote}
                             />
                             <SetupTile
                                 label="Candidates"
@@ -131,6 +148,7 @@ export default function ShowElection({
                                     0,
                                 )}
                                 detail="Across all positions"
+                                icon={Plus}
                             />
                             <SetupTile
                                 label="Approved"
@@ -144,11 +162,12 @@ export default function ShowElection({
                                     0,
                                 )}
                                 detail="Ready for voting"
+                                icon={CheckCircle2}
                             />
                         </div>
 
                         {election.description && (
-                            <Card className="gap-0 py-0">
+                            <Card className="app-panel gap-0 py-0">
                                 <CardHeader className="border-b py-4">
                                     <CardTitle>Election overview</CardTitle>
                                 </CardHeader>
@@ -161,7 +180,7 @@ export default function ShowElection({
                         )}
 
                         {can.vote && (
-                            <Card className="gap-0 py-0">
+                            <Card className="app-panel gap-0 py-0">
                                 <CardHeader className="border-b py-4">
                                     <CardTitle>Voting</CardTitle>
                                     <CardDescription>
@@ -183,7 +202,7 @@ export default function ShowElection({
                             options={options}
                             can={can}
                         />
-                        <Card>
+                        <Card className="app-panel">
                             <CardHeader>
                                 <CardTitle>Results</CardTitle>
                                 <CardDescription>
@@ -194,34 +213,47 @@ export default function ShowElection({
                                 {can.view_results ? (
                                     <ElectionResults election={election} />
                                 ) : (
-                                    <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">
+                                    <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                                         Results are hidden.
                                     </div>
                                 )}
                             </CardContent>
                         </Card>
                     </div>
-                    <Card className="h-fit">
+                    <Card className="app-panel h-fit">
                         <CardHeader>
                             <CardTitle>Status</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             <ElectionStatusBadge status={election.status} />
                             {!setupReady && (
-                                <div className="rounded-md border border-dashed bg-muted/20 p-3 text-xs text-muted-foreground">
+                                <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-3 text-xs leading-5 text-app-muted">
                                     Add at least one position and one approved
                                     candidate per position before publishing or
                                     starting.
                                 </div>
                             )}
-                            <p>{election.votes_count} votes cast</p>
-                            <p>{election.positions.length} positions</p>
-                            <p>
-                                {election.results_visible
-                                    ? 'Results visible'
-                                    : 'Results hidden'}
-                            </p>
-                            <Button asChild variant="outline" className="w-full">
+                            <StatusLine
+                                label="Votes cast"
+                                value={election.votes_count}
+                            />
+                            <StatusLine
+                                label="Positions"
+                                value={election.positions.length}
+                            />
+                            <StatusLine
+                                label="Results"
+                                value={
+                                    election.results_visible
+                                        ? 'Results visible'
+                                        : 'Results hidden'
+                                }
+                            />
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="w-full"
+                            >
                                 <Link href={index()}>Back to elections</Link>
                             </Button>
                         </CardContent>
@@ -236,16 +268,36 @@ function SetupTile({
     label,
     value,
     detail,
+    icon: Icon,
 }: {
     label: string;
     value: number;
     detail: string;
+    icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <div className="rounded-md border bg-card p-4">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 text-2xl font-semibold">{value}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
+        <div className="app-panel p-4">
+            <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold tracking-[0.16em] text-app-muted uppercase">
+                    {label}
+                </p>
+                <Icon className="size-4 text-app-red" />
+            </div>
+            <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-app-ink tabular-nums">
+                {value}
+            </p>
+            <p className="mt-1 text-xs text-app-muted">{detail}</p>
+        </div>
+    );
+}
+
+function StatusLine({ label, value }: { label: string; value: ReactNode }) {
+    return (
+        <div className="app-panel-muted flex items-center justify-between gap-3 px-3 py-2">
+            <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </span>
+            <span className="font-semibold text-app-ink">{value}</span>
         </div>
     );
 }

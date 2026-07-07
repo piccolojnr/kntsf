@@ -17,7 +17,11 @@ export function AppContent({
         return (
             <SidebarInset
                 {...props}
-                className={cn('app-shell-surface overflow-x-hidden', className)}
+                className={cn(
+                    'app-shell-surface overflow-x-hidden',
+                    'admin-page-reveal',
+                    className,
+                )}
             >
                 {children}
             </SidebarInset>

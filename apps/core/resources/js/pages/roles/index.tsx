@@ -25,7 +25,7 @@ export default function RolesIndex({
         <>
             <Head title="Roles & Permissions" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <Heading
                         title="Roles & Permissions"
@@ -37,9 +37,10 @@ export default function RolesIndex({
                     )}
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
-                        <CardTitle>Roles</CardTitle>
+                        <p className="app-kicker">Access control</p>
+                        <CardTitle className="mt-1">Roles</CardTitle>
                         <CardDescription>
                             Protected starter roles cannot be deleted.
                         </CardDescription>

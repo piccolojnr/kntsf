@@ -35,9 +35,12 @@ export function AcademicPeriodFormDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="app-panel sm:max-w-lg">
+                <p className="app-kicker">Calendar window</p>
                 <DialogTitle>
-                    {isEditing ? 'Edit academic period' : 'Create academic period'}
+                    {isEditing
+                        ? 'Edit academic period'
+                        : 'Create academic period'}
                 </DialogTitle>
                 <DialogDescription>
                     Periods define the semester window permits will later use.
@@ -54,7 +57,9 @@ export function AcademicPeriodFormDialog({
                         <>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="grid gap-2 md:col-span-2">
-                                    <Label htmlFor={`period_name_${period?.id ?? 'new'}`}>
+                                    <Label
+                                        htmlFor={`period_name_${period?.id ?? 'new'}`}
+                                    >
                                         Name
                                     </Label>
                                     <Input
@@ -69,7 +74,9 @@ export function AcademicPeriodFormDialog({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`academic_year_${period?.id ?? 'new'}`}>
+                                    <Label
+                                        htmlFor={`academic_year_${period?.id ?? 'new'}`}
+                                    >
                                         Academic year
                                     </Label>
                                     <Input
@@ -77,14 +84,20 @@ export function AcademicPeriodFormDialog({
                                         name="academic_year"
                                         required
                                         maxLength={50}
-                                        defaultValue={period?.academic_year ?? ''}
+                                        defaultValue={
+                                            period?.academic_year ?? ''
+                                        }
                                         placeholder="2025/2026"
                                     />
-                                    <InputError message={errors.academic_year} />
+                                    <InputError
+                                        message={errors.academic_year}
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`semester_${period?.id ?? 'new'}`}>
+                                    <Label
+                                        htmlFor={`semester_${period?.id ?? 'new'}`}
+                                    >
                                         Semester
                                     </Label>
                                     <Input
@@ -98,7 +111,9 @@ export function AcademicPeriodFormDialog({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`starts_at_${period?.id ?? 'new'}`}>
+                                    <Label
+                                        htmlFor={`starts_at_${period?.id ?? 'new'}`}
+                                    >
                                         Starts at
                                     </Label>
                                     <Input
@@ -111,7 +126,9 @@ export function AcademicPeriodFormDialog({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`ends_at_${period?.id ?? 'new'}`}>
+                                    <Label
+                                        htmlFor={`ends_at_${period?.id ?? 'new'}`}
+                                    >
                                         Ends at
                                     </Label>
                                     <Input
@@ -134,8 +151,13 @@ export function AcademicPeriodFormDialog({
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button disabled={processing}>
-                                    {isEditing ? 'Save changes' : 'Create period'}
+                                <Button
+                                    disabled={processing}
+                                    className="theme-primary-action"
+                                >
+                                    {isEditing
+                                        ? 'Save changes'
+                                        : 'Create period'}
                                 </Button>
                             </DialogFooter>
                         </>

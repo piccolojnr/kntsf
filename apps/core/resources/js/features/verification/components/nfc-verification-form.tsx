@@ -15,14 +15,15 @@ import { nfc } from '@/routes/verification';
 
 export function NfcVerificationForm() {
     return (
-        <Card className="gap-0 py-0">
+        <Card className="app-panel gap-0 overflow-hidden py-0 transition duration-300 hover:-translate-y-0.5">
             <CardHeader className="py-4">
                 <CardTitle>NFC UID</CardTitle>
                 <CardDescription>
-                    Test NFC verification from the dashboard before mobile support.
+                    Test NFC verification from the dashboard before mobile
+                    support.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="border-t py-4">
+            <CardContent className="border-t border-app-border py-4">
                 <Form
                     {...nfc.form()}
                     options={{ preserveScroll: true }}
@@ -38,6 +39,7 @@ export function NfcVerificationForm() {
                                     maxLength={100}
                                     placeholder="04:A1:B2:C3:D4"
                                     required
+                                    className="h-11 rounded-xl border-app-border bg-app-surface"
                                 />
                                 <InputError message={errors.uid} />
                             </div>

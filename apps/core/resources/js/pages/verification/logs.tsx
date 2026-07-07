@@ -22,29 +22,33 @@ export default function VerificationLogs({
         <>
             <Head title="Verification Logs" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title="Verification logs"
-                        description="Review manual verification attempts without exposing submitted identifiers."
-                    />
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title="Verification logs"
+                            description="Review manual verification attempts without exposing submitted identifiers."
+                        />
 
-                    <Button asChild variant="outline">
-                        <Link href={index()}>
-                            <ArrowLeft />
-                            Verification
-                        </Link>
-                    </Button>
+                        <Button asChild variant="outline">
+                            <Link href={index()}>
+                                <ArrowLeft />
+                                Verification
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <CardTitle>Recent attempts</CardTitle>
                         <CardDescription>
-                            Raw student numbers and permit codes are not displayed.
+                            Raw student numbers and permit codes are not
+                            displayed.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="border-t py-4">
+                    <CardContent className="border-t border-app-border py-4">
                         <VerificationLogList logs={logs} />
                     </CardContent>
                 </Card>

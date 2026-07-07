@@ -7,10 +7,16 @@ import { Label } from '@/components/ui/label';
 import { vote } from '@/routes/polls';
 import type { Poll } from '../types';
 
-export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean }) {
+export function PollVotePanel({
+    poll,
+    canVote,
+}: {
+    poll: Poll;
+    canVote: boolean;
+}) {
     if (!canVote) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                 Voting is available only to linked student accounts.
             </div>
         );
@@ -18,7 +24,7 @@ export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean 
 
     if (!poll.is_open) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground">
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-6 text-sm text-app-muted">
                 This poll is not currently open for voting.
             </div>
         );
@@ -34,7 +40,7 @@ export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean 
                             .map((option) => (
                                 <div
                                     key={option.id}
-                                    className="flex items-center gap-2 rounded-md border p-3"
+                                    className="flex items-center gap-3 rounded-[1rem] border border-app-border bg-app-surface-muted p-3 transition duration-300 hover:bg-app-surface"
                                 >
                                     <input
                                         type="radio"
@@ -47,7 +53,10 @@ export function PollVotePanel({ poll, canVote }: { poll: Poll; canVote: boolean 
                                         }
                                         className="size-4"
                                     />
-                                    <Label htmlFor={`option-${option.id}`}>
+                                    <Label
+                                        htmlFor={`option-${option.id}`}
+                                        className="text-app-ink"
+                                    >
                                         {option.text}
                                     </Label>
                                 </div>

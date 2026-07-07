@@ -41,16 +41,14 @@ export default function ExecutivesShow({
         <>
             <Head title={executive.name} />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="app-page admin-page-reveal flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-sm text-muted-foreground">
-                            Executive
-                        </p>
-                        <h1 className="text-2xl font-semibold">
+                        <p className="app-kicker">Executive</p>
+                        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-app-ink">
                             {executive.name}
                         </h1>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-app-muted">
                             {executive.email}
                         </p>
                     </div>
@@ -59,7 +57,9 @@ export default function ExecutivesShow({
                             <ExecutiveFormDialog
                                 executive={executive}
                                 options={options}
-                                trigger={<Button variant="outline">Edit</Button>}
+                                trigger={
+                                    <Button variant="outline">Edit</Button>
+                                }
                             />
                         )}
                         {can.sendSetupLink && (
@@ -68,7 +68,10 @@ export default function ExecutivesShow({
                                 options={{ preserveScroll: true }}
                             >
                                 {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                                    <Button
+                                        variant="outline"
+                                        disabled={processing}
+                                    >
                                         <KeyRound />
                                         Send Setup Link
                                     </Button>
@@ -96,7 +99,10 @@ export default function ExecutivesShow({
                                 options={{ preserveScroll: true }}
                             >
                                 {({ processing }) => (
-                                    <Button variant="outline" disabled={processing}>
+                                    <Button
+                                        variant="outline"
+                                        disabled={processing}
+                                    >
                                         <Power />
                                         Activate
                                     </Button>
@@ -110,9 +116,7 @@ export default function ExecutivesShow({
                                 description={`This will delete ${executive.name}'s executive account. This is a destructive action.`}
                                 confirmLabel="Delete executive"
                                 trigger={
-                                    <Button
-                                        variant="destructive"
-                                    >
+                                    <Button variant="destructive">
                                         <Trash2 />
                                         Delete
                                     </Button>
@@ -125,7 +129,7 @@ export default function ExecutivesShow({
                 <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
                     <ExecutiveProfileCard executive={executive} />
 
-                    <Card>
+                    <Card className="app-panel">
                         <CardHeader>
                             <CardTitle>Account details</CardTitle>
                             <CardDescription>
@@ -165,9 +169,13 @@ function Detail({
     children: React.ReactNode;
 }) {
     return (
-        <div className="rounded-md border p-3">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="mt-1 text-sm font-medium">{children}</div>
+        <div className="app-panel-muted p-3">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </p>
+            <div className="mt-2 text-sm font-semibold text-app-ink">
+                {children}
+            </div>
         </div>
     );
 }

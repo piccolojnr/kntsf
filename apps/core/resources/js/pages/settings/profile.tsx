@@ -30,7 +30,7 @@ export default function Profile({
 
             <h1 className="sr-only">Profile settings</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
                 <Heading
                     variant="small"
                     title="Profile information"
@@ -42,7 +42,7 @@ export default function Profile({
                     options={{
                         preserveScroll: true,
                     }}
-                    className="space-y-6"
+                    className="app-panel-muted space-y-5 p-4"
                 >
                     {({ processing, errors }) => (
                         <>
@@ -114,6 +114,7 @@ export default function Profile({
                                 <Button
                                     disabled={processing}
                                     data-test="update-profile-button"
+                                    className="theme-primary-action"
                                 >
                                     Save
                                 </Button>

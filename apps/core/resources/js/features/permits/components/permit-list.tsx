@@ -16,9 +16,11 @@ export function PermitList({
 }) {
     if (permits.data.length === 0) {
         return (
-            <div className="rounded-md border border-dashed bg-muted/20 p-10 text-center">
-                <p className="text-sm font-medium">No permits found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No permits found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
                     Issue the first permit or adjust your search.
                 </p>
             </div>
@@ -27,43 +29,43 @@ export function PermitList({
 
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-md border bg-card">
+            <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-[0_18px_48px_rgba(17,24,19,0.06)] dark:shadow-none">
                 <div className="w-full overflow-x-auto">
                     <table className="w-full min-w-[920px] text-sm">
-                        <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
+                        <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                             <tr>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Student
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Period
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Code
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Status
                                 </th>
-                                <th className="px-4 py-3 text-left font-medium">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
                                     Expires
                                 </th>
-                                <th className="px-4 py-3 text-right font-medium">
+                                <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y divide-app-border">
                             {permits.data.map((permit) => (
                                 <tr
                                     key={permit.id}
-                                    className="bg-card hover:bg-muted/30"
+                                    className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
                                 >
                                     <td className="px-4 py-3">
-                                        <p className="font-medium">
+                                        <p className="font-semibold text-app-ink">
                                             {permit.student.name ??
                                                 'Unnamed student'}
                                         </p>
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-app-muted">
                                             {permit.student.student_number}
                                         </p>
                                     </td>
@@ -77,7 +79,7 @@ export function PermitList({
                                     <td className="px-4 py-3">
                                         <PermitStatusBadge permit={permit} />
                                     </td>
-                                    <td className="px-4 py-3 text-muted-foreground">
+                                    <td className="px-4 py-3 text-app-muted">
                                         {formatDate(permit.expires_at)}
                                     </td>
                                     <td className="px-4 py-3">
@@ -101,8 +103,7 @@ export function PermitList({
                                                             permit.id,
                                                         )}
                                                         options={{
-                                                            preserveScroll:
-                                                                true,
+                                                            preserveScroll: true,
                                                         }}
                                                     >
                                                         {({ processing }) => (
@@ -138,7 +139,9 @@ export function PermitList({
 
                                             {can.delete && (
                                                 <ConfirmActionDialog
-                                                    form={destroy.form(permit.id)}
+                                                    form={destroy.form(
+                                                        permit.id,
+                                                    )}
                                                     title="Delete permit?"
                                                     description={`This will remove permit ending ${permit.code_last4 ?? '----'} from normal permit records. Revocation is preferred when the permit should remain auditable.`}
                                                     confirmLabel="Delete permit"

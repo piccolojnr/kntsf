@@ -22,7 +22,7 @@ export function AppShell({ children, variant = 'sidebar' }: Props) {
     return (
         <SidebarProvider
             defaultOpen={isOpen}
-            className="app-shell-surface has-data-[variant=inset]:bg-app-page"
+            className="app-shell-surface admin-shell-grid has-data-[variant=inset]:bg-[#f8f7f3] dark:has-data-[variant=inset]:bg-app-page"
         >
             {children}
         </SidebarProvider>

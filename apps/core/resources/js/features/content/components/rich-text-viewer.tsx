@@ -12,13 +12,21 @@ export function RichTextViewer({
     const content = value?.trim();
 
     if (!content) {
-        return <p className="text-sm text-muted-foreground">{emptyText}</p>;
+        return <p className="text-sm text-app-muted">{emptyText}</p>;
     }
 
     return (
-        <div className={cn('space-y-4 text-sm leading-7', className)}>
+        <div
+            className={cn(
+                'space-y-4 text-sm leading-7 text-app-ink',
+                className,
+            )}
+        >
             {content.split(/\n{2,}/).map((block, index) => (
-                <TextBlock block={block} key={`${index}-${block.slice(0, 12)}`} />
+                <TextBlock
+                    block={block}
+                    key={`${index}-${block.slice(0, 12)}`}
+                />
             ))}
         </div>
     );
@@ -29,7 +37,8 @@ function TextBlock({ block }: { block: string }) {
         .split('\n')
         .map((line) => line.trim())
         .filter(Boolean);
-    const isList = lines.length > 1 && lines.every((line) => line.startsWith('- '));
+    const isList =
+        lines.length > 1 && lines.every((line) => line.startsWith('- '));
 
     if (isList) {
         return (
@@ -43,5 +52,5 @@ function TextBlock({ block }: { block: string }) {
         );
     }
 
-    return <p className="whitespace-pre-line break-words">{block}</p>;
+    return <p className="break-words whitespace-pre-line">{block}</p>;
 }

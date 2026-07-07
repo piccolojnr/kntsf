@@ -50,30 +50,47 @@ export default function NfcCardsIndex({
         <>
             <Head title="NFC Cards" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4 md:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <Heading
-                        title="NFC Cards"
-                        description="Register and manage student NFC card assignments."
-                    />
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title="NFC Cards"
+                            description="Register and manage student NFC card assignments."
+                        />
 
-                    {can.manage && <NfcCardRegisterDialog options={options} />}
+                        {can.manage && (
+                            <NfcCardRegisterDialog options={options} />
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-3">
-                    <OverviewTile icon={CreditCard} label="Total cards" value={overview.total} />
-                    <OverviewTile icon={ShieldCheck} label="Active cards" value={overview.active} />
-                    <OverviewTile icon={Wifi} label="Inactive cards" value={overview.inactive} />
+                    <OverviewTile
+                        icon={CreditCard}
+                        label="Total cards"
+                        value={overview.total}
+                    />
+                    <OverviewTile
+                        icon={ShieldCheck}
+                        label="Active cards"
+                        value={overview.active}
+                    />
+                    <OverviewTile
+                        icon={Wifi}
+                        label="Inactive cards"
+                        value={overview.inactive}
+                    />
                 </div>
 
-                <Card className="gap-0 py-0">
+                <Card className="app-panel gap-0 overflow-hidden py-0">
                     <CardHeader className="py-4">
                         <CardTitle>NFC registry</CardTitle>
                         <CardDescription>
                             Search by student, student number, or UID last four.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4 border-t py-4">
+                    <CardContent className="space-y-4 border-t border-app-border py-4">
                         <form
                             onSubmit={submitSearch}
                             className="flex flex-col gap-2 sm:flex-row"
@@ -85,7 +102,7 @@ export default function NfcCardsIndex({
                                     onChange={(event) =>
                                         setSearchTerm(event.target.value)
                                     }
-                                    className="pl-9"
+                                    className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
                                     placeholder="Search NFC cards"
                                 />
                             </div>
@@ -112,13 +129,15 @@ function OverviewTile({
     value: number;
 }) {
     return (
-        <div className="flex items-center gap-3 rounded-md border bg-card p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="app-panel-muted flex items-center gap-3 p-4 transition duration-300 hover:-translate-y-0.5">
+            <div className="theme-primary-active flex size-10 shrink-0 items-center justify-center rounded-xl">
                 <Icon className="size-5" />
             </div>
             <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-medium">{value}</p>
+                <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                    {label}
+                </p>
+                <p className="text-sm font-semibold text-app-ink">{value}</p>
             </div>
         </div>
     );
