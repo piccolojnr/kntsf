@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
-        api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__ . '/../routes/console.php',
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -49,14 +49,24 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
-            if (!in_array($response->getStatusCode(), [403, 404, 500, 503], true)) {
+            $status = $response->getStatusCode();
+
+            if (! in_array($status, [403, 404, 500, 503], true)) {
                 return $response;
             }
 
+            if ($status === 404) {
+                return Inertia::render('public/not-found', [
+                    'status' => $status,
+                ])
+                    ->toResponse($request)
+                    ->setStatusCode($status);
+            }
+
             return Inertia::render('error', [
-                'status' => $response->getStatusCode(),
+                'status' => $status,
             ])
                 ->toResponse($request)
-                ->setStatusCode($response->getStatusCode());
+                ->setStatusCode($status);
         });
     })->create();

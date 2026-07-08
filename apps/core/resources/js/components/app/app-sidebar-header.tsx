@@ -17,7 +17,7 @@ export function AppSidebarHeader({
 }) {
     const { auth } = usePage<SharedPageProps>().props;
     const canIssuePermit =
-        auth.user?.permissions.includes('permits.issue') === true;
+        auth?.user?.permissions.includes('permits.issue') === true;
 
     return (
         <header className="sticky top-0 z-20 m-3 mb-0 flex h-16 shrink-0 items-center justify-between gap-3 rounded-[1.1rem] border border-app-border bg-white/82 px-4 shadow-[0_18px_55px_rgba(23,33,27,0.08)] backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:mx-5 md:px-5 dark:bg-app-surface/82 dark:shadow-none">

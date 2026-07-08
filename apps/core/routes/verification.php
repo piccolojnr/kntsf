@@ -4,7 +4,7 @@ use App\Http\Controllers\Verification\VerificationController;
 use App\Http\Controllers\Verification\VerificationLogController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->prefix('dashboard')->group(function () {
     Route::get('verification', [VerificationController::class, 'index'])
         ->name('verification.index');
 

@@ -1,7 +1,10 @@
 import type { Auth, NavItem } from '@/types';
 
-export function filterNavItemsForUser(items: NavItem[], auth: Auth): NavItem[] {
-    const user = auth.user;
+export function filterNavItemsForUser(
+    items: NavItem[],
+    auth?: Auth,
+): NavItem[] {
+    const user = auth?.user;
 
     if (!user) {
         return [];

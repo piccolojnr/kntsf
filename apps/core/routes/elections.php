@@ -5,7 +5,7 @@ use App\Http\Controllers\Elections\ElectionController;
 use App\Http\Controllers\Elections\ElectionPositionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
     Route::post('elections/{election}/publish', [ElectionController::class, 'publish'])->name('elections.publish');
     Route::post('elections/{election}/start', [ElectionController::class, 'start'])->name('elections.start');
     Route::post('elections/{election}/close', [ElectionController::class, 'close'])->name('elections.close');

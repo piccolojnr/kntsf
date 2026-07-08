@@ -48,3 +48,36 @@ require __DIR__.'/events.php';
 require __DIR__.'/documents.php';
 require __DIR__.'/polls.php';
 require __DIR__.'/elections.php';
+
+Route::middleware(['auth', 'verified', 'dashboard_access'])
+    ->prefix('dashboard')
+    ->group(function () {
+        Route::fallback(fn () => Inertia::render('errors/dashboard-not-found', [
+            'status' => 404,
+        ])
+            ->toResponse(request())
+            ->setStatusCode(404));
+    });
+
+Route::get('{dashboardSection}/{dashboardPath?}', function (string $dashboardSection, ?string $dashboardPath = null) {
+    return redirect('/dashboard/'.$dashboardSection.($dashboardPath ? '/'.$dashboardPath : ''), 301);
+})
+    ->whereIn('dashboardSection', [
+        'academic-periods',
+        'audit-logs',
+        'documents',
+        'elections',
+        'events',
+        'executives',
+        'nfc-cards',
+        'payments',
+        'permit-requests',
+        'permits',
+        'polls',
+        'reports',
+        'roles',
+        'settings',
+        'students',
+        'verification',
+    ])
+    ->where('dashboardPath', '.*');

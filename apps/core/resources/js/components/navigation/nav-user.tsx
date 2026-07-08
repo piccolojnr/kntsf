@@ -21,7 +21,7 @@ export function NavUser() {
     const { state } = useSidebar();
     const isMobile = useIsMobile();
 
-    if (!auth.user) {
+    if (!auth?.user) {
         return null;
     }
 

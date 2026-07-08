@@ -34,12 +34,18 @@ const navItems = [
     },
 ];
 
+const defaultPublicContent = {
+    news: true,
+    events: true,
+    documents: true,
+};
+
 export default function PublicLayout({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const page = usePage<SharedPageProps>();
     const currentUrl = page.url;
-    const publicContent = page.props.publicContent;
+    const publicContent = page.props.publicContent ?? defaultPublicContent;
     const visibleNavItems = navItems.filter((item) => {
         if (item.label === 'Announcements') {
             return publicContent.news;

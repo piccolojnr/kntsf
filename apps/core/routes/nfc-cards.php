@@ -3,7 +3,7 @@
 use App\Http\Controllers\NfcCards\NfcCardController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->prefix('dashboard')->group(function () {
     Route::post('nfc-cards/{nfc_card}/replace', [NfcCardController::class, 'replace'])
         ->middleware('throttle:sensitive-actions')
         ->name('nfc-cards.replace');

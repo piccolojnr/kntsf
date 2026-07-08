@@ -3,7 +3,7 @@
 use App\Http\Controllers\PermitRequests\PermitRequestController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->prefix('dashboard')->group(function () {
     Route::get('permit-requests', [PermitRequestController::class, 'index'])->name('permit-requests.index');
     Route::get('permit-requests/{permit_request}', [PermitRequestController::class, 'show'])->name('permit-requests.show');
     Route::post('permit-requests/{permit_request}/approve-review', [PermitRequestController::class, 'approveReview'])

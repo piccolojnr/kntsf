@@ -6,7 +6,7 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
-            publicContent: {
+            publicContent?: {
                 news: boolean;
                 events: boolean;
                 documents: boolean;
