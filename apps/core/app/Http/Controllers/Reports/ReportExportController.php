@@ -17,15 +17,17 @@ class ReportExportController extends Controller
     {
         Gate::authorize('reports.view');
 
-        abort_unless(in_array($format, ['pdf', 'csv'], true), 404);
+        abort_unless(in_array($format, ['pdf', 'excel', 'csv'], true), 404);
 
         $period = ReportPeriod::fromRequest($request);
         $reports = $dashboardSummary->reports($period);
         $summary = $dashboardSummary->counts($period);
 
-        return $format === 'pdf'
-            ? $this->pdf($period, $summary, $reports, $pdfWriter)
-            : $this->csv($period, $summary, $reports);
+        return match ($format) {
+            'pdf' => $this->pdf($period, $summary, $reports, $pdfWriter),
+            'excel' => $this->excel($period, $summary, $reports),
+            default => $this->csv($period, $summary, $reports),
+        };
     }
 
     /**
@@ -34,35 +36,41 @@ class ReportExportController extends Controller
      */
     private function pdf(ReportPeriod $period, array $summary, array $reports, SimplePdfWriter $pdfWriter): Response
     {
-        $lines = [
-            'KNTSF Executive Report',
-            'Period: '.$period->label,
-            'Generated: '.now()->toDayDateTimeString(),
-            '',
-            'Headline',
-            'Students: '.$summary['total_students'],
-            'Active permits: '.$summary['active_permits'],
-            'Successful payments: '.$summary['successful_payments'],
-            'Verification attempts: '.$summary['verification_attempts'],
-            'Election votes: '.$summary['election_votes'],
-            '',
-            'Detailed report groups',
-        ];
-
-        foreach ($reports as $group => $values) {
-            $lines[] = '';
-            $lines[] = str($group)->replace('_', ' ')->title()->toString();
-
-            foreach ($values as $label => $value) {
-                $lines[] = '  '.str($label)->replace('_', ' ')->title()->toString().': '.$value;
-            }
-        }
-
         $filename = 'kntsf-executive-report-'.$period->cacheKey().'.pdf';
 
-        return response($pdfWriter->render($lines), 200, [
+        return response($pdfWriter->renderExecutiveReport(
+            $period->label,
+            $summary,
+            $reports,
+            now()->toDayDateTimeString(),
+        ), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
+
+    /**
+     * @param  array<string, int>  $summary
+     * @param  array<string, array<string, int>>  $reports
+     */
+    private function excel(ReportPeriod $period, array $summary, array $reports): Response
+    {
+        $filename = 'kntsf-executive-report-'.$period->cacheKey().'.xls';
+        $generatedAt = now()->toDayDateTimeString();
+        $largestGroupTotal = max(1, ...array_values(array_map(fn (array $values): int => array_sum($values), $reports)));
+
+        $html = view('exports.reports.executive-report-excel', [
+            'period' => $period,
+            'summary' => $summary,
+            'reports' => $reports,
+            'generatedAt' => $generatedAt,
+            'largestGroupTotal' => $largestGroupTotal,
+        ])->render();
+
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Cache-Control' => 'max-age=0, no-cache, must-revalidate',
         ]);
     }
 
