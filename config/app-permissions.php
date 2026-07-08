@@ -77,6 +77,11 @@ return [
             'settings.update',
         ],
 
+        'content_settings' => [
+            'content_settings.view',
+            'content_settings.update',
+        ],
+
         'audit_logs' => [
             'audit_logs.view',
         ],
@@ -171,6 +176,8 @@ return [
             'payments.manage',
             'settings.view',
             'settings.update',
+            'content_settings.view',
+            'content_settings.update',
             'audit_logs.view',
             'reports.view',
             'announcements.view',
