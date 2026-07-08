@@ -4,7 +4,14 @@ FROM composer:2 AS vendor
 
 WORKDIR /app
 
-RUN docker-php-ext-install exif
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install exif gd \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY composer.json composer.lock ./
 RUN composer install \
@@ -35,6 +42,7 @@ RUN apk add --no-cache \
     php84-curl \
     php84-dom \
     php84-fileinfo \
+    php84-gd \
     php84-mbstring \
     php84-openssl \
     php84-pdo \
