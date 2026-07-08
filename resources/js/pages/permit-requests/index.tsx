@@ -157,7 +157,7 @@ export default function PermitRequestsIndex({
                                         setSearch(event.target.value)
                                     }
                                     placeholder="Search request, student number, name, email"
-                                    className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
+                                    className="rounded-xl border-app-border bg-app-surface pl-9"
                                 />
                             </div>
                             <div className="grid gap-2 md:grid-cols-6">

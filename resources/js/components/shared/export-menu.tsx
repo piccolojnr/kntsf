@@ -24,7 +24,7 @@ export function ExportMenu({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-11">
+                <Button variant="outline">
                     <Download className="size-4" />
                     Export
                 </Button>

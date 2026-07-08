@@ -85,6 +85,18 @@ test('authorized user can create election', function () {
         ->and($election->positions)->toHaveCount(0);
 });
 
+test('authorized user can export election pdf', function () {
+    [, $election, $position] = activeElectionFixture();
+    ElectionCandidate::factory()->approved()->create([
+        'election_position_id' => $position->id,
+    ]);
+
+    $this->actingAs(electionUserWithRole('admin'))
+        ->get(route('elections.export.pdf', $election))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/pdf');
+});
+
 test('authorized user can add election position after creating election', function () {
     $election = Election::factory()->create();
 

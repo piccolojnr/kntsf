@@ -87,7 +87,7 @@ export default function StudentsIndex({
                                     mode="create"
                                     options={options}
                                     trigger={
-                                        <Button className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3">
+                                        <Button className="theme-primary-action">
                                             <Plus />
                                             New student
                                         </Button>
@@ -143,7 +143,7 @@ export default function StudentsIndex({
                                     onChange={(event) =>
                                         setSearchTerm(event.target.value)
                                     }
-                                    className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
+                                    className="rounded-xl border-app-border bg-app-surface pl-9"
                                     placeholder="Search students"
                                 />
                             </div>

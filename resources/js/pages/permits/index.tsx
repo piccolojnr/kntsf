@@ -168,7 +168,7 @@ export default function PermitsIndex({
                                         onChange={(event) =>
                                             setSearchTerm(event.target.value)
                                         }
-                                        className="h-11 rounded-xl border-app-border bg-app-surface pl-9"
+                                        className="rounded-xl border-app-border bg-app-surface pl-9"
                                         placeholder="Search permits"
                                     />
                                 </div>

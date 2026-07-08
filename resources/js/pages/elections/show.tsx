@@ -2,6 +2,7 @@ import { Form, Head, Link } from '@inertiajs/react';
 import {
     Archive,
     CheckCircle2,
+    Download,
     Pencil,
     Play,
     Plus,
@@ -39,6 +40,7 @@ import {
     publish,
     start,
 } from '@/routes/elections';
+import { pdf as exportPdf } from '@/routes/elections/export';
 
 export default function ShowElection({
     election,
@@ -67,6 +69,12 @@ export default function ShowElection({
                         description={`${election.academic_period.name} · ${election.academic_period.academic_year}`}
                     />
                     <div className="flex flex-wrap gap-2">
+                        <Button asChild variant="outline">
+                            <a href={exportPdf.url(election.id)}>
+                                <Download />
+                                PDF
+                            </a>
+                        </Button>
                         {can.update && (
                             <>
                                 <ElectionPositionFormDialog
