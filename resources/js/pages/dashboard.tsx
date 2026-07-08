@@ -5,10 +5,12 @@ import {
     ArrowUpRight,
     BadgeCheck,
     BarChart3,
+    CalendarRange,
     CheckCircle2,
     CreditCard,
     Crown,
     Download,
+    Filter,
     IdCard,
     Landmark,
     Newspaper,
@@ -417,6 +419,11 @@ function ReportFilterBar({
     routeUrl: string;
 }) {
     const [period, setPeriod] = useState(filters.preset);
+    const activeLabel = periodLabel(period);
+    const activeDetail =
+        period === filters.preset
+            ? filters.label
+            : periodPreview(period, filters, filterOptions);
 
     function submit(form: HTMLFormElement) {
         const query = filterFormQuery(new FormData(form), period);
@@ -429,7 +436,7 @@ function ReportFilterBar({
 
     return (
         <form
-            className="app-panel mt-5 flex flex-col gap-3 p-4 lg:flex-row lg:items-end"
+            className="mt-5 overflow-hidden rounded-[1.15rem] border border-app-border bg-app-surface shadow-[0_16px_44px_rgba(17,24,19,0.08)] dark:shadow-none"
             onSubmit={(event) => {
                 event.preventDefault();
                 submit(event.currentTarget);
@@ -437,119 +444,192 @@ function ReportFilterBar({
         >
             <input type="hidden" name="period" value={period} />
 
-            <label className="grid min-w-0 gap-1 lg:w-64">
-                <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
-                    Period
-                </span>
-                <Select value={period} onValueChange={setPeriod}>
-                    <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
-                        <SelectValue placeholder="Choose period" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="current_month">
-                            This month
-                        </SelectItem>
-                        <SelectItem value="current_year">This year</SelectItem>
-                        <SelectItem value="year">Select year</SelectItem>
-                        <SelectItem value="academic_period">
-                            Academic year
-                        </SelectItem>
-                        <SelectItem value="custom">Date range</SelectItem>
-                        <SelectItem value="all">All records</SelectItem>
-                    </SelectContent>
-                </Select>
-            </label>
+            <div className="grid gap-0 xl:grid-cols-[18rem_minmax(0,1fr)_auto]">
+                <div className="theme-ink-panel flex items-center gap-3 p-4">
+                    <div className="grid size-10 shrink-0 place-items-center rounded-full bg-white/10 text-app-brass">
+                        <Filter className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-semibold tracking-[0.2em] text-white/55 uppercase">
+                            Report scope
+                        </p>
+                        <p className="mt-1 truncate text-sm font-semibold text-white">
+                            {activeLabel}
+                        </p>
+                    </div>
+                </div>
 
-            {period === 'custom' && (
-                <>
-                    <label className="grid gap-1 lg:w-40">
-                        <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
-                            Start
+                <div className="grid gap-3 p-4 lg:grid-cols-[minmax(13rem,18rem)_minmax(0,1fr)] lg:items-end">
+                    <label className="grid min-w-0 gap-1.5">
+                        <span className="text-[10px] font-semibold tracking-[0.18em] text-app-muted uppercase">
+                            Period
                         </span>
-                        <input
-                            name="start_date"
-                            type="date"
-                            defaultValue={filters.start_date ?? ''}
-                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
-                        />
+                        <Select value={period} onValueChange={setPeriod}>
+                            <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-semibold text-app-ink">
+                                <SelectValue placeholder="Choose period" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="current_month">
+                                    This month
+                                </SelectItem>
+                                <SelectItem value="current_year">
+                                    This year
+                                </SelectItem>
+                                <SelectItem value="year">
+                                    Select year
+                                </SelectItem>
+                                <SelectItem value="academic_period">
+                                    Academic year
+                                </SelectItem>
+                                <SelectItem value="custom">
+                                    Date range
+                                </SelectItem>
+                                <SelectItem value="all">All records</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </label>
-                    <label className="grid gap-1 lg:w-40">
-                        <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
-                            End
-                        </span>
-                        <input
-                            name="end_date"
-                            type="date"
-                            defaultValue={filters.end_date ?? ''}
-                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
-                        />
-                    </label>
-                </>
-            )}
 
-            {period === 'year' && (
-                <label className="grid gap-1 lg:w-36">
-                    <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
-                        Year
-                    </span>
-                    <Select
-                        name="year"
-                        defaultValue={String(
-                            filters.year ?? new Date().getFullYear(),
+                    <div className="min-w-0">
+                        {period === 'custom' && (
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <DateField
+                                    label="Start"
+                                    name="start_date"
+                                    value={filters.start_date}
+                                />
+                                <DateField
+                                    label="End"
+                                    name="end_date"
+                                    value={filters.end_date}
+                                />
+                            </div>
                         )}
-                    >
-                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
-                            <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {filterOptions.years.map((year) => (
-                                <SelectItem
-                                    key={year.key}
-                                    value={String(year.key)}
-                                >
-                                    {year.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </label>
-            )}
 
-            {period === 'academic_period' && (
-                <label className="grid min-w-0 gap-1 lg:w-72">
-                    <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
-                        Academic year
-                    </span>
-                    <Select
-                        name="academic_period_id"
-                        defaultValue={String(filters.academic_period_id ?? '')}
-                    >
-                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
-                            <SelectValue placeholder="Active period" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {filterOptions.academic_periods.map((item) => (
-                                <SelectItem
-                                    key={item.id}
-                                    value={String(item.id)}
+                        {period === 'year' && (
+                            <SelectField label="Year">
+                                <Select
+                                    name="year"
+                                    defaultValue={String(
+                                        filters.year ??
+                                            new Date().getFullYear(),
+                                    )}
                                 >
-                                    {item.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </label>
-            )}
+                                    <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-semibold text-app-ink">
+                                        <SelectValue placeholder="Year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {filterOptions.years.map((year) => (
+                                            <SelectItem
+                                                key={year.key}
+                                                value={String(year.key)}
+                                            >
+                                                {year.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </SelectField>
+                        )}
 
-            <div className="flex items-end">
-                <button
-                    type="submit"
-                    className="theme-primary-active h-10 rounded-[0.7rem] px-4 text-sm font-semibold"
-                >
-                    Apply
-                </button>
+                        {period === 'academic_period' && (
+                            <SelectField label="Academic year">
+                                <Select
+                                    name="academic_period_id"
+                                    defaultValue={String(
+                                        filters.academic_period_id ?? '',
+                                    )}
+                                >
+                                    <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-semibold text-app-ink">
+                                        <SelectValue placeholder="Active period" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {filterOptions.academic_periods.map(
+                                            (item) => (
+                                                <SelectItem
+                                                    key={item.id}
+                                                    value={String(item.id)}
+                                                >
+                                                    {item.name}
+                                                </SelectItem>
+                                            ),
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </SelectField>
+                        )}
+
+                        {['current_month', 'current_year', 'all'].includes(
+                            period,
+                        ) && (
+                            <div className="flex min-h-11 items-center gap-3 rounded-[0.8rem] border border-dashed border-app-border bg-app-surface-muted px-3">
+                                <CalendarRange className="size-4 shrink-0 text-app-red" />
+                                <p className="truncate text-sm font-semibold text-app-ink">
+                                    {activeDetail}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 border-t border-app-border p-4 xl:border-t-0 xl:border-l">
+                    <div className="min-w-0 xl:w-40">
+                        <p className="text-[10px] font-semibold tracking-[0.18em] text-app-muted uppercase">
+                            Active range
+                        </p>
+                        <p className="mt-1 truncate text-sm font-semibold text-app-ink">
+                            {activeDetail}
+                        </p>
+                    </div>
+                    <button
+                        type="submit"
+                        className="theme-primary-active h-11 rounded-[0.8rem] px-5 text-sm font-semibold"
+                    >
+                        Apply
+                    </button>
+                </div>
             </div>
         </form>
+    );
+}
+
+function DateField({
+    label,
+    name,
+    value,
+}: {
+    label: string;
+    name: string;
+    value: string | null;
+}) {
+    return (
+        <label className="grid gap-1.5">
+            <span className="text-[10px] font-semibold tracking-[0.18em] text-app-muted uppercase">
+                {label}
+            </span>
+            <input
+                name={name}
+                type="date"
+                defaultValue={value ?? ''}
+                className="h-11 rounded-[0.8rem] border border-app-border bg-app-surface-muted px-3 text-sm font-semibold text-app-ink"
+            />
+        </label>
+    );
+}
+
+function SelectField({
+    label,
+    children,
+}: {
+    label: string;
+    children: ReactNode;
+}) {
+    return (
+        <label className="grid gap-1.5">
+            <span className="text-[10px] font-semibold tracking-[0.18em] text-app-muted uppercase">
+                {label}
+            </span>
+            {children}
+        </label>
     );
 }
 
@@ -916,6 +996,46 @@ function titleCase(value: string) {
     return value
         .replaceAll('_', ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function periodLabel(period: string) {
+    return (
+        {
+            current_month: 'This month',
+            current_year: 'This year',
+            year: 'Selected year',
+            academic_period: 'Academic year',
+            custom: 'Date range',
+            all: 'All records',
+        }[period] ?? 'Report period'
+    );
+}
+
+function periodPreview(
+    period: string,
+    filters: ReportFilters,
+    filterOptions: FilterOptions,
+) {
+    if (period === 'year') {
+        return String(filters.year ?? new Date().getFullYear());
+    }
+
+    if (period === 'academic_period') {
+        return (
+            filterOptions.academic_periods.find(
+                (item) => item.id === filters.academic_period_id,
+            )?.name ?? 'Active academic period'
+        );
+    }
+
+    if (period === 'custom') {
+        return [
+            filters.start_date ?? 'Start date',
+            filters.end_date ?? 'End date',
+        ].join(' - ');
+    }
+
+    return periodLabel(period);
 }
 
 Dashboard.layout = {
