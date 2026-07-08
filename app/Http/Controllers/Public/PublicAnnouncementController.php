@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Support\ApplicationCache;
+use App\Support\ContentSettings;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicAnnouncementController extends Controller
 {
-    public function index(Request $request, ApplicationCache $cache): Response
+    public function index(Request $request, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_news'], 404);
+
         $announcements = $cache->remember(
             ApplicationCache::PublicAnnouncements,
             'page:'.$request->integer('page', 1),
@@ -23,7 +26,8 @@ class PublicAnnouncementController extends Controller
                 ->with(['author:id,name', 'media'])
                 ->latest('published_at')
                 ->paginate(9)
-                ->through(fn (Announcement $announcement): array => self::payload($announcement)),
+                ->through(fn (Announcement $announcement): array => self::payload($announcement))
+                ->toArray(),
         );
 
         return Inertia::render('public/announcements/index', [
@@ -31,8 +35,9 @@ class PublicAnnouncementController extends Controller
         ]);
     }
 
-    public function show(Announcement $announcement, ApplicationCache $cache): Response
+    public function show(Announcement $announcement, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_news'], 404);
         abort_unless($announcement->newQuery()->whereKey($announcement->id)->published()->publicVisible()->exists(), 404);
 
         return Inertia::render('public/announcements/show', [

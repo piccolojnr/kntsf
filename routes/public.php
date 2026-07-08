@@ -12,19 +12,35 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('throttle:public-content')->group(function () {
     Route::get('/', HomeController::class)->name('home');
 
-    Route::get('announcements', [PublicAnnouncementController::class, 'index'])->name('public.announcements.index');
-    Route::get('announcements/{announcement:slug}', [PublicAnnouncementController::class, 'show'])->name('public.announcements.show');
+    Route::prefix('public')->name('public.')->group(function () {
+        Route::get('announcements', [PublicAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::get('announcements/{announcement:slug}', [PublicAnnouncementController::class, 'show'])->name('announcements.show');
 
-    Route::get('events/public', [PublicEventController::class, 'index'])->name('public.events.index');
-    Route::get('events/public/{event:slug}', [PublicEventController::class, 'show'])->name('public.events.show');
+        Route::get('events', [PublicEventController::class, 'index'])->name('events.index');
+        Route::get('events/{event:slug}', [PublicEventController::class, 'show'])->name('events.show');
 
-    Route::get('documents/public', [PublicDocumentController::class, 'index'])->name('public.documents.index');
-    Route::get('documents/public/{document:slug}', [PublicDocumentController::class, 'show'])->name('public.documents.show');
+        Route::get('documents', [PublicDocumentController::class, 'index'])->name('documents.index');
+        Route::get('documents/{document:slug}', [PublicDocumentController::class, 'show'])->name('documents.show');
 
-    Route::get('executives/public', PublicExecutiveController::class)->name('public.executives.index');
+        Route::get('executives', PublicExecutiveController::class)->name('executives.index');
 
-    Route::get('elections/public', [PublicElectionController::class, 'index'])->name('public.elections.index');
-    Route::get('elections/public/{election:slug}', [PublicElectionController::class, 'show'])->name('public.elections.show');
+        Route::get('elections', [PublicElectionController::class, 'index'])->name('elections.index');
+        Route::get('elections/{election:slug}', [PublicElectionController::class, 'show'])->name('elections.show');
+    });
+
+    Route::redirect('announcements', '/public/announcements', 301);
+    Route::get('announcements/{announcement}', fn (string $announcement) => redirect()->route('public.announcements.show', $announcement, 301));
+
+    Route::redirect('events/public', '/public/events', 301);
+    Route::get('events/public/{event}', fn (string $event) => redirect()->route('public.events.show', $event, 301));
+
+    Route::redirect('documents/public', '/public/documents', 301);
+    Route::get('documents/public/{document}', fn (string $document) => redirect()->route('public.documents.show', $document, 301));
+
+    Route::redirect('executives/public', '/public/executives', 301);
+
+    Route::redirect('elections/public', '/public/elections', 301);
+    Route::get('elections/public/{election}', fn (string $election) => redirect()->route('public.elections.show', $election, 301));
 });
 
 Route::prefix('permit-request')

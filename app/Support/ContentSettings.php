@@ -57,7 +57,7 @@ class ContentSettings
         return [
             'allow_public_news' => true,
             'allow_public_events' => true,
-            'allow_public_documents' => false,
+            'allow_public_documents' => true,
             'homepage_featured_limit' => 6,
             'enable_comments' => false,
         ];

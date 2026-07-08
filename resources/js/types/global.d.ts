@@ -6,6 +6,11 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            publicContent: {
+                news: boolean;
+                events: boolean;
+                documents: boolean;
+            };
             [key: string]: unknown;
         };
     }

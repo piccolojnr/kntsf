@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Support\ApplicationCache;
+use App\Support\ContentSettings;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicEventController extends Controller
 {
-    public function index(Request $request, ApplicationCache $cache): Response
+    public function index(Request $request, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_events'], 404);
+
         $events = $cache->remember(
             ApplicationCache::PublicEvents,
             'page:'.$request->integer('page', 1),
@@ -24,7 +27,8 @@ class PublicEventController extends Controller
                 ->orderByRaw('starts_at is null')
                 ->orderBy('starts_at')
                 ->paginate(9)
-                ->through(fn (Event $event): array => self::payload($event)),
+                ->through(fn (Event $event): array => self::payload($event))
+                ->toArray(),
         );
 
         return Inertia::render('public/events/index', [
@@ -32,8 +36,9 @@ class PublicEventController extends Controller
         ]);
     }
 
-    public function show(Event $event, ApplicationCache $cache): Response
+    public function show(Event $event, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_events'], 404);
         abort_unless($event->newQuery()->whereKey($event->id)->published()->publicVisible()->exists(), 404);
 
         return Inertia::render('public/events/show', [

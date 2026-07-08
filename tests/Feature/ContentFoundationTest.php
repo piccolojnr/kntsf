@@ -53,7 +53,7 @@ test('content settings defaults load and can be seeded', function () {
 
     expect($settings['allow_public_news'])->toBeTrue()
         ->and($settings['allow_public_events'])->toBeTrue()
-        ->and($settings['allow_public_documents'])->toBeFalse()
+        ->and($settings['allow_public_documents'])->toBeTrue()
         ->and($settings['homepage_featured_limit'])->toBe(6)
         ->and($settings['enable_comments'])->toBeFalse();
 
