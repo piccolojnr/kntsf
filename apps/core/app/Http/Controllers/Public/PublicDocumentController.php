@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Support\ApplicationCache;
+use App\Support\ContentSettings;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicDocumentController extends Controller
 {
-    public function index(Request $request, ApplicationCache $cache): Response
+    public function index(Request $request, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_documents'], 404);
+
         $documents = $cache->remember(
             ApplicationCache::PublicDocuments,
             'page:'.$request->integer('page', 1),
@@ -23,7 +26,8 @@ class PublicDocumentController extends Controller
                 ->with(['author:id,name', 'media'])
                 ->latest('published_at')
                 ->paginate(9)
-                ->through(fn (Document $document): array => self::payload($document)),
+                ->through(fn (Document $document): array => self::payload($document))
+                ->toArray(),
         );
 
         return Inertia::render('public/documents/index', [
@@ -31,8 +35,9 @@ class PublicDocumentController extends Controller
         ]);
     }
 
-    public function show(Document $document, ApplicationCache $cache): Response
+    public function show(Document $document, ApplicationCache $cache, ContentSettings $contentSettings): Response
     {
+        abort_unless($contentSettings->all()['allow_public_documents'], 404);
         abort_unless($document->newQuery()->whereKey($document->id)->published()->publicVisible()->exists(), 404);
 
         return Inertia::render('public/documents/show', [

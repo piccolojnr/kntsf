@@ -11,6 +11,7 @@ import { index as electionsIndex } from '@/routes/public/elections';
 import { index as eventsIndex } from '@/routes/public/events';
 import { index as executivesIndex } from '@/routes/public/executives';
 import { index as permitRequestIndex } from '@/routes/public/permit-request';
+import type { SharedPageProps } from '@/types';
 
 const navItems = [
     {
@@ -36,7 +37,24 @@ const navItems = [
 export default function PublicLayout({ children }: PropsWithChildren) {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const currentUrl = usePage().url;
+    const page = usePage<SharedPageProps>();
+    const currentUrl = page.url;
+    const publicContent = page.props.publicContent;
+    const visibleNavItems = navItems.filter((item) => {
+        if (item.label === 'Announcements') {
+            return publicContent.news;
+        }
+
+        if (item.label === 'Events') {
+            return publicContent.events;
+        }
+
+        if (item.label === 'Documents') {
+            return publicContent.documents;
+        }
+
+        return true;
+    });
     const currentPath = currentUrl.split('?')[0];
     const isHome = currentPath === '/';
     const imageBackedHeaderPaths = [
@@ -123,7 +141,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 : 'border-app-border bg-white/60 dark:bg-app-page/60'
                         }`}
                     >
-                        {navItems.map((item) => (
+                        {visibleNavItems.map((item) => (
                             <Link
                                 key={item.label}
                                 href={item.href}
@@ -194,7 +212,7 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                 {open && (
                     <div className="theme-paper mx-auto mt-2 max-w-7xl rounded-3xl border border-app-border p-2 shadow-[0_24px_70px_rgba(12,10,18,0.16)] md:hidden">
                         <nav className="grid gap-1">
-                            {navItems.map((item) => (
+                            {visibleNavItems.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
@@ -277,11 +295,11 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                         <div className="grid gap-8 sm:grid-cols-2">
                             <FooterLinks
                                 title="Browse"
-                                items={navItems.slice(0, 3)}
+                                items={visibleNavItems.slice(0, 3)}
                             />
                             <FooterLinks
                                 title="Services"
-                                items={navItems.slice(3)}
+                                items={visibleNavItems.slice(3)}
                             />
                         </div>
                     </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\ContentSettings;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -56,6 +57,21 @@ class HandleInertiaRequests extends Middleware
                 ],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'publicContent' => fn (): array => $this->publicContent(),
+        ];
+    }
+
+    /**
+     * @return array{news: bool, events: bool, documents: bool}
+     */
+    private function publicContent(): array
+    {
+        $settings = app(ContentSettings::class)->all();
+
+        return [
+            'news' => $settings['allow_public_news'],
+            'events' => $settings['allow_public_events'],
+            'documents' => $settings['allow_public_documents'],
         ];
     }
 }

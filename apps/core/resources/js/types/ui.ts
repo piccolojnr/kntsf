@@ -25,5 +25,10 @@ export type SharedPageProps = {
     name: string;
     auth: Auth;
     sidebarOpen: boolean;
+    publicContent: {
+        news: boolean;
+        events: boolean;
+        documents: boolean;
+    };
     [key: string]: unknown;
 };
