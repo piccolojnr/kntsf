@@ -1,5 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import {
+    FileUp,
     GraduationCap,
     Plus,
     Search,
@@ -9,6 +10,8 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +32,7 @@ import type {
     StudentIndexPermissions,
 } from '@/features/students/types';
 import { index } from '@/routes/students';
+import { show as importShow } from '@/routes/students/import';
 
 export default function StudentsIndex({
     students,
@@ -69,18 +73,28 @@ export default function StudentsIndex({
                             description="Manage student profiles, account readiness, and academic details."
                         />
 
-                        {can.create && (
-                            <StudentFormDialog
-                                mode="create"
-                                options={options}
-                                trigger={
-                                    <Button className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3">
-                                        <Plus />
-                                        New student
-                                    </Button>
-                                }
-                            />
-                        )}
+                        <div className="flex flex-wrap gap-2">
+                            {can.import && (
+                                <Button variant="outline" asChild>
+                                    <Link href={importShow()}>
+                                        <FileUp />
+                                        Import
+                                    </Link>
+                                </Button>
+                            )}
+                            {can.create && (
+                                <StudentFormDialog
+                                    mode="create"
+                                    options={options}
+                                    trigger={
+                                        <Button className="theme-primary-action h-[39.5px] w-[39.5px] px-0 sm:w-auto sm:px-3">
+                                            <Plus />
+                                            New student
+                                        </Button>
+                                    }
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -120,7 +134,7 @@ export default function StudentsIndex({
                     <CardContent className="space-y-4 border-t border-app-border py-4">
                         <form
                             onSubmit={submitSearch}
-                            className="flex flex-col gap-2 sm:flex-row"
+                            className="flex flex-col gap-2 lg:flex-row"
                         >
                             <div className="relative flex-1">
                                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -136,6 +150,10 @@ export default function StudentsIndex({
                             <Button type="submit" variant="secondary">
                                 Search
                             </Button>
+                            <ExportMenu
+                                resource="students"
+                                filters={{ search: filters.search }}
+                            />
                         </form>
 
                         <StudentList

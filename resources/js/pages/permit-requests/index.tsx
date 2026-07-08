@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { AlertTriangle, Banknote, ClipboardCheck, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ExportMenu } from '@/components/shared/export-menu';
 import { Input } from '@/components/ui/input';
 import { PermitRequestStatusBadge } from '@/features/public-permit-request/components/permit-request-status-badge';
 import { index, show } from '@/routes/permit-requests';
@@ -224,7 +225,11 @@ export default function PermitRequestsIndex({
                                     className="w-full"
                                 />
                             </div>
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-2">
+                                <ExportMenu
+                                    resource="permit-requests"
+                                    filters={filters}
+                                />
                                 <Button type="submit">Apply filters</Button>
                             </div>
                         </form>

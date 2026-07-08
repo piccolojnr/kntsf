@@ -12,6 +12,8 @@ final class AuditEvents
 
     public const StudentAccountActivated = 'student.account_activated';
 
+    public const StudentsImported = 'students.imported';
+
     public const PermitIssued = 'permit.issued';
 
     public const PermitRevoked = 'permit.revoked';
@@ -162,6 +164,7 @@ final class AuditEvents
             self::StudentUpdated,
             self::StudentDeleted,
             self::StudentAccountActivated,
+            self::StudentsImported,
             self::PermitIssued,
             self::PermitRevoked,
             self::PermitCardDelivered,

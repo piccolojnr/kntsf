@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers\Reports;
 
+use App\Exports\ReportWorkbookExport;
 use App\Http\Controllers\Controller;
 use App\Support\DashboardSummary;
 use App\Support\ReportPeriod;
-use App\Support\SimplePdfWriter;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportExportController extends Controller
 {
-    public function __invoke(Request $request, string $format, DashboardSummary $dashboardSummary, SimplePdfWriter $pdfWriter): Response|StreamedResponse
+    public function __invoke(Request $request, string $format, DashboardSummary $dashboardSummary): Response|StreamedResponse|BinaryFileResponse
     {
         Gate::authorize('reports.view');
 
@@ -24,7 +27,7 @@ class ReportExportController extends Controller
         $summary = $dashboardSummary->counts($period);
 
         return match ($format) {
-            'pdf' => $this->pdf($period, $summary, $reports, $pdfWriter),
+            'pdf' => $this->pdf($period, $summary, $reports),
             'excel' => $this->excel($period, $summary, $reports),
             default => $this->csv($period, $summary, $reports),
         };
@@ -34,44 +37,34 @@ class ReportExportController extends Controller
      * @param  array<string, int>  $summary
      * @param  array<string, array<string, int>>  $reports
      */
-    private function pdf(ReportPeriod $period, array $summary, array $reports, SimplePdfWriter $pdfWriter): Response
+    private function pdf(ReportPeriod $period, array $summary, array $reports): Response
     {
         $filename = 'kntsf-executive-report-'.$period->cacheKey().'.pdf';
+        $largestGroupTotal = max(1, ...array_values(array_map(fn (array $values): int => array_sum($values), $reports)));
 
-        return response($pdfWriter->renderExecutiveReport(
-            $period->label,
-            $summary,
-            $reports,
-            now()->toDayDateTimeString(),
-        ), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-        ]);
+        return Pdf::loadView('exports.reports.executive-report-pdf', [
+            'period' => $period,
+            'summary' => $summary,
+            'reports' => $reports,
+            'generatedAt' => now()->toDayDateTimeString(),
+            'largestGroupTotal' => $largestGroupTotal,
+            'watchItems' => $this->watchItems($reports),
+        ])
+            ->setPaper('a4')
+            ->download($filename);
     }
 
     /**
      * @param  array<string, int>  $summary
      * @param  array<string, array<string, int>>  $reports
      */
-    private function excel(ReportPeriod $period, array $summary, array $reports): Response
+    private function excel(ReportPeriod $period, array $summary, array $reports): BinaryFileResponse
     {
-        $filename = 'kntsf-executive-report-'.$period->cacheKey().'.xls';
-        $generatedAt = now()->toDayDateTimeString();
-        $largestGroupTotal = max(1, ...array_values(array_map(fn (array $values): int => array_sum($values), $reports)));
-
-        $html = view('exports.reports.executive-report-excel', [
-            'period' => $period,
-            'summary' => $summary,
-            'reports' => $reports,
-            'generatedAt' => $generatedAt,
-            'largestGroupTotal' => $largestGroupTotal,
-        ])->render();
-
-        return response($html, 200, [
-            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            'Cache-Control' => 'max-age=0, no-cache, must-revalidate',
-        ]);
+        return Excel::download(
+            new ReportWorkbookExport($period, $summary, $reports),
+            'kntsf-executive-report-'.$period->cacheKey().'.xlsx',
+            \Maatwebsite\Excel\Excel::XLSX,
+        );
     }
 
     /**
@@ -112,5 +105,25 @@ class ReportExportController extends Controller
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    /**
+     * @param  array<string, array<string, int>>  $reports
+     * @return array<int, array{group: string, label: string, value: int}>
+     */
+    private function watchItems(array $reports): array
+    {
+        return collect([
+            ['group' => 'Students', 'label' => 'Pending setup', 'value' => $reports['students']['pending_setup'] ?? 0],
+            ['group' => 'Permits', 'label' => 'Expiring soon', 'value' => $reports['permits']['expiring_soon'] ?? 0],
+            ['group' => 'Payments', 'label' => 'Pending payments', 'value' => $reports['payments']['pending'] ?? 0],
+            ['group' => 'Requests', 'label' => 'Paid not issued', 'value' => $reports['permit_requests']['paid_not_issued'] ?? 0],
+            ['group' => 'Verification', 'label' => 'Failed checks', 'value' => $reports['verification']['failed'] ?? 0],
+            ['group' => 'Elections', 'label' => 'Pending candidates', 'value' => $reports['elections']['pending_candidates'] ?? 0],
+        ])
+            ->sortByDesc('value')
+            ->take(6)
+            ->values()
+            ->all();
     }
 }

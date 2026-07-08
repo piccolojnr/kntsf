@@ -4,6 +4,7 @@ use App\Enums\NfcCardStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PermitStatus;
 use App\Enums\VerificationResult;
+use App\Exports\ReportWorkbookExport;
 use App\Models\AcademicPeriod;
 use App\Models\NfcCard;
 use App\Models\Payment;
@@ -16,6 +17,7 @@ use Database\Seeders\PermitSettingsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
@@ -177,6 +179,31 @@ test('report exports use the selected period', function (string $format, string 
         ->assertHeader('content-type', $contentType);
 })->with([
     'pdf' => ['pdf', 'application/pdf'],
-    'excel' => ['excel', 'application/vnd.ms-excel; charset=UTF-8'],
     'csv' => ['csv', 'text/csv; charset=UTF-8'],
 ]);
+
+test('report excel export uses the selected period', function () {
+    Student::factory()->create([
+        'created_at' => now()->setYear(2025)->startOfYear(),
+        'updated_at' => now()->setYear(2025)->startOfYear(),
+    ]);
+    Student::factory()->create([
+        'created_at' => now()->setYear(2026)->startOfYear(),
+        'updated_at' => now()->setYear(2026)->startOfYear(),
+    ]);
+
+    Excel::fake();
+
+    $this->actingAs(reportingUserWithRole('admin'))
+        ->get(route('reports.export', [
+            'format' => 'excel',
+            'period' => 'year',
+            'year' => 2025,
+        ]))
+        ->assertOk();
+
+    Excel::assertDownloaded('kntsf-executive-report-year:2025-01-01:2025-12-31:2025:period.xlsx', function (ReportWorkbookExport $export): bool {
+        return $export->collection()
+            ->contains(fn (array $row): bool => $row[0] === 'Total Students' && $row[1] === 1);
+    });
+});

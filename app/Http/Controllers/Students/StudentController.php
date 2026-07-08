@@ -52,6 +52,7 @@ class StudentController extends Controller
                 'create' => $request->user()?->can('create', Student::class) ?? false,
                 'update' => $request->user()?->can('students.update') ?? false,
                 'delete' => $request->user()?->can('students.delete') ?? false,
+                'import' => $request->user()?->can('import', Student::class) ?? false,
                 'activateAccount' => $request->user()?->can('students.activate_account') ?? false,
             ],
         ]);

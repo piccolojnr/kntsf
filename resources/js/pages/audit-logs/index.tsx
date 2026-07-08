@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -164,6 +165,10 @@ export default function AuditLogsIndex({
                                 >
                                     Reset
                                 </Button>
+                                <ExportMenu
+                                    resource="audit-logs"
+                                    filters={filters}
+                                />
                             </div>
                         </form>
 
