@@ -20,7 +20,15 @@ import {
     BarChart,
     CartesianGrid,
     Cell,
+    Pie,
+    PieChart,
+    PolarAngleAxis,
+    RadialBar,
+    RadialBarChart,
     LabelList,
+    Area,
+    AreaChart,
+    Tooltip,
     XAxis,
     YAxis,
 } from 'recharts';
@@ -111,6 +119,16 @@ const overviewConfig = {
     },
 };
 
+const executivePalette = [
+    '#17211b',
+    '#b45309',
+    '#0369a1',
+    '#15803d',
+    '#7c3aed',
+    '#b91c1c',
+    '#6b5d45',
+];
+
 export default function ReportsIndex({
     reports,
     summary,
@@ -141,6 +159,21 @@ export default function ReportsIndex({
         total: group.total,
         fill: group.color,
     }));
+    const totalTrackedRecords = groups.reduce(
+        (sum, group) => sum + group.total,
+        0,
+    );
+    const moduleMixData = overviewData.map((item, index) => ({
+        ...item,
+        fill: executivePalette[index % executivePalette.length],
+    }));
+    const operationalHealth = buildOperationalHealth(summary, reports);
+    const activityCurve = groups.map((group, index) => ({
+        label: group.title,
+        activity: group.total,
+        index: index + 1,
+    }));
+    const watchItems = buildWatchItems(reports);
 
     const highestTotal = Math.max(1, ...groups.map((group) => group.total));
     const reportQuery = filterQuery(filters);
@@ -179,10 +212,7 @@ export default function ReportsIndex({
                         />
                         <OverviewStat
                             label="Tracked records"
-                            value={groups.reduce(
-                                (sum, group) => sum + group.total,
-                                0,
-                            )}
+                            value={totalTrackedRecords}
                             icon={Activity}
                         />
                     </div>
@@ -224,12 +254,280 @@ export default function ReportsIndex({
                             PDF
                         </Link>
                         <Link
-                            href={exportMethod('csv', { query: reportQuery })}
+                            href={exportMethod('excel', {
+                                query: reportQuery,
+                            })}
                             className="theme-primary-active inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] px-4 text-sm font-semibold"
                         >
                             <Download className="size-4" />
                             Excel
                         </Link>
+                        <Link
+                            href={exportMethod('csv', { query: reportQuery })}
+                            className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] border border-app-border px-4 text-sm font-semibold text-app-ink"
+                        >
+                            <Download className="size-4" />
+                            CSV
+                        </Link>
+                    </div>
+                </section>
+
+                <section className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
+                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                            <div>
+                                <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                                    Cross-module totals
+                                </p>
+                                <h2 className="mt-1 text-2xl font-black tracking-normal">
+                                    Overview distribution
+                                </h2>
+                            </div>
+                            <p className="max-w-md text-sm leading-6 text-app-muted">
+                                Totals are grouped by module so operational
+                                spikes are visible without opening each report.
+                            </p>
+                        </div>
+
+                        <ChartContainer
+                            config={overviewConfig}
+                            className="mt-6 h-[320px] w-full min-w-0"
+                        >
+                            <BarChart
+                                accessibilityLayer
+                                data={overviewData}
+                                margin={{
+                                    top: 24,
+                                    right: 12,
+                                    left: 0,
+                                    bottom: 0,
+                                }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                />
+                                <XAxis
+                                    dataKey="label"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickMargin={12}
+                                    tickFormatter={shortLabel}
+                                />
+                                <YAxis
+                                    allowDecimals={false}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickMargin={8}
+                                />
+                                <ChartTooltip
+                                    cursor={false}
+                                    content={<ChartTooltipContent hideLabel />}
+                                />
+                                <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+                                    <LabelList
+                                        dataKey="total"
+                                        position="top"
+                                        className="fill-foreground font-bold"
+                                    />
+                                    {overviewData.map((item) => (
+                                        <Cell
+                                            key={item.key}
+                                            fill={item.fill}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ChartContainer>
+                    </div>
+
+                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                        <div>
+                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                                Module mix
+                            </p>
+                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                                Share of activity
+                            </h2>
+                        </div>
+                        <ChartContainer
+                            config={overviewConfig}
+                            className="mx-auto mt-4 h-[260px] w-full max-w-sm"
+                        >
+                            <PieChart>
+                                <ChartTooltip
+                                    cursor={false}
+                                    content={<ChartTooltipContent hideLabel />}
+                                />
+                                <Pie
+                                    data={moduleMixData}
+                                    dataKey="total"
+                                    nameKey="label"
+                                    innerRadius={58}
+                                    outerRadius={98}
+                                    paddingAngle={3}
+                                >
+                                    {moduleMixData.map((item) => (
+                                        <Cell
+                                            key={item.key}
+                                            fill={item.fill}
+                                        />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </ChartContainer>
+                        <div className="mt-2 grid gap-2">
+                            {moduleMixData.slice(0, 5).map((item) => (
+                                <div
+                                    key={item.key}
+                                    className="flex items-center justify-between gap-3 text-sm"
+                                >
+                                    <span className="flex min-w-0 items-center gap-2 font-semibold">
+                                        <span
+                                            className="size-2.5 rounded-full"
+                                            style={{
+                                                backgroundColor: item.fill,
+                                            }}
+                                        />
+                                        <span className="truncate">
+                                            {item.label}
+                                        </span>
+                                    </span>
+                                    <span className="font-black tabular-nums">
+                                        {percent(
+                                            item.total,
+                                            Math.max(totalTrackedRecords, 1),
+                                        )}
+                                        %
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                        <div>
+                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                                Operating health
+                            </p>
+                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                                Coverage indicators
+                            </h2>
+                        </div>
+                        <ChartContainer
+                            config={overviewConfig}
+                            className="mx-auto mt-4 h-[290px] w-full max-w-md"
+                        >
+                            <RadialBarChart
+                                data={operationalHealth}
+                                innerRadius="18%"
+                                outerRadius="96%"
+                                startAngle={90}
+                                endAngle={-270}
+                            >
+                                <PolarAngleAxis
+                                    type="number"
+                                    domain={[0, 100]}
+                                    tick={false}
+                                />
+                                <RadialBar
+                                    dataKey="score"
+                                    background
+                                    cornerRadius={8}
+                                />
+                                <Tooltip />
+                            </RadialBarChart>
+                        </ChartContainer>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                            {operationalHealth.map((item) => (
+                                <div
+                                    key={item.label}
+                                    className="app-panel-muted flex items-center justify-between gap-3 p-3"
+                                >
+                                    <span className="text-sm font-semibold text-app-muted">
+                                        {item.label}
+                                    </span>
+                                    <span className="text-lg font-black tabular-nums">
+                                        {item.score}%
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                        <div>
+                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                                Activity curve
+                            </p>
+                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                                Relative movement by module
+                            </h2>
+                        </div>
+                        <ChartContainer
+                            config={overviewConfig}
+                            className="mt-5 h-[300px] w-full min-w-0"
+                        >
+                            <AreaChart
+                                accessibilityLayer
+                                data={activityCurve}
+                                margin={{
+                                    top: 16,
+                                    right: 12,
+                                    left: 0,
+                                    bottom: 0,
+                                }}
+                            >
+                                <defs>
+                                    <linearGradient
+                                        id="activityGradient"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="5%"
+                                            stopColor="#b45309"
+                                            stopOpacity={0.45}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor="#b45309"
+                                            stopOpacity={0.04}
+                                        />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                />
+                                <XAxis
+                                    dataKey="label"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickFormatter={shortLabel}
+                                />
+                                <YAxis
+                                    allowDecimals={false}
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <ChartTooltip
+                                    cursor={false}
+                                    content={<ChartTooltipContent hideLabel />}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="activity"
+                                    stroke="#b45309"
+                                    strokeWidth={3}
+                                    fill="url(#activityGradient)"
+                                />
+                            </AreaChart>
+                        </ChartContainer>
                     </div>
                 </section>
 
@@ -237,65 +535,36 @@ export default function ReportsIndex({
                     <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
                             <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
-                                Cross-module totals
+                                Executive watch list
                             </p>
                             <h2 className="mt-1 text-2xl font-black tracking-normal">
-                                Overview distribution
+                                Exceptions and follow-up points
                             </h2>
                         </div>
                         <p className="max-w-md text-sm leading-6 text-app-muted">
-                            Totals are grouped by module so operational spikes
-                            are visible without opening each report.
+                            These indicators help executives quickly see where
+                            attention is needed before the next operational
+                            review.
                         </p>
                     </div>
-
-                    <ChartContainer
-                        config={overviewConfig}
-                        className="mt-6 h-[320px] w-full min-w-0"
-                    >
-                        <BarChart
-                            accessibilityLayer
-                            data={overviewData}
-                            margin={{
-                                top: 24,
-                                right: 12,
-                                left: 0,
-                                bottom: 0,
-                            }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                vertical={false}
-                            />
-                            <XAxis
-                                dataKey="label"
-                                axisLine={false}
-                                tickLine={false}
-                                tickMargin={12}
-                                tickFormatter={shortLabel}
-                            />
-                            <YAxis
-                                allowDecimals={false}
-                                axisLine={false}
-                                tickLine={false}
-                                tickMargin={8}
-                            />
-                            <ChartTooltip
-                                cursor={false}
-                                content={<ChartTooltipContent hideLabel />}
-                            />
-                            <Bar dataKey="total" radius={[4, 4, 0, 0]}>
-                                <LabelList
-                                    dataKey="total"
-                                    position="top"
-                                    className="fill-foreground font-bold"
-                                />
-                                {overviewData.map((item) => (
-                                    <Cell key={item.key} fill={item.fill} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ChartContainer>
+                    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                        {watchItems.map((item) => (
+                            <div
+                                key={item.label}
+                                className="app-panel-muted min-w-0 p-4"
+                            >
+                                <p className="text-xs font-black tracking-[0.16em] text-app-muted uppercase">
+                                    {item.group}
+                                </p>
+                                <p className="mt-2 truncate text-sm font-semibold">
+                                    {item.label}
+                                </p>
+                                <p className="mt-3 text-3xl font-black tabular-nums">
+                                    {item.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </section>
 
                 <section className="mt-5 grid min-w-0 gap-5 xl:grid-cols-2">
@@ -853,6 +1122,93 @@ function hexToRgba(hex: string, opacity: number) {
     const blue = parseInt(normalized.slice(4, 6), 16);
 
     return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+}
+
+function buildOperationalHealth(
+    summary: Record<string, number>,
+    reports: ReportGroups,
+) {
+    const students = summary.total_students ?? 0;
+    const activated = summary.activated_student_accounts ?? 0;
+    const activePermits = summary.active_permits ?? 0;
+    const verificationAttempts = summary.verification_attempts ?? 0;
+    const failedVerification = summary.failed_verification_attempts ?? 0;
+    const stuckRequests = summary.stuck_permit_requests ?? 0;
+    const permitRequestsTotal = Object.values(reports.permit_requests ?? {})
+        .reduce((sum, value) => sum + value, 0);
+
+    return [
+        {
+            label: 'Account activation',
+            score: percent(activated, Math.max(students, 1)),
+            fill: '#15803d',
+        },
+        {
+            label: 'Permit coverage',
+            score: percent(activePermits, Math.max(students, 1)),
+            fill: '#b45309',
+        },
+        {
+            label: 'Verification quality',
+            score:
+                verificationAttempts > 0
+                    ? Math.max(
+                          0,
+                          100 -
+                              percent(
+                                  failedVerification,
+                                  verificationAttempts,
+                              ),
+                      )
+                    : 100,
+            fill: '#0369a1',
+        },
+        {
+            label: 'Request recovery',
+            score:
+                permitRequestsTotal > 0
+                    ? Math.max(0, 100 - percent(stuckRequests, permitRequestsTotal))
+                    : 100,
+            fill: '#7c3aed',
+        },
+    ];
+}
+
+function buildWatchItems(reports: ReportGroups) {
+    const items = [
+        {
+            group: 'Students',
+            label: 'Pending setup',
+            value: reports.students?.pending_setup ?? 0,
+        },
+        {
+            group: 'Permits',
+            label: 'Expiring soon',
+            value: reports.permits?.expiring_soon ?? 0,
+        },
+        {
+            group: 'Payments',
+            label: 'Pending payments',
+            value: reports.payments?.pending ?? 0,
+        },
+        {
+            group: 'Requests',
+            label: 'Paid not issued',
+            value: reports.permit_requests?.paid_not_issued ?? 0,
+        },
+        {
+            group: 'Verification',
+            label: 'Failed checks',
+            value: reports.verification?.failed ?? 0,
+        },
+        {
+            group: 'Elections',
+            label: 'Pending candidates',
+            value: reports.elections?.pending_candidates ?? 0,
+        },
+    ];
+
+    return items.sort((left, right) => right.value - left.value).slice(0, 4);
 }
 
 ReportsIndex.layout = {

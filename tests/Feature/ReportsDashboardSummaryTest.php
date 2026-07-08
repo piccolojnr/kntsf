@@ -177,5 +177,6 @@ test('report exports use the selected period', function (string $format, string 
         ->assertHeader('content-type', $contentType);
 })->with([
     'pdf' => ['pdf', 'application/pdf'],
-    'excel csv' => ['csv', 'text/csv; charset=UTF-8'],
+    'excel' => ['excel', 'application/vnd.ms-excel; charset=UTF-8'],
+    'csv' => ['csv', 'text/csv; charset=UTF-8'],
 ]);
