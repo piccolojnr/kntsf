@@ -55,6 +55,7 @@ class ApplicationCache
     {
         foreach ([self::DashboardCounts, self::DashboardWarnings, self::DashboardContentReadiness, self::DashboardReports] as $scope) {
             $this->forget($scope);
+            $this->bump($scope);
         }
     }
 

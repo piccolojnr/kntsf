@@ -3,22 +3,14 @@
 namespace App\Support;
 
 use App\Enums\NfcCardStatus;
-use App\Enums\PaymentStatus;
 use App\Enums\PermitStatus;
 use App\Enums\PublishStatus;
-use App\Enums\VerificationResult;
 use App\Models\AcademicPeriod;
 use App\Models\Announcement;
 use App\Models\Document;
-use App\Models\Election;
-use App\Models\ElectionCandidate;
-use App\Models\ElectionVote;
 use App\Models\Event;
-use App\Models\NfcCard;
-use App\Models\Payment;
 use App\Models\Permit;
 use App\Models\Student;
-use App\Models\VerificationLog;
 
 class DashboardSummary
 {
@@ -27,60 +19,25 @@ class DashboardSummary
         private readonly ContentSettings $contentSettings,
         private readonly ApplicationCache $cache,
         private readonly PermitRequestRecovery $permitRequestRecovery,
+        private readonly ExecutiveReport $executiveReport,
     ) {}
 
     /**
      * @return array<string, int>
      */
-    public function counts(): array
+    public function counts(?ReportPeriod $period = null): array
     {
-        return $this->cache->remember(ApplicationCache::DashboardCounts, 'default', 60, fn (): array => $this->uncachedCounts());
+        $period ??= ReportPeriod::all();
+
+        return $this->cache->remember(ApplicationCache::DashboardCounts, $period->cacheKey(), 60, fn (): array => $this->uncachedCounts($period));
     }
 
     /**
      * @return array<string, int>
      */
-    private function uncachedCounts(): array
+    private function uncachedCounts(ReportPeriod $period): array
     {
-        return [
-            'total_students' => Student::query()->count(),
-            'activated_student_accounts' => Student::query()
-                ->whereHas('user', fn ($query) => $query->whereNotNull('password'))
-                ->count(),
-            'pending_setup_student_accounts' => Student::query()
-                ->whereHas('user', fn ($query) => $query->whereNull('password'))
-                ->count(),
-            'active_permits' => Permit::query()
-                ->where('status', PermitStatus::Active)
-                ->where('starts_at', '<=', now())
-                ->where('expires_at', '>=', now())
-                ->count(),
-            'expired_permits' => Permit::query()
-                ->where(function ($query) {
-                    $query->where('status', PermitStatus::Expired)
-                        ->orWhere(function ($query) {
-                            $query->where('status', PermitStatus::Active)
-                                ->where('expires_at', '<', now());
-                        });
-                })
-                ->count(),
-            'revoked_permits' => Permit::query()->where('status', PermitStatus::Revoked)->count(),
-            'active_nfc_cards' => NfcCard::query()->where('status', NfcCardStatus::Active)->count(),
-            'pending_payments' => Payment::query()->where('status', PaymentStatus::Pending)->count(),
-            'successful_payments' => Payment::query()->where('status', PaymentStatus::Success)->count(),
-            'verification_attempts_today' => VerificationLog::query()
-                ->whereDate('created_at', today())
-                ->count(),
-            'failed_verification_attempts_today' => VerificationLog::query()
-                ->whereDate('created_at', today())
-                ->where('result', '!=', VerificationResult::Valid)
-                ->count(),
-            'active_elections' => Election::query()->where('status', 'active')->count(),
-            'pending_candidates' => ElectionCandidate::query()->where('status', 'pending')->count(),
-            'election_votes_today' => ElectionVote::query()->whereDate('cast_at', today())->count(),
-            'stuck_permit_requests' => array_sum($this->permitRequestRecovery->counts()),
-            'paid_unissued_permit_requests' => $this->permitRequestRecovery->paidNotIssued()->count(),
-        ];
+        return $this->executiveReport->counts($period);
     }
 
     /**
@@ -226,58 +183,18 @@ class DashboardSummary
     /**
      * @return array<string, array<string, int>>
      */
-    public function reports(): array
+    public function reports(?ReportPeriod $period = null): array
     {
-        return $this->cache->remember(ApplicationCache::DashboardReports, 'default', 60, fn (): array => $this->uncachedReports());
+        $period ??= ReportPeriod::all();
+
+        return $this->cache->remember(ApplicationCache::DashboardReports, $period->cacheKey(), 60, fn (): array => $this->uncachedReports($period));
     }
 
     /**
      * @return array<string, array<string, int>>
      */
-    private function uncachedReports(): array
+    private function uncachedReports(ReportPeriod $period): array
     {
-        $counts = $this->counts();
-
-        return [
-            'students' => [
-                'total' => $counts['total_students'],
-                'activated_accounts' => $counts['activated_student_accounts'],
-                'pending_setup' => $counts['pending_setup_student_accounts'],
-                'without_active_nfc_cards' => Student::query()
-                    ->whereDoesntHave('nfcCards', fn ($query) => $query->where('status', NfcCardStatus::Active))
-                    ->count(),
-            ],
-            'permits' => [
-                'active' => $counts['active_permits'],
-                'expired' => $counts['expired_permits'],
-                'revoked' => $counts['revoked_permits'],
-                'expiring_soon' => Permit::query()
-                    ->where('status', PermitStatus::Active)
-                    ->whereBetween('expires_at', [now(), now()->addDays(14)])
-                    ->count(),
-            ],
-            'nfc_cards' => [
-                'active' => $counts['active_nfc_cards'],
-                'inactive' => NfcCard::query()->whereNot('status', NfcCardStatus::Active)->count(),
-                'lost' => NfcCard::query()->where('status', NfcCardStatus::Lost)->count(),
-                'revoked' => NfcCard::query()->where('status', NfcCardStatus::Revoked)->count(),
-            ],
-            'payments' => [
-                'pending' => $counts['pending_payments'],
-                'successful' => $counts['successful_payments'],
-                'failed' => Payment::query()->where('status', PaymentStatus::Failed)->count(),
-                'cancelled' => Payment::query()->where('status', PaymentStatus::Cancelled)->count(),
-            ],
-            'permit_requests' => $this->permitRequestRecovery->counts(),
-            'verification' => [
-                'attempts_today' => $counts['verification_attempts_today'],
-                'failed_today' => $counts['failed_verification_attempts_today'],
-                'valid_today' => VerificationLog::query()
-                    ->whereDate('created_at', today())
-                    ->where('result', VerificationResult::Valid)
-                    ->count(),
-                'total_logs' => VerificationLog::query()->count(),
-            ],
-        ];
+        return $this->executiveReport->reports($period);
     }
 }
