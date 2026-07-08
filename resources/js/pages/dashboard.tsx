@@ -1,12 +1,14 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     Activity,
     AlertTriangle,
     ArrowUpRight,
     BadgeCheck,
+    BarChart3,
     CheckCircle2,
     CreditCard,
     Crown,
+    Download,
     IdCard,
     Landmark,
     Newspaper,
@@ -16,12 +18,21 @@ import {
     Wifi,
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
+import { useState } from 'react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import type { ActivityItem } from '@/features/audit-logs/types';
 import { dashboard } from '@/routes';
 import { index as nfcCardsIndex } from '@/routes/nfc-cards';
 import { index as paymentsIndex } from '@/routes/payments';
 import { index as permitRequestsIndex } from '@/routes/permit-requests';
 import { index as permitsIndex } from '@/routes/permits';
+import { index as reportsIndex } from '@/routes/reports';
 import { index as studentsIndex } from '@/routes/students';
 import type { RouteDefinition } from '@/wayfinder';
 
@@ -39,9 +50,12 @@ type DashboardSummary = {
     paid_unissued_permit_requests?: number;
     verification_attempts_today: number;
     failed_verification_attempts_today: number;
+    verification_attempts: number;
+    failed_verification_attempts: number;
     active_elections: number;
     pending_candidates: number;
     election_votes_today: number;
+    election_votes: number;
 };
 
 type DashboardWarning = {
@@ -59,13 +73,39 @@ type ContentReadinessItem = {
     ready: boolean;
 };
 
+type ReportGroups = Record<string, Record<string, number>>;
+
+type ReportFilters = {
+    preset: string;
+    start_date: string | null;
+    end_date: string | null;
+    year: number | null;
+    academic_period_id: number | null;
+    label: string;
+};
+
+type FilterOptions = {
+    years: { key: number; label: string }[];
+    academic_periods: {
+        id: number;
+        name: string;
+        academic_year: string | null;
+    }[];
+};
+
 export default function Dashboard({
+    filters,
+    filterOptions,
     summary,
+    reports = {},
     warnings = [],
     contentReadiness = [],
     recentActivity = [],
 }: {
+    filters: ReportFilters;
+    filterOptions: FilterOptions;
     summary: DashboardSummary;
+    reports?: ReportGroups;
     warnings?: DashboardWarning[];
     contentReadiness?: ContentReadinessItem[];
     recentActivity?: ActivityItem[];
@@ -91,6 +131,7 @@ export default function Dashboard({
     const stuckPermitRequests = summary.stuck_permit_requests ?? 0;
     const paidUnissuedPermitRequests =
         summary.paid_unissued_permit_requests ?? 0;
+    const reportQuery = filterQuery(filters);
 
     const commandCards = [
         {
@@ -181,9 +222,9 @@ export default function Dashboard({
                                 Operations overview
                             </h1>
                             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/68">
-                                A live working summary for student records,
-                                permits, NFC cards, payments, verification,
-                                publishing, and elections.
+                                Executive summary for {filters.label}, covering
+                                student records, permits, NFC cards, payments,
+                                verification, publishing, and elections.
                             </p>
                         </div>
                         <div className="grid content-end gap-3">
@@ -202,6 +243,12 @@ export default function Dashboard({
                     </div>
                 </section>
 
+                <ReportFilterBar
+                    filters={filters}
+                    filterOptions={filterOptions}
+                    routeUrl={dashboard.url()}
+                />
+
                 <section className="mt-5 grid gap-3 lg:grid-cols-3">
                     {triageItems.map((item) => (
                         <TriageLink key={item.label} {...item} />
@@ -212,6 +259,63 @@ export default function Dashboard({
                     {commandCards.map((card) => (
                         <CommandCard key={card.label} {...card} />
                     ))}
+                </section>
+
+                <section className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+                    <Panel
+                        title="Period report"
+                        eyebrow={filters.label}
+                        icon={BarChart3}
+                    >
+                        <div className="grid gap-3 md:grid-cols-3">
+                            <SignalCard
+                                label="Verification attempts"
+                                value={summary.verification_attempts}
+                                detail={`${summary.failed_verification_attempts} failed in this period`}
+                                icon={Radar}
+                            />
+                            <SignalCard
+                                label="Election votes"
+                                value={summary.election_votes}
+                                detail="Votes cast in this period"
+                                icon={Crown}
+                            />
+                            <SignalCard
+                                label="Paid, not issued"
+                                value={paidUnissuedPermitRequests}
+                                detail="Permit requests awaiting completion"
+                                icon={AlertTriangle}
+                            />
+                        </div>
+                        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                            {Object.entries(reports).map(([group, values]) => (
+                                <MiniReportGroup
+                                    key={group}
+                                    title={titleCase(group)}
+                                    values={values}
+                                />
+                            ))}
+                        </div>
+                    </Panel>
+                    <Panel
+                        title="Executive exports"
+                        eyebrow="Share"
+                        icon={Download}
+                    >
+                        <div className="grid gap-3">
+                            <Link
+                                href={reportsIndex({ query: reportQuery })}
+                                className="theme-primary-active inline-flex items-center justify-center gap-2 rounded-[0.8rem] px-4 py-3 text-sm font-semibold"
+                            >
+                                <BarChart3 className="size-4" />
+                                Open full report
+                            </Link>
+                            <p className="text-sm leading-6 text-app-muted">
+                                The reports page exports this same period as PDF
+                                or Excel-compatible CSV.
+                            </p>
+                        </div>
+                    </Panel>
                 </section>
 
                 <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]">
@@ -300,6 +404,176 @@ export default function Dashboard({
                 </section>
             </main>
         </>
+    );
+}
+
+function ReportFilterBar({
+    filters,
+    filterOptions,
+    routeUrl,
+}: {
+    filters: ReportFilters;
+    filterOptions: FilterOptions;
+    routeUrl: string;
+}) {
+    const [period, setPeriod] = useState(filters.preset);
+
+    function submit(form: HTMLFormElement) {
+        const query = filterFormQuery(new FormData(form), period);
+
+        router.get(routeUrl, query, {
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
+
+    return (
+        <form
+            className="app-panel mt-5 flex flex-col gap-3 p-4 lg:flex-row lg:items-end"
+            onSubmit={(event) => {
+                event.preventDefault();
+                submit(event.currentTarget);
+            }}
+        >
+            <input type="hidden" name="period" value={period} />
+
+            <label className="grid min-w-0 gap-1 lg:w-64">
+                <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                    Period
+                </span>
+                <Select value={period} onValueChange={setPeriod}>
+                    <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                        <SelectValue placeholder="Choose period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="current_month">
+                            This month
+                        </SelectItem>
+                        <SelectItem value="current_year">This year</SelectItem>
+                        <SelectItem value="year">Select year</SelectItem>
+                        <SelectItem value="academic_period">
+                            Academic year
+                        </SelectItem>
+                        <SelectItem value="custom">Date range</SelectItem>
+                        <SelectItem value="all">All records</SelectItem>
+                    </SelectContent>
+                </Select>
+            </label>
+
+            {period === 'custom' && (
+                <>
+                    <label className="grid gap-1 lg:w-40">
+                        <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                            Start
+                        </span>
+                        <input
+                            name="start_date"
+                            type="date"
+                            defaultValue={filters.start_date ?? ''}
+                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
+                        />
+                    </label>
+                    <label className="grid gap-1 lg:w-40">
+                        <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                            End
+                        </span>
+                        <input
+                            name="end_date"
+                            type="date"
+                            defaultValue={filters.end_date ?? ''}
+                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
+                        />
+                    </label>
+                </>
+            )}
+
+            {period === 'year' && (
+                <label className="grid gap-1 lg:w-36">
+                    <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                        Year
+                    </span>
+                    <Select
+                        name="year"
+                        defaultValue={String(
+                            filters.year ?? new Date().getFullYear(),
+                        )}
+                    >
+                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                            <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {filterOptions.years.map((year) => (
+                                <SelectItem
+                                    key={year.key}
+                                    value={String(year.key)}
+                                >
+                                    {year.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </label>
+            )}
+
+            {period === 'academic_period' && (
+                <label className="grid min-w-0 gap-1 lg:w-72">
+                    <span className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                        Academic year
+                    </span>
+                    <Select
+                        name="academic_period_id"
+                        defaultValue={String(filters.academic_period_id ?? '')}
+                    >
+                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                            <SelectValue placeholder="Active period" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {filterOptions.academic_periods.map((item) => (
+                                <SelectItem
+                                    key={item.id}
+                                    value={String(item.id)}
+                                >
+                                    {item.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </label>
+            )}
+
+            <div className="flex items-end">
+                <button
+                    type="submit"
+                    className="theme-primary-active h-10 rounded-[0.7rem] px-4 text-sm font-semibold"
+                >
+                    Apply
+                </button>
+            </div>
+        </form>
+    );
+}
+
+function MiniReportGroup({
+    title,
+    values,
+}: {
+    title: string;
+    values: Record<string, number>;
+}) {
+    const total = Object.values(values).reduce((sum, value) => sum + value, 0);
+
+    return (
+        <div className="app-panel-muted min-w-0 p-4">
+            <p className="truncate text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {title}
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-app-ink tabular-nums">
+                {total}
+            </p>
+            <p className="mt-1 text-xs text-app-muted">
+                {Object.keys(values).length} metrics
+            </p>
+        </div>
     );
 }
 
@@ -591,6 +865,57 @@ function formatActivityDate(value: string | null) {
               day: 'numeric',
               month: 'short',
           });
+}
+
+function filterFormQuery(formData: FormData, selectedPeriod?: string) {
+    const period =
+        selectedPeriod ?? String(formData.get('period') ?? 'current_month');
+    const query: Record<string, string | number> = { period };
+
+    if (period === 'custom') {
+        query.start_date = String(formData.get('start_date') ?? '');
+        query.end_date = String(formData.get('end_date') ?? '');
+    }
+
+    if (period === 'year' || period === 'current_year') {
+        query.year = Number(formData.get('year') || new Date().getFullYear());
+    }
+
+    if (period === 'academic_period') {
+        query.academic_period_id = Number(formData.get('academic_period_id'));
+    }
+
+    return query;
+}
+
+function filterQuery(filters: ReportFilters) {
+    const query: Record<string, string | number> = {
+        period: filters.preset,
+    };
+
+    if (filters.start_date !== null) {
+        query.start_date = filters.start_date;
+    }
+
+    if (filters.end_date !== null) {
+        query.end_date = filters.end_date;
+    }
+
+    if (filters.year !== null) {
+        query.year = filters.year;
+    }
+
+    if (filters.academic_period_id !== null) {
+        query.academic_period_id = filters.academic_period_id;
+    }
+
+    return query;
+}
+
+function titleCase(value: string) {
+    return value
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 Dashboard.layout = {

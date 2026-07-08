@@ -1,15 +1,18 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     Activity,
     BarChart3,
     CreditCard,
+    Download,
     FileText,
     IdCard,
+    Landmark,
     ShieldCheck,
     Users,
     Wifi,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { useState } from 'react';
 import {
     Bar,
     BarChart,
@@ -20,13 +23,38 @@ import {
     YAxis,
 } from 'recharts';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import { index } from '@/routes/reports';
+import { exportMethod, index } from '@/routes/reports';
 
 type ReportGroups = Record<string, Record<string, number>>;
+
+type ReportFilters = {
+    preset: string;
+    start_date: string | null;
+    end_date: string | null;
+    year: number | null;
+    academic_period_id: number | null;
+    label: string;
+};
+
+type FilterOptions = {
+    years: { key: number; label: string }[];
+    academic_periods: {
+        id: number;
+        name: string;
+        academic_year: string | null;
+    }[];
+};
 
 type ReportMeta = {
     title: string;
@@ -81,7 +109,17 @@ const overviewConfig = {
     },
 };
 
-export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
+export default function ReportsIndex({
+    reports,
+    summary,
+    filters,
+    filterOptions,
+}: {
+    reports: ReportGroups;
+    summary: Record<string, number>;
+    filters: ReportFilters;
+    filterOptions: FilterOptions;
+}) {
     const groups = Object.entries(reports ?? {}).map(([key, values]) => {
         const meta = reportMeta[key] ?? fallbackMeta(key);
         const entries = Object.entries(values ?? {});
@@ -103,30 +141,35 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
     }));
 
     const highestTotal = Math.max(1, ...groups.map((group) => group.total));
+    const reportQuery = filterQuery(filters);
 
     return (
         <>
             <Head title="Reports" />
 
             <div className="app-page p-4 md:p-6">
-                <section className="app-panel grid min-w-0 gap-5 overflow-hidden p-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
+                <section className="theme-ink-panel grid min-w-0 gap-5 overflow-hidden rounded-[1.35rem] border border-app-border p-5 shadow-[0_24px_80px_rgba(17,24,19,0.18)] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
                     <div className="min-w-0">
-                        <p className="inline-flex items-center gap-2 rounded-md bg-app-ink px-3 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-app-surface dark:bg-app-surface dark:text-app-ink">
+                        <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black tracking-[0.2em] text-[#1c1826] uppercase">
                             <FileText className="size-4" />
                             Operational reporting
                         </p>
-                        <h1 className="mt-5 max-w-3xl text-4xl font-black leading-none tracking-normal md:text-6xl">
-                            Reports that stay close to the work.
+                        <h1 className="mt-5 max-w-3xl text-4xl leading-none font-black tracking-normal text-white md:text-6xl">
+                            Executive report room.
                         </h1>
-                        <p className="mt-4 max-w-2xl text-sm leading-7 text-app-muted">
-                            Lightweight counts across students, permits, NFC
-                            cards, payments, and verification. These charts are
-                            designed for quick operational review, not heavy
-                            analytics.
+                        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70">
+                            A board-ready view of {filters.label}: students,
+                            permits, payments, verification, elections, and
+                            operational exceptions in one place.
                         </p>
                     </div>
 
                     <div className="grid content-end gap-3">
+                        <OverviewStat
+                            label="Period"
+                            value={filters.label}
+                            icon={Landmark}
+                        />
                         <OverviewStat
                             label="Report groups"
                             value={groups.length}
@@ -143,10 +186,55 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
                     </div>
                 </section>
 
+                <ReportFilterBar
+                    filters={filters}
+                    filterOptions={filterOptions}
+                    routeUrl={index.url()}
+                />
+
+                <section className="mt-5 grid gap-3 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
+                    <ExecutiveStat
+                        label="Students"
+                        value={summary.total_students ?? 0}
+                        detail="In selected period"
+                    />
+                    <ExecutiveStat
+                        label="Active permits"
+                        value={summary.active_permits ?? 0}
+                        detail="Valid in period"
+                    />
+                    <ExecutiveStat
+                        label="Successful payments"
+                        value={summary.successful_payments ?? 0}
+                        detail="Paid in period"
+                    />
+                    <ExecutiveStat
+                        label="Verification attempts"
+                        value={summary.verification_attempts ?? 0}
+                        detail="Operational checks"
+                    />
+                    <div className="app-panel grid gap-2 p-3">
+                        <Link
+                            href={exportMethod('pdf', { query: reportQuery })}
+                            className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] bg-app-red px-4 text-sm font-semibold text-white"
+                        >
+                            <Download className="size-4" />
+                            PDF
+                        </Link>
+                        <Link
+                            href={exportMethod('csv', { query: reportQuery })}
+                            className="theme-primary-active inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] px-4 text-sm font-semibold"
+                        >
+                            <Download className="size-4" />
+                            Excel
+                        </Link>
+                    </div>
+                </section>
+
                 <section className="app-panel mt-5 min-w-0 overflow-hidden p-5">
                     <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <p className="text-xs font-black uppercase tracking-[0.18em] text-app-red">
+                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
                                 Cross-module totals
                             </p>
                             <h2 className="mt-1 text-2xl font-black tracking-normal">
@@ -154,14 +242,14 @@ export default function ReportsIndex({ reports }: { reports: ReportGroups }) {
                             </h2>
                         </div>
                         <p className="max-w-md text-sm leading-6 text-app-muted">
-                            Totals are grouped by module so operational spikes are
-                            visible without opening each report.
+                            Totals are grouped by module so operational spikes
+                            are visible without opening each report.
                         </p>
                     </div>
 
                     <ChartContainer
                         config={overviewConfig}
-                        className="mt-6 h-[320px] min-w-0 w-full"
+                        className="mt-6 h-[320px] w-full min-w-0"
                     >
                         <BarChart
                             accessibilityLayer
@@ -257,7 +345,7 @@ function ReportPanel({
                         <Icon className="size-5" />
                     </div>
                     <div className="min-w-0">
-                        <h2 className="break-words text-xl font-black tracking-normal">
+                        <h2 className="text-xl font-black tracking-normal break-words">
                             {group.title}
                         </h2>
                         <p className="mt-1 text-sm leading-6 text-app-muted">
@@ -266,7 +354,7 @@ function ReportPanel({
                     </div>
                 </div>
                 <div className="shrink-0 text-left sm:text-right">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-app-muted">
+                    <p className="text-xs font-black tracking-[0.18em] text-app-muted uppercase">
                         Total
                     </p>
                     <p className="mt-1 text-3xl font-black tabular-nums">
@@ -278,7 +366,7 @@ function ReportPanel({
             <div className="grid min-w-0 gap-5 p-5 2xl:grid-cols-[minmax(0,1fr)_13rem]">
                 <ChartContainer
                     config={config}
-                    className="h-[260px] min-w-0 w-full overflow-hidden"
+                    className="h-[260px] w-full min-w-0 overflow-hidden"
                 >
                     <BarChart
                         accessibilityLayer
@@ -291,7 +379,10 @@ function ReportPanel({
                             bottom: 4,
                         }}
                     >
-                        <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                        <CartesianGrid
+                            horizontal={false}
+                            strokeDasharray="3 3"
+                        />
                         <XAxis
                             type="number"
                             hide
@@ -331,7 +422,7 @@ function ReportPanel({
                             className="app-panel-muted min-w-0 p-3"
                         >
                             <div className="flex min-w-0 items-center justify-between gap-3">
-                                <p className="min-w-0 truncate text-xs font-black uppercase tracking-[0.14em] text-app-muted">
+                                <p className="min-w-0 truncate text-xs font-black tracking-[0.14em] text-app-muted uppercase">
                                     {titleCase(label)}
                                 </p>
                                 <p className="font-black tabular-nums">
@@ -361,19 +452,187 @@ function OverviewStat({
     icon: Icon,
 }: {
     label: string;
-    value: number;
+    value: number | string;
     icon: ComponentType<{ className?: string }>;
 }) {
     return (
-        <div className="app-panel-muted p-4">
+        <div className="rounded-[1rem] border border-white/12 bg-white/8 p-4 text-white backdrop-blur">
             <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-app-muted">
+                <p className="text-xs font-black tracking-[0.18em] text-white/64 uppercase">
                     {label}
                 </p>
-                <Icon className="size-5 text-app-red" />
+                <Icon className="size-5 text-app-brass" />
             </div>
-            <p className="mt-3 text-4xl font-black tabular-nums">{value}</p>
+            <p className="mt-3 text-3xl leading-tight font-black text-white tabular-nums">
+                {value}
+            </p>
         </div>
+    );
+}
+
+function ExecutiveStat({
+    label,
+    value,
+    detail,
+}: {
+    label: string;
+    value: number;
+    detail: string;
+}) {
+    return (
+        <div className="app-panel p-4">
+            <p className="text-xs font-black tracking-[0.16em] text-app-muted uppercase">
+                {label}
+            </p>
+            <p className="mt-2 text-3xl font-black text-app-ink tabular-nums">
+                {value}
+            </p>
+            <p className="mt-1 text-sm text-app-muted">{detail}</p>
+        </div>
+    );
+}
+
+function ReportFilterBar({
+    filters,
+    filterOptions,
+    routeUrl,
+}: {
+    filters: ReportFilters;
+    filterOptions: FilterOptions;
+    routeUrl: string;
+}) {
+    const [period, setPeriod] = useState(filters.preset);
+
+    function submit(form: HTMLFormElement) {
+        router.get(routeUrl, filterFormQuery(new FormData(form), period), {
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
+
+    return (
+        <form
+            className="app-panel mt-5 flex flex-col gap-3 p-4 lg:flex-row lg:items-end"
+            onSubmit={(event) => {
+                event.preventDefault();
+                submit(event.currentTarget);
+            }}
+        >
+            <input type="hidden" name="period" value={period} />
+
+            <label className="grid min-w-0 gap-1 lg:w-64">
+                <span className="text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                    Period
+                </span>
+                <Select value={period} onValueChange={setPeriod}>
+                    <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                        <SelectValue placeholder="Choose period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="current_month">
+                            This month
+                        </SelectItem>
+                        <SelectItem value="current_year">This year</SelectItem>
+                        <SelectItem value="year">Select year</SelectItem>
+                        <SelectItem value="academic_period">
+                            Academic year
+                        </SelectItem>
+                        <SelectItem value="custom">Date range</SelectItem>
+                        <SelectItem value="all">All records</SelectItem>
+                    </SelectContent>
+                </Select>
+            </label>
+
+            {period === 'custom' && (
+                <>
+                    <label className="grid gap-1 lg:w-40">
+                        <span className="text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                            Start
+                        </span>
+                        <input
+                            name="start_date"
+                            type="date"
+                            defaultValue={filters.start_date ?? ''}
+                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
+                        />
+                    </label>
+                    <label className="grid gap-1 lg:w-40">
+                        <span className="text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                            End
+                        </span>
+                        <input
+                            name="end_date"
+                            type="date"
+                            defaultValue={filters.end_date ?? ''}
+                            className="h-10 rounded-[0.7rem] border border-app-border bg-app-surface px-3 text-sm text-app-ink"
+                        />
+                    </label>
+                </>
+            )}
+
+            {period === 'year' && (
+                <label className="grid gap-1 lg:w-36">
+                    <span className="text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                        Year
+                    </span>
+                    <Select
+                        name="year"
+                        defaultValue={String(
+                            filters.year ?? new Date().getFullYear(),
+                        )}
+                    >
+                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                            <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {filterOptions.years.map((year) => (
+                                <SelectItem
+                                    key={year.key}
+                                    value={String(year.key)}
+                                >
+                                    {year.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </label>
+            )}
+
+            {period === 'academic_period' && (
+                <label className="grid min-w-0 gap-1 lg:w-72">
+                    <span className="text-xs font-black tracking-[0.14em] text-app-muted uppercase">
+                        Academic year
+                    </span>
+                    <Select
+                        name="academic_period_id"
+                        defaultValue={String(filters.academic_period_id ?? '')}
+                    >
+                        <SelectTrigger className="h-10 w-full rounded-[0.7rem] border-app-border bg-app-surface px-3 text-sm text-app-ink">
+                            <SelectValue placeholder="Active period" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {filterOptions.academic_periods.map((item) => (
+                                <SelectItem
+                                    key={item.id}
+                                    value={String(item.id)}
+                                >
+                                    {item.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </label>
+            )}
+
+            <div className="flex items-end">
+                <button
+                    type="submit"
+                    className="theme-primary-active h-10 rounded-[0.7rem] px-4 text-sm font-semibold"
+                >
+                    Apply
+                </button>
+            </div>
+        </form>
     );
 }
 
@@ -414,6 +673,51 @@ function percent(value: number, total: number) {
     }
 
     return Math.max(0, Math.min(100, Math.round((value / total) * 100)));
+}
+
+function filterFormQuery(formData: FormData, selectedPeriod?: string) {
+    const period =
+        selectedPeriod ?? String(formData.get('period') ?? 'current_month');
+    const query: Record<string, string | number> = { period };
+
+    if (period === 'custom') {
+        query.start_date = String(formData.get('start_date') ?? '');
+        query.end_date = String(formData.get('end_date') ?? '');
+    }
+
+    if (period === 'year' || period === 'current_year') {
+        query.year = Number(formData.get('year') || new Date().getFullYear());
+    }
+
+    if (period === 'academic_period') {
+        query.academic_period_id = Number(formData.get('academic_period_id'));
+    }
+
+    return query;
+}
+
+function filterQuery(filters: ReportFilters) {
+    const query: Record<string, string | number> = {
+        period: filters.preset,
+    };
+
+    if (filters.start_date !== null) {
+        query.start_date = filters.start_date;
+    }
+
+    if (filters.end_date !== null) {
+        query.end_date = filters.end_date;
+    }
+
+    if (filters.year !== null) {
+        query.year = filters.year;
+    }
+
+    if (filters.academic_period_id !== null) {
+        query.academic_period_id = filters.academic_period_id;
+    }
+
+    return query;
 }
 
 function tint(color: string, index: number) {

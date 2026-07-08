@@ -133,3 +133,49 @@ test('reports page loads for permitted user', function () {
             ->has('reports.nfc_cards')
             ->has('reports.verification'));
 });
+
+test('reports can be filtered by year', function () {
+    Student::factory()->create([
+        'created_at' => now()->setYear(2025)->startOfYear(),
+        'updated_at' => now()->setYear(2025)->startOfYear(),
+    ]);
+    Student::factory()->create([
+        'created_at' => now()->setYear(2026)->startOfYear(),
+        'updated_at' => now()->setYear(2026)->startOfYear(),
+    ]);
+
+    $this->actingAs(reportingUserWithRole('admin'))
+        ->get(route('reports.index', [
+            'period' => 'year',
+            'year' => 2025,
+        ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('reports/index')
+            ->where('filters.preset', 'year')
+            ->where('filters.year', 2025)
+            ->where('reports.students.total', 1));
+});
+
+test('report exports use the selected period', function (string $format, string $contentType) {
+    Student::factory()->create([
+        'created_at' => now()->setYear(2025)->startOfYear(),
+        'updated_at' => now()->setYear(2025)->startOfYear(),
+    ]);
+    Student::factory()->create([
+        'created_at' => now()->setYear(2026)->startOfYear(),
+        'updated_at' => now()->setYear(2026)->startOfYear(),
+    ]);
+
+    $this->actingAs(reportingUserWithRole('admin'))
+        ->get(route('reports.export', [
+            'format' => $format,
+            'period' => 'year',
+            'year' => 2025,
+        ]))
+        ->assertOk()
+        ->assertHeader('content-type', $contentType);
+})->with([
+    'pdf' => ['pdf', 'application/pdf'],
+    'excel csv' => ['csv', 'text/csv; charset=UTF-8'],
+]);

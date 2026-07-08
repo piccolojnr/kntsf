@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\SetupPasswordController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HealthController;
-use App\Support\ActivityFeed;
-use App\Support\DashboardSummary;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,14 +20,7 @@ Route::get('account/mobile-app', fn () => Inertia::render('account/mobile-app'))
     ->name('account.mobile-app');
 
 Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
-    Route::get('dashboard', function (ActivityFeed $activityFeed, DashboardSummary $dashboardSummary) {
-        return Inertia::render('dashboard', [
-            'summary' => $dashboardSummary->counts(),
-            'warnings' => $dashboardSummary->warnings(),
-            'contentReadiness' => $dashboardSummary->contentReadiness(),
-            'recentActivity' => $activityFeed->items(8),
-        ]);
-    })->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
 Route::middleware(['guest', 'throttle:setup-password'])->group(function () {
