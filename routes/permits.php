@@ -3,7 +3,7 @@
 use App\Http\Controllers\Permits\PermitController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified', 'dashboard_access'])->group(function () {
+Route::middleware(['auth', 'verified', 'dashboard_access'])->prefix('dashboard')->group(function () {
     Route::post('permits/{permit}/revoke', [PermitController::class, 'revoke'])
         ->middleware('throttle:sensitive-actions')
         ->name('permits.revoke');
