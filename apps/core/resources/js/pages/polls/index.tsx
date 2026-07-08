@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Archive, BadgeCheck, FileText, Plus, Vote } from 'lucide-react';
 import { useState } from 'react';
+import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,14 +61,17 @@ export default function PollsIndex({
                         description="Create surveys and collect one vote per student."
                     />
 
-                    {can.create && (
-                        <Button asChild>
-                            <Link href={create()}>
-                                <Plus />
-                                New poll
-                            </Link>
-                        </Button>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                        <ExportMenu resource="polls" filters={filters} />
+                        {can.create && (
+                            <Button asChild>
+                                <Link href={create()}>
+                                    <Plus />
+                                    New poll
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                 </ContentToolbar>
 
                 <div className="grid gap-3 md:grid-cols-4">

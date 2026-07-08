@@ -3,6 +3,7 @@ import { CircleDollarSign, Clock, Search, ShieldCheck } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import Heading from '@/components/shared/heading';
+import { ExportMenu } from '@/components/shared/export-menu';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -124,6 +125,10 @@ export default function PaymentsIndex({
                             </form>
 
                             <div className="flex flex-wrap gap-2">
+                                <ExportMenu
+                                    resource="payments"
+                                    filters={filters}
+                                />
                                 <Button
                                     size="sm"
                                     variant={

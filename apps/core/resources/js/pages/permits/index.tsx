@@ -3,6 +3,7 @@ import { BadgeCheck, CreditCard, Search, ShieldCheck } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useMemo, useState } from 'react';
 import Heading from '@/components/shared/heading';
+import { ExportMenu } from '@/components/shared/export-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -177,6 +178,10 @@ export default function PermitsIndex({
                             </form>
 
                             <div className="flex gap-2">
+                                <ExportMenu
+                                    resource="permits"
+                                    filters={filters}
+                                />
                                 <Button
                                     size="sm"
                                     variant={

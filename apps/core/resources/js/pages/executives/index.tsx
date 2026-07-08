@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import Heading from '@/components/shared/heading';
+import { ExportMenu } from '@/components/shared/export-menu';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -76,7 +77,7 @@ export default function ExecutivesIndex({
                     <CardContent className="space-y-4 border-t py-4">
                         <form
                             onSubmit={submit}
-                            className="flex flex-col gap-2 sm:flex-row"
+                            className="flex flex-col gap-2 lg:flex-row"
                         >
                             <div className="relative flex-1">
                                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -95,6 +96,10 @@ export default function ExecutivesIndex({
                             >
                                 Search
                             </Button>
+                            <ExportMenu
+                                resource="executives"
+                                filters={filters}
+                            />
                         </form>
 
                         <ExecutiveList

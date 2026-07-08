@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Archive, CheckCircle2, Crown, Plus, Vote } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import { ElectionStatusBadge } from '@/features/elections/components/election-status-badge';
@@ -13,10 +14,12 @@ import { create, index, show } from '@/routes/elections';
 
 export default function ElectionsIndex({
     elections,
+    filters,
     overview,
     can,
 }: {
     elections: Paginated<Election>;
+    filters: { search: string; status: string };
     overview: {
         total: number;
         active: number;
@@ -34,14 +37,17 @@ export default function ElectionsIndex({
                         title="Elections"
                         description="Manage SRC elections, candidates, and voting."
                     />
-                    {can.create && (
-                        <Button asChild className="theme-primary-action">
-                            <Link href={create()}>
-                                <Plus />
-                                New election
-                            </Link>
-                        </Button>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                        <ExportMenu resource="elections" filters={filters} />
+                        {can.create && (
+                            <Button asChild className="theme-primary-action">
+                                <Link href={create()}>
+                                    <Plus />
+                                    New election
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-4">

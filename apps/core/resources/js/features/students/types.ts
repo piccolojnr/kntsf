@@ -32,6 +32,7 @@ export type StudentIndexPermissions = {
     create: boolean;
     update: boolean;
     delete: boolean;
+    import: boolean;
     activateAccount: boolean;
 };
 

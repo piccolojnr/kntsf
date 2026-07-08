@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { BadgeCheck, FileText, FolderOpen, Plus, Star } from 'lucide-react';
 import { useState } from 'react';
+import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,14 +76,17 @@ export default function DocumentsIndex({
                         description="Upload, publish, and organize downloadable SRC documents."
                     />
 
-                    {can.create && (
-                        <Button asChild>
-                            <Link href={create()}>
-                                <Plus />
-                                New document
-                            </Link>
-                        </Button>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                        <ExportMenu resource="documents" filters={filters} />
+                        {can.create && (
+                            <Button asChild>
+                                <Link href={create()}>
+                                    <Plus />
+                                    New document
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                 </ContentToolbar>
 
                 <div className="grid gap-3 md:grid-cols-4">
