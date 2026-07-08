@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     Activity,
     BarChart3,
@@ -246,29 +246,29 @@ export default function ReportsIndex({
                         detail="Operational checks"
                     />
                     <div className="app-panel grid gap-2 p-3">
-                        <Link
-                            href={exportMethod('pdf', { query: reportQuery })}
+                        <a
+                            href={exportMethod.url('pdf', { query: reportQuery })}
                             className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] bg-app-red px-4 text-sm font-semibold text-white"
                         >
                             <Download className="size-4" />
                             PDF
-                        </Link>
-                        <Link
-                            href={exportMethod('excel', {
+                        </a>
+                        <a
+                            href={exportMethod.url('excel', {
                                 query: reportQuery,
                             })}
                             className="theme-primary-active inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] px-4 text-sm font-semibold"
                         >
                             <Download className="size-4" />
                             Excel
-                        </Link>
-                        <Link
-                            href={exportMethod('csv', { query: reportQuery })}
+                        </a>
+                        <a
+                            href={exportMethod.url('csv', { query: reportQuery })}
                             className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] border border-app-border px-4 text-sm font-semibold text-app-ink"
                         >
                             <Download className="size-4" />
                             CSV
-                        </Link>
+                        </a>
                     </div>
                 </section>
 

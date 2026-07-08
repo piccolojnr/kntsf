@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Elections\ElectionCandidateController;
 use App\Http\Controllers\Elections\ElectionController;
+use App\Http\Controllers\Elections\ElectionExportController;
 use App\Http\Controllers\Elections\ElectionPositionController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::post('elections/{election}/start', [ElectionController::class, 'start'])->name('elections.start');
     Route::post('elections/{election}/close', [ElectionController::class, 'close'])->name('elections.close');
     Route::post('elections/{election}/archive', [ElectionController::class, 'archive'])->name('elections.archive');
+    Route::get('elections/{election}/export/pdf', [ElectionExportController::class, 'pdf'])->name('elections.export.pdf');
     Route::post('elections/{election}/positions', [ElectionPositionController::class, 'store'])->name('elections.positions.store');
     Route::patch('election-positions/{position}', [ElectionPositionController::class, 'update'])->name('election-positions.update');
     Route::delete('election-positions/{position}', [ElectionPositionController::class, 'destroy'])->name('election-positions.destroy');
