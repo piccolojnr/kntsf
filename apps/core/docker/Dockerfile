@@ -1,17 +1,22 @@
 # syntax=docker/dockerfile:1.7
 
-FROM composer:2 AS vendor
+FROM php:8.4-cli-alpine AS vendor
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install exif gd \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+RUN install-php-extensions \
+    bcmath \
+    exif \
+    gd \
+    intl \
+    mbstring \
+    pdo_mysql \
+    pdo_pgsql \
+    pdo_sqlite \
+    zip
 
 COPY composer.json composer.lock ./
 RUN composer install \

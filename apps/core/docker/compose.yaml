@@ -1,3 +1,5 @@
+name: kntsf-core
+
 services:
     app:
         image: ${KNTSF_IMAGE:?Set KNTSF_IMAGE in .env}
