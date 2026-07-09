@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 
     private function shouldSeedDevelopmentData(): bool
     {
-        return app()->environment(['local', 'development'])
+        return app()->environment(['local', 'development', 'staging'])
             && (bool) env('SEED_DEVELOPMENT_DATA', false);
     }
 }

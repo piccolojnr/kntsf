@@ -72,7 +72,7 @@ class PlatformSettings
             'mail.default' => $settings['mail']['mailer'],
             'mail.mailers.smtp.host' => $settings['mail']['host'],
             'mail.mailers.smtp.port' => $settings['mail']['port'],
-            'mail.mailers.smtp.scheme' => $settings['mail']['scheme'],
+            'mail.mailers.smtp.scheme' => $this->mailSchemeForConfig($settings['mail']['scheme']),
             'mail.mailers.smtp.username' => $settings['mail']['username'],
             'mail.mailers.smtp.password' => $settings['mail']['password'],
             'mail.from.address' => $settings['mail']['from_address'],
@@ -230,5 +230,14 @@ class PlatformSettings
     private function stringOrDefault(mixed $value, string $default): string
     {
         return filled($value) ? trim((string) $value) : $default;
+    }
+
+    private function mailSchemeForConfig(?string $scheme): ?string
+    {
+        return match ($scheme) {
+            'tls' => 'smtp',
+            'ssl' => 'smtps',
+            default => $scheme,
+        };
     }
 }

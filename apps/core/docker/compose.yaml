@@ -5,6 +5,10 @@ services:
         image: ${KNTSF_IMAGE:?Set KNTSF_IMAGE in .env}
         env_file:
             - .env
+        environment:
+            CACHE_STORE: ${CACHE_STORE:-redis}
+            QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            REDIS_HOST: ${REDIS_HOST:-redis}
         ports:
             - '${APP_BIND:-127.0.0.1:8087}:8000'
         depends_on:
@@ -31,6 +35,10 @@ services:
         command: php artisan queue:work --sleep=${QUEUE_SLEEP:-3} --tries=${QUEUE_TRIES:-3} --timeout=${QUEUE_TIMEOUT:-90}
         env_file:
             - .env
+        environment:
+            CACHE_STORE: ${CACHE_STORE:-redis}
+            QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            REDIS_HOST: ${REDIS_HOST:-redis}
         depends_on:
             postgres:
                 condition: service_healthy
@@ -47,6 +55,10 @@ services:
         command: php artisan schedule:work
         env_file:
             - .env
+        environment:
+            CACHE_STORE: ${CACHE_STORE:-redis}
+            QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            REDIS_HOST: ${REDIS_HOST:-redis}
         depends_on:
             postgres:
                 condition: service_healthy

@@ -7,6 +7,7 @@ use App\Http\Requests\Settings\UpdatePlatformSettingsRequest;
 use App\Support\PlatformSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,6 +31,8 @@ class PlatformSettingsController extends Controller
     ): RedirectResponse {
         $platformSettings->update($request->validated());
         $platformSettings->applyToConfig();
+        app('mail.manager')->forgetMailers();
+        Artisan::call('queue:restart');
 
         return back();
     }
