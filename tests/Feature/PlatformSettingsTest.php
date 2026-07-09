@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Support\PlatformSettings;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
@@ -77,6 +78,9 @@ test('platform settings can be read by authorized user without exposing secrets'
 });
 
 test('platform settings can be updated by authorized user and override runtime config', function () {
+    Cache::forget('illuminate:queue:restart');
+    $resolvedMailerId = spl_object_id(app('mail.manager')->mailer());
+
     $this->actingAs(platformSettingsUserWithRole('admin'))
         ->from(route('platform-settings.edit'))
         ->patch(route('platform-settings.update'), platformSettingsPayload([
@@ -99,7 +103,10 @@ test('platform settings can be updated by authorized user and override runtime c
         ->and($settings['mail']['password'])->toBe('smtp-secret')
         ->and($settings['mail']['from_address'])->toBe('src@example.com')
         ->and(config('services.paystack.secret_key'))->toBe('sk_test_secret')
-        ->and(config('mail.mailers.smtp.password'))->toBe('smtp-secret');
+        ->and(config('mail.mailers.smtp.password'))->toBe('smtp-secret')
+        ->and(config('mail.mailers.smtp.scheme'))->toBe('smtp')
+        ->and(spl_object_id(app('mail.manager')->mailer()))->not->toBe($resolvedMailerId)
+        ->and(Cache::get('illuminate:queue:restart'))->toBeInt();
 });
 
 test('secret values are encrypted at rest and retained when blank', function () {
