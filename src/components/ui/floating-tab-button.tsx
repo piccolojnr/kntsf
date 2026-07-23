@@ -1,7 +1,7 @@
 import { LucideIcon } from "lucide-react-native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors, radius, spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 
 type FloatingTabButtonProps = {
   icon: LucideIcon;
@@ -20,6 +20,12 @@ export function FloatingTabButton({
   onLongPress,
   onPress,
 }: FloatingTabButtonProps) {
+  const iconColor = isSelected
+    ? colors.primary
+    : isPrimary
+      ? colors.primary
+      : colors.textMuted;
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -29,78 +35,46 @@ export function FloatingTabButton({
       onLongPress={onLongPress}
       onPress={onPress}
     >
-      <View
+      <Icon
+        color={iconColor}
+        size={20}
+        strokeWidth={isSelected ? 2.5 : 2}
+      />
+      <Text
+        numberOfLines={1}
         style={[
-          styles.content,
-          isSelected && styles.contentSelected,
-          isPrimary && styles.primaryContent,
-          isSelected && isPrimary && styles.primaryContentSelected,
+          styles.label,
+          isSelected && styles.labelSelected,
+          isPrimary && styles.labelPrimary,
         ]}
       >
-        <Icon
-          color={
-            isSelected
-              ? "#ffffff"
-              : isPrimary
-                ? colors.primary
-                : colors.textMuted
-          }
-          size={18}
-          strokeWidth={isSelected ? 2.4 : 2.1}
-        />
-        <Text
-          numberOfLines={1}
-          style={[
-          styles.label,
-          isPrimary && styles.primaryLabel,
-          isSelected && styles.labelSelected,
-        ]}
-        >
-          {label}
-        </Text>
-      </View>
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   pressable: {
-    borderRadius: radius.pill,
-    flex: 1,
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  content: {
     alignItems: "center",
-    borderRadius: radius.pill,
-    flexDirection: "row",
-    gap: spacing.xs + 2,
-    height: 48,
+    borderRadius: radius.lg,
+    flex: 1,
+    gap: spacing.xs,
     justifyContent: "center",
-    overflow: "hidden",
-    paddingHorizontal: spacing.xs,
-    width: "100%",
-  },
-  contentSelected: {
-    backgroundColor: colors.primary,
-  },
-  primaryContent: {
-    backgroundColor: colors.primarySoft,
-  },
-  primaryContentSelected: {
-    backgroundColor: colors.primary,
+    paddingVertical: spacing.xs,
   },
   label: {
     color: colors.textMuted,
     flexShrink: 1,
-    fontSize: 11,
+    fontSize: fontSizes.xxs,
     fontWeight: "700",
+    lineHeight: fontSizes.xxs * 1.5,
     textAlign: "center",
   },
   labelSelected: {
-    color: "#ffffff",
+    color: colors.primary,
   },
-  primaryLabel: {
+  labelPrimary: {
     color: colors.primary,
   },
 });

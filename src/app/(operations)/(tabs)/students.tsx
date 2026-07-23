@@ -64,6 +64,7 @@ export default function OperationsStudentsScreen() {
       <AppRefreshableScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
         onRefresh={refreshControl.onRefresh}
         refreshing={refreshControl.refreshing}
       >
@@ -193,10 +194,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: fontSizes.sm,
     fontWeight: "700",
+    lineHeight: fontSizes.sm * 1.5,
   },
   paginationLabel: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "700",
+    lineHeight: fontSizes.sm * 1.5,
   },
 });

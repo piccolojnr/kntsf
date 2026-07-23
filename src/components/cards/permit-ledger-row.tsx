@@ -49,9 +49,6 @@ export function PermitLedgerRow({
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
-      {/* Left accent bar */}
-
-      {/* Content */}
       <View style={styles.body}>
         <View style={styles.top}>
           <View style={styles.nameBlock}>
@@ -108,11 +105,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
 
-  accentBar: {
-    alignSelf: "stretch",
-    width: 4,
-  },
-
   body: {
     flex: 1,
     paddingHorizontal: spacing.md,
@@ -131,11 +123,13 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: fontSizes.md,
     fontWeight: "800",
+    lineHeight: fontSizes.md * 1.4,
   },
   meta: {
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "600",
+    lineHeight: fontSizes.xs * 1.5,
   },
 
   rightBlock: {
@@ -151,11 +145,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "800",
     letterSpacing: 0.5,
+    lineHeight: 11 * 1.5,
     textTransform: "uppercase",
   },
   expiryDate: {
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "600",
+    lineHeight: fontSizes.xs * 1.5,
   },
 });

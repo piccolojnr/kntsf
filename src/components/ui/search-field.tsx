@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSizes.sm,
     fontWeight: "600",
+    lineHeight: fontSizes.sm * 1.6,
     padding: 0,
   },
 });

@@ -31,7 +31,6 @@ export function StudentCard({ onPress, student }: StudentCardProps) {
               {student.course}
             </Text>
           </View>
-          <Text style={styles.levelMeta}>Level {student.level}</Text>
         </View>
       </View>
       <ChevronRight
@@ -78,15 +77,17 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: fontSizes.md,
     fontWeight: "800",
+    lineHeight: fontSizes.md * 1.4,
   },
   meta: {
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "600",
+    lineHeight: fontSizes.xs * 1.5,
   },
   rightBlock: {
     alignItems: "flex-end",
-    gap: spacing.xs,
+    flexShrink: 0,
     maxWidth: 112,
   },
   courseBadge: {
@@ -99,10 +100,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 11,
     fontWeight: "800",
-  },
-  levelMeta: {
-    color: colors.textMuted,
-    fontSize: fontSizes.xs,
-    fontWeight: "600",
+    lineHeight: 11 * 1.5,
   },
 });
