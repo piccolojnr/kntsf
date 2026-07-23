@@ -2,73 +2,119 @@ import { apiClient } from "@/lib/api/api-client";
 import { toUserFacingError } from "@/lib/api/api-error";
 import { ApiListResponse } from "@/lib/api/api-types";
 
-export type AuditLogTone = "primary" | "success" | "warning" | "danger";
-
-export type AuditLogItem = {
+export type VerificationLogItem = {
   id: string;
-  actor: string;
-  action: string;
-  timestamp: string;
-  detail: string;
-  tone: AuditLogTone;
+  method: string;
+  result: string;
+  reason: string | null;
+  createdAt: string;
+  student: { id: number; student_number: string; name: string } | null;
+  permit: { id: number; status: string; code_last4: string | null } | null;
+  verifier: { id: number; name: string } | null;
 };
 
-type AuditLogDto = Omit<Partial<AuditLogItem>, "actor"> & {
+type VerificationLogDto = {
   id: string | number;
-  createdAt?: string;
-  message?: string;
-  description?: string;
-  metadata?: unknown;
-  actor?: string | { name?: string; email?: string; role?: string };
-  user?: { name?: string; email?: string; role?: string };
-  type?: string;
-  event?: string;
+  method?: string;
   result?: string;
+  reason?: string | null;
+  created_at?: string;
+  student?: { id: number; student_number: string; name: string } | null;
+  permit?: { id: number; status: string; code_last4: string | null } | null;
+  verifier?: { id: number; name: string } | null;
 };
 
-type MobileApiResponse<T> = {
-  success: boolean;
-  data: T;
-  message?: string;
-};
-
-function getMobileData<T>(response: MobileApiResponse<T>) {
-  if (!response.success) {
-    throw new Error(response.message ?? "The request could not be completed.");
-  }
-
-  return response.data;
-}
-
-function normalizeAuditLog(dto: AuditLogDto): AuditLogItem {
-  const actor =
-    typeof dto.actor === "string"
-      ? dto.actor
-      : dto.actor?.name ??
-        dto.actor?.email ??
-        dto.user?.name ??
-        dto.user?.email ??
-        "System";
-
+function normalizeLog(dto: VerificationLogDto): VerificationLogItem {
   return {
     id: String(dto.id),
-    actor,
-    action: dto.action ?? dto.event ?? dto.type ?? "Activity recorded",
-    timestamp: dto.timestamp ?? dto.createdAt ?? "",
-    detail: dto.detail ?? dto.message ?? dto.description ?? "",
-    tone: dto.tone ?? "primary",
+    method: dto.method ?? "",
+    result: dto.result ?? "",
+    reason: dto.reason ?? null,
+    createdAt: dto.created_at ?? "",
+    student: dto.student ?? null,
+    permit: dto.permit ?? null,
+    verifier: dto.verifier ?? null,
   };
 }
 
-export async function getAuditLogs() {
+type LaravelPaginatedResponse<T> = {
+  data: T[];
+  meta?: Record<string, unknown>;
+};
+
+function isLaravelPaginated<T>(
+  data: unknown,
+): data is LaravelPaginatedResponse<T> {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "data" in data &&
+    Array.isArray((data as LaravelPaginatedResponse<T>).data) &&
+    "meta" in data
+  );
+}
+
+export type VerificationLogListParams = {
+  method?: string;
+  result?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type VerificationLogPageResult = ApiListResponse<VerificationLogItem>;
+
+export async function getVerificationLogsPage(
+  params?: VerificationLogListParams,
+): Promise<VerificationLogPageResult> {
   try {
     const response = await apiClient.get<
-      MobileApiResponse<ApiListResponse<AuditLogDto> | AuditLogDto[]>
-    >("/api/mobile/operations/audit-logs");
-    const data = getMobileData(response.data);
-    const logs = Array.isArray(data) ? data : data.items;
+      LaravelPaginatedResponse<VerificationLogDto> | VerificationLogDto[]
+    >("/api/mobile/operations/verification-logs", {
+      params: {
+        method: params?.method || undefined,
+        result: params?.result || undefined,
+        search: params?.search,
+        page: params?.page,
+        per_page: params?.limit,
+      },
+    });
 
-    return logs.map(normalizeAuditLog);
+    if (isLaravelPaginated<VerificationLogDto>(response.data)) {
+      const meta = response.data.meta ?? {};
+
+      return {
+        items: response.data.data.map(normalizeLog),
+        pagination: {
+          page: Number(meta.current_page ?? 1),
+          limit: Number(meta.per_page ?? 15),
+          total: Number(meta.total ?? 0),
+          totalPages: Number(meta.last_page ?? 1),
+        },
+      };
+    }
+
+    if (Array.isArray(response.data)) {
+      return {
+        items: response.data.map(normalizeLog),
+        pagination: {
+          page: 1,
+          limit: response.data.length,
+          total: response.data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
+    return {
+      items: [],
+      pagination: {
+        page: 1,
+        limit: 15,
+        total: 0,
+        totalPages: 1,
+      },
+    };
   } catch (error) {
     throw toUserFacingError(error);
   }

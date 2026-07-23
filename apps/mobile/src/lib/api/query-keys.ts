@@ -44,6 +44,8 @@ export const queryKeys = {
     all: ["operations"] as const,
     summary: () => [...queryKeys.operations.all, "summary"] as const,
     students: () => [...queryKeys.operations.all, "students"] as const,
+    auditLogs: (params?: object) =>
+      [...queryKeys.operations.all, "audit-logs", params ?? {}] as const,
     cards: (params?: object) =>
       [...queryKeys.operations.all, "nfc-cards", params ?? {}] as const,
     permits: (params?: object) =>
