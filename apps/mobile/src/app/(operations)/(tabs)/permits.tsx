@@ -26,13 +26,6 @@ type PermitListItem = {
   student: Student | null;
 };
 
-const FILTER_TABS: { key: FilterTab; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "active", label: "Active" },
-  { key: "expired", label: "Expired" },
-  { key: "revoked", label: "Revoked" },
-];
-
 const statConfig = {
   active: { label: "Active", accent: colors.success, soft: colors.successSoft },
   expired: {
@@ -179,29 +172,6 @@ export default function OperationsPermitsScreen() {
           value={searchTerm}
         />
 
-        {/* ── Filter Tabs ── */}
-        <View style={styles.filterRow}>
-          {FILTER_TABS.map((tab) => {
-            const isActive = activeFilter === tab.key;
-            return (
-              <Pressable
-                key={tab.key}
-                onPress={() => setActiveFilter(tab.key)}
-                style={[styles.filterTab, isActive && styles.filterTabActive]}
-              >
-                <Text
-                  style={[
-                    styles.filterTabLabel,
-                    isActive && styles.filterTabLabelActive,
-                  ]}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
         {/* ── List ── */}
         {isLoading ? (
           <LoadingState message="Loading permit records..." />
@@ -300,43 +270,13 @@ const styles = StyleSheet.create({
   statCount: {
     fontSize: fontSizes.md,
     fontWeight: "800",
+    lineHeight: fontSizes.md * 1.4,
   },
   statLabel: {
     fontSize: fontSizes.xs,
     fontWeight: "700",
+    lineHeight: fontSizes.xs * 1.5,
   },
-  /* ── Filter tabs ── */
-  filterRow: {
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.pill,
-    flexDirection: "row",
-    gap: 4,
-    padding: 4,
-  },
-  filterTab: {
-    borderRadius: radius.pill,
-    flex: 1,
-    paddingVertical: spacing.xs + 2,
-    alignItems: "center",
-  },
-  filterTabActive: {
-    backgroundColor: colors.surface,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  filterTabLabel: {
-    color: colors.textMuted,
-    fontSize: fontSizes.xs,
-    fontWeight: "700",
-  },
-  filterTabLabelActive: {
-    color: colors.text,
-    fontWeight: "800",
-  },
-
   /* ── List ── */
   list: {
     gap: spacing.sm,
@@ -365,10 +305,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: fontSizes.sm,
     fontWeight: "700",
+    lineHeight: fontSizes.sm * 1.5,
   },
   paginationLabel: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     fontWeight: "700",
+    lineHeight: fontSizes.sm * 1.5,
   },
 });

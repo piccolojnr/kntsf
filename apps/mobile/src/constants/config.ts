@@ -6,7 +6,6 @@ type EnvironmentConfig = {
 
 const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
   development: {
-    // apiBaseUrl: "http://192.168.100.249:3001",
     apiBaseUrl: "https://kntsf.ri-tech.tech",
   },
   preview: {
@@ -30,7 +29,6 @@ function getAppEnvironment(): AppEnvironment {
 export const APP_ENV = getAppEnvironment();
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
-  process.env.EXPO_PUBLIC_API_URL?.trim() ||
   ENVIRONMENT_CONFIG[APP_ENV].apiBaseUrl;
 
 if (!API_BASE_URL) {
