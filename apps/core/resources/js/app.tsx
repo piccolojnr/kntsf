@@ -15,6 +15,8 @@ createInertiaApp({
         switch (true) {
             case name === 'welcome':
                 return null;
+            case name === 'account/mobile-app':
+                return null;
             case name.startsWith('public/'):
                 return PublicLayout;
             case name.startsWith('auth/'):
