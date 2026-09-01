@@ -8,6 +8,7 @@ use App\Notifications\Auth\SetupPasswordNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
@@ -174,6 +175,33 @@ test('student can set initial password with valid token', function () {
 
     expect(Hash::check('Password123!', $user->fresh()->password))->toBeTrue()
         ->and($activationToken->fresh()->used_at)->not->toBeNull();
+});
+
+test('setup password link remains available to an already authenticated user', function () {
+    $student = User::factory()->create(['password' => null]);
+    $student->assignRole('student');
+    [$plainToken] = createSetupToken($student);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('account.setup-password.show', $plainToken))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('auth/setup-password'));
+});
+
+test('authenticated user can complete a valid setup link', function () {
+    $student = User::factory()->create(['password' => null]);
+    $student->assignRole('student');
+    [$plainToken] = createSetupToken($student);
+
+    $this->actingAs(User::factory()->create())
+        ->post(route('account.setup-password.store', $plainToken), [
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ])
+        ->assertRedirect(route('account.mobile-app'));
+
+    $this->assertGuest();
 });
 
 test('token cannot be reused', function () {

@@ -15,7 +15,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             <Head title="Forgot password" />
 
             {status && (
-                <div className="border-app-green/30 bg-app-green/10 mb-5 rounded-xl border px-4 py-3 text-sm leading-6 text-app-ink">
+                <div className="border-app-green/30 bg-app-green/10 mb-5 rounded-lg border px-4 py-3 text-sm leading-6 text-app-ink">
                     {status}
                 </div>
             )}
@@ -33,7 +33,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     autoComplete="off"
                                     autoFocus
                                     placeholder="email@example.com"
-                                    className="h-11 rounded-xl bg-app-surface"
+                                    className="h-11 rounded-md bg-app-surface"
                                 />
 
                                 <InputError message={errors.email} />
@@ -41,7 +41,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="flex items-center justify-start">
                                 <Button
-                                    className="h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
+                                    className="h-11 w-full rounded-md bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
@@ -55,7 +55,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     )}
                 </Form>
 
-                <div className="rounded-xl border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
+                <div className="rounded-lg border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
                     <span>Or, return to</span>
                     <span> </span>
                     <TextLink href={login()}>log in</TextLink>

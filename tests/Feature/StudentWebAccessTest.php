@@ -3,6 +3,7 @@
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function (): void {
@@ -21,7 +22,10 @@ function studentWebAccessUser(string $role): User
 }
 
 test('mobile app handoff page can be rendered', function () {
-    $this->get(route('account.mobile-app'))->assertOk();
+    $this->get(route('account.mobile-app'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('account/mobile-app'));
 });
 
 test('student only users are redirected from dashboard to mobile handoff page', function () {

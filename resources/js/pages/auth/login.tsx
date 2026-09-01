@@ -28,7 +28,7 @@ export default function Login({ status, canResetPassword }: Props) {
                 {({ processing, errors }) => (
                     <>
                         {status && (
-                            <div className="border-app-green/30 bg-app-green/10 rounded-xl border px-4 py-3 text-sm leading-6 text-app-ink">
+                            <div className="border-app-green/30 bg-app-green/10 rounded-lg border px-4 py-3 text-sm leading-6 text-app-ink">
                                 {status}
                             </div>
                         )}
@@ -45,7 +45,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
-                                    className="h-11 rounded-xl bg-app-surface"
+                                    className="h-11 rounded-md bg-app-surface"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -70,12 +70,12 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
-                                    className="h-11 rounded-xl bg-app-surface"
+                                    className="h-11 rounded-md bg-app-surface"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-surface-muted px-4 py-3">
+                            <div className="flex items-center gap-3 rounded-lg border border-app-border bg-app-surface-muted px-4 py-3">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -86,7 +86,7 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-2 h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
+                                className="mt-2 h-11 w-full rounded-md bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -96,7 +96,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="rounded-xl border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
+                        <div className="rounded-lg border border-app-border bg-app-surface-muted px-4 py-3 text-center text-xs leading-5 text-app-muted">
                             Accounts are created by administrators.
                         </div>
                     </>

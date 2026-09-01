@@ -31,7 +31,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 type="email"
                                 value={email}
                                 readOnly
-                                className="h-11 rounded-xl bg-app-surface-muted"
+                                className="h-11 rounded-md bg-app-surface-muted"
                             />
                         </div>
 
@@ -41,7 +41,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 id="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="h-11 rounded-xl bg-app-surface"
+                                className="h-11 rounded-md bg-app-surface"
                                 autoFocus
                                 placeholder="Password"
                             />
@@ -56,7 +56,7 @@ export default function SetupPassword({ token, email }: Props) {
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="h-11 rounded-xl bg-app-surface"
+                                className="h-11 rounded-md bg-app-surface"
                                 placeholder="Confirm password"
                             />
                             <InputError
@@ -66,7 +66,7 @@ export default function SetupPassword({ token, email }: Props) {
 
                         <Button
                             type="submit"
-                            className="mt-2 h-11 w-full rounded-full bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
+                            className="mt-2 h-11 w-full rounded-md bg-app-ink px-5 text-sm font-semibold text-app-surface hover:bg-app-red"
                             disabled={processing}
                         >
                             {processing && <Spinner />}
