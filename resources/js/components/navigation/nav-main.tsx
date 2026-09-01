@@ -38,13 +38,13 @@ export function NavMain({ groups, items = [] }: NavMainProps) {
         <>
             {navGroups.map((group) => (
                 <SidebarGroup key={group.title} className="px-2 py-0">
-                    <SidebarGroupLabel className="h-7 px-3 text-[0.62rem] font-black tracking-[0.22em] text-sidebar-foreground/45 uppercase">
+                    <SidebarGroupLabel className="h-7 px-3 text-[0.62rem] font-semibold tracking-[0.16em] text-sidebar-foreground/42 uppercase">
                         {group.title}
                     </SidebarGroupLabel>
                     <SidebarGroupContent
                         className={state === 'expanded' ? 'pl-2' : undefined}
                     >
-                        <SidebarMenu className="gap-1.5">
+                        <SidebarMenu className="gap-0.5">
                             {group.items.map((item) => {
                                 const hasChildren =
                                     item.children !== undefined &&
