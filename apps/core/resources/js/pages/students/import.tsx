@@ -1,5 +1,11 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { CheckCircle2, Download, FileUp, TriangleAlert, Users } from 'lucide-react';
+import {
+    CheckCircle2,
+    Download,
+    FileUp,
+    TriangleAlert,
+    Users,
+} from 'lucide-react';
 import Heading from '@/components/shared/heading';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -119,7 +125,7 @@ export default function StudentImportPage({
                                         type="file"
                                         name="file"
                                         accept=".xlsx,.xls,.csv,.txt"
-                                        className="h-11 flex-1 rounded-xl border-app-border bg-app-surface"
+                                        className="h-11 flex-1 rounded-md border-app-border bg-app-surface"
                                     />
                                     <Button
                                         type="submit"
@@ -161,15 +167,29 @@ export default function StudentImportPage({
                             <CardContent className="border-t border-app-border p-0">
                                 <div className="overflow-x-auto">
                                     <table className="w-full min-w-[760px] text-sm">
-                                        <thead className="bg-app-surface-muted text-left text-xs tracking-[0.12em] text-app-muted uppercase">
+                                        <thead className="bg-app-surface-muted text-left text-xs tracking-[0.1em] text-app-muted uppercase">
                                             <tr>
-                                                <th className="px-4 py-3">Row</th>
-                                                <th className="px-4 py-3">Action</th>
-                                                <th className="px-4 py-3">Student number</th>
-                                                <th className="px-4 py-3">Name</th>
-                                                <th className="px-4 py-3">Email</th>
-                                                <th className="px-4 py-3">Course</th>
-                                                <th className="px-4 py-3">Level</th>
+                                                <th className="px-4 py-3">
+                                                    Row
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Action
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Student number
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Name
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Email
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Course
+                                                </th>
+                                                <th className="px-4 py-3">
+                                                    Level
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -178,7 +198,9 @@ export default function StudentImportPage({
                                                     key={row.row}
                                                     className="border-t border-app-border"
                                                 >
-                                                    <td className="px-4 py-3">{row.row}</td>
+                                                    <td className="px-4 py-3">
+                                                        {row.row}
+                                                    </td>
                                                     <td className="px-4 py-3">
                                                         <Badge
                                                             variant={
@@ -192,12 +214,23 @@ export default function StudentImportPage({
                                                         </Badge>
                                                     </td>
                                                     <td className="px-4 py-3 font-semibold">
-                                                        {row.student.student_number}
+                                                        {
+                                                            row.student
+                                                                .student_number
+                                                        }
                                                     </td>
-                                                    <td className="px-4 py-3">{row.student.name}</td>
-                                                    <td className="px-4 py-3">{row.student.email}</td>
-                                                    <td className="px-4 py-3">{row.student.course}</td>
-                                                    <td className="px-4 py-3">{row.student.level}</td>
+                                                    <td className="px-4 py-3">
+                                                        {row.student.name}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        {row.student.email}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        {row.student.course}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        {row.student.level}
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -215,10 +248,22 @@ export default function StudentImportPage({
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="grid gap-3 border-t border-app-border py-4">
-                                    <SummaryRow label="Rows" value={preview.summary.total} />
-                                    <SummaryRow label="Creates" value={preview.summary.creates} />
-                                    <SummaryRow label="Updates" value={preview.summary.updates} />
-                                    <SummaryRow label="Errors" value={preview.summary.failed} />
+                                    <SummaryRow
+                                        label="Rows"
+                                        value={preview.summary.total}
+                                    />
+                                    <SummaryRow
+                                        label="Creates"
+                                        value={preview.summary.creates}
+                                    />
+                                    <SummaryRow
+                                        label="Updates"
+                                        value={preview.summary.updates}
+                                    />
+                                    <SummaryRow
+                                        label="Errors"
+                                        value={preview.summary.failed}
+                                    />
 
                                     <Form {...store.form()}>
                                         {({ processing }) => (
@@ -232,7 +277,8 @@ export default function StudentImportPage({
                                                     type="submit"
                                                     disabled={
                                                         processing ||
-                                                        preview.summary.valid === 0
+                                                        preview.summary
+                                                            .valid === 0
                                                     }
                                                     className="theme-primary-action mt-2 w-full"
                                                 >
@@ -262,7 +308,9 @@ export default function StudentImportPage({
                                                         {error.messages.map(
                                                             (message) => (
                                                                 <li
-                                                                    key={message}
+                                                                    key={
+                                                                        message
+                                                                    }
                                                                 >
                                                                     {message}
                                                                 </li>
@@ -285,7 +333,7 @@ export default function StudentImportPage({
 
 function SummaryRow({ label, value }: { label: string; value: number }) {
     return (
-        <div className="flex items-center justify-between rounded-xl border border-app-border bg-app-surface-muted px-3 py-2">
+        <div className="flex items-center justify-between rounded-md border border-app-border bg-app-surface-muted px-3 py-2">
             <span className="text-sm font-medium text-app-muted">{label}</span>
             <span className="text-lg font-black tabular-nums">{value}</span>
         </div>

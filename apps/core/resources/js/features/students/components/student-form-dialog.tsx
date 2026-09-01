@@ -111,7 +111,7 @@ function StudentFields({
 
     return (
         <div className="space-y-5">
-            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
+            <div className="rounded-lg border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
                     <p className="text-sm font-semibold text-app-ink">
                         Identity
@@ -156,7 +156,7 @@ function StudentFields({
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
+            <div className="rounded-lg border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
                     <p className="text-sm font-semibold text-app-ink">
                         Contact
@@ -197,7 +197,7 @@ function StudentFields({
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-app-border bg-app-surface-muted p-4">
+            <div className="rounded-lg border border-app-border bg-app-surface-muted p-4">
                 <div className="mb-4">
                     <p className="text-sm font-semibold text-app-ink">
                         Academic profile

@@ -24,7 +24,7 @@ export function StudentList({
 }) {
     if (students.data.length === 0) {
         return (
-            <div className="rounded-2xl border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+            <div className="rounded-lg border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
                 <p className="text-sm font-semibold text-app-ink">
                     No student records found
                 </p>
@@ -37,27 +37,27 @@ export function StudentList({
 
     return (
         <div className="space-y-4">
-            <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-[0_18px_48px_rgba(17,24,19,0.06)] dark:shadow-none">
+            <div className="overflow-hidden rounded-lg border border-app-border bg-app-surface">
                 <div className="w-full overflow-x-auto">
                     <table className="w-full min-w-[920px] table-auto text-sm">
                         <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
                             <tr>
-                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.1em] uppercase">
                                     Student
                                 </th>
-                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.1em] uppercase">
                                     Contact
                                 </th>
-                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.1em] uppercase">
                                     Course
                                 </th>
-                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.1em] uppercase">
                                     Level
                                 </th>
-                                <th className="px-4 py-3 text-left font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-left font-semibold tracking-[0.1em] uppercase">
                                     Account
                                 </th>
-                                <th className="px-4 py-3 text-right font-semibold tracking-[0.12em] uppercase">
+                                <th className="px-4 py-3 text-right font-semibold tracking-[0.1em] uppercase">
                                     Actions
                                 </th>
                             </tr>
@@ -70,7 +70,7 @@ export function StudentList({
                                 >
                                     <td className="px-4 py-3 align-middle">
                                         <div className="flex items-center gap-3">
-                                            <div className="theme-ink-soft flex size-9 shrink-0 items-center justify-center rounded-xl text-xs font-semibold text-app-red">
+                                            <div className="theme-ink-soft flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-app-red">
                                                 {student.name
                                                     ?.slice(0, 2)
                                                     .toUpperCase() ?? 'ST'}

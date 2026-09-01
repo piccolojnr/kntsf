@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     FileUp,
     GraduationCap,
@@ -10,7 +10,6 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Link } from '@inertiajs/react';
 import { ExportMenu } from '@/components/shared/export-menu';
 import Heading from '@/components/shared/heading';
 import { Badge } from '@/components/ui/badge';
@@ -65,9 +64,8 @@ export default function StudentsIndex({
             <Head title="Students" />
 
             <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
-                <div className="app-panel relative overflow-hidden p-5 md:p-6">
-                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
-                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="app-panel p-5 md:p-6">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <Heading
                             title="Students"
                             description="Manage student profiles, account readiness, and academic details."
@@ -98,7 +96,7 @@ export default function StudentsIndex({
                     </div>
                 </div>
 
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-px overflow-hidden rounded-lg border border-app-border bg-app-border md:grid-cols-3">
                     <OverviewTile
                         icon={GraduationCap}
                         label="Visible records"
@@ -126,7 +124,7 @@ export default function StudentsIndex({
                                     course.
                                 </CardDescription>
                             </div>
-                            <Badge variant="outline">
+                            <Badge className="rounded-md" variant="outline">
                                 {options.courses.length} courses configured
                             </Badge>
                         </div>
@@ -143,7 +141,7 @@ export default function StudentsIndex({
                                     onChange={(event) =>
                                         setSearchTerm(event.target.value)
                                     }
-                                    className="rounded-xl border-app-border bg-app-surface pl-9"
+                                    className="rounded-md border-app-border bg-app-surface pl-9"
                                     placeholder="Search students"
                                 />
                             </div>
@@ -178,8 +176,8 @@ function OverviewTile({
     value: string;
 }) {
     return (
-        <div className="app-panel-muted flex items-center gap-3 p-4 transition duration-300 hover:-translate-y-0.5">
-            <div className="theme-primary-active flex size-10 shrink-0 items-center justify-center rounded-xl">
+        <div className="app-panel-muted flex items-center gap-3 rounded-none border-0 p-4 transition-colors duration-200 hover:bg-app-surface">
+            <div className="theme-primary-active flex size-9 shrink-0 items-center justify-center rounded-md">
                 <Icon className="size-5" />
             </div>
             <div className="min-w-0">
