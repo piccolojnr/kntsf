@@ -48,9 +48,8 @@ export default function ShowStudent({
                     </Link>
                 </Button>
 
-                <div className="app-panel relative overflow-hidden p-5 md:p-6">
-                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
-                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="app-panel p-5 md:p-6">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <Heading
                             title={student.name ?? 'Unnamed student'}
                             description={`Student number ${student.student_number}`}
@@ -225,7 +224,7 @@ function Detail({
 }) {
     return (
         <div className="app-panel-muted flex gap-3 p-4">
-            <div className="theme-ink-soft flex size-8 shrink-0 items-center justify-center rounded-lg text-app-red">
+            <div className="theme-ink-soft flex size-8 shrink-0 items-center justify-center rounded-md text-app-red">
                 <Icon className="size-4" />
             </div>
             <div className="min-w-0">
