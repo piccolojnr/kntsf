@@ -1,17 +1,14 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
-    CalendarRange,
     CreditCard,
     Download,
     FileText,
-    Filter,
     IdCard,
     ShieldCheck,
     Users,
     Wifi,
 } from 'lucide-react';
-import type { ComponentType, ReactNode } from 'react';
-import { useState } from 'react';
+import type { ComponentType } from 'react';
 import {
     Bar,
     BarChart,
@@ -29,39 +26,19 @@ import {
     XAxis,
     YAxis,
 } from 'recharts';
+import { ReportScopeFilter } from '@/components/shared/report-scope-filter';
+import type {
+    ReportFilterOptions,
+    ReportFilters,
+} from '@/components/shared/report-scope-filter';
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { exportMethod, index } from '@/routes/reports';
 
 type ReportGroups = Record<string, Record<string, number>>;
-
-type ReportFilters = {
-    preset: string;
-    start_date: string | null;
-    end_date: string | null;
-    year: number | null;
-    academic_period_id: number | null;
-    label: string;
-};
-
-type FilterOptions = {
-    years: { key: number; label: string }[];
-    academic_periods: {
-        id: number;
-        name: string;
-        academic_year: string | null;
-    }[];
-};
 
 type ReportMeta = {
     title: string;
@@ -135,7 +112,7 @@ export default function ReportsIndex({
     reports: ReportGroups;
     summary: Record<string, number>;
     filters: ReportFilters;
-    filterOptions: FilterOptions;
+    filterOptions: ReportFilterOptions;
 }) {
     const groups = Object.entries(reports ?? {}).map(([key, values]) => {
         const meta = reportMeta[key] ?? fallbackMeta(key);
@@ -224,7 +201,7 @@ export default function ReportsIndex({
                     </div>
                 </header>
 
-                <ReportFilterBar
+                <ReportScopeFilter
                     filters={filters}
                     filterOptions={filterOptions}
                     routeUrl={index.url()}
@@ -714,228 +691,6 @@ function ExecutiveStat({
     );
 }
 
-function ReportFilterBar({
-    filters,
-    filterOptions,
-    routeUrl,
-}: {
-    filters: ReportFilters;
-    filterOptions: FilterOptions;
-    routeUrl: string;
-}) {
-    const [period, setPeriod] = useState(filters.preset);
-    const activeLabel = periodLabel(period);
-    const activeDetail =
-        period === filters.preset
-            ? filters.label
-            : periodPreview(period, filters, filterOptions);
-
-    function submit(form: HTMLFormElement) {
-        router.get(routeUrl, filterFormQuery(new FormData(form), period), {
-            preserveScroll: true,
-            preserveState: true,
-        });
-    }
-
-    return (
-        <form
-            className="mt-5 overflow-hidden rounded-[1.15rem] border border-app-border bg-app-surface shadow-[0_16px_44px_rgba(17,24,19,0.08)] dark:shadow-none"
-            onSubmit={(event) => {
-                event.preventDefault();
-                submit(event.currentTarget);
-            }}
-        >
-            <input type="hidden" name="period" value={period} />
-
-            <div className="grid gap-0 xl:grid-cols-[18rem_minmax(0,1fr)_auto]">
-                <div className="theme-ink-panel flex items-center gap-3 p-4">
-                    <div className="grid size-10 shrink-0 place-items-center rounded-full bg-white/10 text-app-brass">
-                        <Filter className="size-5" />
-                    </div>
-                    <div className="min-w-0">
-                        <p className="text-[10px] font-black tracking-[0.2em] text-white/55 uppercase">
-                            Report scope
-                        </p>
-                        <p className="mt-1 truncate text-sm font-black text-white">
-                            {activeLabel}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="grid gap-3 p-4 lg:grid-cols-[minmax(13rem,18rem)_minmax(0,1fr)] lg:items-end">
-                    <label className="grid min-w-0 gap-1.5">
-                        <span className="text-[10px] font-black tracking-[0.18em] text-app-muted uppercase">
-                            Period
-                        </span>
-                        <Select value={period} onValueChange={setPeriod}>
-                            <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-black text-app-ink">
-                                <SelectValue placeholder="Choose period" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="current_month">
-                                    This month
-                                </SelectItem>
-                                <SelectItem value="current_year">
-                                    This year
-                                </SelectItem>
-                                <SelectItem value="year">
-                                    Select year
-                                </SelectItem>
-                                <SelectItem value="academic_period">
-                                    Academic year
-                                </SelectItem>
-                                <SelectItem value="custom">
-                                    Date range
-                                </SelectItem>
-                                <SelectItem value="all">All records</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </label>
-
-                    <div className="min-w-0">
-                        {period === 'custom' && (
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                <DateField
-                                    label="Start"
-                                    name="start_date"
-                                    value={filters.start_date}
-                                />
-                                <DateField
-                                    label="End"
-                                    name="end_date"
-                                    value={filters.end_date}
-                                />
-                            </div>
-                        )}
-
-                        {period === 'year' && (
-                            <SelectField label="Year">
-                                <Select
-                                    name="year"
-                                    defaultValue={String(
-                                        filters.year ??
-                                            new Date().getFullYear(),
-                                    )}
-                                >
-                                    <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-black text-app-ink">
-                                        <SelectValue placeholder="Year" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {filterOptions.years.map((year) => (
-                                            <SelectItem
-                                                key={year.key}
-                                                value={String(year.key)}
-                                            >
-                                                {year.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </SelectField>
-                        )}
-
-                        {period === 'academic_period' && (
-                            <SelectField label="Academic year">
-                                <Select
-                                    name="academic_period_id"
-                                    defaultValue={String(
-                                        filters.academic_period_id ?? '',
-                                    )}
-                                >
-                                    <SelectTrigger className="h-11 w-full rounded-[0.8rem] border-app-border bg-app-surface-muted px-3 text-sm font-black text-app-ink">
-                                        <SelectValue placeholder="Active period" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {filterOptions.academic_periods.map(
-                                            (item) => (
-                                                <SelectItem
-                                                    key={item.id}
-                                                    value={String(item.id)}
-                                                >
-                                                    {item.name}
-                                                </SelectItem>
-                                            ),
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </SelectField>
-                        )}
-
-                        {['current_month', 'current_year', 'all'].includes(
-                            period,
-                        ) && (
-                            <div className="flex min-h-11 items-center gap-3 rounded-[0.8rem] border border-dashed border-app-border bg-app-surface-muted px-3">
-                                <CalendarRange className="size-4 shrink-0 text-app-red" />
-                                <p className="truncate text-sm font-black text-app-ink">
-                                    {activeDetail}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 border-t border-app-border p-4 xl:border-t-0 xl:border-l">
-                    <div className="min-w-0 xl:w-40">
-                        <p className="text-[10px] font-black tracking-[0.18em] text-app-muted uppercase">
-                            Active range
-                        </p>
-                        <p className="mt-1 truncate text-sm font-black text-app-ink">
-                            {activeDetail}
-                        </p>
-                    </div>
-                    <button
-                        type="submit"
-                        className="theme-primary-active h-11 rounded-[0.8rem] px-5 text-sm font-semibold"
-                    >
-                        Apply
-                    </button>
-                </div>
-            </div>
-        </form>
-    );
-}
-
-function DateField({
-    label,
-    name,
-    value,
-}: {
-    label: string;
-    name: string;
-    value: string | null;
-}) {
-    return (
-        <label className="grid gap-1.5">
-            <span className="text-[10px] font-black tracking-[0.18em] text-app-muted uppercase">
-                {label}
-            </span>
-            <input
-                name={name}
-                type="date"
-                defaultValue={value ?? ''}
-                className="h-11 rounded-[0.8rem] border border-app-border bg-app-surface-muted px-3 text-sm font-black text-app-ink"
-            />
-        </label>
-    );
-}
-
-function SelectField({
-    label,
-    children,
-}: {
-    label: string;
-    children: ReactNode;
-}) {
-    return (
-        <label className="grid gap-1.5">
-            <span className="text-[10px] font-black tracking-[0.18em] text-app-muted uppercase">
-                {label}
-            </span>
-            {children}
-        </label>
-    );
-}
-
 function fallbackMeta(key: string): ReportMeta {
     return {
         title: titleCase(key),
@@ -975,27 +730,6 @@ function percent(value: number, total: number) {
     return Math.max(0, Math.min(100, Math.round((value / total) * 100)));
 }
 
-function filterFormQuery(formData: FormData, selectedPeriod?: string) {
-    const period =
-        selectedPeriod ?? String(formData.get('period') ?? 'current_month');
-    const query: Record<string, string | number> = { period };
-
-    if (period === 'custom') {
-        query.start_date = String(formData.get('start_date') ?? '');
-        query.end_date = String(formData.get('end_date') ?? '');
-    }
-
-    if (period === 'year' || period === 'current_year') {
-        query.year = Number(formData.get('year') || new Date().getFullYear());
-    }
-
-    if (period === 'academic_period') {
-        query.academic_period_id = Number(formData.get('academic_period_id'));
-    }
-
-    return query;
-}
-
 function filterQuery(filters: ReportFilters) {
     const query: Record<string, string | number> = {
         period: filters.preset,
@@ -1018,46 +752,6 @@ function filterQuery(filters: ReportFilters) {
     }
 
     return query;
-}
-
-function periodLabel(period: string) {
-    return (
-        {
-            current_month: 'This month',
-            current_year: 'This year',
-            year: 'Selected year',
-            academic_period: 'Academic year',
-            custom: 'Date range',
-            all: 'All records',
-        }[period] ?? 'Report period'
-    );
-}
-
-function periodPreview(
-    period: string,
-    filters: ReportFilters,
-    filterOptions: FilterOptions,
-) {
-    if (period === 'year') {
-        return String(filters.year ?? new Date().getFullYear());
-    }
-
-    if (period === 'academic_period') {
-        return (
-            filterOptions.academic_periods.find(
-                (item) => item.id === filters.academic_period_id,
-            )?.name ?? 'Active academic period'
-        );
-    }
-
-    if (period === 'custom') {
-        return [
-            filters.start_date ?? 'Start date',
-            filters.end_date ?? 'End date',
-        ].join(' - ');
-    }
-
-    return periodLabel(period);
 }
 
 function tint(color: string, index: number) {
