@@ -39,8 +39,8 @@ class ReportExportController extends Controller
      */
     private function pdf(ReportPeriod $period, array $summary, array $reports): Response
     {
-        $filename = 'kntsf-executive-report-'.$period->cacheKey().'.pdf';
-        $largestGroupTotal = max(1, ...array_values(array_map(fn (array $values): int => array_sum($values), $reports)));
+        $filename = 'kntsf-executive-report-' . $period->cacheKey() . '.pdf';
+        $largestGroupTotal = max(1, ...array_values(array_map(fn(array $values): int => array_sum($values), $reports)));
 
         return Pdf::loadView('exports.reports.executive-report-pdf', [
             'period' => $period,
@@ -62,7 +62,7 @@ class ReportExportController extends Controller
     {
         return Excel::download(
             new ReportWorkbookExport($period, $summary, $reports),
-            'kntsf-executive-report-'.$period->cacheKey().'.xlsx',
+            'kntsf-executive-report-' . $period->cacheKey() . '.xlsx',
             \Maatwebsite\Excel\Excel::XLSX,
         );
     }
@@ -73,12 +73,12 @@ class ReportExportController extends Controller
      */
     private function csv(ReportPeriod $period, array $summary, array $reports): StreamedResponse
     {
-        $filename = 'kntsf-executive-report-'.$period->cacheKey().'.csv';
+        $filename = 'kntsf-executive-report-' . $period->cacheKey() . '.csv';
 
         return response()->streamDownload(function () use ($period, $summary, $reports): void {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['KNTSF Executive Report']);
+            fputcsv($handle, ['KUC Executive Report']);
             fputcsv($handle, ['Period', $period->label]);
             fputcsv($handle, ['Generated', now()->toDayDateTimeString()]);
             fputcsv($handle, []);

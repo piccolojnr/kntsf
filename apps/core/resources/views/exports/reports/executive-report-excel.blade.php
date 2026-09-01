@@ -1,5 +1,5 @@
 @php
-    $title = 'KNTSF Executive Report';
+    $title = 'KUC Executive Report';
     $headline = [
         'Students' => $summary['total_students'] ?? 0,
         'Active permits' => $summary['active_permits'] ?? 0,

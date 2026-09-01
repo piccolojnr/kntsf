@@ -17,7 +17,7 @@ final class SimplePdfWriter
             '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj',
             '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
             '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
-            '6 0 obj << /Length '.strlen($content)." >> stream\n{$content}\nendstream endobj",
+            '6 0 obj << /Length ' . strlen($content) . " >> stream\n{$content}\nendstream endobj",
         ];
 
         $pdf = "%PDF-1.4\n";
@@ -25,18 +25,18 @@ final class SimplePdfWriter
 
         foreach ($objects as $object) {
             $offsets[] = strlen($pdf);
-            $pdf .= $object."\n";
+            $pdf .= $object . "\n";
         }
 
         $xrefPosition = strlen($pdf);
-        $pdf .= "xref\n0 ".(count($objects) + 1)."\n";
+        $pdf .= "xref\n0 " . (count($objects) + 1) . "\n";
         $pdf .= "0000000000 65535 f \n";
 
         foreach (array_slice($offsets, 1) as $offset) {
-            $pdf .= str_pad((string) $offset, 10, '0', STR_PAD_LEFT)." 00000 n \n";
+            $pdf .= str_pad((string) $offset, 10, '0', STR_PAD_LEFT) . " 00000 n \n";
         }
 
-        return $pdf.'trailer << /Size '.(count($objects) + 1)." /Root 1 0 R >>\nstartxref\n{$xrefPosition}\n%%EOF";
+        return $pdf . 'trailer << /Size ' . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n{$xrefPosition}\n%%EOF";
     }
 
     /**
@@ -57,12 +57,12 @@ final class SimplePdfWriter
             $page++;
             $pages[$page] = [];
             $cursorY = 790;
-            $this->reportPageHeader($add, 'KNTSF Executive Report', 'Continued');
+            $this->reportPageHeader($add, 'KUC Executive Report', 'Continued');
             $cursorY = 710;
         };
 
-        $this->reportPageHeader($add, 'KNTSF Executive Report', $periodLabel);
-        $this->text($add, 44, 710, 'Generated '.$generatedAt, 9, false, 'muted');
+        $this->reportPageHeader($add, 'KUC Executive Report', $periodLabel);
+        $this->text($add, 44, 710, 'Generated ' . $generatedAt, 9, false, 'muted');
         $this->text($add, 44, 690, 'Executive summary', 16, true, 'ink');
         $this->text($add, 44, 674, 'A concise operational view of students, permits, payments, verification, elections, and permit request recovery.', 9, false, 'muted');
 
@@ -93,7 +93,7 @@ final class SimplePdfWriter
             $total = array_sum($values);
             $this->rect($add, 44, $cursorY - 14, 507, 24, 'band');
             $this->text($add, 56, $cursorY - 2, $this->title($group), 11, true, 'white');
-            $this->text($add, 468, $cursorY - 2, 'Total '.number_format($total), 10, true, 'white');
+            $this->text($add, 468, $cursorY - 2, 'Total ' . number_format($total), 10, true, 'white');
             $cursorY -= 32;
 
             foreach ($values as $label => $value) {
@@ -113,8 +113,8 @@ final class SimplePdfWriter
         }
 
         foreach ($pages as $index => &$commands) {
-            $this->textTo($commands, 44, 32, 'KNTSF Core | Executive reporting', 8, false, 'muted');
-            $this->textTo($commands, 510, 32, 'Page '.($index + 1), 8, true, 'muted');
+            $this->textTo($commands, 44, 32, 'KUC SRC | Executive reporting', 8, false, 'muted');
+            $this->textTo($commands, 510, 32, 'Page ' . ($index + 1), 8, true, 'muted');
         }
 
         return $this->document($pages);
@@ -142,7 +142,7 @@ final class SimplePdfWriter
                 $commands[] = 'T*';
             }
 
-            $commands[] = '('.$this->escape($line).') Tj';
+            $commands[] = '(' . $this->escape($line) . ') Tj';
         }
 
         $commands[] = 'ET';
@@ -157,7 +157,7 @@ final class SimplePdfWriter
     {
         $objects = [
             1 => '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
-            2 => '2 0 obj << /Type /Pages /Kids ['.implode(' ', array_map(fn (int $index): string => (5 + ($index * 2)).' 0 R', array_keys($pages))).'] /Count '.count($pages).' >> endobj',
+            2 => '2 0 obj << /Type /Pages /Kids [' . implode(' ', array_map(fn(int $index): string => (5 + ($index * 2)) . ' 0 R', array_keys($pages))) . '] /Count ' . count($pages) . ' >> endobj',
             3 => '3 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
             4 => '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
         ];
@@ -168,7 +168,7 @@ final class SimplePdfWriter
             $content = implode("\n", $commands);
 
             $objects[$pageObject] = "{$pageObject} 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents {$contentObject} 0 R >> endobj";
-            $objects[$contentObject] = "{$contentObject} 0 obj << /Length ".strlen($content)." >> stream\n{$content}\nendstream endobj";
+            $objects[$contentObject] = "{$contentObject} 0 obj << /Length " . strlen($content) . " >> stream\n{$content}\nendstream endobj";
         }
 
         ksort($objects);
@@ -178,18 +178,18 @@ final class SimplePdfWriter
 
         foreach ($objects as $object) {
             $offsets[] = strlen($pdf);
-            $pdf .= $object."\n";
+            $pdf .= $object . "\n";
         }
 
         $xrefPosition = strlen($pdf);
-        $pdf .= "xref\n0 ".(count($objects) + 1)."\n";
+        $pdf .= "xref\n0 " . (count($objects) + 1) . "\n";
         $pdf .= "0000000000 65535 f \n";
 
         foreach (array_slice($offsets, 1) as $offset) {
-            $pdf .= str_pad((string) $offset, 10, '0', STR_PAD_LEFT)." 00000 n \n";
+            $pdf .= str_pad((string) $offset, 10, '0', STR_PAD_LEFT) . " 00000 n \n";
         }
 
-        return $pdf.'trailer << /Size '.(count($objects) + 1)." /Root 1 0 R >>\nstartxref\n{$xrefPosition}\n%%EOF";
+        return $pdf . 'trailer << /Size ' . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n{$xrefPosition}\n%%EOF";
     }
 
     /**
@@ -236,9 +236,9 @@ final class SimplePdfWriter
         [$red, $green, $blue] = $this->rgb($color);
         $commands[] = 'BT';
         $commands[] = sprintf('%.3F %.3F %.3F rg', $red, $green, $blue);
-        $commands[] = '/'.($bold ? 'F2' : 'F1').' '.$size.' Tf';
+        $commands[] = '/' . ($bold ? 'F2' : 'F1') . ' ' . $size . ' Tf';
         $commands[] = sprintf('%.2F %.2F Td', $x, $y);
-        $commands[] = '('.$this->escape($this->pdfText($value)).') Tj';
+        $commands[] = '(' . $this->escape($this->pdfText($value)) . ') Tj';
         $commands[] = 'ET';
     }
 

@@ -26,7 +26,7 @@ class ReportWorkbookExport implements FromCollection, ShouldAutoSize, WithStyles
     public function collection(): Collection
     {
         $rows = collect([
-            ['KNTSF Executive Report', '', ''],
+            ['KUC Executive Report', '', ''],
             ['Period', $this->period->label, ''],
             ['Generated', now()->toDayDateTimeString(), ''],
             ['', '', ''],

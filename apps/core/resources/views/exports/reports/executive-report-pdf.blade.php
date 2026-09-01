@@ -45,7 +45,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>KNTSF Executive Report</title>
+    <title>KUC Executive Report</title>
 
     <style>
         @page {
@@ -242,12 +242,12 @@
 
 <body>
     <div class="footer">
-        KNTSF Executive Report · Internal Use Only · Page <span class="page-number"></span>
+        KUC Executive Report · Internal Use Only · Page <span class="page-number"></span>
     </div>
 
     <header class="document-header">
         <p class="eyebrow">Operational Reporting</p>
-        <h1 class="title">KNTSF Executive Report</h1>
+        <h1 class="title">KUC Executive Report</h1>
         <p class="subtitle">
             Formal executive summary of student records, permits, NFC cards, payments, permit requests,
             verification activity, and election operations for the selected reporting period.

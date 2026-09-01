@@ -172,7 +172,7 @@
 
 <body>
     <div class="footer">
-        KNTSF Election Report · Internal Use Only · Page <span class="page-number"></span>
+        KUC Election Report · Internal Use Only · Page <span class="page-number"></span>
     </div>
 
     <header class="document-header">
@@ -214,7 +214,9 @@
                     <td>Approved candidates</td>
                     <td class="number">{{ number_format($approvedCount) }}</td>
                     <td>Votes cast</td>
-                    <td class="number">{{ $canViewResults ? number_format($election->votes_count ?? $election->votes()->count()) : 'Restricted' }}</td>
+                    <td class="number">
+                        {{ $canViewResults ? number_format($election->votes_count ?? $election->votes()->count()) : 'Restricted' }}
+                    </td>
                 </tr>
                 <tr>
                     <td>Starts</td>
@@ -240,7 +242,8 @@
             <div class="position-block">
                 <h3 class="position-title">
                     {{ $position->title }}
-                    <span class="muted"> · {{ $formatStatus($position->status) }} · {{ $position->max_winners }} winner(s)</span>
+                    <span class="muted"> · {{ $formatStatus($position->status) }} · {{ $position->max_winners }}
+                        winner(s)</span>
                 </h3>
 
                 <table class="data">
@@ -263,7 +266,8 @@
                                 </td>
                                 <td>{{ $candidate->student->student_number }}</td>
                                 <td>{{ $formatStatus($candidate->status) }}</td>
-                                <td class="number">{{ $canViewResults ? number_format($candidate->votes->count()) : 'Restricted' }}</td>
+                                <td class="number">
+                                    {{ $canViewResults ? number_format($candidate->votes->count()) : 'Restricted' }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -282,7 +286,8 @@
         <section class="section">
             <h2 class="section-title">Results Visibility</h2>
             <div class="notice">
-                Vote totals are restricted for the current user or election state. This export includes setup and candidate information only.
+                Vote totals are restricted for the current user or election state. This export includes setup and candidate
+                information only.
             </div>
         </section>
     @endunless

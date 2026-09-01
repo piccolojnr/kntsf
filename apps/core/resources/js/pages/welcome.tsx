@@ -5,7 +5,7 @@ import {
     BookOpen,
     CreditCard,
     ShieldCheck,
-    UsersRound
+    UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
@@ -30,9 +30,7 @@ export default function Welcome() {
                             <ShieldCheck className="size-5" />
                         </div>
                         <div>
-                            <p className="text-sm font-semibold">
-                                KNTSF Core
-                            </p>
+                            <p className="text-sm font-semibold">KUC SRC</p>
                             <p className="text-xs text-app-muted">
                                 Student operations
                             </p>
@@ -44,8 +42,11 @@ export default function Welcome() {
                             <Link
                                 href={dashboard()}
                                 className={cn(
-                                    buttonVariants({ variant: 'outline', size: 'default' }),
-                                    'gap-2'
+                                    buttonVariants({
+                                        variant: 'outline',
+                                        size: 'default',
+                                    }),
+                                    'gap-2',
                                 )}
                             >
                                 Dashboard
@@ -55,7 +56,10 @@ export default function Welcome() {
                             <>
                                 <Link
                                     href={login()}
-                                    className={buttonVariants({ variant: 'ghost', size: 'default' })}
+                                    className={buttonVariants({
+                                        variant: 'ghost',
+                                        size: 'default',
+                                    })}
                                 >
                                     Log in
                                 </Link>
@@ -84,8 +88,11 @@ export default function Welcome() {
                             <Link
                                 href={auth.user ? dashboard() : login()}
                                 className={cn(
-                                    buttonVariants({ variant: 'default', size: 'default' }),
-                                    'gap-2'
+                                    buttonVariants({
+                                        variant: 'default',
+                                        size: 'default',
+                                    }),
+                                    'gap-2',
                                 )}
                             >
                                 {auth.user ? 'Open dashboard' : 'Log in'}
