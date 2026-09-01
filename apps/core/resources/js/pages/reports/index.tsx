@@ -1,14 +1,11 @@
 import { Head, router } from '@inertiajs/react';
 import {
-    Activity,
-    BarChart3,
     CalendarRange,
     CreditCard,
     Download,
     FileText,
     Filter,
     IdCard,
-    Landmark,
     ShieldCheck,
     Users,
     Wifi,
@@ -182,41 +179,50 @@ export default function ReportsIndex({
         <>
             <Head title="Reports" />
 
-            <div className="app-page p-4 md:p-6">
-                <section className="theme-ink-panel grid min-w-0 gap-5 overflow-hidden rounded-[1.35rem] border border-app-border p-5 shadow-[0_24px_80px_rgba(17,24,19,0.18)] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,26rem)]">
-                    <div className="min-w-0">
-                        <p className="inline-flex items-center gap-2 rounded-md bg-app-brass px-3 py-1.5 text-xs font-black tracking-[0.2em] text-[#1c1826] uppercase">
-                            <FileText className="size-4" />
+            <div className="app-page w-full max-w-full overflow-x-hidden px-4 pb-12 md:px-7 lg:px-9">
+                <header className="flex flex-col gap-4 border-b border-app-border py-7 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p className="text-xs font-bold tracking-[0.16em] text-app-muted uppercase">
                             Operational reporting
                         </p>
-                        <h1 className="mt-5 max-w-3xl text-4xl leading-none font-black tracking-normal text-white md:text-6xl">
-                            Executive report room.
+                        <h1 className="dashboard-display mt-2 text-4xl font-semibold tracking-[-0.055em] text-app-ink md:text-5xl">
+                            Reports
                         </h1>
-                        <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70">
-                            A board-ready view of {filters.label}: students,
-                            permits, payments, verification, elections, and
-                            operational exceptions in one place.
+                        <p className="mt-2 text-sm text-app-muted">
+                            {filters.label} · {groups.length} report groups ·{' '}
+                            {totalTrackedRecords} tracked records
                         </p>
                     </div>
-
-                    <div className="grid content-end gap-3">
-                        <OverviewStat
-                            label="Period"
-                            value={filters.label}
-                            icon={Landmark}
-                        />
-                        <OverviewStat
-                            label="Report groups"
-                            value={groups.length}
-                            icon={BarChart3}
-                        />
-                        <OverviewStat
-                            label="Tracked records"
-                            value={totalTrackedRecords}
-                            icon={Activity}
-                        />
+                    <div className="flex gap-2">
+                        <a
+                            href={exportMethod.url('pdf', {
+                                query: reportQuery,
+                            })}
+                            className="inline-flex items-center gap-2 rounded-lg bg-app-red px-3.5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                        >
+                            <Download className="size-4" />
+                            PDF
+                        </a>
+                        <a
+                            href={exportMethod.url('excel', {
+                                query: reportQuery,
+                            })}
+                            className="theme-primary-active inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-semibold transition hover:bg-app-red"
+                        >
+                            <Download className="size-4" />
+                            Excel
+                        </a>
+                        <a
+                            href={exportMethod.url('csv', {
+                                query: reportQuery,
+                            })}
+                            className="hidden items-center gap-2 rounded-lg border border-app-border px-3.5 py-2.5 text-sm font-semibold text-app-ink transition hover:bg-app-surface-muted sm:inline-flex"
+                        >
+                            <Download className="size-4" />
+                            CSV
+                        </a>
                     </div>
-                </section>
+                </header>
 
                 <ReportFilterBar
                     filters={filters}
@@ -224,7 +230,7 @@ export default function ReportsIndex({
                     routeUrl={index.url()}
                 />
 
-                <section className="mt-5 grid gap-3 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
+                <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <ExecutiveStat
                         label="Students"
                         value={summary.total_students ?? 0}
@@ -245,41 +251,16 @@ export default function ReportsIndex({
                         value={summary.verification_attempts ?? 0}
                         detail="Operational checks"
                     />
-                    <div className="app-panel grid gap-2 p-3">
-                        <a
-                            href={exportMethod.url('pdf', { query: reportQuery })}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] bg-app-red px-4 text-sm font-semibold text-white"
-                        >
-                            <Download className="size-4" />
-                            PDF
-                        </a>
-                        <a
-                            href={exportMethod.url('excel', {
-                                query: reportQuery,
-                            })}
-                            className="theme-primary-active inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] px-4 text-sm font-semibold"
-                        >
-                            <Download className="size-4" />
-                            Excel
-                        </a>
-                        <a
-                            href={exportMethod.url('csv', { query: reportQuery })}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-[0.75rem] border border-app-border px-4 text-sm font-semibold text-app-ink"
-                        >
-                            <Download className="size-4" />
-                            CSV
-                        </a>
-                    </div>
                 </section>
 
-                <section className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
-                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
+                    <div className="app-panel min-w-0 overflow-hidden p-4">
                         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                             <div>
-                                <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                                <p className="text-xs font-semibold tracking-[0.14em] text-app-red uppercase">
                                     Cross-module totals
                                 </p>
-                                <h2 className="mt-1 text-2xl font-black tracking-normal">
+                                <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-app-ink">
                                     Overview distribution
                                 </h2>
                             </div>
@@ -331,22 +312,19 @@ export default function ReportsIndex({
                                         className="fill-foreground font-bold"
                                     />
                                     {overviewData.map((item) => (
-                                        <Cell
-                                            key={item.key}
-                                            fill={item.fill}
-                                        />
+                                        <Cell key={item.key} fill={item.fill} />
                                     ))}
                                 </Bar>
                             </BarChart>
                         </ChartContainer>
                     </div>
 
-                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                    <div className="app-panel min-w-0 overflow-hidden p-4">
                         <div>
-                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                            <p className="text-xs font-semibold tracking-[0.14em] text-app-red uppercase">
                                 Module mix
                             </p>
-                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-app-ink">
                                 Share of activity
                             </h2>
                         </div>
@@ -368,10 +346,7 @@ export default function ReportsIndex({
                                     paddingAngle={3}
                                 >
                                     {moduleMixData.map((item) => (
-                                        <Cell
-                                            key={item.key}
-                                            fill={item.fill}
-                                        />
+                                        <Cell key={item.key} fill={item.fill} />
                                     ))}
                                 </Pie>
                             </PieChart>
@@ -406,13 +381,13 @@ export default function ReportsIndex({
                     </div>
                 </section>
 
-                <section className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                    <div className="app-panel min-w-0 overflow-hidden p-4">
                         <div>
-                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                            <p className="text-xs font-semibold tracking-[0.14em] text-app-red uppercase">
                                 Operating health
                             </p>
-                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-app-ink">
                                 Coverage indicators
                             </h2>
                         </div>
@@ -457,12 +432,12 @@ export default function ReportsIndex({
                         </div>
                     </div>
 
-                    <div className="app-panel min-w-0 overflow-hidden p-5">
+                    <div className="app-panel min-w-0 overflow-hidden p-4">
                         <div>
-                            <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
+                            <p className="text-xs font-semibold tracking-[0.14em] text-app-red uppercase">
                                 Activity curve
                             </p>
-                            <h2 className="mt-1 text-2xl font-black tracking-normal">
+                            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-app-ink">
                                 Relative movement by module
                             </h2>
                         </div>
@@ -531,7 +506,7 @@ export default function ReportsIndex({
                     </div>
                 </section>
 
-                <section className="app-panel mt-5 min-w-0 overflow-hidden p-5">
+                <section className="app-panel mt-4 min-w-0 overflow-hidden p-4">
                     <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                         <div>
                             <p className="text-xs font-black tracking-[0.18em] text-app-red uppercase">
@@ -714,30 +689,6 @@ function ReportPanel({
                 </div>
             </div>
         </article>
-    );
-}
-
-function OverviewStat({
-    label,
-    value,
-    icon: Icon,
-}: {
-    label: string;
-    value: number | string;
-    icon: ComponentType<{ className?: string }>;
-}) {
-    return (
-        <div className="rounded-[1rem] border border-white/12 bg-white/8 p-4 text-white backdrop-blur">
-            <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-black tracking-[0.18em] text-white/64 uppercase">
-                    {label}
-                </p>
-                <Icon className="size-5 text-app-brass" />
-            </div>
-            <p className="mt-3 text-3xl leading-tight font-black text-white tabular-nums">
-                {value}
-            </p>
-        </div>
     );
 }
 
@@ -1134,8 +1085,9 @@ function buildOperationalHealth(
     const verificationAttempts = summary.verification_attempts ?? 0;
     const failedVerification = summary.failed_verification_attempts ?? 0;
     const stuckRequests = summary.stuck_permit_requests ?? 0;
-    const permitRequestsTotal = Object.values(reports.permit_requests ?? {})
-        .reduce((sum, value) => sum + value, 0);
+    const permitRequestsTotal = Object.values(
+        reports.permit_requests ?? {},
+    ).reduce((sum, value) => sum + value, 0);
 
     return [
         {
@@ -1155,10 +1107,7 @@ function buildOperationalHealth(
                     ? Math.max(
                           0,
                           100 -
-                              percent(
-                                  failedVerification,
-                                  verificationAttempts,
-                              ),
+                              percent(failedVerification, verificationAttempts),
                       )
                     : 100,
             fill: '#0369a1',
@@ -1167,7 +1116,10 @@ function buildOperationalHealth(
             label: 'Request recovery',
             score:
                 permitRequestsTotal > 0
-                    ? Math.max(0, 100 - percent(stuckRequests, permitRequestsTotal))
+                    ? Math.max(
+                          0,
+                          100 - percent(stuckRequests, permitRequestsTotal),
+                      )
                     : 100,
             fill: '#7c3aed',
         },
