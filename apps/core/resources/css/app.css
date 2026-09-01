@@ -16,6 +16,7 @@
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --font-display: 'Cabinet Grotesk', 'Montserrat Variable', sans-serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -210,6 +211,10 @@
 }
 
 @layer components {
+    .dashboard-display {
+        font-family: var(--font-display);
+    }
+
     .app-page {
         @apply min-h-full min-w-0 bg-transparent text-app-ink;
     }
@@ -219,7 +224,7 @@
     }
 
     .app-panel {
-        @apply rounded-[1.1rem] border border-app-border bg-app-surface shadow-[0_18px_55px_rgba(23,33,27,0.08)] transition duration-300 dark:shadow-none;
+        @apply rounded-xl border border-app-border bg-app-surface shadow-[0_8px_24px_rgba(23,33,27,0.04)] transition duration-300 dark:shadow-none;
     }
 
     .app-panel-muted {
@@ -305,23 +310,11 @@
     }
 
     .admin-rail {
-        background:
-            radial-gradient(
-                circle at 20% 8%,
-                color-mix(in srgb, var(--app-brass) 22%, transparent),
-                transparent 32%
-            ),
-            linear-gradient(180deg, #231a34 0%, #120d1c 100%);
+        background: #1c1826;
     }
 
     .dark .admin-rail {
-        background:
-            radial-gradient(
-                circle at 20% 8%,
-                color-mix(in srgb, var(--app-brass) 14%, transparent),
-                transparent 34%
-            ),
-            linear-gradient(180deg, #120d1c 0%, #08060c 100%);
+        background: #0c0a12;
     }
 
     .admin-nav-item {
