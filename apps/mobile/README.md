@@ -18,7 +18,7 @@ EXPO_PUBLIC_API_BASE_URL=http://<backend-host>:3001
 EXPO_PUBLIC_APP_ENV=development
 ```
 
-The app does not include a mock API fallback. If `EXPO_PUBLIC_API_BASE_URL` is missing, startup fails with a clear configuration error.
+The app does not include a mock or hosted-URL fallback. If `EXPO_PUBLIC_API_BASE_URL` is missing, startup fails with a clear configuration error.
 
 Android emulator backend URL:
 

@@ -1,21 +1,5 @@
 export type AppEnvironment = "development" | "preview" | "production";
 
-type EnvironmentConfig = {
-  apiBaseUrl: string;
-};
-
-const ENVIRONMENT_CONFIG: Record<AppEnvironment, EnvironmentConfig> = {
-  development: {
-    apiBaseUrl: "https://kntsf.ri-tech.tech",
-  },
-  preview: {
-    apiBaseUrl: "https://kntsf.ri-tech.tech",
-  },
-  production: {
-    apiBaseUrl: "https://kntsf.ri-tech.tech",
-  },
-};
-
 function getAppEnvironment(): AppEnvironment {
   const value = process.env.EXPO_PUBLIC_APP_ENV;
 
@@ -27,13 +11,11 @@ function getAppEnvironment(): AppEnvironment {
 }
 
 export const APP_ENV = getAppEnvironment();
-export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
-  ENVIRONMENT_CONFIG[APP_ENV].apiBaseUrl;
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
 
 if (!API_BASE_URL) {
   throw new Error(
-    "EXPO_PUBLIC_API_BASE_URL is required. Set it to your backend base URL.",
+    `EXPO_PUBLIC_API_BASE_URL is required for the ${APP_ENV} build. Set it to your backend base URL.`,
   );
 }
 
