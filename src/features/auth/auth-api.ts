@@ -86,7 +86,7 @@ function normalizeRoles(dto: AuthUserDto): UserRole[] {
     return ["student"];
   }
 
-  return ["staff"];
+  return [];
 }
 
 function getPrimaryRole(roles: UserRole[]): UserRole {
@@ -111,6 +111,11 @@ function normalizeAuthUser(dto: AuthUserDto | null | undefined) {
   }
 
   const roles = normalizeRoles(dto);
+
+  if (roles.length === 0) {
+    return null;
+  }
+
   const role = getPrimaryRole(roles);
 
   return {
