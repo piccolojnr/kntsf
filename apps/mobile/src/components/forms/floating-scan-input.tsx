@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     padding: 0,
     paddingHorizontal: 0,
     paddingVertical: 0,
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     textAlignVertical: "center",
   },
 
