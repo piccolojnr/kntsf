@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldAlert } from "lucide-react-native";
+import { ArrowRight, Hash, ShieldAlert } from "lucide-react-native";
 import {
   ActivityIndicator,
   Platform,
@@ -37,6 +37,10 @@ export function FloatingScanInput({
 
   return (
     <View style={styles.wrapper}>
+      <View style={styles.labelRow}>
+        <Hash color={colors.primary} size={14} strokeWidth={2.6} />
+        <Text style={styles.label}>Manual verification</Text>
+      </View>
       <View style={styles.pill}>
         <View style={styles.inputArea}>
           <Text style={styles.prefix}>ID</Text>
@@ -102,8 +106,28 @@ export function FloatingScanInput({
 
 const styles = StyleSheet.create({
   wrapper: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.xl,
+    borderWidth: 1,
     gap: spacing.sm,
+    padding: spacing.sm,
+    boxShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
     alignItems: "stretch",
+  },
+  labelRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingTop: 2,
+  },
+  label: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
   },
   helperText: {
     color: colors.textMuted,
@@ -130,7 +154,7 @@ const styles = StyleSheet.create({
   /* ── Pill ── */
   pill: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderColor: colors.border,
     borderRadius: radius.pill,
     borderWidth: 1,
@@ -139,11 +163,6 @@ const styles = StyleSheet.create({
     height: 56,
     paddingLeft: spacing.lg,
     paddingRight: 6,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 8,
   },
 
   /* ── Input ── */
