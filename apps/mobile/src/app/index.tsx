@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import {
   Animated,
   Image,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -28,7 +29,15 @@ function getRoleRoute(role?: string | null): Href {
 
 // ─── Branded loading screen ───────────────────────────────────────────────────
 
-function LoadingScreen({ message }: { message?: string }) {
+function LoadingScreen({
+  message,
+  onRetry,
+  onSignOut,
+}: {
+  message?: string;
+  onRetry?: () => void;
+  onSignOut?: () => void;
+}) {
   const opacity = useRef(new Animated.Value(0)).current;
   const dotScale1 = useRef(new Animated.Value(0.5)).current;
   const dotScale2 = useRef(new Animated.Value(0.5)).current;
@@ -95,6 +104,18 @@ function LoadingScreen({ message }: { message?: string }) {
           ))}
         </View>
         {message ? <Text style={styles.message}>{message}</Text> : null}
+        {onRetry ? (
+          <View style={styles.actions}>
+            <Pressable style={styles.actionButton} onPress={onRetry}>
+              <Text style={styles.actionLabel}>Retry</Text>
+            </Pressable>
+            {onSignOut ? (
+              <Pressable onPress={onSignOut}>
+                <Text style={styles.signOutLabel}>Sign out</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
       </Animated.View>
     </SafeAreaView>
   );
@@ -103,14 +124,21 @@ function LoadingScreen({ message }: { message?: string }) {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function Index() {
-  const { authError, isLoading, isAuthenticated, token, user } = useAuth();
+  const { authError, isLoading, isAuthenticated, logout, retryAuth, token, user } =
+    useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   if (token && authError) {
-    return <LoadingScreen message={authError} />;
+    return (
+      <LoadingScreen
+        message={authError}
+        onRetry={() => void retryAuth()}
+        onSignOut={() => void logout()}
+      />
+    );
   }
 
   if (!isAuthenticated) {
@@ -175,5 +203,26 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     maxWidth: 280,
     textAlign: "center",
+  },
+  actions: {
+    alignItems: "center",
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  actionButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 999,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  actionLabel: {
+    color: colors.background,
+    fontSize: fontSizes.sm,
+    fontWeight: "700",
+  },
+  signOutLabel: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
   },
 });

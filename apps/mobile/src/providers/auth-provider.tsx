@@ -28,6 +28,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   login: (payload: LoginPayload) => Promise<LoginResponse>;
   logout: () => Promise<void>;
+  retryAuth: () => Promise<void>;
   refreshUser: () => Promise<AuthUser | null>;
 };
 
@@ -93,60 +94,55 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setAuthError(null);
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
+  const retryAuth = useCallback(async () => {
+    setIsLoading(true);
 
-    async function bootstrapAuth() {
-      try {
-        const storedToken = await getStoredToken();
+    try {
+      const storedToken = await getStoredToken();
 
-        try {
-          const currentUser = await getCurrentAuthUser();
-
-          if (!isMounted) {
-            return;
-          }
-
-          setToken(currentUser ? storedToken : null);
-          setUser(currentUser);
-          setAuthError(null);
-        } catch {
-          if (!isMounted) {
-            return;
-          }
-
-          setToken(storedToken);
-          setUser(null);
-          setAuthError(
-            "Unable to restore your session. Check your connection and try again.",
-          );
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      if (!storedToken) {
+        setToken(null);
+        setUser(null);
+        setAuthError(null);
+        return;
       }
+
+      const currentUser = await getCurrentAuthUser();
+      setToken(currentUser ? storedToken : null);
+      setUser(currentUser);
+      setAuthError(null);
+    } catch (error) {
+      const normalizedError = normalizeApiError(error);
+      const storedToken = await getStoredToken();
+
+      setToken(storedToken);
+      setUser(null);
+      setAuthError(
+        normalizedError.message ||
+          "Unable to restore your session. Check your connection and try again.",
+      );
+    } finally {
+      setIsLoading(false);
     }
-
-    bootstrapAuth();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    void retryAuth();
+  }, [retryAuth]);
 
   const value = useMemo(
     () => ({
       user,
       token,
       isLoading,
-      authError,
-      isAuthenticated: Boolean(user && token),
-      login,
-      logout,
-      refreshUser,
-    }),
-    [authError, isLoading, login, refreshUser, token, user, logout],
+    authError,
+    isAuthenticated: Boolean(user && token),
+    login,
+    logout,
+    retryAuth,
+    refreshUser,
+  }),
+    [authError, isLoading, login, logout, refreshUser, retryAuth, token, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
