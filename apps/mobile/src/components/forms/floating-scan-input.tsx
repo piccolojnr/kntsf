@@ -38,7 +38,7 @@ export function FloatingScanInput({
   return (
     <View style={styles.wrapper}>
       <View style={styles.labelRow}>
-        <Hash color={colors.primary} size={14} strokeWidth={2.6} />
+        <Hash color={colors.gold} size={14} strokeWidth={2.6} />
         <Text style={styles.label}>Student ID</Text>
       </View>
       <View style={styles.pill}>
@@ -109,7 +109,7 @@ export function FloatingScanInput({
 const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: colors.surface,
-    borderColor: colors.border,
+    borderColor: `${colors.gold}55`,
     borderRadius: radius.lg,
     borderWidth: 1,
     gap: spacing.sm,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
   },
   label: {
-    color: colors.textMuted,
+    color: colors.navy,
     fontSize: fontSizes.xs,
     fontWeight: "800",
     letterSpacing: 1.1,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
   },
   valueText: {
-    color: colors.text,
+    color: colors.navy,
   },
   ghostText: {
     color: colors.textMuted,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   /* ── Go button ── */
   goButton: {
     alignItems: "center",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.navy,
     borderRadius: 999,
     height: 44,
     justifyContent: "center",

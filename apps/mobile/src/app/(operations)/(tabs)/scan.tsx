@@ -21,7 +21,6 @@ import { VerificationResultCard } from "@/components/cards/verification-result-c
 import { FloatingScanInput } from "@/components/forms/floating-scan-input";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
-import { PageHeader } from "@/components/ui/page-header";
 import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
@@ -172,7 +171,7 @@ export default function OperationsScanScreen() {
             : "idle";
   const scanVisual = {
     idle: {
-      color: colors.primary,
+      color: colors.gold,
       duration: 2400,
       intensity: 1,
       title: "Ready to scan",
@@ -221,23 +220,33 @@ export default function OperationsScanScreen() {
   return (
     <Screen>
       <View style={styles.flex}>
-        <PageHeader
-          badgeText={
-            isCheckingNfc ? "CHECKING" : isNfcAvailable ? "READY" : "MANUAL"
-          }
-          eyebrow="NFC Operations"
-          subtitle={
-            isNfcAvailable
+        <Animated.View
+          entering={FadeInDown.duration(350)}
+          style={[styles.brandHeader, isCompact && styles.brandHeaderCompact]}
+        >
+          <View style={styles.brandStripe} />
+          <View style={styles.brandHeaderRow}>
+            <View style={styles.brandEyebrowRow}>
+              <View style={styles.brandDot} />
+              <Text style={styles.brandEyebrow}>Knutsford NFC Operations</Text>
+            </View>
+            <View style={styles.brandBadge}>
+              <Text style={styles.brandBadgeText}>
+                {isCheckingNfc
+                  ? "CHECKING"
+                  : isNfcAvailable
+                    ? "READY"
+                    : "MANUAL"}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.brandTitle}>Verify a permit</Text>
+          <Text style={styles.brandSubtitle}>
+            {isNfcAvailable
               ? "Tap a registered student card or enter a student ID."
-              : "Enter a student ID to confirm permit access."
-          }
-          style={
-            isCompact
-              ? { ...styles.pageHeader, ...styles.pageHeaderCompact }
-              : styles.pageHeader
-          }
-          title="Verify a permit"
-        />
+              : "Enter a student ID to confirm permit access."}
+          </Text>
+        </Animated.View>
 
         {/* ─── Stage ─── */}
         {screenState === "result" && result ? (
@@ -328,7 +337,7 @@ export default function OperationsScanScreen() {
                 <View style={styles.scanCardHeader}>
                   <View style={styles.scanCardTitleWrap}>
                     <View style={styles.scanCardIcon}>
-                      <Nfc color={colors.primary} size={18} strokeWidth={2.4} />
+                      <Nfc color={colors.gold} size={18} strokeWidth={2.4} />
                     </View>
                     <View style={styles.scanCardTitleText}>
                       <Text style={styles.scanCardTitle}>Tap an NFC card</Text>
@@ -407,7 +416,7 @@ export default function OperationsScanScreen() {
               >
                 <View style={styles.manualModeIcon}>
                   <ShieldAlert
-                    color={colors.textMuted}
+                    color={colors.gold}
                     size={20}
                     strokeWidth={2.2}
                   />
@@ -462,15 +471,82 @@ export default function OperationsScanScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, gap: spacing.lg },
+  flex: { flex: 1, gap: spacing.md },
   scrollView: {
     flex: 1,
   },
-  pageHeader: {
-    paddingTop: 0,
+  brandHeader: {
+    backgroundColor: colors.navy,
+    borderCurve: "continuous",
+    borderRadius: radius.xl,
+    gap: spacing.xs,
+    overflow: "hidden",
+    padding: spacing.lg,
+    paddingTop: 20,
+    boxShadow: "0 12px 28px rgba(16, 42, 76, 0.2)",
   },
-  pageHeaderCompact: {
-    marginBottom: -4,
+  brandHeaderCompact: {
+    padding: spacing.md,
+  },
+  brandStripe: {
+    backgroundColor: colors.gold,
+    height: 4,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  brandHeaderRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  brandEyebrowRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexShrink: 1,
+    gap: spacing.xs,
+  },
+  brandDot: {
+    backgroundColor: colors.gold,
+    borderRadius: radius.pill,
+    height: 7,
+    width: 7,
+  },
+  brandEyebrow: {
+    color: "#efd494",
+    flexShrink: 1,
+    fontSize: fontSizes.xxs,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+  },
+  brandBadge: {
+    backgroundColor: "rgba(200, 146, 47, 0.16)",
+    borderColor: "rgba(239, 212, 148, 0.5)",
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  brandBadgeText: {
+    color: "#f5dda5",
+    fontSize: fontSizes.xxs,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+  },
+  brandTitle: {
+    color: colors.onNavy,
+    fontSize: fontSizes.xl,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    lineHeight: 34,
+    paddingTop: spacing.xs,
+  },
+  brandSubtitle: {
+    color: "#cbd5e1",
+    fontSize: fontSizes.sm,
+    lineHeight: 21,
   },
 
   verificationContent: {
@@ -506,7 +582,7 @@ const styles = StyleSheet.create({
   },
   scanCardIcon: {
     alignItems: "center",
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.goldSoft,
     borderRadius: radius.md,
     height: 36,
     justifyContent: "center",
@@ -567,8 +643,8 @@ const styles = StyleSheet.create({
   },
   manualModeNotice: {
     alignItems: "center",
-    backgroundColor: colors.surfaceMuted,
-    borderColor: colors.border,
+    backgroundColor: colors.goldSoft,
+    borderColor: `${colors.gold}66`,
     borderRadius: radius.lg,
     borderWidth: 1,
     flexDirection: "row",
@@ -588,7 +664,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   manualModeTitle: {
-    color: colors.text,
+    color: colors.navy,
     fontSize: fontSizes.sm,
     fontWeight: "800",
   },

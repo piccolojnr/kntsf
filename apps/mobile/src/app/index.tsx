@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { colors, fontSizes, spacing } from "@/constants/theme";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -82,11 +82,13 @@ function LoadingScreen({
     <SafeAreaView style={styles.screen}>
       <Animated.View style={[styles.content, { opacity }]}>
         {/* Logo */}
-        <Image
-          source={require("@assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <View style={styles.logoFrame}>
+          <Image
+            source={require("@assets/images/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
         {/* App name */}
         <View style={styles.nameBlock}>
@@ -162,9 +164,21 @@ const styles = StyleSheet.create({
   },
 
   // Logo
+  logoFrame: {
+    alignItems: "center",
+    backgroundColor: colors.navy,
+    borderColor: colors.gold,
+    borderCurve: "continuous",
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    height: 124,
+    justifyContent: "center",
+    width: 124,
+    boxShadow: "0 12px 28px rgba(16, 42, 76, 0.2)",
+  },
   logo: {
-    height: 96,
-    width: 96,
+    height: 102,
+    width: 102,
   },
 
   // Name
@@ -192,7 +206,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   dot: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.gold,
     borderRadius: 4,
     height: 8,
     width: 8,

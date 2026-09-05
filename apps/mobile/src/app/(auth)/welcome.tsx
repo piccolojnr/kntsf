@@ -13,11 +13,13 @@ export default function WelcomeScreen() {
     <SafeAreaView style={styles.screen}>
       <View style={styles.inner}>
         <View style={styles.brand}>
-          <Image
-            source={require("@assets/images/logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <View style={styles.logoFrame}>
+            <Image
+              source={require("@assets/images/logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
 
           <View style={styles.brandText}>
             <Text style={styles.brandEyebrow}>KNUTSFORD UNIVERSITY</Text>
@@ -60,8 +62,20 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   logo: {
-    height: 88,
-    width: 88,
+    height: 108,
+    width: 108,
+  },
+  logoFrame: {
+    alignItems: "center",
+    backgroundColor: colors.navy,
+    borderColor: colors.gold,
+    borderCurve: "continuous",
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    height: 132,
+    justifyContent: "center",
+    width: 132,
+    boxShadow: "0 14px 30px rgba(16, 42, 76, 0.2)",
   },
   brandText: {
     alignItems: "center",
@@ -80,7 +94,7 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
   },
   brandRule: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.gold,
     borderRadius: 2,
     height: 3,
     marginVertical: 2,
