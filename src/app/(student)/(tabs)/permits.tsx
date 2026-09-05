@@ -66,8 +66,6 @@ const STATUS_SOFT: Record<PermitStatus, string> = {
 function SrcPermitDetailsCard({ permit }: { permit: Permit }) {
   return (
     <View style={detailStyles.card}>
-      {/* Accent stripe */}
-
       <View style={detailStyles.inner}>
         {/* Header */}
         <View style={detailStyles.header}>
@@ -167,18 +165,7 @@ const detailStyles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     overflow: "hidden",
-    // shadow
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  accentStripe: {
-    backgroundColor: colors.primary,
-    width: 4,
-    borderTopLeftRadius: radius.lg,
-    borderBottomLeftRadius: radius.lg,
+    boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
   },
   inner: {
     flex: 1,
@@ -610,6 +597,7 @@ export default function StudentPermitsScreen() {
           eyebrow="Student"
           title="Permits"
           subtitle="Your active permit and payment history."
+          tone="brand"
         />
 
         {isLoading ? (

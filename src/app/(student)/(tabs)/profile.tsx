@@ -101,11 +101,9 @@ const CARD_SOFT: Record<CardStatus, string> = {
 function ProfileHeroCard({
   name,
   email,
-  role,
 }: {
   name: string;
   email: string;
-  role: string;
 }) {
   return (
     <View style={heroStyles.card}>
@@ -116,18 +114,15 @@ function ProfileHeroCard({
 
       {/* Identity */}
       <View style={heroStyles.identity}>
-        <Text style={heroStyles.name} numberOfLines={1}>
+        <Text style={heroStyles.name} numberOfLines={2}>
           {name}
         </Text>
         <Text style={heroStyles.email} numberOfLines={1}>
           {email}
         </Text>
         <View style={heroStyles.badgeRow}>
-          <View style={heroStyles.roleBadge}>
-            <Text style={heroStyles.roleBadgeText}>{role.toUpperCase()}</Text>
-          </View>
           <View style={heroStyles.workspaceBadge}>
-            <Text style={heroStyles.workspaceBadgeText}>STUDENT</Text>
+            <Text style={heroStyles.workspaceBadgeText}>STUDENT ACCOUNT</Text>
           </View>
         </View>
       </View>
@@ -137,33 +132,29 @@ function ProfileHeroCard({
 
 const heroStyles = StyleSheet.create({
   card: {
-    backgroundColor: "#0a1628",
+    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,
-    borderColor: "#1e3a5f33",
+    borderColor: colors.border,
     padding: spacing.lg,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    shadowColor: "#1f4b9966",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.45,
-    shadowRadius: 20,
-    elevation: 10,
+    boxShadow: "0 5px 16px rgba(15, 23, 42, 0.07)",
   },
   avatarWrap: {
     width: 64,
     height: 64,
     borderRadius: radius.xl,
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: colors.navy,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
+    borderColor: colors.navy,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   avatarText: {
-    color: "#ffffff",
+    color: colors.gold,
     fontSize: fontSizes.xl,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -173,13 +164,13 @@ const heroStyles = StyleSheet.create({
     gap: 5,
   },
   name: {
-    color: "#ffffff",
+    color: colors.navy,
     fontSize: fontSizes.lg,
     fontWeight: "800",
     letterSpacing: 0.1,
   },
   email: {
-    color: "rgba(255,255,255,0.40)",
+    color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "500",
   },
@@ -188,26 +179,14 @@ const heroStyles = StyleSheet.create({
     gap: spacing.xs,
     marginTop: 2,
   },
-  roleBadge: {
-    backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  roleBadgeText: {
-    color: "rgba(255,255,255,0.60)",
-    fontSize: 9,
-    fontWeight: "700",
-    letterSpacing: 1.2,
-  },
   workspaceBadge: {
-    backgroundColor: `${colors.primary}55`,
+    backgroundColor: colors.goldSoft,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
   },
   workspaceBadgeText: {
-    color: "rgba(255,255,255,0.70)",
+    color: colors.warning,
     fontSize: 9,
     fontWeight: "700",
     letterSpacing: 1.2,
@@ -319,11 +298,9 @@ const chipPairStyles = StyleSheet.create({
 
 function InfoPanel({
   title,
-  accentColor,
   rows,
 }: {
   title: string;
-  accentColor?: string;
   rows: { label: string; value: string; sub?: string }[];
 }) {
   return (
@@ -362,14 +339,7 @@ const panelStyles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     overflow: "hidden",
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  stripe: {
-    width: 4,
+    boxShadow: "0 3px 12px rgba(15, 23, 42, 0.05)",
   },
   inner: {
     flex: 1,
@@ -492,6 +462,7 @@ export default function StudentProfileScreen() {
           eyebrow="Student"
           subtitle="Your account, permit record, and SRC card details."
           title="Profile"
+          tone="brand"
         />
 
         {isLoading ? (
@@ -514,7 +485,6 @@ export default function StudentProfileScreen() {
             <ProfileHeroCard
               name={student.name}
               email={user?.email ?? student.email}
-              role={user?.role ?? "student"}
             />
 
             {/* Status chips */}
@@ -526,7 +496,6 @@ export default function StudentProfileScreen() {
             {/* Account details */}
             <InfoPanel
               title="Account Overview"
-              accentColor={colors.primary}
               rows={[
                 {
                   label: "Student ID",
@@ -553,11 +522,6 @@ export default function StudentProfileScreen() {
             {/* Permit record */}
             <InfoPanel
               title="Permit Record"
-              accentColor={
-                latestPermit
-                  ? PERMIT_COLOR[latestPermit.status]
-                  : colors.textMuted
-              }
               rows={[
                 {
                   label: "Permit Code",
@@ -579,9 +543,6 @@ export default function StudentProfileScreen() {
             {/* Card record */}
             <InfoPanel
               title="SRC Card"
-              accentColor={
-                latestCard ? CARD_COLOR[latestCard.status] : colors.textMuted
-              }
               rows={[
                 {
                   label: "Card UID",

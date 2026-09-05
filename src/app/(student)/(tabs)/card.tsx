@@ -139,16 +139,7 @@ const panelStyles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     overflow: "hidden",
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  accentStripe: {
-    borderBottomLeftRadius: radius.lg,
-    borderTopLeftRadius: radius.lg,
-    width: 4,
+    boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
   },
   inner: {
     flex: 1,
@@ -296,6 +287,7 @@ export default function StudentCardScreen() {
           eyebrow="Student"
           title="SRC Card"
           subtitle="Your NFC student card and registration details."
+          tone="brand"
         />
 
         {isLoading ? (
