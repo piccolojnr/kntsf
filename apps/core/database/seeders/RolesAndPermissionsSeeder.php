@@ -21,7 +21,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissions = $this->permissions();
 
         $permissions->each(
-            fn (string $permission) => Permission::findOrCreate($permission, 'web')
+            fn(string $permission) => Permission::findOrCreate($permission, 'web')
         );
 
         $roles = config('app-permissions.roles', []);
@@ -54,7 +54,7 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         $credentials = config('app-permissions.super_admin');
 
-        if (User::query()->exists() || ! $this->hasCompleteSuperAdminCredentials($credentials)) {
+        if (User::query()->exists() || !$this->hasCompleteSuperAdminCredentials($credentials)) {
             return;
         }
 
@@ -73,6 +73,6 @@ class RolesAndPermissionsSeeder extends Seeder
     private function hasCompleteSuperAdminCredentials(array $credentials): bool
     {
         return collect(['name', 'email', 'password'])
-            ->every(fn (string $key): bool => filled($credentials[$key] ?? null));
+            ->every(fn(string $key): bool => filled($credentials[$key] ?? null));
     }
 }
