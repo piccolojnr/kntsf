@@ -39,7 +39,7 @@ export function FloatingScanInput({
     <View style={styles.wrapper}>
       <View style={styles.labelRow}>
         <Hash color={colors.primary} size={14} strokeWidth={2.6} />
-        <Text style={styles.label}>Manual verification</Text>
+        <Text style={styles.label}>Student ID</Text>
       </View>
       <View style={styles.pill}>
         <View style={styles.inputArea}>
@@ -70,6 +70,8 @@ export function FloatingScanInput({
         </View>
 
         <Pressable
+          accessibilityLabel="Verify student ID"
+          accessibilityRole="button"
           disabled={isLoading}
           onPress={onSubmit}
           style={({ pressed }) => [
@@ -108,19 +110,18 @@ const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: colors.surface,
     borderColor: colors.border,
-    borderRadius: radius.xl,
+    borderRadius: radius.lg,
     borderWidth: 1,
     gap: spacing.sm,
-    padding: spacing.sm,
-    boxShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
+    padding: spacing.md,
+    boxShadow: "0 8px 20px rgba(15, 23, 42, 0.07)",
     alignItems: "stretch",
   },
   labelRow: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingTop: 2,
+    paddingHorizontal: spacing.xs,
   },
   label: {
     color: colors.textMuted,
@@ -133,8 +134,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "600",
-    paddingHorizontal: spacing.md,
-    textAlign: "center",
+    lineHeight: 17,
+    paddingHorizontal: spacing.xs,
   },
   inlineMessage: {
     alignItems: "center",

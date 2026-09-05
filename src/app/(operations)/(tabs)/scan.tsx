@@ -8,23 +8,12 @@ import {
 } from "lucide-react-native";
 import { Href, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import {
-  Keyboard,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Keyboard, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, {
-  Easing,
+  FadeIn,
   FadeInDown,
   FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PermitDetailModal } from "@/components/cards/permit-detail-modal";
 import { PermitIssueConfirmationModal } from "@/components/cards/permit-issue-confirmation-modal";
@@ -48,36 +37,8 @@ type ScanVisualState =
   | "detected"
   | "verifying";
 
-const ANIM_CONFIG = { duration: 280, easing: Easing.bezier(0.4, 0, 0.2, 1) };
-
-function useKeyboardHeight() {
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    const showEvent =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent =
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-
-    const showSub = Keyboard.addListener(showEvent, (e) =>
-      setHeight(e.endCoordinates.height),
-    );
-    const hideSub = Keyboard.addListener(hideEvent, () => setHeight(0));
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
-
-  return height;
-}
-
 export default function OperationsScanScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const keyboardHeight = useKeyboardHeight();
-  const keyboardOpen = keyboardHeight > 0;
   const { fixedScreen, isCompact } = useScreenDensity();
   const { isCheckingNfc, isNfcAvailable } = useNfcAvailability();
   const {
@@ -98,30 +59,6 @@ export default function OperationsScanScreen() {
   const [showIssueConfirm, setShowIssueConfirm] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Animate the pill's bottom offset
-  const pillBottom = useSharedValue(
-    Math.max(insets.bottom, spacing.sm) + fixedScreen.pillClearance,
-  );
-
-  useEffect(() => {
-    pillBottom.value = withTiming(
-      keyboardOpen
-        ? keyboardHeight + spacing.sm
-        : Math.max(insets.bottom, spacing.sm) + fixedScreen.pillClearance,
-      ANIM_CONFIG,
-    );
-  }, [
-    fixedScreen.pillClearance,
-    keyboardOpen,
-    keyboardHeight,
-    insets.bottom,
-    pillBottom,
-  ]);
-
-  const pillAnimStyle = useAnimatedStyle(() => ({
-    bottom: pillBottom.value,
-  }));
 
   useEffect(() => {
     if (loading) {
@@ -238,8 +175,8 @@ export default function OperationsScanScreen() {
       color: colors.primary,
       duration: 2400,
       intensity: 1,
-      title: "Verify Student Permit",
-      hint: "Enter student ID below",
+      title: "Ready to scan",
+      hint: "Start the reader, then hold the card near this device",
       Icon: ScanLine,
       iconColor: "#ffffff",
     },
@@ -285,9 +222,15 @@ export default function OperationsScanScreen() {
     <Screen>
       <View style={styles.flex}>
         <PageHeader
-          badgeText={isNfcAvailable ? "READY" : "MANUAL"}
+          badgeText={
+            isCheckingNfc ? "CHECKING" : isNfcAvailable ? "READY" : "MANUAL"
+          }
           eyebrow="NFC Operations"
-          subtitle="Tap a registered student card to confirm permit access."
+          subtitle={
+            isNfcAvailable
+              ? "Tap a registered student card or enter a student ID."
+              : "Enter a student ID to confirm permit access."
+          }
           style={
             isCompact
               ? { ...styles.pageHeader, ...styles.pageHeaderCompact }
@@ -370,64 +313,63 @@ export default function OperationsScanScreen() {
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={[
-              styles.radarZone,
-              { paddingBottom: fixedScreen.heroBottomReserve },
+              styles.verificationContent,
+              { paddingBottom: fixedScreen.tabBarClearance },
             ]}
             keyboardShouldPersistTaps="handled"
             onScrollBeginDrag={Keyboard.dismiss}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.scanCard}>
-              <View style={styles.scanCardHeader}>
-                <View style={styles.scanCardTitleWrap}>
-                  <View style={styles.scanCardIcon}>
-                    <Nfc color={colors.primary} size={18} strokeWidth={2.4} />
-                  </View>
-                  <View>
-                    <Text style={styles.scanCardTitle}>Contactless verification</Text>
-                    <Text style={styles.scanCardSubtitle}>Reader status</Text>
-                  </View>
-                </View>
-                <View
-                  style={[
-                    styles.readerStatus,
-                    nfcUnavailable && styles.readerStatusMuted,
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.readerStatusDot,
-                      { backgroundColor: nfcUnavailable ? colors.textMuted : colors.success },
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.readerStatusText,
-                      nfcUnavailable && styles.readerStatusTextMuted,
-                    ]}
-                  >
-                    {isCheckingNfc ? "Checking" : nfcUnavailable ? "Unavailable" : "Ready"}
-                  </Text>
-                </View>
-              </View>
-
-              <RadarPulse
-                active={!keyboardOpen && isNfcAvailable}
-                color={scanVisual.color}
-                duration={scanVisual.duration}
-                intensity={scanVisual.intensity}
-                size={fixedScreen.heroSize}
-                ringCount={3}
+            {isCheckingNfc || isNfcAvailable ? (
+              <Animated.View
+                entering={FadeInDown.duration(350)}
+                style={styles.scanCard}
               >
-                <scanVisual.Icon
-                  color={scanVisual.iconColor}
-                  size={fixedScreen.heroIconSize}
-                  strokeWidth={2}
-                />
-              </RadarPulse>
+                <View style={styles.scanCardHeader}>
+                  <View style={styles.scanCardTitleWrap}>
+                    <View style={styles.scanCardIcon}>
+                      <Nfc color={colors.primary} size={18} strokeWidth={2.4} />
+                    </View>
+                    <View style={styles.scanCardTitleText}>
+                      <Text style={styles.scanCardTitle}>Tap an NFC card</Text>
+                      <Text style={styles.scanCardSubtitle}>
+                        Hold the card near the back of this device
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.readerStatus}>
+                    <View
+                      style={[
+                        styles.readerStatusDot,
+                        {
+                          backgroundColor: isCheckingNfc
+                            ? colors.warning
+                            : colors.success,
+                        },
+                      ]}
+                    />
+                    <Text style={styles.readerStatusText}>
+                      {isCheckingNfc ? "Checking" : "Ready"}
+                    </Text>
+                  </View>
+                </View>
 
-              {!keyboardOpen &&
-                (screenState === "loading" ? (
+                <RadarPulse
+                  active={isNfcAvailable}
+                  color={scanVisual.color}
+                  duration={scanVisual.duration}
+                  intensity={scanVisual.intensity}
+                  size={isCompact ? 128 : 152}
+                  ringCount={3}
+                >
+                  <scanVisual.Icon
+                    color={scanVisual.iconColor}
+                    size={isCompact ? 28 : 32}
+                    strokeWidth={2}
+                  />
+                </RadarPulse>
+
+                {screenState === "loading" ? (
                   <View style={styles.statusArea}>
                     <LoadingState
                       message={loadingMessage}
@@ -455,39 +397,50 @@ export default function OperationsScanScreen() {
                         onPress={() => void handleVerifyByNfc()}
                       />
                     </View>
-                    {nfcUnavailable ? (
-                      <View style={styles.nfcNotice}>
-                        <ShieldAlert
-                          color={colors.textMuted}
-                          size={15}
-                          strokeWidth={2.4}
-                        />
-                        <Text style={styles.nfcNoticeText}>
-                          NFC scan is not supported on this device. Use student ID
-                          verification instead.
-                        </Text>
-                      </View>
-                    ) : null}
                   </View>
-                ))}
+                )}
+              </Animated.View>
+            ) : (
+              <Animated.View
+                entering={FadeIn.duration(250)}
+                style={styles.manualModeNotice}
+              >
+                <View style={styles.manualModeIcon}>
+                  <ShieldAlert
+                    color={colors.textMuted}
+                    size={20}
+                    strokeWidth={2.2}
+                  />
+                </View>
+                <View style={styles.manualModeCopy}>
+                  <Text style={styles.manualModeTitle}>NFC reader unavailable</Text>
+                  <Text style={styles.manualModeText}>
+                    Manual verification is ready on this device.
+                  </Text>
+                </View>
+              </Animated.View>
+            )}
+
+            <Animated.View entering={FadeInDown.delay(80).duration(350)}>
+              <FloatingScanInput
+                errorMessage={validationError ?? error}
+                helperText="Enter the eight-digit ID printed on the student card."
+                isLoading={loading}
+                onChangeStudentId={setStudentId}
+                onSubmit={() => void handleVerify()}
+                studentId={studentId}
+              />
+            </Animated.View>
+
+            <View style={styles.securityNote}>
+              <CheckCircle2 color={colors.success} size={16} strokeWidth={2.4} />
+              <Text style={styles.securityNoteText}>
+                Verification checks the current permit record in real time.
+              </Text>
             </View>
           </ScrollView>
         )}
       </View>
-
-      {/* ─── Floating Input Pill (absolutely positioned) ─── */}
-      {screenState !== "result" && (
-        <Animated.View style={[styles.floatingPill, pillAnimStyle]}>
-          <FloatingScanInput
-            errorMessage={validationError ?? error}
-            helperText="Most student IDs start with 2610."
-            isLoading={loading}
-            onChangeStudentId={setStudentId}
-            onSubmit={() => void handleVerify()}
-            studentId={studentId}
-          />
-        </Animated.View>
-      )}
 
       <PermitIssueConfirmationModal
         config={result?.issuanceConfig}
@@ -520,13 +473,9 @@ const styles = StyleSheet.create({
     marginBottom: -4,
   },
 
-  /* ── Radar zone ── */
-  radarZone: {
-    alignItems: "center",
-    flex: 1,
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingTop: spacing.sm,
+  verificationContent: {
+    gap: spacing.md,
+    paddingTop: spacing.xs,
   },
   scanCard: {
     alignItems: "center",
@@ -534,9 +483,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.xl,
     borderWidth: 1,
-    gap: spacing.md,
+    gap: spacing.sm,
     maxWidth: 520,
-    padding: spacing.lg,
+    padding: spacing.md,
     width: "100%",
     boxShadow: "0 12px 24px rgba(15, 23, 42, 0.07)",
   },
@@ -548,8 +497,12 @@ const styles = StyleSheet.create({
   },
   scanCardTitleWrap: {
     alignItems: "center",
+    flex: 1,
     flexDirection: "row",
     gap: spacing.sm,
+  },
+  scanCardTitleText: {
+    flex: 1,
   },
   scanCardIcon: {
     alignItems: "center",
@@ -568,7 +521,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: fontSizes.xs,
     fontWeight: "600",
-    marginTop: 2,
+    lineHeight: 17,
+    marginTop: 1,
   },
   readerStatus: {
     alignItems: "center",
@@ -579,9 +533,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 6,
   },
-  readerStatusMuted: {
-    backgroundColor: colors.surfaceMuted,
-  },
   readerStatusDot: {
     borderRadius: 4,
     height: 7,
@@ -591,9 +542,6 @@ const styles = StyleSheet.create({
     color: colors.success,
     fontSize: fontSizes.xs,
     fontWeight: "800",
-  },
-  readerStatusTextMuted: {
-    color: colors.textMuted,
   },
   statusArea: {
     alignItems: "center",
@@ -614,31 +562,53 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   nfcAction: {
-    marginTop: spacing.sm,
-    minWidth: 220,
+    marginTop: spacing.xs,
+    minWidth: 240,
   },
-  nfcNotice: {
+  manualModeNotice: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceMuted,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    padding: spacing.md,
+  },
+  manualModeIcon: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  manualModeCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  manualModeTitle: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+  },
+  manualModeText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    lineHeight: 17,
+  },
+  securityNote: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.xs,
+    gap: spacing.sm,
     justifyContent: "center",
-    maxWidth: 320,
     paddingHorizontal: spacing.md,
   },
-  nfcNoticeText: {
+  securityNoteText: {
     color: colors.textMuted,
     flexShrink: 1,
     fontSize: fontSizes.xs,
-    fontWeight: "700",
     lineHeight: 17,
-    textAlign: "center",
-  },
-
-  /* ── Floating pill (absolute) ── */
-  floatingPill: {
-    left: spacing.lg,
-    position: "absolute",
-    right: spacing.lg,
   },
 
   /* ── Result ── */
