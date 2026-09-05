@@ -133,6 +133,7 @@ export default function OperationsPermitsScreen() {
           eyebrow="Operations"
           subtitle="Search, review, and inspect permit records across the workspace."
           title="Permits"
+          tone="brand"
         />
 
         {/* ── Stat Chips ── */}

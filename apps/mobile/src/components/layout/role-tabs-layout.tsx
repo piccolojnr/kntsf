@@ -155,14 +155,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     backgroundColor: colors.surface,
     borderRadius: radius.pill,
-    shadowColor: colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 4,
+    boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
   },
   tabBarLabel: {
     fontSize: fontSizes.xs,

@@ -91,6 +91,7 @@ export default function OperationsProfileScreen() {
           eyebrow="Operations"
           subtitle="Review your workspace identity, access level, and live record counts."
           title="Profile"
+          tone="brand"
         />
         {canViewSummary && summaryQuery.isLoading ? (
           <LoadingState message="Loading workspace profile..." />

@@ -73,6 +73,7 @@ export default function OperationsStudentsScreen() {
           eyebrow="Operations"
           subtitle="Search student records and manage NFC card assignments."
           title="Students"
+          tone="brand"
         />
 
         <SearchField
