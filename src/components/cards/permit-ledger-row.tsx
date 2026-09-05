@@ -95,11 +95,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     overflow: "hidden",
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    boxShadow: "0 3px 10px rgba(15, 23, 42, 0.05)",
   },
   cardPressed: {
     opacity: 0.75,

@@ -31,7 +31,7 @@ export function FloatingTabButton({
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
       android_ripple={null}
-      style={styles.pressable}
+      style={[styles.pressable, isSelected && styles.pressableSelected]}
       onLongPress={onLongPress}
       onPress={onPress}
     >
@@ -62,6 +62,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     justifyContent: "center",
     paddingVertical: spacing.xs,
+  },
+  pressableSelected: {
+    backgroundColor: colors.navySoft,
   },
   label: {
     color: colors.textMuted,

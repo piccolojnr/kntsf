@@ -21,6 +21,7 @@ import { VerificationResultCard } from "@/components/cards/verification-result-c
 import { FloatingScanInput } from "@/components/forms/floating-scan-input";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { RadarPulse } from "@/components/ui/radar-pulse";
 import { Screen } from "@/components/ui/screen";
 import { colors, fontSizes, radius, spacing } from "@/constants/theme";
@@ -220,33 +221,20 @@ export default function OperationsScanScreen() {
   return (
     <Screen>
       <View style={styles.flex}>
-        <Animated.View
-          entering={FadeInDown.duration(350)}
-          style={[styles.brandHeader, isCompact && styles.brandHeaderCompact]}
-        >
-          <View style={styles.brandStripe} />
-          <View style={styles.brandHeaderRow}>
-            <View style={styles.brandEyebrowRow}>
-              <View style={styles.brandDot} />
-              <Text style={styles.brandEyebrow}>Knutsford NFC Operations</Text>
-            </View>
-            <View style={styles.brandBadge}>
-              <Text style={styles.brandBadgeText}>
-                {isCheckingNfc
-                  ? "CHECKING"
-                  : isNfcAvailable
-                    ? "READY"
-                    : "MANUAL"}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.brandTitle}>Verify a permit</Text>
-          <Text style={styles.brandSubtitle}>
-            {isNfcAvailable
+        <PageHeader
+          badgeText={
+            isCheckingNfc ? "CHECKING" : isNfcAvailable ? "READY" : "MANUAL"
+          }
+          eyebrow="Knutsford NFC Operations"
+          subtitle={
+            isNfcAvailable
               ? "Tap a registered student card or enter a student ID."
-              : "Enter a student ID to confirm permit access."}
-          </Text>
-        </Animated.View>
+              : "Enter a student ID to confirm permit access."
+          }
+          style={isCompact ? styles.brandHeaderCompact : undefined}
+          title="Verify a permit"
+          tone="brand"
+        />
 
         {/* ─── Stage ─── */}
         {screenState === "result" && result ? (
@@ -475,78 +463,8 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  brandHeader: {
-    backgroundColor: colors.navy,
-    borderCurve: "continuous",
-    borderRadius: radius.xl,
-    gap: spacing.xs,
-    overflow: "hidden",
-    padding: spacing.lg,
-    paddingTop: 20,
-    boxShadow: "0 12px 28px rgba(16, 42, 76, 0.2)",
-  },
   brandHeaderCompact: {
     padding: spacing.md,
-  },
-  brandStripe: {
-    backgroundColor: colors.gold,
-    height: 4,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  brandHeaderRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  brandEyebrowRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexShrink: 1,
-    gap: spacing.xs,
-  },
-  brandDot: {
-    backgroundColor: colors.gold,
-    borderRadius: radius.pill,
-    height: 7,
-    width: 7,
-  },
-  brandEyebrow: {
-    color: "#efd494",
-    flexShrink: 1,
-    fontSize: fontSizes.xxs,
-    fontWeight: "800",
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-  },
-  brandBadge: {
-    backgroundColor: "rgba(200, 146, 47, 0.16)",
-    borderColor: "rgba(239, 212, 148, 0.5)",
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-  },
-  brandBadgeText: {
-    color: "#f5dda5",
-    fontSize: fontSizes.xxs,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-  },
-  brandTitle: {
-    color: colors.onNavy,
-    fontSize: fontSizes.xl,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-    lineHeight: 34,
-    paddingTop: spacing.xs,
-  },
-  brandSubtitle: {
-    color: "#cbd5e1",
-    fontSize: fontSizes.sm,
-    lineHeight: 21,
   },
 
   verificationContent: {

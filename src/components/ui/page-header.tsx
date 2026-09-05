@@ -10,6 +10,7 @@ type PageHeaderProps = {
   badgeText?: string;
   onBack?: () => void;
   style?: ViewStyle;
+  tone?: "default" | "brand";
 };
 
 export function PageHeader({
@@ -19,9 +20,12 @@ export function PageHeader({
   badgeText,
   onBack,
   style,
+  tone = "default",
 }: PageHeaderProps) {
+  const branded = tone === "brand";
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, branded && styles.brandContainer, style]}>
       {onBack ? (
         <Pressable
           accessibilityLabel="Go back"
@@ -33,21 +37,40 @@ export function PageHeader({
             pressed && styles.backButtonPressed,
           ]}
         >
-          <ChevronLeft color={colors.textMuted} size={18} strokeWidth={2.5} />
-          <Text style={styles.backButtonText}>Back</Text>
+          <ChevronLeft
+            color={branded ? "#cbd5e1" : colors.textMuted}
+            size={18}
+            strokeWidth={2.5}
+          />
+          <Text
+            style={[
+              styles.backButtonText,
+              branded && styles.brandBackButtonText,
+            ]}
+          >
+            Back
+          </Text>
         </Pressable>
       ) : null}
       <View style={styles.headerRow}>
-        <View style={styles.dot} />
-        <Text style={styles.eyebrow}>{eyebrow}</Text>
+        <View style={[styles.dot, branded && styles.brandDot]} />
+        <Text style={[styles.eyebrow, branded && styles.brandEyebrow]}>
+          {eyebrow}
+        </Text>
         {badgeText ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{badgeText}</Text>
+          <View style={[styles.badge, branded && styles.brandBadge]}>
+            <Text style={[styles.badgeText, branded && styles.brandBadgeText]}>
+              {badgeText}
+            </Text>
           </View>
         ) : null}
       </View>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <Text style={[styles.title, branded && styles.brandTitle]}>{title}</Text>
+      {subtitle ? (
+        <Text style={[styles.subtitle, branded && styles.brandSubtitle]}>
+          {subtitle}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -55,6 +78,13 @@ export function PageHeader({
 const styles = StyleSheet.create({
   container: {
     gap: spacing.xs,
+  },
+  brandContainer: {
+    backgroundColor: colors.navy,
+    borderCurve: "continuous",
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    boxShadow: "0 12px 28px rgba(16, 42, 76, 0.18)",
   },
   backButton: {
     alignItems: "center",
@@ -76,6 +106,9 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.xs,
     fontWeight: "800",
   },
+  brandBackButtonText: {
+    color: "#cbd5e1",
+  },
   headerRow: {
     alignItems: "center",
     flexDirection: "row",
@@ -88,12 +121,18 @@ const styles = StyleSheet.create({
     height: 8,
     width: 8,
   },
+  brandDot: {
+    backgroundColor: colors.gold,
+  },
   eyebrow: {
     color: colors.primary,
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 2,
     textTransform: "uppercase",
+  },
+  brandEyebrow: {
+    color: "#efd494",
   },
   badge: {
     backgroundColor: colors.primarySoft,
@@ -102,10 +141,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
   },
+  brandBadge: {
+    backgroundColor: "rgba(200, 146, 47, 0.16)",
+    borderColor: "rgba(239, 212, 148, 0.5)",
+    borderWidth: 1,
+  },
   badgeText: {
     color: colors.primary,
     fontSize: 11,
     fontWeight: "800",
+  },
+  brandBadgeText: {
+    color: "#f5dda5",
   },
   title: {
     color: colors.text,
@@ -114,9 +161,15 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
     lineHeight: 32,
   },
+  brandTitle: {
+    color: colors.onNavy,
+  },
   subtitle: {
     color: colors.textMuted,
     fontSize: fontSizes.sm,
     lineHeight: 22,
+  },
+  brandSubtitle: {
+    color: "#cbd5e1",
   },
 });
