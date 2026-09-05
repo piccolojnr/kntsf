@@ -55,7 +55,11 @@ const STATUS: Record<CardStatus, { label: string; color: string }> = {
 
 // Status → card bg colours (dark, distinct per state)
 const CARD_BG: Record<CardStatus, { bg: string; border: string; glow: string }> = {
-  active: { bg: "#0a1628", border: "#1e3a5f33", glow: "#1f4b9966" },
+  active: {
+    bg: colors.navy,
+    border: `${colors.gold}66`,
+    glow: "rgba(16, 42, 76, 0.24)",
+  },
   inactive: { bg: "#10151f", border: "#33415533", glow: "#33415566" },
   blocked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
   revoked: { bg: "#1a0a0a", border: "#5f1e1e33", glow: "#99241f66" },
@@ -124,7 +128,7 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
           width: cardWidth,
           backgroundColor: bg.bg,
           borderColor: bg.border,
-          shadowColor: bg.glow,
+          boxShadow: `0 12px 30px ${bg.glow}`,
         },
         style,
       ]}
@@ -176,7 +180,11 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
       {/* ── Dashed divider ───────────────────────────────── */}
       <View style={styles.dividerRow}>
         <View
-          style={[styles.notch, styles.notchLeft, { backgroundColor: "#f5f7fb" }]}
+          style={[
+            styles.notch,
+            styles.notchLeft,
+            { backgroundColor: colors.background },
+          ]}
         />
         <View style={styles.dashedLine}>
           {Array.from({ length: 18 }).map((_, i) => (
@@ -190,7 +198,11 @@ export default function StudentIDCard({ student, style }: StudentIDCardProps) {
           ))}
         </View>
         <View
-          style={[styles.notch, styles.notchRight, { backgroundColor: "#f5f7fb" }]}
+          style={[
+            styles.notch,
+            styles.notchRight,
+            { backgroundColor: colors.background },
+          ]}
         />
       </View>
 
@@ -235,10 +247,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 10,
   },
 
   // Top
@@ -253,7 +261,7 @@ const styles = StyleSheet.create({
     paddingRight: spacing.md,
   },
   issuerLabel: {
-    color: "rgba(255,255,255,0.70)",
+    color: "#efd494",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1.5,

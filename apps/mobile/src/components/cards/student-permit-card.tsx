@@ -35,7 +35,7 @@ const STATUS_CONFIG: Record<
   active: {
     label: "ACTIVE",
     fg: "#22c55e",
-    bg: "#052e16",
+    bg: colors.navy,
     gradientTop: "#0f2b1a",
     gradientBot: "#071f12",
     Icon: ShieldCheck,
@@ -128,7 +128,7 @@ export default function StudentPermitCard({
           width: cardWidth,
           backgroundColor: st.bg,
           borderColor: `${st.fg}22`,
-          shadowColor: st.fg,
+          boxShadow: `0 12px 30px ${st.fg}24`,
         },
         style,
       ]}
@@ -201,11 +201,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    // shadow
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 10,
   },
 
   // Top
@@ -220,7 +215,7 @@ const styles = StyleSheet.create({
     paddingRight: spacing.md,
   },
   issuerLabel: {
-    color: "rgba(255,255,255,0.30)",
+    color: "#efd494",
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 2,
