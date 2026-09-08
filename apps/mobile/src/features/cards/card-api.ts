@@ -1,3 +1,5 @@
+import { normalizeStudent } from "@/features/students/student-api";
+import { Student } from "@/features/students/student-types";
 import { apiClient } from "@/lib/api/api-client";
 import { normalizeApiError, toUserFacingError } from "@/lib/api/api-error";
 import { unwrapData, unwrapPaginated } from "@/lib/api/api-response";
@@ -31,13 +33,14 @@ type CardMutationResponse =
     };
 
 export function normalizeCard(dto: StudentCardDto): StudentCard {
+  const student = dto.student ? normalizeStudent(dto.student) : null;
   const uidLast4 = dto.uidLast4 ?? dto.uid_last4;
   const issuedAt = dto.issuedAt ?? dto.issued_at ?? null;
   const activatedAt = dto.activatedAt ?? dto.activated_at ?? null;
 
   return {
     id: String(dto.id),
-    studentId: String(dto.studentId ?? dto.student_id ?? dto.student?.studentId ?? ""),
+    studentId: String(dto.studentId ?? student?.studentId ?? dto.student_id ?? ""),
     uid: uidLast4 ? `.... ${uidLast4}` : "",
     type: dto.type ?? "unknown",
     status: dto.status ?? "inactive",
@@ -47,11 +50,12 @@ export function normalizeCard(dto: StudentCardDto): StudentCard {
       activatedAt ??
       issuedAt ??
       dto.createdAt ??
+      dto.created_at ??
       "",
     issuedAt,
     activatedAt,
     uidLast4,
-    student: dto.student ?? null,
+    student,
   };
 }
 
@@ -186,10 +190,13 @@ export async function getCardsByStudentId(studentId: string) {
     .sort(sortCardsByRegisteredAt);
 }
 
-export async function getCurrentCardByStudentId(studentId: string) {
+export async function getCurrentCardByStudentId(
+  studentId: string,
+  studentRecordId: string,
+) {
   const cards = await getCardsByStudentId(studentId);
   const cardFromList =
-    cards.find((card) => card.status === "active") ?? cards[0] ?? null;
+    cards.find((card) => card.status === "active") ?? null;
 
   if (cardFromList) {
     return cardFromList;
@@ -207,7 +214,7 @@ export async function getCurrentCardByStudentId(studentId: string) {
             nfc_card?: StudentCardDto | null;
           };
         }
-    >(`/api/mobile/operations/students/${encodeURIComponent(studentId)}`);
+    >(`/api/mobile/operations/students/${encodeURIComponent(studentRecordId)}`);
     const studentDetail =
       response.data && "data" in response.data && response.data.data
         ? response.data.data
@@ -217,19 +224,23 @@ export async function getCurrentCardByStudentId(studentId: string) {
           });
     const card = studentDetail?.active_nfc_card ?? studentDetail?.nfc_card ?? null;
 
-    return card ? normalizeCard(card) : null;
-  } catch {
-    return null;
+    return card?.status === "active" ? normalizeCard(card) : null;
+  } catch (error) {
+    if (normalizeApiError(error).status === 404) {
+      return null;
+    }
+
+    throw toUserFacingError(error);
   }
 }
 
-export async function registerCardForStudent(studentId: string, uid: string) {
+export async function registerCardForStudent(studentRecordId: string, uid: string) {
   try {
     const response = await apiClient.post<
       CardMutationResponse | { data: CardMutationResponse } | MobileApiResponse<CardMutationResponse>
     >(
       "/api/mobile/operations/nfc-cards/register",
-      { student_number: studentId, student_id: studentId, uid },
+      { student_id: studentRecordId, uid },
     );
     const data = unwrapData<CardMutationResponse>(response.data);
 
@@ -239,9 +250,13 @@ export async function registerCardForStudent(studentId: string, uid: string) {
   }
 }
 
-export async function replaceCardForStudent(studentId: string, uid: string) {
+export async function replaceCardForStudent(
+  studentId: string,
+  studentRecordId: string,
+  uid: string,
+) {
   try {
-    const currentCard = await getCurrentCardByStudentId(studentId);
+    const currentCard = await getCurrentCardByStudentId(studentId, studentRecordId);
 
     if (!currentCard) {
       throw new Error("No active NFC card was found for replacement.");
@@ -263,7 +278,7 @@ export async function replaceCardForStudent(studentId: string, uid: string) {
 
 export async function assignCardToStudent(input: {
   mode: CardAssignmentMode;
-  studentId: string;
+  student: Pick<Student, "id" | "studentId">;
   uid: string;
 }) {
   const normalizedUid = input.uid.trim().toUpperCase();
@@ -273,8 +288,12 @@ export async function assignCardToStudent(input: {
   }
 
   return input.mode === "register"
-    ? registerCardForStudent(input.studentId, normalizedUid)
-    : replaceCardForStudent(input.studentId, normalizedUid);
+    ? registerCardForStudent(input.student.id, normalizedUid)
+    : replaceCardForStudent(
+        input.student.studentId,
+        input.student.id,
+        normalizedUid,
+      );
 }
 
 export async function revokeCardForStudent(cardId: string) {

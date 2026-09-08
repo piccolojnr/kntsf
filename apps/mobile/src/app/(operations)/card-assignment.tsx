@@ -36,6 +36,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNfcAvailability } from "@/hooks/use-nfc-availability";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useScreenDensity } from "@/hooks/use-screen-density";
+import { queryKeys } from "@/lib/api/query-keys";
 import { readCardUid } from "@/lib/nfc/nfc-service";
 
 type ScreenState = "idle" | "loading" | "result";
@@ -202,11 +203,14 @@ export default function OperationsCardAssignmentScreen() {
       try {
         const nextCard = await assignCardToStudent({
           mode: assignmentMode,
-          studentId: student.studentId,
+          student,
           uid: nextUid.trim(),
         });
 
-        await queryClient.invalidateQueries({ queryKey: ["cards"] });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: queryKeys.operations.all }),
+          queryClient.invalidateQueries({ queryKey: queryKeys.student.all }),
+        ]);
         setAssignedUid(nextCard.uid);
         setAssignmentPhase("success");
         setScreenState("result");
