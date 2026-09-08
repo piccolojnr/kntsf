@@ -37,6 +37,30 @@ test('authorized user can view students index', function () {
             ->where('can.create', true));
 });
 
+test('student directory paginates and preserves supported filters', function () {
+    Student::factory()->count(12)->create([
+        'course' => 'Computer Science',
+        'level' => '300',
+    ]);
+
+    $this->actingAs(userWithRole('admin'))
+        ->get(route('students.index', [
+            'course' => 'Computer Science',
+            'level' => '300',
+            'per_page' => 10,
+        ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('students/index')
+            ->has('students.data', 10)
+            ->where('students.total', 12)
+            ->where('students.current_page', 1)
+            ->where('students.last_page', 2)
+            ->where('filters.course', 'Computer Science')
+            ->where('filters.level', '300')
+            ->where('filters.per_page', 10));
+});
+
 test('unauthorized user cannot view students index', function () {
     $this->actingAs(userWithRole('student'))
         ->get(route('students.index'))

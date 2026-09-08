@@ -36,13 +36,13 @@ export function AppSidebar() {
             variant="inset"
             className="admin-rail border-sidebar-border/70 shadow-[10px_0_30px_rgba(18,13,28,0.1)]"
         >
-            <SidebarHeader className="border-b border-sidebar-border/60 p-3">
+            <SidebarHeader className="border-b border-sidebar-border/60 p-3 group-data-[collapsible=icon]:p-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             size="lg"
                             asChild
-                            className="h-12 rounded-lg px-2.5 text-sidebar-foreground transition duration-200 hover:bg-white/8 data-active:bg-white/8"
+                            className="h-12 rounded-lg px-2.5 text-sidebar-foreground transition duration-200 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-0! hover:bg-white/8 data-active:bg-white/8"
                         >
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />
