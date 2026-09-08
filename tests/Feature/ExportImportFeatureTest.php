@@ -88,6 +88,25 @@ test('student import preview validates bad rows with row numbers', function () {
             ->where('preview.errors.0.row', 2));
 });
 
+test('student import preview normalizes numeric student numbers and level labels', function () {
+    $file = UploadedFile::fake()->createWithContent(
+        'students.csv',
+        implode(PHP_EOL, [
+            'student_number,name,email,phone,course,level',
+            '26100012,Efua Mensah,efua@example.edu,,Computer Science,Level 400',
+        ]),
+    );
+
+    $this->actingAs(exportImportUserWithRole('admin'))
+        ->post(route('students.import.preview'), ['file' => $file])
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('students/import')
+            ->where('preview.summary.valid', 1)
+            ->where('preview.valid.0.student.student_number', '26100012')
+            ->where('preview.valid.0.student.level', '400'));
+});
+
 test('student import commit creates and updates students', function () {
     $existing = Student::factory()->create([
         'student_number' => '26100010',
