@@ -1,2 +1,5 @@
+allowBuilds:
+  msw: false
+  unrs-resolver: true
 publicHoistPattern:
   - '@inertiajs/core'
