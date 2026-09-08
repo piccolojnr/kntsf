@@ -38,6 +38,11 @@ class ApplicationCache
         return Cache::remember($this->key($scope, $key), $seconds, $callback);
     }
 
+    public function flexible(string $scope, string $key, int $freshSeconds, int $staleSeconds, Closure $callback): mixed
+    {
+        return Cache::flexible($this->key($scope, $key), [$freshSeconds, $staleSeconds], $callback);
+    }
+
     public function forget(string $scope, string $key = 'default'): void
     {
         Cache::forget($this->key($scope, $key));

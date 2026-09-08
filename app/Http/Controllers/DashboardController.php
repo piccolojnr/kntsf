@@ -15,6 +15,7 @@ class DashboardController extends Controller
     public function __invoke(Request $request, ActivityFeed $activityFeed, DashboardSummary $dashboardSummary, ExecutiveReport $executiveReport): Response
     {
         $period = ReportPeriod::fromRequest($request);
+        $summary = $dashboardSummary->counts($period);
 
         return Inertia::render('dashboard', [
             'filters' => $period->toArray(),
@@ -22,8 +23,8 @@ class DashboardController extends Controller
                 'years' => $executiveReport->years(),
                 'academic_periods' => $executiveReport->academicPeriods(),
             ],
-            'summary' => $dashboardSummary->counts($period),
-            'reports' => $dashboardSummary->reports($period),
+            'summary' => $summary,
+            'reports' => $dashboardSummary->reports($period, $summary),
             'warnings' => $dashboardSummary->warnings(),
             'contentReadiness' => $dashboardSummary->contentReadiness(),
             'recentActivity' => $activityFeed->items(8),

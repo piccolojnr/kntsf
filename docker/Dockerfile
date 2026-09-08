@@ -95,12 +95,14 @@ RUN install-php-extensions \
     exif \
     gd \
     intl \
+    mbstring \
     opcache \
     pcntl \
     pdo_mysql \
     pdo_pgsql \
     pdo_sqlite \
     redis \
+    xml \
     zip
 
 COPY docker/Caddyfile /etc/caddy/Caddyfile

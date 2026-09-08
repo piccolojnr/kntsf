@@ -18,6 +18,7 @@ class ReportController extends Controller
         Gate::authorize('reports.view');
 
         $period = ReportPeriod::fromRequest($request);
+        $summary = $dashboardSummary->counts($period);
 
         return Inertia::render('reports/index', [
             'filters' => $period->toArray(),
@@ -25,8 +26,8 @@ class ReportController extends Controller
                 'years' => $executiveReport->years(),
                 'academic_periods' => $executiveReport->academicPeriods(),
             ],
-            'reports' => $dashboardSummary->reports($period),
-            'summary' => $dashboardSummary->counts($period),
+            'reports' => $dashboardSummary->reports($period, $summary),
+            'summary' => $summary,
         ]);
     }
 }

@@ -23,9 +23,12 @@ use App\Support\ApplicationCache;
 use App\Support\PlatformSettings;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -46,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureSlowQueryLogging();
 
         if (app()->runningConsoleCommand('wayfinder:generate')) {
             config([
@@ -79,6 +83,30 @@ class AppServiceProvider extends ServiceProvider
                 ->symbols()
                 ->uncompromised()
             : null,
+        );
+    }
+
+    /**
+     * Record database-bound requests that warrant production investigation.
+     */
+    protected function configureSlowQueryLogging(): void
+    {
+        if (! config('app.performance.log_slow_queries')) {
+            return;
+        }
+
+        DB::whenQueryingForLongerThan(
+            config('app.performance.slow_query_threshold_ms'),
+            function (Connection $connection, QueryExecuted $event): void {
+                Log::warning('Database query duration threshold exceeded.', [
+                    'connection' => $connection->getName(),
+                    'database' => $connection->getDatabaseName(),
+                    'total_query_duration_ms' => $connection->totalQueryDuration(),
+                    'trigger_query_duration_ms' => $event->time,
+                    'request_path' => app()->runningInConsole() ? null : request()->path(),
+                    'request_method' => app()->runningInConsole() ? null : request()->method(),
+                ]);
+            },
         );
     }
 

@@ -43,9 +43,11 @@ final class ExecutiveReport
             'active_nfc_cards' => $this->between(NfcCard::query()->where('status', NfcCardStatus::Active), $period)->count(),
             'pending_payments' => $this->between(Payment::query()->where('status', PaymentStatus::Pending), $period)->count(),
             'successful_payments' => $this->between(Payment::query()->where('status', PaymentStatus::Success), $period, 'paid_at')->count(),
-            'verification_attempts_today' => VerificationLog::query()->whereDate('created_at', today())->count(),
+            'verification_attempts_today' => VerificationLog::query()
+                ->whereBetween('created_at', [today()->startOfDay(), today()->endOfDay()])
+                ->count(),
             'failed_verification_attempts_today' => VerificationLog::query()
-                ->whereDate('created_at', today())
+                ->whereBetween('created_at', [today()->startOfDay(), today()->endOfDay()])
                 ->where('result', '!=', VerificationResult::Valid)
                 ->count(),
             'verification_attempts' => $this->between(VerificationLog::query(), $period)->count(),
@@ -55,7 +57,9 @@ final class ExecutiveReport
             )->count(),
             'active_elections' => $this->between(Election::query()->where('status', 'active'), $period, 'starts_at')->count(),
             'pending_candidates' => $this->between(ElectionCandidate::query()->where('status', 'pending'), $period)->count(),
-            'election_votes_today' => ElectionVote::query()->whereDate('cast_at', today())->count(),
+            'election_votes_today' => ElectionVote::query()
+                ->whereBetween('cast_at', [today()->startOfDay(), today()->endOfDay()])
+                ->count(),
             'election_votes' => $this->between(ElectionVote::query(), $period, 'cast_at')->count(),
             'stuck_permit_requests' => $this->stuckPermitRequests($period)->count(),
             'paid_unissued_permit_requests' => $this->paidUnissuedPermitRequests($period)->count(),
@@ -65,9 +69,13 @@ final class ExecutiveReport
     /**
      * @return array<string, array<string, int>>
      */
-    public function reports(ReportPeriod $period): array
+    /**
+     * @param  array<string, int>|null  $counts
+     * @return array<string, array<string, int>>
+     */
+    public function reports(ReportPeriod $period, ?array $counts = null): array
     {
-        $counts = $this->counts($period);
+        $counts ??= $this->counts($period);
 
         return [
             'students' => [

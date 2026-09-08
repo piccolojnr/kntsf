@@ -8,6 +8,7 @@ services:
         environment:
             CACHE_STORE: ${CACHE_STORE:-redis}
             QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            SESSION_DRIVER: ${SESSION_DRIVER:-redis}
             REDIS_HOST: ${REDIS_HOST:-redis}
         ports:
             - '${APP_BIND:-127.0.0.1:8087}:8000'
@@ -38,6 +39,7 @@ services:
         environment:
             CACHE_STORE: ${CACHE_STORE:-redis}
             QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            SESSION_DRIVER: ${SESSION_DRIVER:-redis}
             REDIS_HOST: ${REDIS_HOST:-redis}
         depends_on:
             postgres:
@@ -58,6 +60,7 @@ services:
         environment:
             CACHE_STORE: ${CACHE_STORE:-redis}
             QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+            SESSION_DRIVER: ${SESSION_DRIVER:-redis}
             REDIS_HOST: ${REDIS_HOST:-redis}
         depends_on:
             postgres:
