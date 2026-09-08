@@ -106,7 +106,13 @@ class StudentImportPreviewer
         $row = collect($row);
 
         return collect(self::Columns)
-            ->mapWithKeys(fn (string $column): array => [$column => $this->clean($row->get($column))])
+            ->mapWithKeys(fn (string $column): array => [
+                $column => match ($column) {
+                    'student_number' => $this->normalizeStudentNumber($row->get($column)),
+                    'level' => $this->normalizeLevel($row->get($column)),
+                    default => $this->clean($row->get($column)),
+                },
+            ])
             ->all();
     }
 
@@ -158,5 +164,51 @@ class StudentImportPreviewer
         }
 
         return $value === '' ? null : $value;
+    }
+
+    private function normalizeStudentNumber(mixed $value): ?string
+    {
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if (is_float($value) && is_finite($value) && floor($value) === $value) {
+            return number_format($value, 0, '.', '');
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
+    }
+
+    private function normalizeLevel(mixed $value): ?string
+    {
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if (is_float($value) && is_finite($value) && floor($value) === $value) {
+            return number_format($value, 0, '.', '');
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        if (preg_match('/^(?:level\s*)?(\d+)(?:\s*level)?$/i', $value, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return $value;
     }
 }

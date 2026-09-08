@@ -2,10 +2,15 @@ import { Form, Head, Link } from '@inertiajs/react';
 import {
     CheckCircle2,
     Download,
+    FileSpreadsheet,
     FileUp,
     TriangleAlert,
+    UploadCloud,
     Users,
+    X,
 } from 'lucide-react';
+import {   useRef, useState } from 'react';
+import type {ChangeEvent, DragEvent} from 'react';
 import Heading from '@/components/shared/heading';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +74,36 @@ export default function StudentImportPage({
     preview?: PreviewPayload;
     result?: ImportResult;
 }) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) =>
+        setSelectedFile(event.target.files?.[0] ?? null);
+
+    const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
+        event.preventDefault();
+        setIsDragging(false);
+        const file = event.dataTransfer.files[0];
+
+        if (!file || !fileInputRef.current) {
+            return;
+        }
+
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        fileInputRef.current.files = transfer.files;
+        setSelectedFile(file);
+    };
+
+    const clearFile = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+
+        setSelectedFile(null);
+    };
+
     return (
         <>
             <Head title="Import students" />
@@ -111,38 +146,118 @@ export default function StudentImportPage({
                     <CardHeader className="py-4">
                         <CardTitle>Upload spreadsheet</CardTitle>
                         <CardDescription>
-                            Accepted formats are XLSX, XLS, and CSV.
+                            Drop your completed template below. Every row is
+                            checked before anything is imported.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="border-t border-app-border py-4">
+                    <CardContent className="grid gap-5 border-t border-app-border py-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
                         <Form
                             {...previewRoute.form()}
                             encType="multipart/form-data"
                         >
                             {({ errors, processing }) => (
-                                <div className="flex flex-col gap-3 sm:flex-row">
+                                <div className="grid gap-4">
+                                    <label
+                                        htmlFor="student-import-file"
+                                        onDragEnter={(event) => {
+                                            event.preventDefault();
+                                            setIsDragging(true);
+                                        }}
+                                        onDragOver={(event) =>
+                                            event.preventDefault()
+                                        }
+                                        onDragLeave={() => setIsDragging(false)}
+                                        onDrop={handleDrop}
+                                        className={`flex min-h-64 cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed px-6 py-10 text-center transition-colors focus-within:ring-2 focus-within:ring-ring ${isDragging ? 'border-primary bg-primary/5' : 'border-app-border bg-app-surface-muted hover:border-primary/60 hover:bg-primary/5'}`}
+                                    >
+                                        <span className="flex size-14 items-center justify-center rounded-lg border border-app-border bg-app-surface text-primary shadow-sm">
+                                            {selectedFile ? (
+                                                <FileSpreadsheet className="size-7" />
+                                            ) : (
+                                                <UploadCloud className="size-7" />
+                                            )}
+                                        </span>
+                                        <span className="grid gap-1">
+                                            <strong>
+                                                {selectedFile?.name ??
+                                                    'Drag and drop your spreadsheet here'}
+                                            </strong>
+                                            <span className="text-sm text-app-muted">
+                                                {selectedFile
+                                                    ? `${Math.max(1, Math.round(selectedFile.size / 1024))} KB selected`
+                                                    : 'or click to browse your files'}
+                                            </span>
+                                        </span>
+                                        <span className="text-xs text-app-muted">
+                                            XLSX, XLS, CSV, or TXT. Maximum 5 MB
+                                        </span>
+                                    </label>
                                     <Input
+                                        ref={fileInputRef}
+                                        id="student-import-file"
                                         type="file"
                                         name="file"
                                         accept=".xlsx,.xls,.csv,.txt"
-                                        className="h-11 flex-1 rounded-md border-app-border bg-app-surface"
+                                        onChange={handleFileChange}
+                                        className="sr-only"
                                     />
-                                    <Button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="theme-primary-action h-11"
-                                    >
-                                        <FileUp />
-                                        {processing ? 'Checking...' : 'Preview'}
-                                    </Button>
                                     {errors.file && (
                                         <p className="text-sm font-medium text-destructive">
                                             {errors.file}
                                         </p>
                                     )}
+                                    <div className="flex gap-2 sm:justify-end">
+                                        {selectedFile && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                onClick={clearFile}
+                                            >
+                                                <X /> Remove
+                                            </Button>
+                                        )}
+                                        <Button
+                                            type="submit"
+                                            disabled={
+                                                processing || !selectedFile
+                                            }
+                                            className="theme-primary-action"
+                                        >
+                                            <FileUp />
+                                            {processing
+                                                ? 'Checking rows...'
+                                                : 'Preview spreadsheet'}
+                                        </Button>
+                                    </div>
                                 </div>
                             )}
                         </Form>
+                        <div className="grid content-start gap-4 rounded-lg border border-app-border bg-app-surface-muted p-4">
+                            <div className="grid gap-1">
+                                <p className="font-semibold">
+                                    Prepare your file
+                                </p>
+                                <p className="text-sm text-app-muted">
+                                    Start with the template to keep column names
+                                    consistent.
+                                </p>
+                            </div>
+                            <ol className="grid gap-2 text-sm text-app-muted">
+                                <li>1. Complete the template.</li>
+                                <li>2. Keep one student per row.</li>
+                                <li>3. Preview, review, and confirm.</li>
+                            </ol>
+                            <p className="rounded-md border border-app-border bg-app-surface p-3 text-xs leading-5 text-app-muted">
+                                Student numbers may be text or whole numbers.
+                                Levels accept 100-400 and labels such as "Level
+                                400".
+                            </p>
+                            <Button variant="outline" asChild>
+                                <a href={template.url()}>
+                                    <Download /> Download template
+                                </a>
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 
