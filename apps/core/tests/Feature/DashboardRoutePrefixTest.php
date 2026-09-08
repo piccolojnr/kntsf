@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('dashboard route names resolve under the dashboard prefix', function () {
@@ -42,4 +43,27 @@ test('dashboard not found pages use the dashboard error surface', function () {
 
 test('guests are redirected before the dashboard not found page is rendered', function () {
     $this->get('/dashboard/missing-dashboard-page')->assertRedirect(route('login'));
+});
+
+test('server errors on public routes use the public error surface', function () {
+    Route::middleware('web')->get('/test-public-server-error', fn () => abort(500));
+
+    $this->get('/test-public-server-error')
+        ->assertStatus(500)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('public/error')
+            ->where('status', 500));
+});
+
+test('server errors on dashboard routes use the dashboard error surface', function () {
+    Route::middleware(['web', 'auth'])->get('/dashboard/test-server-error', fn () => abort(500));
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get('/dashboard/test-server-error')
+        ->assertStatus(500)
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('errors/dashboard-error')
+            ->where('status', 500));
 });
