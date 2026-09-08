@@ -20,7 +20,7 @@ use App\Models\VerificationLog;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 
-final class ExecutiveReport
+class ExecutiveReport
 {
     /**
      * @return array<string, int>
