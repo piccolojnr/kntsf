@@ -105,6 +105,49 @@ test('nfc cards list hides uid hash and paginates', function () {
     expect($response->getContent())->not->toContain('sensitive-uid-hash');
 });
 
+test('mobile card registration requires the database student id instead of the student number', function () {
+    $student = Student::factory()->create(['student_number' => '26102859']);
+    $this->withToken(aggregateMobileToken(aggregateMobileUser('admin')));
+
+    $this->postJson('/api/mobile/operations/nfc-cards/register', [
+        'student_id' => $student->student_number,
+        'student_number' => $student->student_number,
+        'uid' => '04:A1:B2:C3:D4',
+    ])->assertUnprocessable()->assertJsonValidationErrors('student_id');
+
+    $this->postJson('/api/mobile/operations/nfc-cards/register', [
+        'student_id' => (string) $student->id,
+        'uid' => '04:A1:B2:C3:D4',
+    ])->assertCreated()
+        ->assertJsonPath('data.status', 'active')
+        ->assertJsonPath('data.student.id', $student->id)
+        ->assertJsonPath('data.student.student_number', $student->student_number);
+
+    expect($student->nfcCards()->count())->toBe(1);
+});
+
+test('mobile card replacement uses the card id returned by student number search', function () {
+    $student = Student::factory()->create(['student_number' => '26102859']);
+    $card = NfcCard::factory()->create([
+        'student_id' => $student->id,
+        'status' => NfcCardStatus::Active,
+    ]);
+    $this->withToken(aggregateMobileToken(aggregateMobileUser('admin')));
+
+    $response = $this->getJson('/api/mobile/operations/nfc-cards?search='.$student->student_number)
+        ->assertOk()
+        ->assertJsonPath('data.0.student.student_number', $student->student_number);
+
+    $this->postJson('/api/mobile/operations/nfc-cards/'.$response->json('data.0.id').'/replace', [
+        'uid' => '04:A1:B2:C3:D5',
+    ])->assertOk()
+        ->assertJsonPath('data.status', 'active')
+        ->assertJsonPath('data.student.id', $student->id);
+
+    expect($card->refresh()->status)->toBe(NfcCardStatus::Replaced)
+        ->and($student->nfcCards()->where('status', NfcCardStatus::Active)->count())->toBe(1);
+});
+
 test('permits list hides code hash and filters by status academic period and search', function () {
     $period = AcademicPeriod::factory()->create();
     $student = Student::factory()->create([
