@@ -29,7 +29,7 @@ class DashboardSummary
     {
         $period ??= ReportPeriod::all();
 
-        return $this->cache->remember(ApplicationCache::DashboardCounts, $period->cacheKey(), 60, fn (): array => $this->uncachedCounts($period));
+        return $this->cache->flexible(ApplicationCache::DashboardCounts, $period->cacheKey(), 60, 300, fn (): array => $this->uncachedCounts($period));
     }
 
     /**
@@ -45,7 +45,7 @@ class DashboardSummary
      */
     public function warnings(): array
     {
-        return $this->cache->remember(ApplicationCache::DashboardWarnings, 'default', 60, fn (): array => $this->uncachedWarnings());
+        return $this->cache->flexible(ApplicationCache::DashboardWarnings, 'default', 60, 300, fn (): array => $this->uncachedWarnings());
     }
 
     /**
@@ -136,7 +136,7 @@ class DashboardSummary
      */
     public function contentReadiness(): array
     {
-        return $this->cache->remember(ApplicationCache::DashboardContentReadiness, 'default', 120, fn (): array => $this->uncachedContentReadiness());
+        return $this->cache->flexible(ApplicationCache::DashboardContentReadiness, 'default', 120, 300, fn (): array => $this->uncachedContentReadiness());
     }
 
     /**
@@ -183,18 +183,32 @@ class DashboardSummary
     /**
      * @return array<string, array<string, int>>
      */
-    public function reports(?ReportPeriod $period = null): array
+    /**
+     * @param  array<string, int>|null  $counts
+     * @return array<string, array<string, int>>
+     */
+    public function reports(?ReportPeriod $period = null, ?array $counts = null): array
     {
         $period ??= ReportPeriod::all();
 
-        return $this->cache->remember(ApplicationCache::DashboardReports, $period->cacheKey(), 60, fn (): array => $this->uncachedReports($period));
+        return $this->cache->flexible(
+            ApplicationCache::DashboardReports,
+            $period->cacheKey(),
+            60,
+            300,
+            fn (): array => $this->uncachedReports($period, $counts),
+        );
     }
 
     /**
      * @return array<string, array<string, int>>
      */
-    private function uncachedReports(ReportPeriod $period): array
+    /**
+     * @param  array<string, int>|null  $counts
+     * @return array<string, array<string, int>>
+     */
+    private function uncachedReports(ReportPeriod $period, ?array $counts = null): array
     {
-        return $this->executiveReport->reports($period);
+        return $this->executiveReport->reports($period, $counts);
     }
 }

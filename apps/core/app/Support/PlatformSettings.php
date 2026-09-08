@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Models\PlatformSetting;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class PlatformSettings
@@ -51,10 +50,6 @@ class PlatformSettings
     public function applyToConfig(): void
     {
         try {
-            if (! Schema::hasTable('platform_settings')) {
-                return;
-            }
-
             $settings = $this->all();
         } catch (Throwable $exception) {
             Log::debug('Platform settings could not be loaded.', [
@@ -131,10 +126,6 @@ class PlatformSettings
     private function stored(): array
     {
         try {
-            if (! Schema::hasTable('platform_settings')) {
-                return [];
-            }
-
             $stored = PlatformSetting::query()
                 ->where('key', self::SettingKey)
                 ->first()

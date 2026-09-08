@@ -41,6 +41,11 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'performance' => [
+        'log_slow_queries' => (bool) env('PERFORMANCE_LOG_SLOW_QUERIES', false),
+        'slow_query_threshold_ms' => (int) env('SLOW_QUERY_THRESHOLD_MS', 500),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application URL
