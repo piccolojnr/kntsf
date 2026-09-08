@@ -46,7 +46,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        app(PlatformSettings::class)->applyToConfig();
+
+        if (app()->runningConsoleCommand('wayfinder:generate')) {
+            config([
+                'database.default' => 'sqlite',
+                'database.connections.sqlite.database' => ':memory:',
+            ]);
+        } else {
+            app(PlatformSettings::class)->applyToConfig();
+        }
+
         $this->configureRateLimiting();
         $this->configureCacheInvalidation();
     }
