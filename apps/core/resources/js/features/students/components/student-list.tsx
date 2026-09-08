@@ -213,7 +213,8 @@ function Pagination({ students }: { students: Paginated<Student> }) {
         <div className="flex flex-col gap-3 text-sm text-app-muted sm:flex-row sm:items-center sm:justify-between">
             <span>
                 Showing {students.from ?? 0} to {students.to ?? 0} of{' '}
-                {students.total}
+                {students.total} students · Page {students.current_page} of{' '}
+                {students.last_page}
             </span>
             <div className="flex flex-wrap gap-2">
                 {students.links.map((link) => (

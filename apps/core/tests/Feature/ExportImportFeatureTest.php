@@ -57,6 +57,38 @@ test('student table csv export respects search filters', function () {
     });
 });
 
+test('student table export respects course and level filters', function () {
+    now()->setTestNow('2026-09-08 12:00:00');
+
+    Student::factory()->create([
+        'course' => 'Computer Science',
+        'level' => '300',
+    ]);
+    Student::factory()->create([
+        'course' => 'Accounting',
+        'level' => '200',
+    ]);
+
+    Excel::fake();
+
+    $this->actingAs(exportImportUserWithRole('admin'))
+        ->get(route('admin-exports.show', [
+            'resource' => 'students',
+            'format' => 'csv',
+            'course' => 'Computer Science',
+            'level' => '300',
+        ]))
+        ->assertOk();
+
+    Excel::assertDownloaded('students-20260908-120000.csv', function (AdminTableExport $export): bool {
+        $rows = $export->collection();
+
+        return $rows->count() === 1
+            && $rows->first()[4] === 'Computer Science'
+            && $rows->first()[5] === '300';
+    });
+});
+
 test('restricted users cannot export admin tables', function () {
     $this->actingAs(exportImportUserWithRole('student'))
         ->get(route('admin-exports.show', ['resource' => 'students', 'format' => 'csv']))

@@ -3,6 +3,7 @@ import {
     FileUp,
     GraduationCap,
     Plus,
+    RotateCcw,
     Search,
     ShieldCheck,
     UserRoundPlus,
@@ -22,6 +23,13 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { StudentFormDialog } from '@/features/students/components/student-form-dialog';
 import { StudentList } from '@/features/students/components/student-list';
 import type {
@@ -40,23 +48,39 @@ export default function StudentsIndex({
     can,
 }: {
     students: Paginated<Student>;
-    filters: { search: string };
+    filters: {
+        search: string;
+        course: string;
+        level: string;
+        per_page: number;
+    };
     options: StudentFormOptions;
     can: StudentIndexPermissions;
 }) {
     const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
 
-    function submitSearch(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+    function applyFilters(overrides: Partial<typeof filters>) {
+        const nextFilters = { ...filters, ...overrides };
 
         router.get(
             index.url(),
-            { search: searchTerm || undefined },
             {
-                preserveState: true,
-                preserveScroll: true,
+                search: nextFilters.search || undefined,
+                course: nextFilters.course || undefined,
+                level: nextFilters.level || undefined,
+                per_page:
+                    nextFilters.per_page === 10
+                        ? undefined
+                        : nextFilters.per_page,
             },
+            { preserveState: true, preserveScroll: true, replace: true },
         );
+    }
+
+    function submitSearch(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        applyFilters({ search: searchTerm });
     }
 
     return (
@@ -130,28 +154,127 @@ export default function StudentsIndex({
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4 border-t border-app-border py-4">
-                        <form
-                            onSubmit={submitSearch}
-                            className="flex flex-col gap-2 lg:flex-row"
-                        >
-                            <div className="relative flex-1">
-                                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    value={searchTerm}
-                                    onChange={(event) =>
-                                        setSearchTerm(event.target.value)
-                                    }
-                                    className="rounded-md border-app-border bg-app-surface pl-9"
-                                    placeholder="Search students"
+                        <form onSubmit={submitSearch} className="grid gap-3">
+                            <div className="flex flex-col gap-2 lg:flex-row">
+                                <div className="relative flex-1">
+                                    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        value={searchTerm}
+                                        onChange={(event) =>
+                                            setSearchTerm(event.target.value)
+                                        }
+                                        className="rounded-md border-app-border bg-app-surface pl-9"
+                                        placeholder="Search students"
+                                    />
+                                </div>
+                                <Button type="submit" variant="secondary">
+                                    Search
+                                </Button>
+                                <ExportMenu
+                                    resource="students"
+                                    filters={{
+                                        search: filters.search,
+                                        course: filters.course,
+                                        level: filters.level,
+                                    }}
                                 />
                             </div>
-                            <Button type="submit" variant="secondary">
-                                Search
-                            </Button>
-                            <ExportMenu
-                                resource="students"
-                                filters={{ search: filters.search }}
-                            />
+                            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                                <Select
+                                    value={filters.course || 'all'}
+                                    onValueChange={(value) =>
+                                        applyFilters({
+                                            course:
+                                                value === 'all' ? '' : value,
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger className="w-full sm:w-56">
+                                        <SelectValue placeholder="All courses" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All courses
+                                        </SelectItem>
+                                        {options.courses.map((course) => (
+                                            <SelectItem
+                                                key={course.value}
+                                                value={course.value}
+                                            >
+                                                {course.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select
+                                    value={filters.level || 'all'}
+                                    onValueChange={(value) =>
+                                        applyFilters({
+                                            level: value === 'all' ? '' : value,
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger className="w-full sm:w-44">
+                                        <SelectValue placeholder="All levels" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All levels
+                                        </SelectItem>
+                                        {options.levels.map((level) => (
+                                            <SelectItem
+                                                key={level.value}
+                                                value={level.value}
+                                            >
+                                                Level {level.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select
+                                    value={String(filters.per_page)}
+                                    onValueChange={(value) =>
+                                        applyFilters({
+                                            per_page: Number(value),
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger className="w-full sm:ml-auto sm:w-36">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[10, 25, 50].map((size) => (
+                                            <SelectItem
+                                                key={size}
+                                                value={String(size)}
+                                            >
+                                                {size} per page
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {(filters.search ||
+                                    filters.course ||
+                                    filters.level ||
+                                    filters.per_page !== 10) && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            setSearchTerm('');
+                                            applyFilters({
+                                                search: '',
+                                                course: '',
+                                                level: '',
+                                                per_page: 10,
+                                            });
+                                        }}
+                                    >
+                                        <RotateCcw />
+                                        Clear filters
+                                    </Button>
+                                )}
+                            </div>
                         </form>
 
                         <StudentList

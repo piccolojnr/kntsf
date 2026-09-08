@@ -69,6 +69,8 @@ class AdminTableExportRegistry
                             ->orWhere('email', 'like', "%{$search}%")
                             ->orWhere('course', 'like', "%{$search}%");
                     }))
+                    ->when($request->string('course')->trim()->isNotEmpty(), fn (Builder $query) => $query->where('course', $request->string('course')->trim()->toString()))
+                    ->when($request->string('level')->trim()->isNotEmpty(), fn (Builder $query) => $query->where('level', $request->string('level')->trim()->toString()))
                     ->latest()
                     ->get()
                     ->map(fn (Student $student): array => [

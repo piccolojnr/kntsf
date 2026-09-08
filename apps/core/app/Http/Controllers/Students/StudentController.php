@@ -25,6 +25,13 @@ class StudentController extends Controller
         Gate::authorize('viewAny', Student::class);
 
         $search = $request->string('search')->trim()->toString();
+        $course = $request->string('course')->trim()->toString();
+        $level = $request->string('level')->trim()->toString();
+        $perPage = $request->integer('per_page');
+
+        $course = in_array($course, $this->studentOptions->courseValues(), true) ? $course : '';
+        $level = in_array($level, $this->studentOptions->levelValues(), true) ? $level : '';
+        $perPage = in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
 
         $students = Student::query()
             ->select(['id', 'user_id', 'student_number', 'name', 'email', 'phone', 'course', 'level', 'created_at'])
@@ -37,8 +44,10 @@ class StudentController extends Controller
                         ->orWhere('course', 'like', "%{$search}%");
                 });
             })
+            ->when($course !== '', fn (Builder $query) => $query->where('course', $course))
+            ->when($level !== '', fn (Builder $query) => $query->where('level', $level))
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString()
             ->through(fn (Student $student): array => $this->studentPayload($student));
 
@@ -46,6 +55,9 @@ class StudentController extends Controller
             'students' => $students,
             'filters' => [
                 'search' => $search,
+                'course' => $course,
+                'level' => $level,
+                'per_page' => $perPage,
             ],
             'options' => $this->studentOptions->forFrontend(),
             'can' => [
