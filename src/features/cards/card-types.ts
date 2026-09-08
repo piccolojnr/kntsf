@@ -1,4 +1,4 @@
-import { Student } from "@/features/students/student-types";
+import { Student, StudentDto } from "@/features/students/student-types";
 
 export type CardType = "mifare_classic" | "ntag216" | "unknown";
 
@@ -25,9 +25,10 @@ export type StudentCard = {
   student?: Student | null;
 };
 
-export type StudentCardDto = Partial<StudentCard> & {
+export type StudentCardDto = Omit<Partial<StudentCard>, "id" | "student"> & {
   id: string | number;
-  student_id?: string;
+  student_id?: string | number;
+  created_at?: string;
   registered_at?: string;
   issued_at?: string | null;
   activated_at?: string | null;
@@ -40,5 +41,5 @@ export type StudentCardDto = Partial<StudentCard> & {
   uidLast4?: string;
   uid_last4?: string;
   status?: CardStatus;
-  student?: Student | null;
+  student?: StudentDto | null;
 };
