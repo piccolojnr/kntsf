@@ -55,6 +55,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
+            $isDashboardRequest = $request->is('dashboard', 'dashboard/*');
+
+            if ($isDashboardRequest) {
+                return Inertia::render('errors/dashboard-error', [
+                    'status' => $status,
+                ])
+                    ->toResponse($request)
+                    ->setStatusCode($status);
+            }
+
             if ($status === 404) {
                 return Inertia::render('public/not-found', [
                     'status' => $status,
@@ -63,7 +73,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->setStatusCode($status);
             }
 
-            return Inertia::render('error', [
+            return Inertia::render('public/error', [
                 'status' => $status,
             ])
                 ->toResponse($request)

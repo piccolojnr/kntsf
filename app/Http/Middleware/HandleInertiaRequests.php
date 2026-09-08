@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Support\ContentSettings;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Throwable;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -66,7 +67,13 @@ class HandleInertiaRequests extends Middleware
      */
     private function publicContent(): array
     {
-        $settings = app(ContentSettings::class)->all();
+        $contentSettings = app(ContentSettings::class);
+
+        try {
+            $settings = $contentSettings->all();
+        } catch (Throwable) {
+            $settings = $contentSettings->defaults();
+        }
 
         return [
             'news' => $settings['allow_public_news'],
