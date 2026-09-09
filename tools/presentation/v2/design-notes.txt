@@ -1,0 +1,18 @@
+Direction: dark modern technology presentation.
+
+Visual system:
+- Deep navy canvas with bright violet, cyan, and emerald signals.
+- Alternating light slides for pacing and contrast.
+- Large typographic statements and flat compositions instead of repeated card grids.
+- Screenshots treated as hero evidence, not small illustrations.
+- Minimal top labels and restrained slide numbering.
+- Aptos Display / Aptos for reliable PowerPoint rendering.
+
+Content contract:
+- Preserve the approved 13-slide narrative, factual boundaries, speaker ownership, example talk tracks, and internal presenter notes.
+- Keep the pilot limitation visible.
+- Label 337 tests as post-submission validation.
+- Describe the recorded verification as the student-number fallback, not an NFC scan.
+
+Communication job:
+By the end, the school panel should understand and trust that the team built one connected system, because the presentation clearly links the problem, implementation, evidence, limitations, and demonstration.

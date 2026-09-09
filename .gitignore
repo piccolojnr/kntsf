@@ -1,0 +1,16 @@
+# Local workspace state
+/.agents/
+/.codex/
+/.pnpm-store/
+/.tmp/
+/tmp/
+
+# Legacy source checkouts retained until the migration is verified
+/kntsf-core/
+/kntsf-app/
+
+# Generated or large presentation assets; add through Git LFS if they need versioning
+/docs/demo/archive/
+/docs/demo/videos/
+/docs/defense/exports/
+/docs/presentation/previews/

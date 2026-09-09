@@ -1,0 +1,285 @@
+{"kind":"deck","id":"pr/wzru7h","name":"Deck"}
+{"kind":"layout","layoutId":"e33338fb-f41c-4073-81d6-3f37681d94d9","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"876af16c-1bfc-4e21-9dbd-20057ba039dc","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/kpw03c","slide":1,"title":"FINAL YEAR PROJECT","textShapes":6}
+{"kind":"shape","id":"sh/kr6pwjeh","slide":1,"bbox":[0,0,24,720]}
+{"kind":"textbox","id":"sh/jqxonedc","slide":1,"text":"FINAL YEAR PROJECT","textPreview":"FINAL YEAR PROJECT","textChars":18,"textLines":1,"bbox":[58,46,430,24]}
+{"kind":"textbox","id":"sh/yp47u9wr","slide":1,"text":"NFC-Based Student Permit Verification and Governance Management System","textPreview":"NFC-Based Student Permit Verification and Governance Management System","textChars":70,"textLines":1,"bbox":[58,108,560,250]}
+{"kind":"textbox","id":"sh/xov6lov6","slide":1,"text":"One connected platform for permits, verified payments, SRC operations, and student verification.","textPreview":"One connected platform for permits, verified payments, SRC operations, and student verification.","textChars":96,"textLines":1,"bbox":[58,384,545,96]}
+{"kind":"textbox","id":"sh/wnmpsjel","slide":1,"text":"Daud Abdul-Rahim  •  Kwuatsenu Divine  •  M'Bangot-Menard Naeem Latif Dieudonne","textPreview":"Daud Abdul-Rahim  •  Kwuatsenu Divine  •  M'Bangot-Menard Naeem Latif Dieudonne","textChars":79,"textLines":1,"bbox":[58,538,570,58]}
+{"kind":"textbox","id":"sh/bmdojed0","slide":1,"text":"Supervisor: Mr. Bryan Laryea","textPreview":"Supervisor: Mr. Bryan Laryea","textChars":28,"textLines":1,"bbox":[58,612,420,24]}
+{"kind":"shape","id":"sh/hkzqx8va","slide":1,"bbox":[692,66,118,118]}
+{"kind":"textbox","id":"sh/ap832tkj","slide":1,"text":"Faster services • stronger accountability • safer verification","textPreview":"Faster services • stronger accountability • safer verification","textChars":62,"textLines":1,"bbox":[690,594,514,38]}
+{"kind":"image","id":"im/n61wvat8","slide":1,"name":"","geometry":"roundRect","alt":"Knutsford University campus","bbox":[670,42,560,610]}
+{"kind":"image","id":"im/t4nytobi","slide":1,"name":"","alt":"Knutsford University mark","bbox":[702,76,98,98]}
+{"kind":"notes","id":"nt/kpw03c","slide":1,"text":"Speaker: Divine\nMain point: Introduce the project as one connected platform and preview the proof points.\n\nExample wording — adapt; do not read verbatim:\nGood morning. Our project is an NFC-based student permit verification and governance management system for Knutsford University. We developed it to connect permit requests, verified payments, SRC activities, and student verification in one platform. We will explain the problem, show how the system works, present our evidence, and demonstrate the connected workflow.\n\nInternal presenter note — do not say aloud:\nKeep the opening under 25 seconds. Do not list every feature. Move directly into the problem.\n\n[Sources]\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx\n- kntsf-core/public/images/campus-hero.jpg\n- kntsf-core/public/images/kntsf-logo.png"}
+{"kind":"slide","id":"sl/ejcnlw","slide":2,"title":"THE PROBLEM","textShapes":15}
+{"kind":"textbox","id":"sh/radcnetk","slide":2,"text":"THE PROBLEM","textPreview":"THE PROBLEM","textChars":11,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/sb6dgju5","slide":2,"text":"Disconnected processes created delays and weak accountability","textPreview":"Disconnected processes created delays and weak accountability","textChars":61,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/tcfupoba","slide":2,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/il4ba9cn","slide":2,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/jmdcjed8","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/4nmtcjut","slide":2,"text":"The challenge was not just a paper form. It was the missing connection between each decision.","textPreview":"The challenge was not just a paper form. It was the missing connection between each decision.","textChars":93,"textLines":1,"bbox":[48,150,560,72]}
+{"kind":"textbox","id":"sh/5ovul4ve","slide":2,"text":"Students could wait while eligibility and payment were confirmed.\nAdministrators had to coordinate records across separate activities.\nVerification staff needed a current, auditable permit decision.","textPreview":"Students could wait while eligibility and payment were confirmed. | Administrators had to coordinate records across separate activities. ...","textChars":198,"textLines":3,"bbox":[48,262,560,270]}
+{"kind":"textbox","id":"sh/uhkb6pcr","slide":2,"text":"A fragmented journey","textPreview":"A fragmented journey","textChars":20,"textLines":1,"bbox":[700,154,430,34]}
+{"kind":"shape","id":"sh/vitcfudc","slide":2,"bbox":[704,214,398,66]}
+{"kind":"textbox","id":"sh/jutobah4","slide":2,"text":"01  Request","textPreview":"01  Request","textChars":11,"textLines":1,"bbox":[728,231,320,32]}
+{"kind":"shape","id":"sh/itkn25gj","slide":2,"bbox":[903,280,0,28]}
+{"kind":"textbox","id":"sh/5wb6dkza","slide":2,"text":"break","textPreview":"break","textChars":5,"textLines":1,"bbox":[916,284,58,20]}
+{"kind":"shape","id":"sh/kv254fyp","slide":2,"bbox":[704,308,398,66]}
+{"kind":"textbox","id":"sh/7ytofah0","slide":2,"text":"02  Payment","textPreview":"02  Payment","textChars":11,"textLines":1,"bbox":[728,325,320,32]}
+{"kind":"shape","id":"sh/6xkn65gf","slide":2,"bbox":[903,374,0,28]}
+{"kind":"textbox","id":"sh/t0v6hkz6","slide":2,"text":"break","textPreview":"break","textChars":5,"textLines":1,"bbox":[916,378,58,20]}
+{"kind":"shape","id":"sh/szm58fyl","slide":2,"bbox":[704,402,398,66]}
+{"kind":"textbox","id":"sh/n2943qhw","slide":2,"text":"03  Approval","textPreview":"03  Approval","textChars":12,"textLines":1,"bbox":[728,419,320,32]}
+{"kind":"shape","id":"sh/m10nulgb","slide":2,"bbox":[903,468,0,28]}
+{"kind":"textbox","id":"sh/qhorit0z","slide":2,"text":"break","textPreview":"break","textChars":5,"textLines":1,"bbox":[916,472,58,20]}
+{"kind":"shape","id":"sh/rih8by1k","slide":2,"bbox":[704,496,398,66]}
+{"kind":"textbox","id":"sh/cjq9k3i5","slide":2,"text":"04  Verification","textPreview":"04  Verification","textChars":16,"textLines":1,"bbox":[728,513,320,32]}
+{"kind":"shape","id":"sh/dkzqd8zq","slide":2,"bbox":[700,604,434,42]}
+{"kind":"textbox","id":"sh/2tore90n","slide":2,"text":"Result: slower service and limited audit visibility","textPreview":"Result: slower service and limited audit visibility","textChars":51,"textLines":1,"bbox":[718,615,398,22]}
+{"kind":"notes","id":"nt/ejcnlw","slide":2,"text":"Speaker: Divine\nMain point: Explain that the real problem was the disconnected end-to-end workflow.\n\nExample wording — adapt; do not read verbatim:\nPreviously, the permit process involved several separate activities. A request could be submitted, but eligibility, payment confirmation, permit issuance, and later verification still had to be coordinated. When those records are disconnected, students may wait longer and administrators have less visibility. We therefore focused on connecting the complete workflow.\n\nInternal presenter note — do not say aloud:\nAvoid saying every old activity completely failed or was entirely manual. Transition by saying the solution was designed around the full journey.\n\n[Sources]\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/aog0ez","slide":3,"title":"THE SOLUTION","textShapes":13}
+{"kind":"textbox","id":"sh/mp0v25or","slide":3,"text":"THE SOLUTION","textPreview":"THE SOLUTION","textChars":12,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/9crex07i","slide":3,"text":"One backend connects the website, mobile app, and verification decisions","textPreview":"One backend connects the website, mobile app, and verification decisions","textChars":72,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/obid4f6x","slide":3,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/betwzapo","slide":3,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/ad0v65o3","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/xgbe1k7e","slide":3,"text":"Different interfaces. One controlled source of truth.","textPreview":"Different interfaces. One controlled source of truth.","textChars":53,"textLines":1,"bbox":[48,150,600,42]}
+{"kind":"shape","id":"sh/wf2x8f6t","slide":3,"bbox":[408,246,88,108]}
+{"kind":"shape","id":"sh/jitw3upk","slide":3,"bbox":[784,246,88,108]}
+{"kind":"shape","id":"sh/yhkfapoz","slide":3,"bbox":[640,354,0,188]}
+{"kind":"shape","id":"sh/ovm1of2p","slide":3,"bbox":[496,278,288,152]}
+{"kind":"textbox","id":"sh/9wv2xkja","slide":3,"text":"SHARED BACKEND","textPreview":"SHARED BACKEND","textChars":14,"textLines":1,"bbox":[528,307,224,28]}
+{"kind":"textbox","id":"sh/mt4jm5kj","slide":3,"text":"Laravel rules + one database","textPreview":"Laravel rules + one database","textChars":28,"textLines":1,"bbox":[528,348,224,52]}
+{"kind":"shape","id":"sh/nudkva14","slide":3,"bbox":[88,176,320,126]}
+{"kind":"textbox","id":"sh/wjmlsf21","slide":3,"text":"Website","textPreview":"Website","textChars":7,"textLines":1,"bbox":[112,196,272,30]}
+{"kind":"textbox","id":"sh/xkv21kjm","slide":3,"text":"Public information and administrative operations","textPreview":"Public information and administrative operations","textChars":48,"textLines":1,"bbox":[112,236,272,48]}
+{"kind":"shape","id":"sh/ax43q5kv","slide":3,"bbox":[872,176,320,126]}
+{"kind":"textbox","id":"sh/bydkza1g","slide":3,"text":"Mobile app","textPreview":"Mobile app","textChars":10,"textLines":1,"bbox":[896,196,272,30]}
+{"kind":"textbox","id":"sh/kn6lwz2x","slide":3,"text":"Student services and authorized staff verification","textPreview":"Student services and authorized staff verification","textChars":50,"textLines":1,"bbox":[896,236,272,48]}
+{"kind":"shape","id":"sh/lof254ji","slide":3,"bbox":[482,510,316,126]}
+{"kind":"textbox","id":"sh/t4b29kbm","slide":3,"text":"Current decision","textPreview":"Current decision","textChars":16,"textLines":1,"bbox":[506,530,268,30]}
+{"kind":"textbox","id":"sh/s321gfa1","slide":3,"text":"The same permit, payment, role, and audit state everywhere","textPreview":"The same permit, payment, role, and audit state everywhere","textChars":58,"textLines":1,"bbox":[506,570,268,48]}
+{"kind":"notes","id":"nt/aog0ez","slide":3,"text":"Speaker: Divine\nMain point: Show that the website and mobile application are channels into the same controlled system.\n\nExample wording — adapt; do not read verbatim:\nOur solution has a website and a mobile application, but they are not separate systems. They use the same backend rules and the same source of data. The website supports public information and administrative work, while the mobile application supports students and authorized verification staff. A permit should therefore not appear valid in one channel and invalid in another.\n\nInternal presenter note — do not say aloud:\nAfter the shared-backend point, hand over to Daud for the architecture.\n\n[Sources]\n- SYSTEM_ARCHITECTURE.md\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/2tq1ut","slide":4,"title":"ARCHITECTURE","textShapes":18}
+{"kind":"textbox","id":"sh/pw3m9kbq","slide":4,"text":"ARCHITECTURE","textPreview":"ARCHITECTURE","textChars":12,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/2tcny5sz","slide":4,"text":"Laravel enforces the business rules for every channel","textPreview":"Laravel enforces the business rules for every channel","textChars":53,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/3ul47atk","slide":4,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/cze54fa1","slide":4,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/d0n6dkbm","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/qxcn2psb","slide":4,"text":"Web and mobile remain independent interfaces, while permissions, payments, permits, and verification stay centralized.","textPreview":"Web and mobile remain independent interfaces, while permissions, payments, permits, and verification stay centralized.","textChars":118,"textLines":1,"bbox":[48,148,1140,54]}
+{"kind":"shape","id":"sh/ry5obutw","slide":4,"bbox":[330,298,160,0]}
+{"kind":"shape","id":"sh/0ne58zad","slide":4,"bbox":[330,478,80,0]}
+{"kind":"shape","id":"sh/1on6h4by","slide":4,"bbox":[410,298,0,180]}
+{"kind":"shape","id":"sh/hozylwfe","slide":4,"bbox":[410,298,80,0]}
+{"kind":"shape","id":"sh/wnqxcret","slide":4,"bbox":[780,298,146,0]}
+{"kind":"shape","id":"sh/vmhgj6x8","slide":4,"bbox":[640,386,0,120]}
+{"kind":"shape","id":"sh/ul8fa1wn","slide":4,"bbox":[640,386,330,120]}
+{"kind":"shape","id":"sh/5sjypgfa","slide":4,"bbox":[60,236,270,124]}
+{"kind":"textbox","id":"sh/4rahgbep","slide":4,"text":"Website","textPreview":"Website","textChars":7,"textLines":1,"bbox":[80,254,230,30]}
+{"kind":"textbox","id":"sh/jq1gn6x4","slide":4,"text":"Inertia • React • TypeScript","textPreview":"Inertia • React • TypeScript","textChars":28,"textLines":1,"bbox":[80,294,230,52]}
+{"kind":"shape","id":"sh/ip8ze1wj","slide":4,"bbox":[60,416,270,124]}
+{"kind":"textbox","id":"sh/lwfydcf6","slide":4,"text":"Mobile app","textPreview":"Mobile app","textChars":10,"textLines":1,"bbox":[80,434,230,30]}
+{"kind":"textbox","id":"sh/kv6x47yl","slide":4,"text":"Expo React Native","textPreview":"Expo React Native","textChars":17,"textLines":1,"bbox":[80,474,230,52]}
+{"kind":"shape","id":"sh/czah0r6h","slide":4,"bbox":[490,226,290,160]}
+{"kind":"textbox","id":"sh/d0jytcn2","slide":4,"text":"Laravel 13","textPreview":"Laravel 13","textChars":10,"textLines":1,"bbox":[510,244,250,30]}
+{"kind":"textbox","id":"sh/qxsfyhob","slide":4,"text":"Application + API\nSanctum authentication","textPreview":"Application + API | Sanctum authentication","textChars":40,"textLines":2,"bbox":[510,284,250,88]}
+{"kind":"shape","id":"sh/by1grm5w","slide":4,"bbox":[926,236,280,124]}
+{"kind":"textbox","id":"sh/03ah4r6d","slide":4,"text":"PostgreSQL","textPreview":"PostgreSQL","textChars":10,"textLines":1,"bbox":[946,254,240,30]}
+{"kind":"textbox","id":"sh/l43yxwny","slide":4,"text":"Production data store","textPreview":"Production data store","textChars":21,"textLines":1,"bbox":[946,294,240,52]}
+{"kind":"shape","id":"sh/y1sz2ho7","slide":4,"bbox":[492,506,296,112]}
+{"kind":"textbox","id":"sh/z21gvm5s","slide":4,"text":"Paystack","textPreview":"Paystack","textChars":8,"textLines":1,"bbox":[512,524,256,30]}
+{"kind":"textbox","id":"sh/87uh8b6p","slide":4,"text":"Server-side payment verification","textPreview":"Server-side payment verification","textChars":32,"textLines":1,"bbox":[512,564,256,40]}
+{"kind":"shape","id":"sh/9s3y1wnu","slide":4,"bbox":[866,506,340,112]}
+{"kind":"textbox","id":"sh/jm5krapc","slide":4,"text":"NFC + staff device","textPreview":"NFC + staff device","textChars":18,"textLines":1,"bbox":[886,524,300,30]}
+{"kind":"textbox","id":"sh/i1wjy58r","slide":4,"text":"Identifier initiates an authenticated lookup","textPreview":"Identifier initiates an authenticated lookup","textChars":44,"textLines":1,"bbox":[886,564,300,40]}
+{"kind":"shape","id":"sh/5o72t072","slide":4,"bbox":[390,420,500,58]}
+{"kind":"textbox","id":"sh/kny10vqx","slide":4,"text":"Central rule: clients display the backend's current decision","textPreview":"Central rule: clients display the backend's current decision","textChars":60,"textLines":1,"bbox":[400,430,480,36]}
+{"kind":"notes","id":"nt/2tq1ut","slide":4,"text":"Speaker: Daud\nMain point: Explain the responsibility of each technical layer without turning the slide into a framework inventory.\n\nExample wording — adapt; do not read verbatim:\nTechnically, Laravel is the central application and API layer. The website uses Inertia, React, and TypeScript, while the mobile application is built with Expo React Native. Both clients communicate with the same backend and database. Sanctum protects authenticated API requests, and PostgreSQL is used for production data. Keeping the main rules in one backend applies the same permission, payment, permit, and verification decisions everywhere.\n\nInternal presenter note — do not say aloud:\nKeep this to about one minute. Paystack and NFC are integrations, not databases.\n\n[Sources]\n- SYSTEM_ARCHITECTURE.md\n- kntsf-core/docs/MOBILE_API.md\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/iyyn76","slide":5,"title":"CONTROLLED WORKFLOW","textShapes":19}
+{"kind":"textbox","id":"sh/q1gz2tcv","slide":5,"text":"CONTROLLED WORKFLOW","textPreview":"CONTROLLED WORKFLOW","textChars":19,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/d4rix8b6","slide":5,"text":"A permit is issued only after eligibility and verified payment","textPreview":"A permit is issued only after eligibility and verified payment","textChars":62,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/s3ih43ul","slide":5,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/3ep0ryd4","slide":5,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/idgzytcj","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/507it8ba","slide":5,"text":"A browser redirect is not accepted as proof of payment; the backend verifies the transaction first.","textPreview":"A browser redirect is not accepted as proof of payment; the backend verifies the transaction first.","textChars":99,"textLines":1,"bbox":[48,148,1120,48]}
+{"kind":"shape","id":"sh/4fyh03up","slide":5,"bbox":[116,346,1000,0]}
+{"kind":"shape","id":"sh/va50ned8","slide":5,"bbox":[178,328,36,36]}
+{"kind":"textbox","id":"sh/u9wzu9cn","slide":5,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[82,242,90,28]}
+{"kind":"textbox","id":"sh/cvmxofit","slide":5,"text":"Request","textPreview":"Request","textChars":7,"textLines":1,"bbox":[82,280,224,34]}
+{"kind":"textbox","id":"sh/dgvyxkze","slide":5,"text":"Student submits the permit request.","textPreview":"Student submits the permit request.","textChars":35,"textLines":1,"bbox":[82,392,224,104]}
+{"kind":"shape","id":"sh/qt4fm50n","slide":5,"bbox":[438,328,36,36]}
+{"kind":"textbox","id":"sh/rudgvah8","slide":5,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[342,242,90,28]}
+{"kind":"textbox","id":"sh/4r2xkfih","slide":5,"text":"Eligibility","textPreview":"Eligibility","textChars":11,"textLines":1,"bbox":[342,280,224,34]}
+{"kind":"textbox","id":"sh/psvytkz2","slide":5,"text":"Backend applies the required checks.","textPreview":"Backend applies the required checks.","textChars":36,"textLines":1,"bbox":[342,392,224,104]}
+{"kind":"shape","id":"sh/2pkfi50r","slide":5,"bbox":[698,328,36,36]}
+{"kind":"textbox","id":"sh/3qtgra1w","slide":5,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[602,242,90,28]}
+{"kind":"textbox","id":"sh/on6hwzi1","slide":5,"text":"Verify payment","textPreview":"Verify payment","textChars":14,"textLines":1,"bbox":[602,280,224,34]}
+{"kind":"textbox","id":"sh/9ofy54zm","slide":5,"text":"Paystack result is confirmed server-side.","textPreview":"Paystack result is confirmed server-side.","textChars":41,"textLines":1,"bbox":[602,392,224,104]}
+{"kind":"shape","id":"sh/h4byp4rq","slide":5,"bbox":[958,328,36,36]}
+{"kind":"textbox","id":"sh/w32xgza5","slide":5,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[862,242,90,28]}
+{"kind":"textbox","id":"sh/v2tgnu9k","slide":5,"text":"Issue permit","textPreview":"Issue permit","textChars":12,"textLines":1,"bbox":[862,280,224,34]}
+{"kind":"textbox","id":"sh/a1kfepsz","slide":5,"text":"Receipt, history, renewal, and verification use the same record.","textPreview":"Receipt, history, renewal, and verification use the same record.","textChars":64,"textLines":1,"bbox":[862,392,224,104]}
+{"kind":"shape","id":"sh/90bylkre","slide":5,"bbox":[82,548,1004,72]}
+{"kind":"textbox","id":"sh/8f2xcfat","slide":5,"text":"Outcome","textPreview":"Outcome","textChars":7,"textLines":1,"bbox":[106,568,98,24]}
+{"kind":"textbox","id":"sh/ne9wju98","slide":5,"text":"The permit is created only from a verified backend state; duplicate processing is controlled.","textPreview":"The permit is created only from a verified backend state; duplicate processing is controlled.","textChars":93,"textLines":1,"bbox":[220,562,832,34]}
+{"kind":"notes","id":"nt/iyyn76","slide":5,"text":"Speaker: Daud\nMain point: Explain why server-side payment verification controls permit issuance.\n\nExample wording — adapt; do not read verbatim:\nA student first submits a permit request. After the required checks, the student can begin payment through Paystack. Returning from the payment page is not enough for the system to assume that payment succeeded. The backend verifies the transaction and records the result. The permit is issued only after that verified state is confirmed.\n\nInternal presenter note — do not say aloud:\nIf asked, explain server-side verification and idempotent processing. Do not claim that every payment failure is impossible.\n\n[Sources]\n- kntsf-core/docs/PAYSTACK_INTEGRATION.md\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/k5qfox","slide":6,"title":"WEBSITE EXPERIENCE","textShapes":7}
+{"kind":"textbox","id":"sh/qt0b29gz","slide":6,"text":"WEBSITE EXPERIENCE","textPreview":"WEBSITE EXPERIENCE","textChars":18,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/dwrudofq","slide":6,"text":"The website centralizes daily SRC operations","textPreview":"The website centralizes daily SRC operations","textChars":44,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/cvit4jy5","slide":6,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/3qpc7eho","slide":6,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/2pgby9g3","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"shape","id":"sh/oryt0jyt","slide":6,"bbox":[778,154,404,434]}
+{"kind":"textbox","id":"sh/f2pc3uhc","slide":6,"text":"Authorized workspace","textPreview":"Authorized workspace","textChars":20,"textLines":1,"bbox":[810,184,336,32]}
+{"kind":"textbox","id":"sh/e1gbupgr","slide":6,"text":"Review permit activity and payment records\nIssue receipts and monitor status history\nManage complaints, announcements, budgets, reports, and elections\nSeparate public information from restricted administrative records","textPreview":"Review permit activity and payment records | Issue receipts and monitor status history | Manage complaints, announcements, budgets, repor...","textChars":217,"textLines":4,"bbox":[810,244,332,270]}
+{"kind":"shape","id":"sh/ovup0zed","slide":6,"bbox":[810,522,336,44]}
+{"kind":"textbox","id":"sh/9w36t4vy","slide":6,"text":"Role permissions control access","textPreview":"Role permissions control access","textChars":31,"textLines":1,"bbox":[826,533,304,22]}
+{"kind":"image","id":"im/wzqhkz6l","slide":6,"name":"","geometry":"roundRect","alt":"Administrator permit detail from the KNTSF website","bbox":[48,154,700,434]}
+{"kind":"notes","id":"nt/k5qfox","slide":6,"text":"Speaker: Naeem\nMain point: Explain the practical value of a single administrative workspace and the public/private boundary.\n\nExample wording — adapt; do not read verbatim:\nThe website gives authorized administrators one place to review permit activity, monitor payments, issue receipts, manage complaints, publish announcements, track budgets, and administer elections. A separate public-facing area exposes only approved SRC information. Private administrative records remain restricted through role permissions.\n\nInternal presenter note — do not say aloud:\nFocus on usefulness. Do not read every menu item. The screenshot uses prepared demonstration data.\n\n[Sources]\n- recording/combined video.mp4\n- kntsf-core/docs/PUBLIC_PORTAL.md\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/ha2owy","slide":7,"title":"MOBILE EXPERIENCE","textShapes":9}
+{"kind":"textbox","id":"sh/61wvalwv","slide":7,"text":"MOBILE EXPERIENCE","textPreview":"MOBILE EXPERIENCE","textChars":17,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/t4nu50f6","slide":7,"text":"One mobile app presents different workflows by role","textPreview":"One mobile app presents different workflows by role","textChars":51,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/s3edcvel","slide":7,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/f6pc7qxc","slide":7,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/u5wvelwr","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/h87u90fi","slide":7,"text":"The app displays the backend's decision; it does not independently decide whether a permit is valid.","textPreview":"The app displays the backend's decision; it does not independently decide whether a permit is valid.","textChars":100,"textLines":1,"bbox":[48,146,1140,44]}
+{"kind":"shape","id":"sh/g7ydgvex","slide":7,"bbox":[48,214,548,392]}
+{"kind":"shape","id":"sh/3upcbax8","slide":7,"bbox":[636,214,548,392]}
+{"kind":"textbox","id":"sh/hkvyx0fq","slide":7,"text":"Student","textPreview":"Student","textChars":7,"textLines":1,"bbox":[292,244,258,34]}
+{"kind":"textbox","id":"sh/uh4fmlgz","slide":7,"text":"Permit requests\nPayments and receipts\nCurrent permit status\nAnnouncements and elections","textPreview":"Permit requests | Payments and receipts | Current permit status | Announcements and elections","textChars":87,"textLines":4,"bbox":[292,300,258,220]}
+{"kind":"textbox","id":"sh/vidgvqxk","slide":7,"text":"Authorized staff","textPreview":"Authorized staff","textChars":16,"textLines":1,"bbox":[880,244,258,34]}
+{"kind":"textbox","id":"sh/4n6hsve1","slide":7,"text":"Focused verification workflow\nStudent-number fallback\nCurrent backend result\nVerification audit record","textPreview":"Focused verification workflow | Student-number fallback | Current backend result | Verification audit record","textChars":102,"textLines":4,"bbox":[880,300,258,220]}
+{"kind":"image","id":"im/zepk76do","slide":7,"name":"","geometry":"roundRect","alt":"Student permit view in the KNTSF mobile application","bbox":[78,238,180,344]}
+{"kind":"image","id":"im/7mhgbe1c","slide":7,"name":"","geometry":"roundRect","alt":"Authorized staff permit verification result","bbox":[666,238,180,344]}
+{"kind":"notes","id":"nt/ha2owy","slide":7,"text":"Speaker: Naeem\nMain point: Explain that students and staff use the same app for different authorized tasks.\n\nExample wording — adapt; do not read verbatim:\nThe mobile application presents different functions depending on the user's role. Students can submit requests, complete payments, view permits and receipts, follow announcements, and participate in elections when eligible. Authorized staff use a focused verification workflow. The application displays the current result returned by the backend rather than deciding validity by itself.\n\nInternal presenter note — do not say aloud:\nAvoid touring every screen. The recording demonstrates the student-number fallback path, not an NFC tap.\n\n[Sources]\n- recording/combined video.mp4\n- kntsf-core/docs/MOBILE_API.md\n- KNTSF_PRESENTATION_FACT_LOCK_AND_DEMO_PLAN.md"}
+{"kind":"slide","id":"sl/ua6kq3","slide":8,"title":"VERIFICATION AND SECURITY","textShapes":18}
+{"kind":"textbox","id":"sh/d03y9sji","slide":8,"text":"VERIFICATION AND SECURITY","textPreview":"VERIFICATION AND SECURITY","textChars":25,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/qxcfyx0r","slide":8,"text":"NFC starts the lookup; the backend decides","textPreview":"NFC starts the lookup; the backend decides","textChars":42,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/bylg7i1c","slide":8,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/0nux47it","slide":8,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/lonydcje","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/y1cf2x03","slide":8,"text":"The card carries an identifier—not a complete student profile or a permanent permit decision.","textPreview":"The card carries an identifier—not a complete student profile or a permanent permit decision.","textChars":93,"textLines":1,"bbox":[48,146,1130,44]}
+{"kind":"shape","id":"sh/zmlgb21o","slide":8,"bbox":[336,330,122,0]}
+{"kind":"shape","id":"sh/8rex87i5","slide":8,"bbox":[754,330,122,0]}
+{"kind":"shape","id":"sh/9snyhczq","slide":8,"bbox":[62,238,300,186]}
+{"kind":"textbox","id":"sh/14ja9crq","slide":8,"text":"1  Tap","textPreview":"1  Tap","textChars":6,"textLines":1,"bbox":[90,270,244,34]}
+{"kind":"textbox","id":"sh/03a9g7a5","slide":8,"text":"The phone reads the registered NFC identifier.","textPreview":"The phone reads the registered NFC identifier.","textChars":46,"textLines":1,"bbox":[90,322,244,76]}
+{"kind":"shape","id":"sh/z21s729k","slide":8,"bbox":[458,238,300,186]}
+{"kind":"textbox","id":"sh/e18rexsz","slide":8,"text":"2  Check","textPreview":"2  Check","textChars":8,"textLines":1,"bbox":[486,270,244,34]}
+{"kind":"textbox","id":"sh/98jadwrm","slide":8,"text":"The backend confirms the verifier, linked record, and current permit state.","textPreview":"The backend confirms the verifier, linked record, and current permit state.","textChars":75,"textLines":1,"bbox":[486,322,244,76]}
+{"kind":"shape","id":"sh/o7a9krqh","slide":8,"bbox":[876,238,300,186]}
+{"kind":"textbox","id":"sh/n61sbm9w","slide":8,"text":"3  Return","textPreview":"3  Return","textChars":9,"textLines":1,"bbox":[904,270,244,34]}
+{"kind":"textbox","id":"sh/m5srihsb","slide":8,"text":"Only the authorized verification result is displayed and logged.","textPreview":"Only the authorized verification result is displayed and logged.","textChars":64,"textLines":1,"bbox":[904,322,244,76]}
+{"kind":"textbox","id":"sh/pcza1sri","slide":8,"text":"Controls around the lookup","textPreview":"Controls around the lookup","textChars":26,"textLines":1,"bbox":[62,478,420,32]}
+{"kind":"shape","id":"sh/4bq98nax","slide":8,"bbox":[62,536,192,54]}
+{"kind":"textbox","id":"sh/gfa9onit","slide":8,"text":"Role-based access","textPreview":"Role-based access","textChars":17,"textLines":1,"bbox":[74,550,168,26]}
+{"kind":"shape","id":"sh/hg3axsze","slide":8,"bbox":[284,536,192,54]}
+{"kind":"textbox","id":"sh/udsrmx0n","slide":8,"text":"Server validation","textPreview":"Server validation","textChars":17,"textLines":1,"bbox":[296,550,168,26]}
+{"kind":"shape","id":"sh/ve1svih8","slide":8,"bbox":[506,536,192,54]}
+{"kind":"textbox","id":"sh/4ju9s7i5","slide":8,"text":"Audit logs","textPreview":"Audit logs","textChars":10,"textLines":1,"bbox":[518,550,168,26]}
+{"kind":"shape","id":"sh/5k3a1cza","slide":8,"bbox":[728,536,192,54]}
+{"kind":"textbox","id":"sh/ihcrqx0z","slide":8,"text":"Rate limits","textPreview":"Rate limits","textChars":11,"textLines":1,"bbox":[740,550,168,26]}
+{"kind":"shape","id":"sh/3ilsz2hk","slide":8,"bbox":[950,536,192,54]}
+{"kind":"textbox","id":"sh/snetw7i1","slide":8,"text":"Verified payments","textPreview":"Verified payments","textChars":17,"textLines":1,"bbox":[962,550,168,26]}
+{"kind":"textbox","id":"sh/d8na5czm","slide":8,"text":"Limitation: copied identifiers remain a risk; stronger deployments can add cryptographic tags or controlled devices.","textPreview":"Limitation: copied identifiers remain a risk; stronger deployments can add cryptographic tags or controlled devices.","textChars":116,"textLines":1,"bbox":[62,620,1114,32]}
+{"kind":"notes","id":"nt/ua6kq3","slide":8,"text":"Speaker: Daud\nMain point: Explain the privacy boundary and why the server, not the card, determines validity.\n\nExample wording — adapt; do not read verbatim:\nDuring verification, the phone reads the NFC identifier and sends an authenticated request to the backend. The backend checks whether the staff member is authorized, finds the linked permit, and returns the current result. The card does not need to store the student's complete profile. We also use role-based access, validation, audit logs, rate limits, and secure payment verification around sensitive actions.\n\nInternal presenter note — do not say aloud:\nDo not say NFC completely prevents copying. Acknowledge the limitation and the stronger future options if asked.\n\n[Sources]\n- kntsf-core/docs/VERIFICATION_MODULE.md\n- KNTSF_PRESENTATION_FACT_LOCK_AND_DEMO_PLAN.md\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx"}
+{"kind":"slide","id":"sl/353k24","slide":9,"title":"PILOT EVIDENCE","textShapes":13}
+{"kind":"textbox","id":"sh/6pcnelsn","slide":9,"text":"PILOT EVIDENCE","textPreview":"PILOT EVIDENCE","textChars":14,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/tsn6p0be","slide":9,"text":"The pilot exercised the digital permit and payment workflow at scale","textPreview":"The pilot exercised the digital permit and payment workflow at scale","textChars":68,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/sre5gvat","slide":9,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/j2loj6tc","slide":9,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/i1cna1sr","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/5o36lgbi","slide":9,"text":"These figures validate permit and payment operations—not a completed campus-wide NFC rollout.","textPreview":"These figures validate permit and payment operations—not a completed campus-wide NFC rollout.","textChars":93,"textLines":1,"bbox":[48,146,1138,46]}
+{"kind":"shape","id":"sh/knu5cbax","slide":9,"bbox":[48,244,350,250]}
+{"kind":"textbox","id":"sh/3y5ovatg","slide":9,"text":"2,021","textPreview":"2,021","textChars":5,"textLines":1,"bbox":[76,292,294,72]}
+{"kind":"textbox","id":"sh/2xw7m5sv","slide":9,"text":"registered student records","textPreview":"registered student records","textChars":26,"textLines":1,"bbox":[76,386,294,70]}
+{"kind":"shape","id":"sh/0vip8v2p","slide":9,"bbox":[432,244,350,250]}
+{"kind":"textbox","id":"sh/1wr610ja","slide":9,"text":"2,769","textPreview":"2,769","textChars":5,"textLines":1,"bbox":[460,292,294,72]}
+{"kind":"textbox","id":"sh/e9gn6lkj","slide":9,"text":"permit records linked to successful payments","textPreview":"permit records linked to successful payments","textChars":44,"textLines":1,"bbox":[460,386,294,70]}
+{"kind":"shape","id":"sh/za9ozq14","slide":9,"bbox":[816,244,350,250]}
+{"kind":"textbox","id":"sh/c7y54v2d","slide":9,"text":"GHS 276,900","textPreview":"GHS 276,900","textChars":11,"textLines":1,"bbox":[844,292,294,72]}
+{"kind":"textbox","id":"sh/d876xg3y","slide":9,"text":"value of successful pilot transactions","textPreview":"value of successful pilot transactions","textChars":38,"textLines":1,"bbox":[844,386,294,70]}
+{"kind":"shape","id":"sh/q5gn2lkn","slide":9,"bbox":[48,532,1118,82]}
+{"kind":"textbox","id":"sh/r6povql8","slide":9,"text":"Why permits exceed students","textPreview":"Why permits exceed students","textChars":27,"textLines":1,"bbox":[72,551,298,28]}
+{"kind":"textbox","id":"sh/43y50b2h","slide":9,"text":"The figures count different things: 2,021 registered students versus 2,769 processed permit/payment records. Some students have repeated records across permit periods.","textPreview":"The figures count different things: 2,021 registered students versus 2,769 processed permit/payment records. Some students have repeated ...","textChars":167,"textLines":1,"bbox":[390,548,744,46]}
+{"kind":"notes","id":"nt/353k24","slide":9,"text":"Speaker: Divine\nMain point: Present the four pilot figures and clearly limit what they prove.\n\nExample wording — adapt; do not read verbatim:\nDuring the pilot, the system captured 2,021 registered student records and processed 2,769 permit and successful payment records, representing GHS 276,900. These figures show meaningful use of the digital permit and payment workflow. NFC was not fully deployed during that pilot, so we do not present these numbers as proof of a completed campus-wide NFC rollout.\n\nInternal presenter note — do not say aloud:\nIf asked why permits exceed students, use the agreed explanation about repeated permit records across periods. Do not call every repeated record a renewal.\n\n[Sources]\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx\n- KNTSF_PRESENTATION_FACT_LOCK_AND_DEMO_PLAN.md"}
+{"kind":"slide","id":"sl/dtbwve","slide":10,"title":"POST-SUBMISSION VALIDATION","textShapes":11}
+{"kind":"textbox","id":"sh/8ze547q5","slide":10,"text":"POST-SUBMISSION VALIDATION","textPreview":"POST-SUBMISSION VALIDATION","textChars":26,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/7y5ov2pk","slide":10,"text":"The latest verified build passed 337 automated tests","textPreview":"The latest verified build passed 337 automated tests","textChars":52,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/6xwn2x8z","slide":10,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/ho761w7m","slide":10,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/gnyp8rq1","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/v25ozmpg","slide":10,"text":"Development and validation continued after the report was submitted.","textPreview":"Development and validation continued after the report was submitted.","textChars":68,"textLines":1,"bbox":[48,148,900,38]}
+{"kind":"shape","id":"sh/u1wn6h8v","slide":10,"bbox":[48,228,480,330]}
+{"kind":"textbox","id":"sh/5s765w7i","slide":10,"text":"337","textPreview":"337","textChars":3,"textLines":1,"bbox":[88,270,390,100]}
+{"kind":"textbox","id":"sh/4rypcrqd","slide":10,"text":"automated tests passed","textPreview":"automated tests passed","textChars":22,"textLines":1,"bbox":[88,382,380,40]}
+{"kind":"textbox","id":"sh/exkvilsn","slide":10,"text":"1,657 assertions","textPreview":"1,657 assertions","textChars":16,"textLines":1,"bbox":[88,456,380,42]}
+{"kind":"shape","id":"sh/zytwbq98","slide":10,"bbox":[572,228,596,330]}
+{"kind":"textbox","id":"sh/0z2dkvqt","slide":10,"text":"Verified checks","textPreview":"Verified checks","textChars":15,"textLines":1,"bbox":[608,264,510,34]}
+{"kind":"textbox","id":"sh/10ved0ry","slide":10,"text":"Laravel feature and API tests\nTypeScript checks passed\nMobile lint passed\nNo failed checks in the verified run","textPreview":"Laravel feature and API tests | TypeScript checks passed | Mobile lint passed | No failed checks in the verified run","textChars":110,"textLines":4,"bbox":[608,330,510,190]}
+{"kind":"shape","id":"sh/m14fm58j","slide":10,"bbox":[48,596,1120,48]}
+{"kind":"textbox","id":"sh/nmdwfa94","slide":10,"text":"The report contains the submission-time count; this slide reports the newer current-build validation.","textPreview":"The report contains the submission-time count; this slide reports the newer current-build validation.","textChars":101,"textLines":1,"bbox":[72,609,1072,24]}
+{"kind":"notes","id":"nt/dtbwve","slide":10,"text":"Speaker: Daud\nMain point: Present the current validation evidence without implying the submitted report was changed.\n\nExample wording — adapt; do not read verbatim:\nValidation continued after the report was submitted. In the latest verified build, 337 automated tests passed with 1,657 assertions. The TypeScript checks and mobile lint also passed. If this count differs from the report, it is because the report contains the submission-time result while this slide shows the current build.\n\nInternal presenter note — do not say aloud:\nKeep this to about 40 seconds. Be ready to name the main test groups if asked.\n\n[Sources]\n- KNTSF_PRESENTATION_FACT_LOCK_AND_DEMO_PLAN.md\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/yqjkn9","slide":11,"title":"IMPLEMENTATION PATH","textShapes":17}
+{"kind":"textbox","id":"sh/mtgf2ds7","slide":11,"text":"IMPLEMENTATION PATH","textPreview":"IMPLEMENTATION PATH","textChars":19,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/9w7yx8bi","slide":11,"text":"A phased GHS 32,450 rollout keeps adoption realistic","textPreview":"A phased GHS 32,450 rollout keeps adoption realistic","textChars":52,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/8vyx43ax","slide":11,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/vypgzito","slide":11,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/uxgf6ds3","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"shape","id":"sh/hkry1sbu","slide":11,"bbox":[48,162,270,430]}
+{"kind":"textbox","id":"sh/wjyx8na9","slide":11,"text":"SUBMITTED BUDGET","textPreview":"SUBMITTED BUDGET","textChars":16,"textLines":1,"bbox":[78,202,210,24]}
+{"kind":"textbox","id":"sh/b25wnetk","slide":11,"text":"GHS\n32,450","textPreview":"GHS | 32,450","textChars":10,"textLines":2,"bbox":[78,260,210,150]}
+{"kind":"textbox","id":"sh/a1wfutsz","slide":11,"text":"Implementation envelope","textPreview":"Implementation envelope","textChars":23,"textLines":1,"bbox":[78,466,210,48]}
+{"kind":"textbox","id":"sh/s7qdc3ut","slide":11,"text":"Controlled stages reduce operational risk and create room for training, monitoring, and improvement.","textPreview":"Controlled stages reduce operational risk and create room for training, monitoring, and improvement.","textChars":100,"textLines":1,"bbox":[360,160,806,58]}
+{"kind":"shape","id":"sh/t8ze58be","slide":11,"bbox":[408,366,700,0]}
+{"kind":"shape","id":"sh/658vatcn","slide":11,"bbox":[462,348,36,36]}
+{"kind":"textbox","id":"sh/76hw3yt8","slide":11,"text":"PHASE 1","textPreview":"PHASE 1","textChars":7,"textLines":1,"bbox":[374,268,212,22]}
+{"kind":"textbox","id":"sh/gbadgnu5","slide":11,"text":"Prepare","textPreview":"Prepare","textChars":7,"textLines":1,"bbox":[374,302,212,34]}
+{"kind":"textbox","id":"sh/hcje98ba","slide":11,"text":"Confirm accounts, training, and controlled verification points.","textPreview":"Confirm accounts, training, and controlled verification points.","textChars":63,"textLines":1,"bbox":[374,410,212,112]}
+{"kind":"shape","id":"sh/u98vedcz","slide":11,"bbox":[718,348,36,36]}
+{"kind":"textbox","id":"sh/fa1w7itk","slide":11,"text":"PHASE 2","textPreview":"PHASE 2","textChars":7,"textLines":1,"bbox":[630,268,212,22]}
+{"kind":"textbox","id":"sh/wf6d4jul","slide":11,"text":"Expand","textPreview":"Expand","textChars":6,"textLines":1,"bbox":[630,302,212,34]}
+{"kind":"textbox","id":"sh/xgfexob6","slide":11,"text":"Widen permit use and authorized staff coverage.","textPreview":"Widen permit use and authorized staff coverage.","textChars":47,"textLines":1,"bbox":[630,410,212,112]}
+{"kind":"shape","id":"sh/d0n2lgzy","slide":11,"bbox":[974,348,36,36]}
+{"kind":"textbox","id":"sh/czelcbid","slide":11,"text":"PHASE 3","textPreview":"PHASE 3","textChars":7,"textLines":1,"bbox":[886,268,212,22]}
+{"kind":"textbox","id":"sh/ry5kj61s","slide":11,"text":"Improve","textPreview":"Improve","textChars":7,"textLines":1,"bbox":[886,302,212,34]}
+{"kind":"textbox","id":"sh/qxw3a107","slide":11,"text":"Monitor adoption, support users, and refine the system.","textPreview":"Monitor adoption, support users, and refine the system.","textChars":55,"textLines":1,"bbox":[886,410,212,112]}
+{"kind":"notes","id":"nt/yqjkn9","slide":11,"text":"Speaker: Naeem\nMain point: Connect the submitted budget to a controlled three-phase implementation approach.\n\nExample wording — adapt; do not read verbatim:\nThe submitted implementation budget is GHS 32,450. We recommend using a phased rollout rather than switching the whole institution at once. The first phase confirms accounts, training, and controlled verification points. The second expands permit use and staff coverage. The third focuses on monitoring, support, and improvements based on actual use.\n\nInternal presenter note — do not say aloud:\nDo not invent or revise budget line items. Do not imply the rollout has already happened.\n\n[Sources]\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}
+{"kind":"slide","id":"sl/tley27","slide":12,"title":"DEMONSTRATION","textShapes":12}
+{"kind":"textbox","id":"sh/9obihwz6","slide":12,"text":"DEMONSTRATION","textPreview":"DEMONSTRATION","textChars":13,"textLines":1,"bbox":[48,30,420,20]}
+{"kind":"textbox","id":"sh/ml0j6hgf","slide":12,"text":"One record connects every channel","textPreview":"One record connects every channel","textChars":33,"textLines":1,"bbox":[48,58,1170,76]}
+{"kind":"shape","id":"sh/nmt0fmh0","slide":12,"bbox":[48,674,1134,0]}
+{"kind":"textbox","id":"sh/wr21cryh","slide":12,"text":"KNTSF","textPreview":"KNTSF","textChars":5,"textLines":1,"bbox":[48,684,100,18]}
+{"kind":"textbox","id":"sh/xsbilwz2","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1130,684,52,18]}
+{"kind":"textbox","id":"sh/apkja1gr","slide":12,"text":"Student 26100001  •  permit ending 0259  •  active status","textPreview":"Student 26100001  •  permit ending 0259  •  active status","textChars":57,"textLines":1,"bbox":[48,146,850,34]}
+{"kind":"shape","id":"sh/bqt0j6hc","slide":12,"bbox":[48,206,420,320]}
+{"kind":"shape","id":"sh/kfm1gbyt","slide":12,"bbox":[510,206,300,320]}
+{"kind":"shape","id":"sh/lgvipgze","slide":12,"bbox":[852,206,300,320]}
+{"kind":"textbox","id":"sh/ps7qlc3i","slide":12,"text":"Administrator","textPreview":"Administrator","textChars":13,"textLines":1,"bbox":[72,220,372,30]}
+{"kind":"textbox","id":"sh/ory9s7mx","slide":12,"text":"Student","textPreview":"Student","textChars":7,"textLines":1,"bbox":[534,220,252,30]}
+{"kind":"textbox","id":"sh/nqp8j2lc","slide":12,"text":"Staff verification","textPreview":"Staff verification","textChars":18,"textLines":1,"bbox":[876,220,252,30]}
+{"kind":"textbox","id":"sh/bup8nml8","slide":12,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[470,335,38,48]}
+{"kind":"textbox","id":"sh/atgruh4n","slide":12,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[812,335,38,48]}
+{"kind":"shape","id":"sh/t0nqds3a","slide":12,"bbox":[48,562,1104,76]}
+{"kind":"textbox","id":"sh/szepknmp","slide":12,"text":"What the demonstration proves","textPreview":"What the demonstration proves","textChars":29,"textLines":1,"bbox":[72,582,292,28]}
+{"kind":"textbox","id":"sh/k3i90nul","slide":12,"text":"The website, student app, and authorized staff workflow return the same backend-controlled record.","textPreview":"The website, student app, and authorized staff workflow return the same backend-controlled record.","textChars":98,"textLines":1,"bbox":[382,576,740,42]}
+{"kind":"image","id":"im/5knm5w7u","slide":12,"name":"","alt":"Administrator permit record","bbox":[66,266,384,216]}
+{"kind":"image","id":"im/qlg3e18f","slide":12,"name":"","geometry":"roundRect","alt":"Student mobile permit record","bbox":[574,258,172,250]}
+{"kind":"image","id":"im/rmp476p0","slide":12,"name":"","geometry":"roundRect","alt":"Staff permit verification result","bbox":[916,258,172,250]}
+{"kind":"notes","id":"nt/tley27","slide":12,"text":"Speaker: Naeem narrates; Divine and Daud operate\nMain point: Demonstrate one record across administrator, student, and staff views.\n\nExample wording — adapt; do not read verbatim:\nWe will now follow one record through the system. Divine will show the active permit from the administrator's view. We will then open the same permit in the student's mobile application. Finally, Daud will use the authorized staff workflow to retrieve the current result from the backend. The recording demonstrates the student-number fallback path.\n\nInternal presenter note — do not say aloud:\nUse recording/combined video.mp4 as the 32-second fallback. If the live NFC tap is not available, say clearly that the student-number fallback uses the same authenticated verification service. Do not claim the recording shows NFC scanning.\n\n[Sources]\n- recording/combined video.mp4\n- KNTSF_PRESENTATION_FACT_LOCK_AND_DEMO_PLAN.md"}
+{"kind":"slide","id":"sl/nnxz6y","slide":13,"title":"CONCLUSION","textShapes":8}
+{"kind":"textbox","id":"sh/bypwnqhs","slide":13,"text":"CONCLUSION","textPreview":"CONCLUSION","textChars":10,"textLines":1,"bbox":[58,48,260,24]}
+{"kind":"textbox","id":"sh/czydgvyx","slide":13,"text":"One accountable system replaces fragmented decisions","textPreview":"One accountable system replaces fragmented decisions","textChars":52,"textLines":1,"bbox":[58,106,1010,132]}
+{"kind":"textbox","id":"sh/d07ep0zi","slide":13,"text":"The project connects:","textPreview":"The project connects:","textChars":21,"textLines":1,"bbox":[58,286,360,34]}
+{"kind":"shape","id":"sh/y1gvi5g3","slide":13,"bbox":[60,355,18,18]}
+{"kind":"textbox","id":"sh/z2pwraho","slide":13,"text":"a shared backend across web and mobile","textPreview":"a shared backend across web and mobile","textChars":38,"textLines":1,"bbox":[104,350,850,40]}
+{"kind":"shape","id":"sh/0nyxkvy9","slide":13,"bbox":[60,427,18,18]}
+{"kind":"textbox","id":"sh/loret0zu","slide":13,"text":"verified payment before permit issuance","textPreview":"verified payment before permit issuance","textChars":39,"textLines":1,"bbox":[104,422,850,40]}
+{"kind":"shape","id":"sh/e5wv610z","slide":13,"bbox":[60,499,18,18]}
+{"kind":"textbox","id":"sh/f65wf6hk","slide":13,"text":"backend-controlled verification with an honest phased rollout","textPreview":"backend-controlled verification with an honest phased rollout","textChars":61,"textLines":1,"bbox":[104,494,850,40]}
+{"kind":"shape","id":"sh/7mx4nmx0","slide":13,"bbox":[958,472,250,120]}
+{"kind":"textbox","id":"sh/mlonehwv","slide":13,"text":"Questions","textPreview":"Questions","textChars":9,"textLines":1,"bbox":[978,502,210,52]}
+{"kind":"textbox","id":"sh/9ofmpwf6","slide":13,"text":"Evidence supports continued, controlled institutional adoption.","textPreview":"Evidence supports continued, controlled institutional adoption.","textChars":63,"textLines":1,"bbox":[58,614,780,36]}
+{"kind":"notes","id":"nt/nnxz6y","slide":13,"text":"Speaker: Divine\nMain point: Resolve the opening by restating the integrated achievement and the phased recommendation.\n\nExample wording — adapt; do not read verbatim:\nIn conclusion, our project brings permit, payment, governance, and verification activities into one system. The website and mobile application use the same backend rules, payments are verified before permit issuance, and verification returns the current backend result. The pilot provides meaningful evidence for the digital permit and payment workflow. We therefore recommend a controlled, phased rollout with training, monitoring, and continued improvement. Thank you. We are ready for your questions.\n\nInternal presenter note — do not say aloud:\nPause after inviting questions. Divine receives the first question and routes technical questions to Daud and workflow or rollout questions to Naeem.\n\n[Sources]\n- KNTSF_REPORT_UPDATED_WITH_PILOT_RESULTS_AND_BUDGET.docx\n- KNTSF_PRESENTATION_STORYBOARD_SPEAKING_GUIDE.md"}

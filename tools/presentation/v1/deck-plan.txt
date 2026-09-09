@@ -1,0 +1,15 @@
+Communication job: By the end, the school panel should understand that the team built one connected web-and-mobile system for permit, payment, governance, and verification workflows, and should view the pilot evidence and phased rollout recommendation as credible because the claims are carefully bounded.
+
+Narrative arc:
+1. Establish the problem.
+2. Show the integrated solution and architecture.
+3. Explain the controlled permit/payment and verification logic.
+4. Show the website and mobile experiences.
+5. Present pilot and current validation evidence.
+6. Recommend a realistic rollout.
+7. Demonstrate the connected record.
+8. Close on accountability and phased adoption.
+
+Visual route: Codex Grid reference system, using the hierarchy of layouts 08, 10, 17, and 19. White/light canvas, strong black typography, flat pale-gray panels, thin rules, and one deliberate violet accent with green reserved for verified states.
+
+Slide count: 13. Intended delivery: approximately 13 minutes within a 15-minute slot.

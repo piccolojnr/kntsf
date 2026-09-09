@@ -1,0 +1,23 @@
+KNTSF final presentation source notes
+
+Primary factual source:
+- docs/academic/final-project-report.docx
+
+Presentation fact checks and boundaries:
+- docs/defense/briefing/presentation-facts-and-demo-plan.md
+- docs/defense/briefing/presentation-storyboard-and-speaking-guide.md
+
+Technical implementation references:
+- docs/architecture/system-architecture.md
+- kntsf-core/docs/MOBILE_API.md
+- kntsf-core/docs/PAYSTACK_INTEGRATION.md
+- kntsf-core/docs/VERIFICATION_MODULE.md
+- kntsf-core/academic-documentation/CHAPTER_5_SUMMARY_CONCLUSION_AND_RECOMMENDATIONS.md
+
+Visual assets:
+- kntsf-core/public/images/campus-hero.jpg
+- kntsf-core/public/images/kntsf-logo.png
+- docs/demo/videos/combined-demo.mp4
+- Frames extracted locally from the combined demonstration recording at approximately 6 s, 14 s, and 29.2 s.
+
+No internet-sourced claims or visual assets were used.
