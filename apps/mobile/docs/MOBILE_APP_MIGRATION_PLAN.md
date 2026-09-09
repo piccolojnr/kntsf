@@ -1,0 +1,234 @@
+# Mobile App Migration Plan
+
+## Current Migration Phase
+
+Phase 5 is in progress: staff verification and NFC operations migration. Staff/admin verification, student search/detail, NFC card mutations, staff permit issuance, and aggregate operations list/dashboard endpoints now point at Laravel mobile operations endpoints.
+
+## Laravel API Response Strategy
+
+The app now treats Laravel responses as the default contract:
+
+- Plain resource: `{ "data": { ... } }`
+- Plain object response: `{ ... }`
+- Paginated collection: `{ "data": [], "links": {}, "meta": {} }`
+- Validation error: `{ "message": "...", "errors": { "field": ["..."] } }`
+
+Shared helpers:
+
+- `unwrapData<T>()` unwraps Laravel `{ data }` resources and direct object responses.
+- `unwrapPaginated<T>()` converts Laravel paginated collections into app-friendly `{ items, pagination }` results.
+- Temporary old `{ success, data, message }` compatibility remains only so unmigrated screens continue to compile during phased endpoint migration.
+
+## Auth Changes
+
+- Login payload is now Laravel/Sanctum-oriented: `email`, `password`, and optional `device_name`.
+- Login response supports `token`, `token_type`, `user.roles`, and `user.permissions`.
+- `AuthUser` keeps a compatibility `role` field for existing screens, derived from `roles`.
+- The app stores Sanctum tokens in Expo SecureStore as before.
+- `/api/mobile/me` supports Laravel resource/direct response shapes.
+- Logout still calls `/api/mobile/auth/logout` and clears the local token even if the network request fails.
+- Auth bootstrap no longer treats network/server timeout during `/me` as logout. It preserves the token and surfaces a recoverable startup state.
+
+## Student Core Migration
+
+Migrated student endpoints:
+
+- `GET /api/mobile/student/profile`
+- `GET /api/mobile/student/permits`
+- `GET /api/mobile/student/nfc-card`
+- `POST /api/mobile/student/nfc-card/report-lost`
+- `GET /api/mobile/content/home` helper added for later lightweight home content use
+
+Student response mapping now uses Laravel resource fields such as `student_number`, `starts_at`, `expires_at`, `amount_paid`, `code_last4`, and `uid_last4`. The UI compatibility fields remain normalized inside feature APIs so existing screens do not need a redesign. Raw NFC UIDs and full permit codes are not expected by the student screens.
+
+## Permit Request And Payment Flow
+
+Implemented endpoints:
+
+- `GET /api/mobile/permit-requests/options`
+- `GET /api/mobile/permit-requests`
+- `POST /api/mobile/permit-requests`
+- `GET /api/mobile/permit-requests/{reference}`
+- `POST /api/mobile/permit-requests/{reference}/initialize-payment`
+- `POST /api/mobile/permit-requests/{reference}/verify-payment`
+
+Implemented routes:
+
+- `/(student)/permit-request`
+- `/(student)/permit-request/[reference]`
+- `/(student)/permit-request/payment-return`
+
+Payment handling:
+
+- Paystack checkout opens through `expo-web-browser`.
+- Redirect return is handled by the payment return route when available.
+- Payment is never trusted from redirect alone; the app calls backend verification.
+- A manual "I Have Paid, Verify Payment" fallback is available on the request detail screen.
+
+## Elections UI
+
+Implemented endpoints:
+
+- `GET /api/mobile/elections`
+- `GET /api/mobile/elections/{election}`
+- `POST /api/mobile/elections/{election}/positions/{position}/vote`
+- `GET /api/mobile/elections/{election}/results`
+
+Implemented routes:
+
+- `/(student)/elections`
+- `/(student)/elections/[id]`
+- `/(student)/elections/[id]/results`
+
+Voting handling:
+
+- Authenticated students can view elections, positions, approved candidates, eligibility, and voting status.
+- Vote submission goes through the backend endpoint and is confirmed before mutation.
+- The UI does not support vote editing and does not duplicate backend eligibility rules.
+- Results are shown only when the backend returns them.
+
+## Content Screens
+
+Implemented endpoints:
+
+- `GET /api/mobile/content/home`
+- `GET /api/mobile/content/announcements`
+- `GET /api/mobile/content/announcements/{slug}`
+- `GET /api/mobile/content/events`
+- `GET /api/mobile/content/events/{slug}`
+- `GET /api/mobile/content/documents`
+- `GET /api/mobile/content/documents/{slug}`
+- `GET /api/mobile/content/executives`
+
+Implemented routes:
+
+- `/(student)/announcements`
+- `/(student)/announcements/[slug]`
+- `/(student)/events`
+- `/(student)/events/[slug]`
+- `/(student)/documents`
+- `/(student)/documents/[slug]`
+- `/(student)/executives`
+
+Content handling:
+
+- Content is read-only in the mobile app.
+- Student home shows compact sections for announcements, events, and documents.
+- Document file URLs are opened with `expo-web-browser`; files are not stored locally.
+
+## Staff Verification And NFC Operations
+
+Implemented endpoint replacements:
+
+- `POST /api/mobile/verification/nfc`
+- `POST /api/mobile/verification/student-number`
+- `POST /api/mobile/verification/permit-code`
+- `GET /api/mobile/operations/students/search`
+- `GET /api/mobile/operations/students/{student}`
+- `POST /api/mobile/operations/nfc-cards/register`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke`
+- `POST /api/mobile/operations/permits/issue`
+
+Migration notes:
+
+- The NFC UID reader remains unchanged and only sends the UID to the backend.
+- Verification results are normalized from Laravel `method`, `result`, `reason`, `student`, and `permit` fields into existing UI-compatible result objects.
+- Card mutation responses expose masked UID data only through `uid_last4` normalization.
+- Student detail/search now uses Laravel operations student endpoints.
+- Staff verification uses staff-scoped `GET /api/mobile/operations/permits/options` for permit issue defaults and selected-student blocking state. It no longer calls the student-scoped `GET /api/mobile/permit-requests/options` endpoint after lookup.
+
+## Operations Aggregate Endpoint Alignment
+
+Implemented endpoint replacements:
+
+- `GET /api/mobile/operations/nfc-cards`
+- `GET /api/mobile/operations/permits`
+- `GET /api/mobile/operations/verification-logs`
+- `GET /api/mobile/operations/summary`
+
+Migration notes:
+
+- NFC-card list calls now use `per_page` pagination and Laravel paginated `{ data, links, meta }` responses.
+- Permit list calls now use Laravel pagination and support `academic_period_id`.
+- Verification log calls now use `/verification-logs` and avoid depending on raw identifier values.
+- Admin dashboard, reports, and operations profile now use `/operations/summary` for counts instead of deriving dashboard metrics from full list endpoints.
+- Backend implementation could not be changed in this workspace because no Laravel `artisan` project is present under `C:\Users\USER\projects\kntsf`.
+
+## Old Endpoint Mappings Still In Code
+
+No known legacy mobile operations endpoint usage remains in `src`.
+
+Backend contracts that must exist for the migrated operations screens:
+
+| Laravel endpoint | Mobile usage |
+| --- | --- |
+| `GET /api/mobile/operations/nfc-cards` | Operations cards list, card lookup helpers |
+| `GET /api/mobile/operations/permits` | Operations permits list and permit lookup helpers |
+| `GET /api/mobile/operations/verification-logs` | Verification log/report consumers |
+| `GET /api/mobile/operations/summary` | Admin dashboard, reports, operations profile counts |
+
+## New Endpoint Foundation
+
+Already aligned or prepared:
+
+- `POST /api/mobile/auth/login`
+- `POST /api/mobile/auth/logout`
+- `GET /api/mobile/me`
+- `GET /api/mobile/student/profile`
+- `GET /api/mobile/student/permits`
+- `GET /api/mobile/student/nfc-card`
+- `POST /api/mobile/student/nfc-card/report-lost`
+- `GET /api/mobile/permit-requests/options`
+- `GET /api/mobile/permit-requests`
+- `POST /api/mobile/permit-requests`
+- `GET /api/mobile/permit-requests/{reference}`
+- `POST /api/mobile/permit-requests/{reference}/initialize-payment`
+- `POST /api/mobile/permit-requests/{reference}/verify-payment`
+- `GET /api/mobile/elections`
+- `GET /api/mobile/elections/{election}`
+- `POST /api/mobile/elections/{election}/positions/{position}/vote`
+- `GET /api/mobile/elections/{election}/results`
+- `GET /api/mobile/content/home`
+- `GET /api/mobile/content/announcements`
+- `GET /api/mobile/content/announcements/{slug}`
+- `GET /api/mobile/content/events`
+- `GET /api/mobile/content/events/{slug}`
+- `GET /api/mobile/content/documents`
+- `GET /api/mobile/content/documents/{slug}`
+- `GET /api/mobile/content/executives`
+- `POST /api/mobile/verification/nfc`
+- `POST /api/mobile/verification/student-number`
+- `POST /api/mobile/verification/permit-code`
+- `GET /api/mobile/operations/students/search`
+- `GET /api/mobile/operations/students/{student}`
+- `GET /api/mobile/operations/nfc-cards`
+- `GET /api/mobile/operations/permits`
+- `GET /api/mobile/operations/verification-logs`
+- `GET /api/mobile/operations/summary`
+- `POST /api/mobile/operations/nfc-cards/register`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/replace`
+- `POST /api/mobile/operations/nfc-cards/{nfcCard}/revoke`
+- `POST /api/mobile/operations/permits/issue`
+- Laravel resource and pagination response helpers
+- Laravel validation error normalization
+- Query-key namespaces for auth, student, permits, permit requests, elections, content, verification, and operations
+
+## Screens Not Yet Migrated
+
+No new UI was built in this phase. These screens still need endpoint/data migration or backend confirmation:
+
+- Settings
+- Audit logs
+
+Missing future workflows remain out of scope for this phase:
+
+- Staff permit request review
+
+## Next Steps
+
+1. Confirm the Paystack callback/redirect URL configured by the backend matches the Expo deep-link route.
+2. Confirm the Laravel backend exposes the operations aggregate endpoints and safe resources documented above.
+3. Add staff permit request review.
+4. Add feature-level response schemas with Zod once endpoint payloads are stable.
+5. Decompose oversized screens while migrating each feature, not before.

@@ -1,0 +1,156 @@
+import { ArrowRight, ShieldAlert } from "lucide-react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+
+type FloatingCardInputProps = {
+  errorMessage: string | null;
+  isLoading: boolean;
+  onChangeUid: (value: string) => void;
+  onSubmit: () => void;
+  uid: string;
+};
+
+export function FloatingCardInput({
+  errorMessage,
+  isLoading,
+  onChangeUid,
+  onSubmit,
+  uid,
+}: FloatingCardInputProps) {
+  return (
+    <View style={styles.wrapper}>
+      {errorMessage ? (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(150)}
+          style={styles.errorToast}
+        >
+          <ShieldAlert color={colors.danger} size={14} strokeWidth={2.5} />
+          <Text style={styles.errorText} numberOfLines={2}>
+            {errorMessage}
+          </Text>
+        </Animated.View>
+      ) : null}
+
+      <View style={styles.pill}>
+        <View style={styles.inputArea}>
+          <Text style={styles.prefix}>UID</Text>
+          <TextInput
+            autoCapitalize="characters"
+            autoCorrect={false}
+            onChangeText={(value) => onChangeUid(value.toUpperCase())}
+            onSubmitEditing={onSubmit}
+            placeholder="UID-AMA-001"
+            placeholderTextColor={colors.textMuted}
+            returnKeyType="done"
+            style={styles.input}
+            value={uid}
+          />
+        </View>
+
+        <Pressable
+          disabled={isLoading}
+          onPress={onSubmit}
+          style={({ pressed }) => [
+            styles.goButton,
+            pressed && styles.goButtonPressed,
+            isLoading && styles.goButtonLoading,
+          ]}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#ffffff" size="small" />
+          ) : (
+            <ArrowRight color="#ffffff" size={20} strokeWidth={2.5} />
+          )}
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    alignItems: "stretch",
+    gap: spacing.sm,
+  },
+  errorToast: {
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.danger,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+  },
+  errorText: {
+    color: colors.danger,
+    flexShrink: 1,
+    fontSize: fontSizes.xs,
+    fontWeight: "700",
+  },
+  pill: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    height: 56,
+    paddingLeft: spacing.lg,
+    paddingRight: 6,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  inputArea: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  prefix: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  input: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
+    fontSize: fontSizes.lg,
+    fontWeight: "700",
+    letterSpacing: 2,
+    paddingVertical: 0,
+  },
+  goButton: {
+    alignItems: "center",
+    backgroundColor: colors.primary,
+    borderRadius: 999,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  goButtonPressed: {
+    opacity: 0.75,
+  },
+  goButtonLoading: {
+    opacity: 0.6,
+  },
+});

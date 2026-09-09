@@ -1,0 +1,568 @@
+import { Screen } from "@/components/ui/screen";
+import { useQueryClient } from "@tanstack/react-query";
+import { Href, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  AlertTriangle,
+  ChevronLeft,
+  CheckCircle2,
+  CreditCard,
+  Lock,
+  RefreshCw,
+  ShieldAlert,
+  ShieldOff,
+  Wifi,
+  XCircle,
+} from "lucide-react-native";
+import { useMemo, useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { SectionCard } from "@/components/cards/section-card";
+import { StudentInfoCard } from "@/components/cards/student-info-card";
+import { AppRefreshableScrollView } from "@/components/ui/app-refreshable-scroll-view";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { colors, fontSizes, radius, spacing } from "@/constants/theme";
+import { revokeCardForStudent } from "@/features/cards/card-api";
+import { useCards } from "@/features/cards/use-cards";
+import { useStudentByStudentId } from "@/features/students/use-students";
+import { useAuth } from "@/hooks/use-auth";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+
+const statusConfig = {
+  active: {
+    accent: colors.success,
+    soft: colors.successSoft,
+    label: "Active",
+    Icon: CheckCircle2,
+  },
+  inactive: {
+    accent: colors.warning,
+    soft: colors.warningSoft,
+    label: "Inactive",
+    Icon: AlertTriangle,
+  },
+  lost: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Lost",
+    Icon: ShieldAlert,
+  },
+  blocked: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Blocked",
+    Icon: XCircle,
+  },
+  replaced: {
+    accent: colors.warning,
+    soft: colors.warningSoft,
+    label: "Replaced",
+    Icon: AlertTriangle,
+  },
+  revoked: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Revoked",
+    Icon: XCircle,
+  },
+  stolen: {
+    accent: colors.danger,
+    soft: colors.dangerSoft,
+    label: "Stolen",
+    Icon: ShieldAlert,
+  },
+  damaged: {
+    accent: colors.warning,
+    soft: colors.warningSoft,
+    label: "Damaged",
+    Icon: AlertTriangle,
+  },
+} as const;
+
+function resolveCardStatus(status?: string) {
+  switch (status) {
+    case "active":
+    case "inactive":
+    case "lost":
+    case "blocked":
+    case "replaced":
+    case "revoked":
+    case "stolen":
+    case "damaged":
+      return status;
+    default:
+      return "inactive";
+  }
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export default function OperationsStudentDetailsScreen() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { studentId } = useLocalSearchParams<{ studentId?: string }>();
+  const requestedStudentId = studentId?.trim() ?? "";
+  const studentQuery = useStudentByStudentId(requestedStudentId);
+  const cardsQuery = useCards(
+    requestedStudentId
+      ? {
+          search: requestedStudentId,
+          page: 1,
+          limit: 100,
+        }
+      : undefined,
+  );
+  const queryClient = useQueryClient();
+  const [actionLoading, setActionLoading] = useState<"revoke" | null>(null);
+
+  const student = useMemo(() => {
+    return studentQuery.data?.studentId === requestedStudentId
+      ? studentQuery.data
+      : null;
+  }, [requestedStudentId, studentQuery.data]);
+
+  const currentCard = useMemo(() => {
+    if (!student) return null;
+    const cardFromList =
+      (cardsQuery.data ?? [])
+        .filter(
+          (card) =>
+            card.studentId === student.id ||
+            card.studentId === student.studentId ||
+            card.student?.studentId === student.studentId,
+        )
+        .sort(
+          (l, r) =>
+            new Date(r.registeredAt).getTime() -
+            new Date(l.registeredAt).getTime(),
+        )[0] ?? null
+
+    if (cardFromList) {
+      return cardFromList;
+    }
+
+    return student.activeNfcCard
+      ? {
+          id: student.activeNfcCard.id,
+          studentId: student.studentId,
+          uid: student.activeNfcCard.uid ?? "",
+          type: "unknown" as const,
+          status: resolveCardStatus(student.activeNfcCard.status),
+          registeredAt: student.activeNfcCard.registeredAt ?? "",
+          uidLast4: student.activeNfcCard.uidLast4 ?? undefined,
+          issuedAt: student.activeNfcCard.issuedAt,
+          activatedAt: student.activeNfcCard.activatedAt,
+          student,
+        }
+      : null;
+  }, [cardsQuery.data, student]);
+
+  async function refreshCards() {
+    await queryClient.invalidateQueries({ queryKey: ["cards"] });
+  }
+
+  function runRevoke() {
+    if (!student) return;
+    Alert.alert("Confirm Action", `Revoke card for ${student.name}?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Revoke",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setActionLoading("revoke");
+            if (!currentCard) {
+              throw new Error("No active card is available to revoke.");
+            }
+            await revokeCardForStudent(currentCard.id);
+            await refreshCards();
+            Alert.alert("Done", "The active card has been revoked.");
+          } catch (error) {
+            Alert.alert(
+              "Action Failed",
+              error instanceof Error
+                ? error.message
+                : "The card action could not be completed.",
+            );
+          } finally {
+            setActionLoading(null);
+          }
+        },
+      },
+    ]);
+  }
+
+  function openAssignmentFlow(mode: "register" | "replace") {
+    if (!student) return;
+    router.push(
+      `/(operations)/card-assignment?studentId=${student.studentId}&mode=${mode}` as Href,
+    );
+  }
+
+  const cardStatus = resolveCardStatus(currentCard?.status);
+  const cardConfig = currentCard ? statusConfig[cardStatus] : undefined;
+  const isResolvingStudent = Boolean(
+    requestedStudentId &&
+      !student &&
+      (studentQuery.isLoading || studentQuery.isFetching),
+  );
+  const isLoading =
+    !requestedStudentId ||
+    isResolvingStudent ||
+    studentQuery.isLoading ||
+    cardsQuery.isLoading;
+  const hasError = studentQuery.isError || cardsQuery.isError;
+  const hasActiveCard = currentCard?.status === "active";
+  const canManageCards = user?.role === "admin";
+  const refreshControl = usePullToRefresh(async () => {
+    await Promise.all([studentQuery.refetch(), cardsQuery.refetch()]);
+  });
+
+  return (
+    <Screen scrolled>
+      {/* ── Drag handle (sheet affordance) ── */}
+      <View style={styles.dragHandle} />
+
+      {/* ── Scrollable body ── */}
+      <AppRefreshableScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        onRefresh={refreshControl.onRefresh}
+        refreshing={refreshControl.refreshing}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Sheet header ── */}
+        <View style={styles.sheetHeader}>
+          <Pressable
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && styles.backButtonPressed,
+            ]}
+          >
+            <ChevronLeft color={colors.textMuted} size={18} strokeWidth={2.5} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
+          <Text style={styles.eyebrow}>STUDENT RECORD</Text>
+          <Text style={styles.title}>Student Details</Text>
+        </View>
+
+        {isLoading ? (
+          <LoadingState message="Loading student and card records..." />
+        ) : hasError ? (
+          <EmptyState
+            description="Student card details could not be loaded right now."
+            icon={ShieldAlert}
+            title="Unable to load student details"
+          />
+        ) : !student ? (
+          <EmptyState
+            description="No student record matched the requested student ID."
+            icon={XCircle}
+            title="Student not found"
+          />
+        ) : (
+          <>
+            {/* ── Hero identity block ── */}
+            <StudentInfoCard student={student} />
+
+            {/* ── NFC Card section ── */}
+            <View style={styles.cardSection}>
+              <Text style={styles.sectionLabel}>Assigned NFC Card</Text>
+
+              {currentCard && cardConfig ? (
+                <View
+                  style={[
+                    styles.virtualCard,
+                    { backgroundColor: cardConfig.soft },
+                  ]}
+                >
+                  <View style={styles.virtualCardTop}>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: cardConfig.accent },
+                      ]}
+                    >
+                      <cardConfig.Icon
+                        color="#fff"
+                        size={13}
+                        strokeWidth={2.5}
+                      />
+                      <Text style={styles.statusBadgeLabel}>
+                        {cardConfig.label}
+                      </Text>
+                    </View>
+                    <Wifi color={cardConfig.accent} size={24} />
+                  </View>
+                  <View style={styles.virtualCardBottom}>
+                    <Text
+                      style={[
+                        styles.virtualCardUid,
+                        { color: cardConfig.accent },
+                      ]}
+                    >
+                      {currentCard.uid}
+                    </Text>
+                    <Text style={styles.virtualCardDate}>
+                      Registered: {formatDate(currentCard.registeredAt)}
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={[styles.virtualCard, styles.virtualCardEmpty]}>
+                  <CreditCard
+                    color={colors.textMuted}
+                    size={32}
+                    strokeWidth={1.5}
+                  />
+                  <Text style={styles.virtualCardEmptyText}>
+                    No active card assigned
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* ── Action Buttons ── */}
+            <View style={styles.actionsContainer}>
+              {canManageCards ? (
+                !hasActiveCard ? (
+                  <Button
+                    icon={CreditCard}
+                    label="Register New Card"
+                    onPress={() => openAssignmentFlow("register")}
+                  />
+                ) : (
+                  <View style={styles.actionRow}>
+                    <View style={styles.actionFlex}>
+                      <Button
+                        icon={RefreshCw}
+                        label="Replace"
+                        onPress={() => openAssignmentFlow("replace")}
+                        size="compact"
+                        variant="secondary"
+                      />
+                    </View>
+                    <View style={styles.actionFlex}>
+                      <Button
+                        icon={ShieldOff}
+                        label="Revoke"
+                        loading={actionLoading === "revoke"}
+                        onPress={runRevoke}
+                        size="compact"
+                        variant="danger"
+                      />
+                    </View>
+                  </View>
+                )
+              ) : (
+                <SectionCard title="Card Management">
+                  <View style={styles.adminNotice}>
+                    <View style={styles.adminNoticeIconWrap}>
+                      <Lock
+                        color={colors.warning}
+                        size={16}
+                        strokeWidth={2.2}
+                      />
+                    </View>
+                    <View style={styles.adminNoticeCopy}>
+                      <Text style={styles.adminNoticeTitle}>
+                        Admin Access Required
+                      </Text>
+                      <Text style={styles.adminNoticeText}>
+                        Registering, replacing, and revoking cards can only be
+                        performed by an admin user.
+                      </Text>
+                    </View>
+                  </View>
+                </SectionCard>
+              )}
+            </View>
+          </>
+        )}
+        <View
+          style={{
+            height: 32,
+          }}
+        />
+      </AppRefreshableScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  /* ── Sheet affordances ── */
+  dragHandle: {
+    alignSelf: "center",
+    backgroundColor: colors.border,
+    borderRadius: radius.pill,
+    height: 4,
+    marginTop: spacing.sm,
+    width: 40,
+  },
+
+  sheetHeader: {
+    gap: spacing.xs,
+    paddingBottom: spacing.md,
+  },
+  backButton: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 2,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  backButtonPressed: {
+    opacity: 0.65,
+  },
+  backButtonText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xs,
+    fontWeight: "800",
+  },
+  eyebrow: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+  },
+  title: {
+    color: colors.text,
+    fontSize: fontSizes.xl,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
+
+  /* ── Scroll ── */
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xxl + 32,
+  },
+
+  /* ── NFC card section ── */
+  cardSection: {
+    gap: spacing.md,
+  },
+  sectionLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+  },
+
+  virtualCard: {
+    borderRadius: radius.xl,
+    gap: spacing.lg,
+    padding: spacing.xl,
+  },
+  virtualCardEmpty: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderStyle: "dashed",
+    borderWidth: 2,
+    justifyContent: "center",
+    paddingVertical: spacing.xxxl,
+  },
+  virtualCardEmptyText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
+    marginTop: spacing.sm,
+  },
+  virtualCardTop: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  statusBadge: {
+    alignItems: "center",
+    borderRadius: radius.pill,
+    flexDirection: "row",
+    gap: 5,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  statusBadgeLabel: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  virtualCardBottom: {
+    gap: spacing.xs,
+    paddingTop: spacing.md,
+  },
+  virtualCardUid: {
+    fontSize: fontSizes.xl,
+    fontWeight: "800",
+    letterSpacing: 2,
+  },
+  virtualCardDate: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    fontWeight: "600",
+  },
+
+  /* ── Actions ── */
+  actionsContainer: {
+    paddingTop: spacing.md,
+  },
+  actionRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  actionFlex: {
+    flex: 1,
+  },
+  adminNotice: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  adminNoticeIconWrap: {
+    alignItems: "center",
+    backgroundColor: colors.warningSoft,
+    borderRadius: radius.pill,
+    height: 32,
+    justifyContent: "center",
+    width: 32,
+  },
+  adminNoticeCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  adminNoticeTitle: {
+    color: colors.text,
+    fontSize: fontSizes.sm,
+    fontWeight: "800",
+  },
+  adminNoticeText: {
+    color: colors.textMuted,
+    fontSize: fontSizes.sm,
+    lineHeight: 20,
+  },
+});
