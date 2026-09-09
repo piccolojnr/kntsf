@@ -115,6 +115,39 @@ test('duplicate active UID is rejected', function () {
     expect(NfcCard::query()->count())->toBe(1);
 });
 
+test('a deleted NFC card UID can be assigned to another student', function () {
+    $user = nfcUserWithRole('admin');
+    $firstStudent = Student::factory()->create();
+    $nextStudent = Student::factory()->create();
+    $uid = '04:A1:B2:C3:DA';
+
+    $this->actingAs($user)
+        ->post(route('nfc-cards.store'), [
+            'student_id' => $firstStudent->id,
+            'uid' => $uid,
+        ])
+        ->assertRedirect();
+
+    $deletedCard = NfcCard::query()->firstOrFail();
+
+    $this->actingAs($user)
+        ->delete(route('nfc-cards.destroy', $deletedCard))
+        ->assertRedirect(route('nfc-cards.index'));
+
+    expect($deletedCard->refresh()->trashed())->toBeTrue();
+
+    $this->actingAs($user)
+        ->post(route('nfc-cards.store'), [
+            'student_id' => $nextStudent->id,
+            'uid' => $uid,
+        ])
+        ->assertRedirect();
+
+    expect(NfcCard::query()->count())->toBe(1)
+        ->and(NfcCard::withTrashed()->count())->toBe(2)
+        ->and(NfcCard::query()->firstOrFail()->student_id)->toBe($nextStudent->id);
+});
+
 test('one student cannot have two active cards', function () {
     $student = Student::factory()->create();
 
