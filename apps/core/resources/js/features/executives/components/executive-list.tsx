@@ -1,0 +1,208 @@
+import { Form, Link } from '@inertiajs/react';
+import { Eye, KeyRound, Power, PowerOff, Trash2 } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
+import { Button } from '@/components/ui/button';
+import {
+    activate,
+    deactivate,
+    destroy,
+    sendSetupLink,
+    show,
+} from '@/routes/executives';
+import type { Executive, ExecutiveOptions, Paginated } from '../types';
+import { ExecutiveFormDialog } from './executive-form-dialog';
+import { ExecutiveStatusBadge } from './executive-status-badge';
+
+export function ExecutiveList({
+    executives,
+    options,
+    can,
+}: {
+    executives: Paginated<Executive>;
+    options: ExecutiveOptions;
+    can: { update: boolean; delete: boolean; activate: boolean };
+}) {
+    if (executives.data.length === 0) {
+        return (
+            <div className="rounded-[1rem] border border-dashed border-app-border bg-app-surface-muted p-10 text-center">
+                <p className="text-sm font-semibold text-app-ink">
+                    No executives found
+                </p>
+                <p className="mt-1 text-sm text-app-muted">
+                    Create an executive account or adjust the search.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="overflow-hidden rounded-[1rem] border border-app-border bg-app-surface">
+            <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-[920px] text-sm">
+                    <thead className="border-b border-app-border bg-app-surface-muted text-xs text-app-muted">
+                        <tr>
+                            <th className="px-4 py-3 text-left font-medium">
+                                Executive
+                            </th>
+                            <th className="px-4 py-3 text-left font-medium">
+                                Role
+                            </th>
+                            <th className="px-4 py-3 text-left font-medium">
+                                Position
+                            </th>
+                            <th className="px-4 py-3 text-left font-medium">
+                                Status
+                            </th>
+                            <th className="px-4 py-3 text-right font-medium">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-app-border">
+                        {executives.data.map((executive) => (
+                            <tr
+                                key={executive.id}
+                                className="bg-app-surface transition duration-200 hover:bg-app-surface-muted"
+                            >
+                                <td className="px-4 py-3">
+                                    <p className="font-semibold text-app-ink">
+                                        {executive.name}
+                                    </p>
+                                    <p className="text-xs text-app-muted">
+                                        {executive.email}
+                                    </p>
+                                </td>
+                                <td className="px-4 py-3">
+                                    {executive.roles
+                                        .map((role) => role.label)
+                                        .join(', ')}
+                                </td>
+                                <td className="px-4 py-3">
+                                    {executive.profile?.position ?? 'Not set'}
+                                </td>
+                                <td className="px-4 py-3">
+                                    <ExecutiveStatusBadge
+                                        executive={executive}
+                                    />
+                                </td>
+                                <td className="px-4 py-3">
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            variant="ghost"
+                                        >
+                                            <Link href={show(executive.id)}>
+                                                <Eye />
+                                                View
+                                            </Link>
+                                        </Button>
+                                        {can.update && (
+                                            <>
+                                                <ExecutiveFormDialog
+                                                    executive={executive}
+                                                    options={options}
+                                                    trigger={
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    }
+                                                />
+                                                <Form
+                                                    {...sendSetupLink.form(
+                                                        executive.id,
+                                                    )}
+                                                    options={{
+                                                        preserveScroll: true,
+                                                    }}
+                                                >
+                                                    {({ processing }) => (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                        >
+                                                            <KeyRound />
+                                                            Setup
+                                                        </Button>
+                                                    )}
+                                                </Form>
+                                            </>
+                                        )}
+                                        {can.activate &&
+                                            (executive.is_active ? (
+                                                <ConfirmActionDialog
+                                                    form={deactivate.form(
+                                                        executive.id,
+                                                    )}
+                                                    title="Deactivate executive?"
+                                                    description={`This will prevent ${executive.name} from using the dashboard until reactivated.`}
+                                                    confirmLabel="Deactivate"
+                                                    variant="outline"
+                                                    trigger={
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                        >
+                                                            <PowerOff />
+                                                            Deactivate
+                                                        </Button>
+                                                    }
+                                                />
+                                            ) : (
+                                                <Form
+                                                    {...activate.form(
+                                                        executive.id,
+                                                    )}
+                                                    options={{
+                                                        preserveScroll: true,
+                                                    }}
+                                                >
+                                                    {({ processing }) => (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                        >
+                                                            <Power />
+                                                            Activate
+                                                        </Button>
+                                                    )}
+                                                </Form>
+                                            ))}
+                                        {can.delete && (
+                                            <ConfirmActionDialog
+                                                form={destroy.form(
+                                                    executive.id,
+                                                )}
+                                                title="Delete executive?"
+                                                description={`This will delete ${executive.name}'s executive account. This cannot be used on protected accounts.`}
+                                                confirmLabel="Delete executive"
+                                                trigger={
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                    >
+                                                        <Trash2 />
+                                                        Delete
+                                                    </Button>
+                                                }
+                                            />
+                                        )}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}

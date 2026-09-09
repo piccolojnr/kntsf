@@ -1,0 +1,253 @@
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, Ban, CheckCircle2, Trash2, XCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog';
+import Heading from '@/components/shared/heading';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { PaymentStatusBadge } from '@/features/payments/components/payment-status-badge';
+import { PaymentStatusDialog } from '@/features/payments/components/payment-status-dialog';
+import type { Payment, PaymentOptions } from '@/features/payments/types';
+import { destroy, index } from '@/routes/payments';
+import { show as showPermitRequest } from '@/routes/permit-requests';
+
+export default function PaymentShow({
+    payment,
+    options,
+    can,
+}: {
+    payment: Payment;
+    options: PaymentOptions;
+    can: { manage: boolean };
+}) {
+    return (
+        <>
+            <Head title={payment.reference} />
+
+            <div className="app-page flex h-full flex-1 flex-col gap-5 overflow-x-auto p-4 md:p-6">
+                <div className="app-panel relative overflow-hidden p-5 md:p-6">
+                    <div className="absolute right-6 bottom-6 size-24 rounded-full border border-dashed border-app-border opacity-70" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <Heading
+                            title={payment.reference}
+                            description="Payment details, linked student, and permit status."
+                        />
+
+                        <Button asChild variant="outline">
+                            <Link href={index()}>
+                                <ArrowLeft />
+                                Back to payments
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+
+                <Card className="app-panel gap-0 overflow-hidden py-0">
+                    <CardHeader className="py-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <CardTitle>Payment details</CardTitle>
+                                <CardDescription>
+                                    Manual and future gateway payment record.
+                                </CardDescription>
+                            </div>
+                            <PaymentStatusBadge payment={payment} />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-3 border-t border-app-border py-4 md:grid-cols-2">
+                        <Detail
+                            label="Amount"
+                            value={`${payment.currency} ${payment.amount}`}
+                        />
+                        <Detail label="Gateway" value={payment.gateway} />
+                        <Detail
+                            label="Paid at"
+                            value={formatDate(payment.paid_at)}
+                        />
+                        <Detail
+                            label="Verified at"
+                            value={formatDate(payment.verified_at)}
+                        />
+                        <Detail
+                            label="Student"
+                            value={`${payment.student.name ?? 'Unnamed student'} (${payment.student.student_number})`}
+                        />
+                        <Detail
+                            label="Permit"
+                            value={
+                                payment.permit
+                                    ? `Last 4: ${payment.permit.code_last4 ?? '----'}`
+                                    : payment.permit_request
+                                      ? 'Pending permit issuance'
+                                      : 'Not linked'
+                            }
+                        />
+                        {payment.failure_reason && (
+                            <Detail
+                                label="Failure reason"
+                                value={payment.failure_reason}
+                            />
+                        )}
+                    </CardContent>
+                </Card>
+
+                {payment.permit_request && (
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="py-4">
+                            <CardTitle>Permit request</CardTitle>
+                            <CardDescription>
+                                This payment was collected through the
+                                self-service permit request flow.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid gap-3 border-t border-app-border py-4 md:grid-cols-2">
+                            <Detail
+                                label="Request reference"
+                                value={
+                                    <Button
+                                        asChild
+                                        variant="link"
+                                        className="h-auto p-0"
+                                    >
+                                        <Link
+                                            href={showPermitRequest(
+                                                payment.permit_request.id,
+                                            )}
+                                        >
+                                            {payment.permit_request.reference}
+                                        </Link>
+                                    </Button>
+                                }
+                            />
+                            <Detail
+                                label="Request status"
+                                value={payment.permit_request.status.replaceAll(
+                                    '_',
+                                    ' ',
+                                )}
+                            />
+                            <Detail
+                                label="Review status"
+                                value={
+                                    payment.permit_request.review_status
+                                        ? payment.permit_request.review_status.replaceAll(
+                                              '_',
+                                              ' ',
+                                          )
+                                        : 'Not required'
+                                }
+                            />
+                            <Detail
+                                label="Issuance state"
+                                value={
+                                    payment.permit
+                                        ? 'Permit issued'
+                                        : payment.permit_request
+                                                .requires_review &&
+                                            payment.permit_request
+                                                .review_status ===
+                                                'pending_review'
+                                          ? 'Waiting for student review approval'
+                                          : 'Waiting for permit issuance'
+                                }
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {can.manage && (
+                    <Card className="app-panel gap-0 overflow-hidden py-0">
+                        <CardHeader className="py-4">
+                            <CardTitle>Actions</CardTitle>
+                            <CardDescription>
+                                Admin-only payment status updates.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-wrap gap-2 border-t border-app-border py-4">
+                            {payment.status === 'pending' && (
+                                <>
+                                    <PaymentStatusDialog
+                                        payment={payment}
+                                        options={options}
+                                        action="success"
+                                        trigger={
+                                            <Button>
+                                                <CheckCircle2 />
+                                                Mark successful
+                                            </Button>
+                                        }
+                                    />
+                                    <PaymentStatusDialog
+                                        payment={payment}
+                                        options={options}
+                                        action="failed"
+                                        trigger={
+                                            <Button variant="outline">
+                                                <XCircle />
+                                                Mark failed
+                                            </Button>
+                                        }
+                                    />
+                                    <PaymentStatusDialog
+                                        payment={payment}
+                                        options={options}
+                                        action="cancel"
+                                        trigger={
+                                            <Button variant="outline">
+                                                <Ban />
+                                                Cancel payment
+                                            </Button>
+                                        }
+                                    />
+                                </>
+                            )}
+
+                            <ConfirmActionDialog
+                                form={destroy.form(payment.id)}
+                                title="Delete payment?"
+                                description={`This will remove payment ${payment.reference} from normal payment records. This is a destructive action.`}
+                                confirmLabel="Delete payment"
+                                trigger={
+                                    <Button variant="destructive">
+                                        <Trash2 />
+                                        Delete
+                                    </Button>
+                                }
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+            </div>
+        </>
+    );
+}
+
+function Detail({ label, value }: { label: string; value: ReactNode }) {
+    return (
+        <div className="app-panel-muted p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-app-muted uppercase">
+                {label}
+            </p>
+            <p className="mt-1 font-semibold text-app-ink">{value}</p>
+        </div>
+    );
+}
+
+function formatDate(value: string | null) {
+    return value === null ? 'Not set' : new Date(value).toLocaleString();
+}
+
+PaymentShow.layout = {
+    breadcrumbs: [
+        {
+            title: 'Payments',
+            href: index(),
+        },
+    ],
+};

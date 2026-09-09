@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Support\ContentSettings;
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+use Throwable;
+
+class HandleInertiaRequests extends Middleware
+{
+    /**
+     * The root template that's loaded on the first page visit.
+     *
+     * @see https://inertiajs.com/server-side-setup#root-template
+     *
+     * @var string
+     */
+    protected $rootView = 'app';
+
+    /**
+     * Determines the current asset version.
+     *
+     * @see https://inertiajs.com/asset-versioning
+     */
+    public function version(Request $request): ?string
+    {
+        return parent::version($request);
+    }
+
+    /**
+     * Define the props that are shared by default.
+     *
+     * @see https://inertiajs.com/shared-data
+     *
+     * @return array<string, mixed>
+     */
+    public function share(Request $request): array
+    {
+        $user = $request->user();
+
+        return [
+            ...parent::share($request),
+            'name' => config('app.name'),
+            'auth' => [
+                'user' => $user === null ? null : [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar' => $user->avatar ?? null,
+                    'email_verified_at' => $user->email_verified_at,
+                    'is_active' => $user->is_active,
+                    'two_factor_enabled' => $user->two_factor_secret !== null,
+                    'roles' => $user->getRoleNames()->values(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->values(),
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                ],
+            ],
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'publicContent' => fn (): array => $this->publicContent(),
+        ];
+    }
+
+    /**
+     * @return array{news: bool, events: bool, documents: bool}
+     */
+    private function publicContent(): array
+    {
+        $contentSettings = app(ContentSettings::class);
+
+        try {
+            $settings = $contentSettings->all();
+        } catch (Throwable) {
+            $settings = $contentSettings->defaults();
+        }
+
+        return [
+            'news' => $settings['allow_public_news'],
+            'events' => $settings['allow_public_events'],
+            'documents' => $settings['allow_public_documents'],
+        ];
+    }
+}

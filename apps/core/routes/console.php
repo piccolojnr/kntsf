@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+
+Schedule::command('sanctum:prune-expired --hours=24')
+    ->daily()
+    ->withoutOverlapping();
+
+Schedule::command('queue:prune-failed --hours=168')
+    ->daily()
+    ->withoutOverlapping();
+
+Schedule::command('queue:prune-batches --hours=168 --unfinished=336 --cancelled=336')
+    ->daily()
+    ->withoutOverlapping();
+
+Schedule::command('permits:expire')
+    ->hourly()
+    ->withoutOverlapping();
+
+Schedule::command('permit-requests:expire')
+    ->hourly()
+    ->withoutOverlapping();

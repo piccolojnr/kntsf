@@ -1,0 +1,192 @@
+import { Head, Link, usePage } from '@inertiajs/react';
+import {
+    ArrowRight,
+    BadgeCheck,
+    BookOpen,
+    CreditCard,
+    ShieldCheck,
+    UsersRound,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { dashboard, login } from '@/routes';
+import type { SharedPageProps } from '@/types';
+
+export default function Welcome() {
+    const { auth } = usePage<SharedPageProps>().props;
+
+    return (
+        <>
+            <Head title="Welcome" />
+
+            <main className="app-page min-h-screen">
+                <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
+                    <Link
+                        href={auth.user ? dashboard() : login()}
+                        className="flex items-center gap-3"
+                    >
+                        <div className="flex size-9 items-center justify-center rounded-md bg-app-ink text-app-surface">
+                            <ShieldCheck className="size-5" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold">KUC SRC</p>
+                            <p className="text-xs text-app-muted">
+                                Student operations
+                            </p>
+                        </div>
+                    </Link>
+
+                    <nav className="flex items-center gap-2 text-sm">
+                        {auth.user ? (
+                            <Link
+                                href={dashboard()}
+                                className={cn(
+                                    buttonVariants({
+                                        variant: 'outline',
+                                        size: 'default',
+                                    }),
+                                    'gap-2',
+                                )}
+                            >
+                                Dashboard
+                                <ArrowRight className="size-4" />
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    href={login()}
+                                    className={buttonVariants({
+                                        variant: 'ghost',
+                                        size: 'default',
+                                    })}
+                                >
+                                    Log in
+                                </Link>
+                            </>
+                        )}
+                    </nav>
+                </header>
+
+                <section className="mx-auto grid min-h-[calc(100vh-76px)] w-full max-w-6xl items-center gap-10 px-6 py-10 lg:grid-cols-[0.92fr_1.08fr]">
+                    <div className="max-w-2xl">
+                        <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-app-border bg-app-surface px-3 py-1.5 text-xs font-medium text-app-muted">
+                            <BadgeCheck className="size-4 text-app-teal" />
+                            Foundation ready for student records
+                        </div>
+                        <h1 className="max-w-xl text-4xl font-semibold tracking-normal text-balance md:text-5xl">
+                            Student records, account activation, and campus
+                            operations in one workspace.
+                        </h1>
+                        <p className="mt-5 max-w-xl text-base leading-7 text-app-muted">
+                            Manage student profiles now, then layer in permits,
+                            NFC verification, payments, events, and reporting as
+                            the system grows.
+                        </p>
+
+                        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                            <Link
+                                href={auth.user ? dashboard() : login()}
+                                className={cn(
+                                    buttonVariants({
+                                        variant: 'default',
+                                        size: 'default',
+                                    }),
+                                    'gap-2',
+                                )}
+                            >
+                                {auth.user ? 'Open dashboard' : 'Log in'}
+                                <ArrowRight className="size-4" />
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="app-panel p-4">
+                        <div className="mb-4 flex items-center justify-between border-b pb-4">
+                            <div>
+                                <p className="text-sm font-medium">
+                                    Operations overview
+                                </p>
+                                <p className="text-xs text-app-muted">
+                                    Current foundation modules
+                                </p>
+                            </div>
+                            <span className="rounded-md border border-app-border bg-app-surface-muted px-2 py-1 text-xs text-app-muted">
+                                Live workspace
+                            </span>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <PreviewTile
+                                icon={UsersRound}
+                                label="Students"
+                                value="Profiles and activation"
+                            />
+                            <PreviewTile
+                                icon={BookOpen}
+                                label="Courses"
+                                value="Configurable lists"
+                            />
+                            <PreviewTile
+                                icon={ShieldCheck}
+                                label="Permissions"
+                                value="Role based access"
+                            />
+                            <PreviewTile
+                                icon={CreditCard}
+                                label="Payments"
+                                value="Planned module"
+                            />
+                        </div>
+
+                        <div className="app-panel-muted mt-4 p-4">
+                            <div className="mb-3 flex items-center justify-between">
+                                <p className="text-sm font-medium">
+                                    Student activation
+                                </p>
+                                <span className="rounded-md bg-app-teal/10 px-2 py-1 text-xs font-medium text-app-teal">
+                                    Ready
+                                </span>
+                            </div>
+                            <div className="space-y-2">
+                                {[
+                                    'Create profile',
+                                    'Link user account',
+                                    'Send setup password link',
+                                ].map((item) => (
+                                    <div
+                                        key={item}
+                                        className="flex items-center gap-2 text-sm"
+                                    >
+                                        <BadgeCheck className="size-4 text-app-teal" />
+                                        <span>{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </>
+    );
+}
+
+function PreviewTile({
+    icon: Icon,
+    label,
+    value,
+}: {
+    icon: LucideIcon;
+    label: string;
+    value: string;
+}) {
+    return (
+        <div className="rounded-md border border-app-border bg-app-surface p-4">
+            <div className="mb-3 flex size-9 items-center justify-center rounded-md bg-app-surface-muted text-app-muted">
+                <Icon className="size-5" />
+            </div>
+            <p className="text-sm font-medium">{label}</p>
+            <p className="mt-1 text-xs text-app-muted">{value}</p>
+        </div>
+    );
+}

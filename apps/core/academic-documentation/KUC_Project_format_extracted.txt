@@ -1,0 +1,99 @@
+=== SLIDE 1 ===
+KNUTSFORD UNIVERSITYFINAL YEAR PROJECT REPORT GUIDELINEFACULTY OF COMPUTING & DATA SCIENCE
+ByISAAC AFOAKWAH
+
+=== SLIDE 2 ===
+Front Matter Main body Back matter
+Project REPORT parts
+
+=== SLIDE 3 ===
+Front pageTitle pageDeclarationDedicationAcknowledgementAbstract
+Front matter
+7. Table of contentsa. List of tablesb. List of figures
+
+=== SLIDE 4 ===
+The front cover contains: Knutsford University must be printed Print the title of the project report in the middle of the pageThe full name of the author(s)Print the month and year of submission at the bottom
+Front page
+
+=== SLIDE 5 ===
+The title page is the first page. It consist of five blocks of words:Knutsford UniversityTitle of the projectThe full name and Index Number of the candidate preceded with ‘ BY ’ (titles such as Mr., Mrs., Reverend, etc. are not acceptableThe departments and faculty of the university to which the project is submitted as well as the purpose for which the work is required (written in lower cases)Month and Year in which the work is submitted
+Title page
+
+=== SLIDE 6 ===
+This has two declarations:Candidates declaration and Supervisor’s declarationCandidate’s DeclarationI hereby declare that this project is the result of my own original research and that no part of it has been presented for another degree in this university or elsewhere.Candidate’s signature: ..………………..	Date:………………..Name: candidates’ name printed
+declaration
+
+=== SLIDE 7 ===
+Supervisor’s DeclarationI hereby declare that  the preparation and presentation of the project were supervised in accordance with the guidelines on supervision of project laid down by Knutsford University.Supervisor’s signature: ..………………..	Date:………………..Name: supervisor’s name printed
+declaration
+
+=== SLIDE 8 ===
+The abstract is a brief summary that tells the reader what the report is about and what the main conclusions are. The following should be noted:It should not be more than 250 words (1/2 A4)It should not contain symbols / diagramsIt should not contain subheadings and citationsIt should not be paragraphed
+ABSTRACT
+
+=== SLIDE 9 ===
+This section provides the student with the opportunity to express gratitude to those who directly assisted the student to successfully complete the project work.These may be mentors, supervisors, organizations, officials, chiefs, and colleagues, among others.Acknowledging God/ Allah or any other supernatural powers in documents of this nature is not allowed.
+Acknowledgement
+
+=== SLIDE 10 ===
+A student may dedicate the work to a person or group although this is not a requirement. The dedication page is another acknowledgment page. It should contain at most two lines, consisting of just a few words Example: to my family, in memory of my late father , etc.
+dedication
+
+=== SLIDE 11 ===
+The title TABLE OF CONTENTS,  and not just CONTENTS, should be typed in upper cases and made bold.All chapter headings should be in upper case letters.Sub-headings should appear in title heads (first letters capitalized) and should be numbered. The corresponding pages of all headings and sub-headings should be indicated.
+Table of contents
+
+=== SLIDE 12 ===
+TABLE OF CONTENTS	Title 						PageDECLARATION						iABSTRACT							iiCHAPTER ONE	INTRODUCTION					1	1.1 Background of study					1.2 Statement of problem				3TWO	REVIEW OF RELATED LITERATURE		4	(provide appropriate subheadings )Note: The table of contents should be double spacing
+
+=== SLIDE 13 ===
+The heading LIST OF TABLES  is typed on the next page after table  of contentsThe words ‘ Table ’ and ‘ Page’ head their respective columns
+List of table
+List of figures
+This comes after List of Tables and contains the list of figures in the reportThe words ‘ figure ‘ and ‘ Page ’ head their respective columns
+
+=== SLIDE 14 ===
+The main text consists of the following:CHAPTER ONE : INTRODUCTIONCHAPTER TWO: LITERATURE AND REVIEW OF RELATED SYSTEMSCHAPTER THREE: SYSTEM ANALYSIS AND DESIGN CHAPTER FOUR: SYSTEM IMPLEMENTATIONCHAPTER FIVE:SUMMARY CONCLUSIONS AND RECOMMENDATIONSREFERENCES
+Main text/ body
+
+=== SLIDE 15 ===
+Introduction [the chapter]Background to the studyStatement of the problem Objectives [Purpose of the study]Research questions
+Chapter oneintroduction
+This chapter is made up of the following components.
+Significance of the studyScope of the studyLimitations of the studyOrganisation of the studyDefinition of terms- if any
+
+=== SLIDE 16 ===
+This chapter provides support for the study. The opening paragraph of the chapter should provide an overview of what is covered in the chapter. Appropriate sub-headings must be provided in reviewing the literatureThe chapter must be broken into sections to cover the important aspects of the review such as theoretical Framework, Technological Base and other relevant sub-headings.Review of at least two (2) similar systemsProvide summary of the major findings of the literature review.(i.e. the state of the art) indicating the linkage with your study at the end.
+Chapter twoLITERATURE AND review of related SYSTEMS
+
+=== SLIDE 17 ===
+3.1 IntroductionThis chapter explains how the system was developed. The introductory paragraph should provide an overview of what is covered in this chapter. The following sub-headings are used in this chapter:3.2 Analysis of the existing system 3.2.1 Detailed description of the existing system (what is the existing system, define its scope, how does it work)3.2.2 Challenges associated with the existing system3.2.3 Detailed definition  of the problem (System Request)
+Chapter threeSYSTEM ANALYSIS AND DESIGN
+
+=== SLIDE 18 ===
+This chapter explains how the system was developed. The introductory paragraph should provide an overview of what is covered in this chapter. The following sub-headings are used in this chapter:3.3 Analysis of the Proposed System3.3.1 Requirements of the proposed system3.3.1.1 Functional/Non-Functional requirements 3.3.1.2 User interface requirements3.3.1.3 System Requirement (Hardware Software Platform)
+Chapter threeSYSTEM ANALYSIS AND DESIGN
+
+=== SLIDE 19 ===
+This chapter explains how the system developed. The introductory paragraph should provide an overview of what is covered in this chapter. The following sub-headings are used in this chapter:3.4 Design and architecture of the Proposed  System3.4.1 Database Design (where applicable)Entity Relationship Models, Data dictionaries 3.4.2 System Logic DesignUML diagrams, DFD, flowcharts3.4.3 User interface Design3.4.4 System Test Plan
+Chapter threeSYSTEM ANALYSIS AND DESIGN
+
+=== SLIDE 20 ===
+4.1 Introduction The opening paragraph of the chapter should provide overview of what is covered in the chapter. 4.2 Programming languages/Technologies appliedJustification of above4.3 Frameworks and development platforms/ tools4.4 Coding / evidence (in the form of snippets) 4.5 Testing results/evidence (preferably in table format)4.6 Deployment (User/System Documentation)
+chapter fourSYSTEM IMPLEMENTATION
+
+=== SLIDE 21 ===
+SummaryGive an overview of the research study and methodologyProvide summary of key findings of the studyConclusionsThis section is based on the results and findingsThe researcher indicates whether the findings confirm or are inline with the project objectives
+Chapter fiveSUMMARY, CONCLUSION AND RECOMMENDATION
+
+=== SLIDE 22 ===
+What is new? What has the study brought to the fore?What is the general feeling concerning the results and findings of the study?
+Chapter five
+
+=== SLIDE 23 ===
+The American Psychological Association (APA) referencing style is usedIn all citations or quotations indicate author(s), year and page(s)Example:Nitko (2000, p.36) noted that “validity is the soundness of interpretation and use of assessment results” When a work has more than two authors, cites all authors for the first time the reference occur. In subsequent citation include only the surname of the first author followed by “et al.”
+references
+
+=== SLIDE 24 ===
+This constitute the back matter and follows after the References.There should be a fresh page with the word “APPENDICES”, centered on the page preceding the various appendices.E.g. Appendix 1: Code Snippets
+appendices
