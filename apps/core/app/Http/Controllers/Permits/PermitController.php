@@ -11,6 +11,7 @@ use App\Http\Requests\Permits\StorePermitRequest;
 use App\Models\AcademicPeriod;
 use App\Models\Permit;
 use App\Models\Student;
+use App\Support\ActiveAcademicPeriod;
 use App\Support\PermitSettings;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -192,7 +193,7 @@ class PermitController extends Controller
     private function formOptions(): array
     {
         $settings = app(PermitSettings::class)->all();
-        $activeAcademicPeriod = AcademicPeriod::query()->where('is_active', true)->first();
+        $activeAcademicPeriod = app(ActiveAcademicPeriod::class)->get();
         $startsAt = $this->defaultStartsAt($activeAcademicPeriod);
         $expiresAt = $this->defaultExpiresAt($activeAcademicPeriod, $startsAt, $settings['default_validity_days']);
 
@@ -216,7 +217,7 @@ class PermitController extends Controller
                 ->map(fn (AcademicPeriod $period): array => [
                     'id' => $period->id,
                     'label' => trim($period->name.' - '.$period->academic_year.($period->semester ? ' '.$period->semester : '')),
-                    'is_active' => $period->is_active,
+                    'is_active' => $period->is($activeAcademicPeriod),
                 ])
                 ->values()
                 ->all(),

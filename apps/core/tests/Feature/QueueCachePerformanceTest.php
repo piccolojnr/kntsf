@@ -36,6 +36,28 @@ test('active academic period cache stores only scalar id', function () {
         ->and(cache()->get(ApplicationCache::ActiveAcademicPeriod.':v1:id'))->toBe($period->id);
 });
 
+test('current dated academic period takes precedence over a future active period', function () {
+    AcademicPeriod::factory()->active()->create([
+        'starts_at' => now()->addYear()->startOfMonth(),
+        'ends_at' => now()->addYear()->endOfMonth(),
+    ]);
+    $currentPeriod = AcademicPeriod::factory()->create([
+        'starts_at' => now()->subMonth(),
+        'ends_at' => now()->addMonth(),
+    ]);
+
+    expect(app(ActiveAcademicPeriod::class)->get()?->is($currentPeriod))->toBeTrue();
+});
+
+test('active academic period remains the fallback when no period contains today', function () {
+    $futurePeriod = AcademicPeriod::factory()->active()->create([
+        'starts_at' => now()->addYear()->startOfMonth(),
+        'ends_at' => now()->addYear()->endOfMonth(),
+    ]);
+
+    expect(app(ActiveAcademicPeriod::class)->get()?->is($futurePeriod))->toBeTrue();
+});
+
 test('health endpoints respond with lightweight status data', function () {
     $this->get('/up')->assertOk();
 
