@@ -46,10 +46,10 @@ class ActiveAcademicPeriod
             },
         );
 
-        if (! is_int($activeAcademicPeriodId)) {
+        if (! is_int($activeAcademicPeriodId) && ! ctype_digit((string) $activeAcademicPeriodId)) {
             return null;
         }
 
-        return AcademicPeriod::query()->find($activeAcademicPeriodId);
+        return AcademicPeriod::query()->find((int) $activeAcademicPeriodId);
     }
 }

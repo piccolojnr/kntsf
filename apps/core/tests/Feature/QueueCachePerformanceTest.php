@@ -36,6 +36,14 @@ test('active academic period cache stores only scalar id', function () {
         ->and(cache()->get(ApplicationCache::ActiveAcademicPeriod.':v1:id'))->toBe($period->id);
 });
 
+test('active academic period accepts a numeric string id returned by redis', function () {
+    $period = AcademicPeriod::factory()->active()->create();
+
+    cache()->put(ApplicationCache::ActiveAcademicPeriod.':v1:id', (string) $period->id, 300);
+
+    expect(app(ActiveAcademicPeriod::class)->get()?->is($period))->toBeTrue();
+});
+
 test('current dated academic period takes precedence over a future active period', function () {
     AcademicPeriod::factory()->active()->create([
         'starts_at' => now()->addYear()->startOfMonth(),
